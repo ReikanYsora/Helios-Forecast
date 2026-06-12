@@ -1,0 +1,41 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  hassfest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hacs/action@main
+        with:
+          category: integration
+          ignore: brands
+
+  import-check:
+    # Installs Home Assistant and imports the HA-coupled modules, so a wrong API
+    # name or import surfaces in CI rather than only when a user loads the card.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install homeassistant
+      - run: |
+          python - <<'PY'
+          import importlib
+          mods = ["__init__", "coordinator", "sensor", "energy", "websocket", "config_flow", "config", "summary"]
+          for m in mods:
+              importlib.import_module(f"custom_components.helios_forecast.{m}")
+          print("imports ok:", ", ".join(mods))
+          PY

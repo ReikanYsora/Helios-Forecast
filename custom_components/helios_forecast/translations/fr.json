@@ -1,0 +1,84 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Position et limite de l'onduleur. Laissez la position vide pour utiliser le domicile configuré dans Home Assistant.",
+        "data": {
+          "name": "Nom",
+          "latitude": "Latitude (optionnel)",
+          "longitude": "Longitude (optionnel)",
+          "inverter_max_kw": "Puissance max de l'onduleur (kW, optionnel)",
+          "production_entity": "Capteur de production PV (pour la correction apprise)",
+          "battery_soc_entity": "Capteur de niveau de charge batterie (optionnel)",
+          "inverter_cutoff_soc": "SoC de coupure onduleur % (optionnel)"
+        }
+      },
+      "array": {
+        "title": "Champ de panneaux",
+        "description": "Un groupe de panneaux de même orientation. Ajoutez-en d'autres à l'écran suivant si vos panneaux sont orientés différemment.",
+        "data": {
+          "tilt": "Inclinaison (degrés, 0 = à plat, 90 = vertical)",
+          "azimuth": "Azimut (degrés depuis le nord, 90 = est, 180 = sud, 270 = ouest)",
+          "kwp": "Puissance crête (kWc)",
+          "tracker": "Suiveur solaire",
+          "latitude": "Latitude des panneaux (remplacement optionnel)",
+          "longitude": "Longitude des panneaux (remplacement optionnel)"
+        }
+      },
+      "menu": {
+        "title": "Champs de panneaux",
+        "description": "Ajoutez un autre champ, ou terminez la configuration.",
+        "menu_options": {
+          "add_array": "Ajouter un autre champ",
+          "finish": "Terminer"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Ajoutez un champ de panneaux, modifiez les réglages, ou enregistrez.",
+        "menu_options": {
+          "add_array": "Ajouter un champ de panneaux",
+          "settings": "Modifier les réglages",
+          "save": "Enregistrer et terminer"
+        }
+      },
+      "add_array": {
+        "title": "Ajouter un champ de panneaux",
+        "data": {
+          "tilt": "Inclinaison (degrés, 0 = à plat, 90 = vertical)",
+          "azimuth": "Azimut (degrés depuis le nord, 90 = est, 180 = sud, 270 = ouest)",
+          "kwp": "Puissance crête (kWc)",
+          "latitude": "Latitude des panneaux (remplacement optionnel)",
+          "longitude": "Longitude des panneaux (remplacement optionnel)",
+          "tracker": "Suiveur solaire"
+        }
+      },
+      "settings": {
+        "title": "Réglages",
+        "data": {
+          "inverter_max_kw": "Puissance max de l'onduleur (kW, optionnel)",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "production_entity": "Capteur de production PV (pour la correction apprise)",
+          "battery_soc_entity": "Capteur de niveau de charge batterie (optionnel)",
+          "inverter_cutoff_soc": "SoC de coupure onduleur % (optionnel)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Aucun (fixe)",
+        "dual-axis": "Deux axes (suit le soleil)",
+        "single-axis-h": "Un axe horizontal (l'inclinaison suit)",
+        "single-axis-v": "Un axe vertical (l'azimut suit)"
+      }
+    }
+  }
+}

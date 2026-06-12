@@ -1,0 +1,818 @@
+[
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 0,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 0,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": null,
+    "expected": 0
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 0,
+    "panel": null,
+    "ctx": null,
+    "expected": 92.87504255394762
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 100,
+    "panel": null,
+    "ctx": null,
+    "expected": 23.218760638486906
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 20,
+    "panel": null,
+    "ctx": {
+      "shading": true
+    },
+    "expected": 23.145578974005964
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 0,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": null,
+    "expected": 100
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 40,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": null,
+    "expected": 97.39354691045592
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 100,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": null,
+    "expected": 21.97447100602009
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 30,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 600
+    },
+    "expected": 65.32492147446814
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 30,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 650,
+      "directWm2": 400,
+      "diffuseWm2": 150
+    },
+    "expected": 69.56710037563674
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 30,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "poaWm2": 720
+    },
+    "expected": 72
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 30,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "poaWm2": 720,
+      "ghiWm2": 650,
+      "directWm2": 400,
+      "diffuseWm2": 150,
+      "shading": true
+    },
+    "expected": 17.410605499854128
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 10,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 850,
+      "directWm2": 600,
+      "diffuseWm2": 120,
+      "airTempC": 32,
+      "windMs": 1.5
+    },
+    "expected": 81.98413980644831
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 10,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 300,
+      "directWm2": 180,
+      "diffuseWm2": 60,
+      "airTempC": -5,
+      "windMs": 4
+    },
+    "expected": 65.95979978545388
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 8,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 10,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180,
+      "tracker": "dual-axis"
+    },
+    "ctx": {
+      "ghiWm2": 700
+    },
+    "expected": 100
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 8,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 10,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180,
+      "tracker": "single-axis-h"
+    },
+    "ctx": {
+      "ghiWm2": 700
+    },
+    "expected": 55.87309667399305
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 8,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 10,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180,
+      "tracker": "single-axis-v"
+    },
+    "ctx": {
+      "ghiWm2": 700
+    },
+    "expected": 99.95236576332427
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 10,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180,
+      "tracker": "dual-axis"
+    },
+    "ctx": {
+      "ghiWm2": 700
+    },
+    "expected": 76.5597500542971
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 10,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180,
+      "tracker": "single-axis-h"
+    },
+    "ctx": {
+      "ghiWm2": 700
+    },
+    "expected": 76.52634301969867
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 10,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180,
+      "tracker": "single-axis-v"
+    },
+    "ctx": {
+      "ghiWm2": 700
+    },
+    "expected": 76.41626674829318
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 16,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 10,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180,
+      "tracker": "dual-axis"
+    },
+    "ctx": {
+      "ghiWm2": 700
+    },
+    "expected": 100
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 16,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 10,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180,
+      "tracker": "single-axis-h"
+    },
+    "ctx": {
+      "ghiWm2": 700
+    },
+    "expected": 51.11750779732951
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 16,
+    "lat": 48.85,
+    "lon": 2.35,
+    "cloud": 10,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180,
+      "tracker": "single-axis-v"
+    },
+    "ctx": {
+      "ghiWm2": 700
+    },
+    "expected": 100
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 6,
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 54.96120000000001
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 9,
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 54.96120000000001
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 54.96120000000001
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 15,
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 54.96120000000001
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 18,
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 54.96120000000001
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "day": 21,
+    "hour": 6,
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 0
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "day": 21,
+    "hour": 9,
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 54.96120000000001
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "day": 21,
+    "hour": 12,
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 54.96120000000001
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "day": 21,
+    "hour": 15,
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 54.96120000000001
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "day": 21,
+    "hour": 18,
+    "lat": 48.8566,
+    "lon": 2.3522,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 0
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 6,
+    "lat": -27.47,
+    "lon": 153.02,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 54.96120000000001
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 9,
+    "lat": -27.47,
+    "lon": 153.02,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 0
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 12,
+    "lat": -27.47,
+    "lon": 153.02,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 0
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 15,
+    "lat": -27.47,
+    "lon": 153.02,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 0
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "day": 21,
+    "hour": 18,
+    "lat": -27.47,
+    "lon": 153.02,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 0
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "day": 21,
+    "hour": 6,
+    "lat": -27.47,
+    "lon": 153.02,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 54.96120000000001
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "day": 21,
+    "hour": 9,
+    "lat": -27.47,
+    "lon": 153.02,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 0
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "day": 21,
+    "hour": 12,
+    "lat": -27.47,
+    "lon": 153.02,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 0
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "day": 21,
+    "hour": 15,
+    "lat": -27.47,
+    "lon": 153.02,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 0
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "day": 21,
+    "hour": 18,
+    "lat": -27.47,
+    "lon": 153.02,
+    "cloud": 35,
+    "panel": {
+      "tiltDeg": 30,
+      "azimuthDeg": 180
+    },
+    "ctx": {
+      "ghiWm2": 500,
+      "directWm2": 320,
+      "diffuseWm2": 140,
+      "airTempC": 18,
+      "windMs": 3,
+      "poaWm2": 560
+    },
+    "expected": 0
+  }
+]
