@@ -24,6 +24,9 @@ CONF_ARRAYS = "arrays"
 CONF_PRODUCTION_ENTITY = "production_entity"
 CONF_BATTERY_SOC_ENTITY = "battery_soc_entity"
 CONF_INVERTER_CUTOFF_SOC = "inverter_cutoff_soc"
+# Today-trend reference anchor (local hour at which the day's reference is frozen).
+CONF_TREND_ANCHOR_HOUR = "trend_anchor_hour"
+DEFAULT_TREND_ANCHOR_HOUR = 6
 # Per-array keys.
 CONF_TILT = "tilt"
 CONF_AZIMUTH = "azimuth"
@@ -106,3 +109,11 @@ def learning_from_config(
     soc = data.get(CONF_BATTERY_SOC_ENTITY) or None
     cutoff = _as_float(data.get(CONF_INVERTER_CUTOFF_SOC))
     return production, soc, cutoff
+
+
+def trend_anchor_hour_from_config(data: Dict[str, Any]) -> int:
+    """Local hour (0-23) at which today's trend reference is frozen, default 06:00."""
+    h = _as_float(data.get(CONF_TREND_ANCHOR_HOUR))
+    if h is None:
+        return DEFAULT_TREND_ANCHOR_HOUR
+    return int(max(0, min(23, h)))

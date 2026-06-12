@@ -23,6 +23,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 
@@ -31,8 +32,10 @@ from .config import (
     layout_from_config,
     learning_from_config,
     location_from_config,
+    trend_anchor_hour_from_config,
 )
 from .analog import build_library, enrich_points
+from .trend import TodayTrend, TrendReference, compute_trend, should_capture
 from .const import DOMAIN
 from .forecast import ForecastPoint, build_forecast_series
 from .openmeteo import GtiSeries, WeatherSeries, fetch_gti, fetch_weather
@@ -74,6 +77,9 @@ class ForecastData:
     # Forecast reliability index (0..100) and its components, feeds the
     # reliability sensor.
     reliability: Reliability
+    # Today's outlook versus its frozen daily reference (default 06:00), feeds
+    # the today-trend sensor.
+    trend: TodayTrend
 
 
 class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
@@ -97,6 +103,11 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # Production history (recorder change buckets) from the most recent refresh, kept so the
         # reliability index can reuse it without a second recorder fetch.
         self._production_buckets: List[ProductionBucket] = []
+        # Persisted today-trend reference (frozen daily snapshot of the predicted total). Survives
+        # restarts so the morning anchor is not lost when HA restarts mid-day.
+        self._trend_store: Store = Store(hass, 1, f"{DOMAIN}.{entry.entry_id}.trend")
+        self._trend_ref: Optional[TrendReference] = None
+        self._trend_loaded = False
 
     def _config(self) -> Dict[str, Any]:
         return {**self.entry.data, **self.entry.options}
@@ -172,7 +183,42 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             self._production_buckets, self.archive_points, weather, now, dt_util.DEFAULT_TIME_ZONE
         )
 
-        return ForecastData(points=points, summary=summary, observed=observed, reliability=reliability)
+        trend = await self._today_trend(data, now, summary)
+
+        return ForecastData(
+            points=points, summary=summary, observed=observed, reliability=reliability, trend=trend
+        )
+
+    async def _today_trend(self, data, now, summary) -> TodayTrend:
+        """Today's predicted total versus its frozen daily reference (default 06:00).
+
+        The reference is captured once per day at the first refresh at/after the anchor hour and
+        persisted, so it survives restarts; the trend is the current total minus that reference."""
+        today_date = now.date().isoformat()
+        current = summary.days[0].energy_kwh if summary.days else 0.0
+
+        if not self._trend_loaded:
+            stored = await self._trend_store.async_load()
+            if stored and stored.get("date") and stored.get("captured_at"):
+                self._trend_ref = TrendReference(
+                    date=stored["date"],
+                    kwh=float(stored["kwh"]),
+                    captured_at=dt_util.parse_datetime(stored["captured_at"]),
+                )
+            self._trend_loaded = True
+
+        anchor = trend_anchor_hour_from_config(data)
+        if should_capture(self._trend_ref, today_date, now, anchor):
+            self._trend_ref = TrendReference(date=today_date, kwh=current, captured_at=dt_util.utcnow())
+            await self._trend_store.async_save(
+                {
+                    "date": today_date,
+                    "kwh": current,
+                    "captured_at": self._trend_ref.captured_at.isoformat(),
+                }
+            )
+
+        return compute_trend(self._trend_ref, current, today_date)
 
     @callback
     def write_weather_statistics(self, now: datetime) -> None:

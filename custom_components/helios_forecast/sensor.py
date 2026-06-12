@@ -176,6 +176,7 @@ async def async_setup_entry(
         HeliosWeatherSensor(coordinator, entry, description) for description in _build_weather_descriptions()
     ]
     entities.append(HeliosReliabilitySensor(coordinator, entry))
+    entities.append(HeliosTodayTrendSensor(coordinator, entry))
     async_add_entities(entities)
 
 
@@ -274,4 +275,40 @@ class HeliosReliabilitySensor(CoordinatorEntity[HeliosForecastCoordinator], Sens
             "today_predictability": r.today_predictability,
             "days_learned": r.days_learned,
             "per_day": r.per_day,
+        }
+
+
+class HeliosTodayTrendSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEntity):
+    """How much today's predicted total has moved since its frozen daily reference
+    (default the 06:00 snapshot). Signed kWh: positive when the day now looks better
+    than at the reference, negative when worse. Unknown before the reference is set."""
+
+    _attr_has_entity_name = True
+    _attr_name = "Today forecast trend"
+    _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_suggested_display_precision = 2
+    _attr_icon = "mdi:trending-up"
+
+    def __init__(self, coordinator: HeliosForecastCoordinator, entry: ConfigEntry) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{entry.entry_id}_today_trend"
+        self._attr_device_info = _device_info(entry)
+
+    @property
+    def native_value(self) -> Optional[float]:
+        if self.coordinator.data is None:
+            return None
+        return self.coordinator.data.trend.delta_kwh
+
+    @property
+    def extra_state_attributes(self) -> Optional[dict]:
+        if self.coordinator.data is None:
+            return None
+        t = self.coordinator.data.trend
+        return {
+            "reference_kwh": t.reference_kwh,
+            "reference_time": t.reference_time.isoformat() if t.reference_time else None,
+            "current_kwh": round(t.current_kwh, 2),
+            "direction": t.direction,
         }

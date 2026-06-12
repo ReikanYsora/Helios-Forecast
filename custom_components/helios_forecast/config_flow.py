@@ -26,12 +26,17 @@ from .config import (
     CONF_PRODUCTION_ENTITY,
     CONF_TILT,
     CONF_TRACKER,
+    CONF_TREND_ANCHOR_HOUR,
+    DEFAULT_TREND_ANCHOR_HOUR,
     TRACKER_NONE,
 )
 from .const import DOMAIN
 
 _DEFAULT_NAME = "Helios Forecast"
 _SENSOR = selector.EntitySelector(selector.EntitySelectorConfig(domain="sensor"))
+_HOUR = selector.NumberSelector(
+    selector.NumberSelectorConfig(min=0, max=23, step=1, mode=selector.NumberSelectorMode.BOX)
+)
 _TRACKER = selector.SelectSelector(
     selector.SelectSelectorConfig(
         options=[TRACKER_NONE, "dual-axis", "single-axis-h", "single-axis-v"],
@@ -51,6 +56,7 @@ def _user_schema(home_lat: float, home_lon: float) -> vol.Schema:
             vol.Optional(CONF_PRODUCTION_ENTITY): _SENSOR,
             vol.Optional(CONF_BATTERY_SOC_ENTITY): _SENSOR,
             vol.Optional(CONF_INVERTER_CUTOFF_SOC): vol.Coerce(float),
+            vol.Optional(CONF_TREND_ANCHOR_HOUR, default=DEFAULT_TREND_ANCHOR_HOUR): _HOUR,
         }
     )
 
@@ -117,6 +123,7 @@ _SETTING_KEYS = (
     CONF_PRODUCTION_ENTITY,
     CONF_BATTERY_SOC_ENTITY,
     CONF_INVERTER_CUTOFF_SOC,
+    CONF_TREND_ANCHOR_HOUR,
 )
 
 
@@ -161,6 +168,7 @@ class HeliosForecastOptionsFlow(OptionsFlow):
                 vol.Optional(CONF_PRODUCTION_ENTITY, description={"suggested_value": s.get(CONF_PRODUCTION_ENTITY)}): _SENSOR,
                 vol.Optional(CONF_BATTERY_SOC_ENTITY, description={"suggested_value": s.get(CONF_BATTERY_SOC_ENTITY)}): _SENSOR,
                 vol.Optional(CONF_INVERTER_CUTOFF_SOC, description={"suggested_value": s.get(CONF_INVERTER_CUTOFF_SOC)}): vol.Coerce(float),
+                vol.Optional(CONF_TREND_ANCHOR_HOUR, description={"suggested_value": s.get(CONF_TREND_ANCHOR_HOUR, DEFAULT_TREND_ANCHOR_HOUR)}): _HOUR,
             }
         )
         return self.async_show_form(step_id="settings", data_schema=schema)
