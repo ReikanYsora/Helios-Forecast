@@ -22,8 +22,6 @@ CONF_INVERTER_MAX_KW = "inverter_max_kw"
 CONF_ARRAYS = "arrays"
 # Learning loop.
 CONF_PRODUCTION_ENTITY = "production_entity"
-CONF_BATTERY_SOC_ENTITY = "battery_soc_entity"
-CONF_INVERTER_CUTOFF_SOC = "inverter_cutoff_soc"
 # Today-trend reference anchor (local hour at which the day's reference is frozen).
 CONF_TREND_ANCHOR_HOUR = "trend_anchor_hour"
 DEFAULT_TREND_ANCHOR_HOUR = 6
@@ -97,18 +95,14 @@ def inverter_max_w_from_config(data: Dict[str, Any]) -> float:
     return kw * 1000.0 if (kw is not None and kw > 0) else INF
 
 
-def learning_from_config(
-    data: Dict[str, Any],
-) -> Tuple[Optional[str], Optional[str], Optional[float]]:
-    """The learning-loop wiring: (production entity, battery SoC entity, cutoff SoC).
+def learning_from_config(data: Dict[str, Any]) -> Optional[str]:
+    """The PV production entity that drives the learned correction, or None.
 
-    Production entity drives the learned correction; without it the forecast stays
-    uncorrected. The SoC entity + cutoff enable the inverter-cutoff guard.
+    The learning reads this entity's real production (curtailment included), so the
+    forecast tracks what the home actually harvests; without it the forecast stays
+    uncorrected.
     """
-    production = data.get(CONF_PRODUCTION_ENTITY) or None
-    soc = data.get(CONF_BATTERY_SOC_ENTITY) or None
-    cutoff = _as_float(data.get(CONF_INVERTER_CUTOFF_SOC))
-    return production, soc, cutoff
+    return data.get(CONF_PRODUCTION_ENTITY) or None
 
 
 def trend_anchor_hour_from_config(data: Dict[str, Any]) -> int:

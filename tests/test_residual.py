@@ -2,8 +2,8 @@
 
 sample_sky_residual is golden-tested against the card's sampleSkyResidual (same
 constructed map, same queries). build_sky_residual_map is checked behaviourally:
-ratio = production / model, the clamp, the inverter-cutoff guard, the
-too-little-history None, and that the forecast assembly applies the ratio.
+ratio = production / model, the clamp, the too-little-history None, and that the
+forecast assembly applies the ratio.
 """
 
 from __future__ import annotations
@@ -27,10 +27,8 @@ from custom_components.helios_forecast.solar.residual import (  # noqa: E402
     ProductionBucket,
     SkyResidualInput,
     SkyResidualMap,
-    SocBucket,
     _dt,
     _nearest_cloud_idx,
-    _soc_at_ms,
     build_sky_residual_map,
     sample_sky_residual,
 )
@@ -60,14 +58,6 @@ def test_nearest_cloud_idx() -> None:
     assert _nearest_cloud_idx(times, 16.0) == 2
     assert _nearest_cloud_idx(times, -5.0) == 0
     assert _nearest_cloud_idx([], 5.0) == -1
-
-
-def test_soc_at_ms() -> None:
-    series = [SocBucket(0, 10, 50.0), SocBucket(10, 20, 90.0)]
-    assert _soc_at_ms(series, 5) == 50.0       # inside first bucket
-    assert _soc_at_ms(series, 15) == 90.0      # inside second
-    assert _soc_at_ms(None, 5) is None
-    assert _soc_at_ms([], 5) is None
 
 
 # --- build scaffolding ----------------------------------------------------------
@@ -117,7 +107,7 @@ def _input(buckets: list[ProductionBucket], **over) -> SkyResidualInput:
         lat=_LAT, lon=_LON, layout=_layout(), production=buckets,
         cloud_times=times, cloud=w["cloud"], shortwave=w["shortwave"], direct=w["direct"],
         diffuse=w["diffuse"], temp=w["temp"], wind=w["wind"], snow=w["snow"],
-        gti_store=None, soc_series=None, cutoff_soc=None,
+        gti_store=None,
         now_ms=datetime(2026, 6, 23, tzinfo=timezone.utc).timestamp() * 1000.0,
     )
     base.update(over)
@@ -148,16 +138,6 @@ def test_ratio_clamped_high() -> None:
     sky_map = build_sky_residual_map(_input(over))
     assert sky_map is not None
     assert sky_map.global_ratio == M_MAX   # 5x clamps to the ceiling
-
-
-def test_cutoff_guard_drops_full_battery_hours() -> None:
-    buckets = _midday_buckets()
-    inp0 = _input(buckets)
-    matched = [ProductionBucket(b.start_ms, b.end_ms, _model_kwh(b, inp0)) for b in buckets]
-    # Battery full (95%) across the whole window, cutoff at 90: every hour is dropped.
-    soc = [SocBucket(b.start_ms, b.end_ms, 95.0) for b in matched]
-    sky_map = build_sky_residual_map(_input(matched, soc_series=soc, cutoff_soc=90.0))
-    assert sky_map is None   # all samples curtailed -> nothing learned
 
 
 def test_forecast_applies_ratio() -> None:

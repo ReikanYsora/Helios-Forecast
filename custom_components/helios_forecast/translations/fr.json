@@ -10,8 +10,6 @@
           "longitude": "Longitude (optionnel)",
           "inverter_max_kw": "Puissance max de l'onduleur (kW, optionnel)",
           "production_entity": "Capteur de production PV (pour la correction apprise)",
-          "battery_soc_entity": "Capteur de niveau de charge batterie (optionnel)",
-          "inverter_cutoff_soc": "SoC de coupure onduleur % (optionnel)",
           "trend_anchor_hour": "Heure de référence de la tendance du jour (0-23, défaut 6)"
         }
       },
@@ -66,8 +64,6 @@
           "latitude": "Latitude",
           "longitude": "Longitude",
           "production_entity": "Capteur de production PV (pour la correction apprise)",
-          "battery_soc_entity": "Capteur de niveau de charge batterie (optionnel)",
-          "inverter_cutoff_soc": "SoC de coupure onduleur % (optionnel)",
           "trend_anchor_hour": "Heure de référence de la tendance du jour (0-23, défaut 6)"
         }
       }

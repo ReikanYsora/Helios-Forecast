@@ -53,7 +53,6 @@ from .solar.residual import (
     LEARN_DAYS,
     ProductionBucket,
     SkyResidualInput,
-    SocBucket,
     build_sky_residual_map,
 )
 from .summary import ForecastSummary, summarize
@@ -304,18 +303,13 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
     async def _build_residual_map(self, data, lat, lon, layout, weather, store, now):
         """Learn the actual/model residual from the recorder's production history."""
         self._production_buckets = []
-        production_entity, soc_entity, cutoff = learning_from_config(data)
+        production_entity = learning_from_config(data)
         if not production_entity:
             return None
 
         learn_start = now - timedelta(days=LEARN_DAYS)
         try:
             production = await self._fetch_change_buckets(production_entity, learn_start, now)
-            soc_series = (
-                await self._fetch_mean_buckets(soc_entity, learn_start, now)
-                if (soc_entity and cutoff is not None)
-                else None
-            )
         except Exception as err:  # noqa: BLE001 - learning is best-effort, forecast still renders
             _LOGGER.warning("Helios learning history fetch failed, forecast stays uncorrected: %s", err)
             return None
@@ -330,8 +324,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 cloud_times=[t.timestamp() * 1000.0 for t in weather.times],
                 cloud=weather.cloud, shortwave=weather.shortwave, direct=weather.direct,
                 diffuse=weather.diffuse, temp=weather.temp, wind=weather.wind, snow=weather.snow,
-                gti_store=store, soc_series=soc_series, cutoff_soc=cutoff,
-                now_ms=now.timestamp() * 1000.0,
+                gti_store=store, now_ms=now.timestamp() * 1000.0,
             )
         )
 
@@ -347,12 +340,4 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             ProductionBucket(start_ms=r["start"] * 1000.0, end_ms=r["end"] * 1000.0, kwh=r["change"])
             for r in rows
             if r.get("change") is not None
-        ]
-
-    async def _fetch_mean_buckets(self, stat_id, start, end) -> List[SocBucket]:
-        rows = await self._statistics(stat_id, start, end, {"mean"}, None)
-        return [
-            SocBucket(start_ms=r["start"] * 1000.0, end_ms=r["end"] * 1000.0, mean=r["mean"])
-            for r in rows
-            if r.get("mean") is not None
         ]

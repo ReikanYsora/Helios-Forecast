@@ -10,8 +10,6 @@
           "longitude": "Longitude (optional)",
           "inverter_max_kw": "Inverter max output (kW, optional)",
           "production_entity": "PV production sensor (for the learned correction)",
-          "battery_soc_entity": "Battery state-of-charge sensor (optional)",
-          "inverter_cutoff_soc": "Inverter cutoff SoC % (optional)",
           "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)"
         }
       },
@@ -66,8 +64,6 @@
           "latitude": "Latitude",
           "longitude": "Longitude",
           "production_entity": "PV production sensor (for the learned correction)",
-          "battery_soc_entity": "Battery state-of-charge sensor (optional)",
-          "inverter_cutoff_soc": "Inverter cutoff SoC % (optional)",
           "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)"
         }
       }

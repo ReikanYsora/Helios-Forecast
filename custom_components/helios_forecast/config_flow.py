@@ -17,8 +17,6 @@ from homeassistant.helpers import selector
 
 from .config import (
     CONF_AZIMUTH,
-    CONF_BATTERY_SOC_ENTITY,
-    CONF_INVERTER_CUTOFF_SOC,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
     CONF_LATITUDE,
@@ -54,8 +52,6 @@ def _user_schema(home_lat: float, home_lon: float) -> vol.Schema:
             vol.Optional(CONF_LONGITUDE, description={"suggested_value": home_lon}): vol.Coerce(float),
             vol.Optional(CONF_INVERTER_MAX_KW): vol.Coerce(float),
             vol.Optional(CONF_PRODUCTION_ENTITY): _SENSOR,
-            vol.Optional(CONF_BATTERY_SOC_ENTITY): _SENSOR,
-            vol.Optional(CONF_INVERTER_CUTOFF_SOC): vol.Coerce(float),
             vol.Optional(CONF_TREND_ANCHOR_HOUR, default=DEFAULT_TREND_ANCHOR_HOUR): _HOUR,
         }
     )
@@ -121,8 +117,6 @@ _SETTING_KEYS = (
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_PRODUCTION_ENTITY,
-    CONF_BATTERY_SOC_ENTITY,
-    CONF_INVERTER_CUTOFF_SOC,
     CONF_TREND_ANCHOR_HOUR,
 )
 
@@ -166,8 +160,6 @@ class HeliosForecastOptionsFlow(OptionsFlow):
                 vol.Optional(CONF_LATITUDE, description={"suggested_value": s.get(CONF_LATITUDE, home_lat)}): vol.Coerce(float),
                 vol.Optional(CONF_LONGITUDE, description={"suggested_value": s.get(CONF_LONGITUDE, home_lon)}): vol.Coerce(float),
                 vol.Optional(CONF_PRODUCTION_ENTITY, description={"suggested_value": s.get(CONF_PRODUCTION_ENTITY)}): _SENSOR,
-                vol.Optional(CONF_BATTERY_SOC_ENTITY, description={"suggested_value": s.get(CONF_BATTERY_SOC_ENTITY)}): _SENSOR,
-                vol.Optional(CONF_INVERTER_CUTOFF_SOC, description={"suggested_value": s.get(CONF_INVERTER_CUTOFF_SOC)}): vol.Coerce(float),
                 vol.Optional(CONF_TREND_ANCHOR_HOUR, description={"suggested_value": s.get(CONF_TREND_ANCHOR_HOUR, DEFAULT_TREND_ANCHOR_HOUR)}): _HOUR,
             }
         )

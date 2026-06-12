@@ -2,10 +2,14 @@
 
 Per (sun-azimuth, sun-altitude) cell, learns the ratio between what the home
 actually produced and what the model predicted, over a rolling 60-day window,
-recency-weighted, with an inverter-cutoff guard. At forecast time the ratio
-replaces a flat scalar: forecast = model x sky-ratio(sun position). A thin cell
-leans on the global mean ratio; too little history returns None so the caller
-keeps the uncorrected forecast.
+recency-weighted. At forecast time the ratio replaces a flat scalar: forecast =
+model x sky-ratio(sun position). A thin cell leans on the global mean ratio; too
+little history returns None so the caller keeps the uncorrected forecast.
+
+The learning deliberately keeps every produced hour, including hours where a
+hybrid inverter curtailed output once the battery was full: that curtailment is
+part of what the home really harvests, so learning it pulls the forecast toward
+the realistic (curtailed) production instead of the theoretical potential.
 
 Pure, no Home Assistant imports. The map is stored as plain float lists (the card
 uses Float32Array; the values agree to single-precision).
@@ -51,15 +55,6 @@ class ProductionBucket:
 
 
 @dataclass(frozen=True)
-class SocBucket:
-    """Hourly mean battery state of charge (%)."""
-
-    start_ms: float
-    end_ms: float
-    mean: float
-
-
-@dataclass(frozen=True)
 class SkyResidualMap:
     """Learned actual/model ratio + confidence per sky cell."""
 
@@ -89,8 +84,6 @@ class SkyResidualInput:
     wind: List[float]
     snow: List[float]
     gti_store: Optional[GtiStore]
-    soc_series: Optional[List[SocBucket]]
-    cutoff_soc: Optional[float]
     now_ms: float
 
 
@@ -154,11 +147,6 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
         sun = sun_position(_dt(mid), inp.lat, inp.lon)
         if sun.altitude <= 0:
             continue
-
-        if inp.cutoff_soc is not None:
-            soc = _soc_at_ms(inp.soc_series, mid)
-            if soc is not None and soc >= inp.cutoff_soc:
-                continue
 
         ci = _nearest_cloud_idx(inp.cloud_times, mid)
         cloud = _clamp_pct(inp.cloud[ci]) if ci >= 0 else 0.0
@@ -278,22 +266,3 @@ def _nearest_cloud_idx(times: List[float], t_ms: float) -> int:
 
 def _clamp_pct(v: float) -> float:
     return max(0.0, min(100.0, v)) if math.isfinite(v) else 0.0
-
-
-def _soc_at_ms(series: Optional[List[SocBucket]], t_ms: float) -> Optional[float]:
-    """SoC at an instant from the hourly mean series, or None when absent."""
-    if not series:
-        return None
-    best = -1
-    best_dt = math.inf
-    for i in range(len(series)):
-        b = series[i]
-        if b.start_ms <= t_ms < b.end_ms:
-            return b.mean
-        dt = abs((b.start_ms + b.end_ms) / 2 - t_ms)
-        if dt < best_dt:
-            best_dt = dt
-            best = i
-        elif b.start_ms > t_ms and dt > best_dt:
-            break
-    return series[best].mean if best >= 0 else None
