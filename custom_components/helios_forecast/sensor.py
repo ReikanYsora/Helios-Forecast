@@ -91,6 +91,23 @@ def _energy(key: str, name: str, value_fn: Callable[[ForecastSummary], _ValueTyp
     )
 
 
+def _archive_energy(key: str, name: str, value_fn: Callable[[ForecastSummary], _ValueType]) -> HeliosSensorDescription:
+    # Archive entity: its purpose is the long-term mean statistics the coordinator imports
+    # (the card's past predicted-production curve). Those imported stats are entity-bound
+    # (statistic_id == entity_id), so the entity MUST carry a state_class, otherwise HA flags
+    # "entity no longer has a state class" on every statistics cycle. kWh + MEASUREMENT is valid
+    # only WITHOUT the energy device class (HA rejects energy + measurement), so we drop
+    # device_class here, the same pattern the trend sensor uses.
+    return HeliosSensorDescription(
+        key=key,
+        name=name,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        suggested_display_precision=2,
+        value_fn=value_fn,
+    )
+
+
 def _timestamp(key: str, name: str, value_fn: Callable[[ForecastSummary], _ValueType]) -> HeliosSensorDescription:
     return HeliosSensorDescription(
         key=key,
@@ -115,7 +132,7 @@ def _build_descriptions() -> list[HeliosSensorDescription]:
         # purpose is the long-term statistics the coordinator backfills (predicted production history,
         # kept by HA well beyond Open-Meteo's 60-day window so the card can draw the past forecast).
         _power("predicted_power", "Predicted power", lambda s: s.power_now_w),
-        _energy("predicted_energy", "Predicted energy", lambda s: s.energy_this_hour_kwh),
+        _archive_energy("predicted_energy", "Predicted energy", lambda s: s.energy_this_hour_kwh),
     ]
     for n in range(1, _HORIZON_DAYS + 1):
         i = n - 1

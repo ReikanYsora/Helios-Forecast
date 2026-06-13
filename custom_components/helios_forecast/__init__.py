@@ -41,9 +41,40 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator.write_weather_statistics(dt_util.utcnow())
     coordinator.write_forecast_statistics()
 
+    _purge_orphan_forecast_stats(hass, entry)
+
     entry.async_on_unload(entry.add_update_listener(_async_reload_entry))
     websocket.async_register(hass)
     return True
+
+
+def _purge_orphan_forecast_stats(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Clear long-term statistics left on the live forecast energy sensors.
+
+    Earlier versions gave these sensors a state_class, so HA recorded statistics for them. They
+    are point-in-time forecast values, not meters, and now carry no state_class, which makes HA
+    flag "entity no longer has a state class" on every statistics cycle. We clear those orphan
+    stats so testers do not have to do it by hand. predicted_energy is excluded: it is the archive
+    entity whose statistics are kept on purpose (it carries a valid state_class again). Idempotent:
+    the live sensors never regain a state_class, so this is a no-op once their stats are gone.
+    """
+    from homeassistant.components.recorder import get_instance
+    from homeassistant.helpers import entity_registry as er
+
+    live_energy_keys = [
+        "energy_today_remaining",
+        "energy_this_hour",
+        "energy_next_hour",
+        *(f"energy_day_{n}" for n in range(1, 8)),
+    ]
+    registry = er.async_get(hass)
+    stat_ids = [
+        eid
+        for key in live_energy_keys
+        if (eid := registry.async_get_entity_id("sensor", DOMAIN, f"{entry.entry_id}_{key}"))
+    ]
+    if stat_ids:
+        get_instance(hass).async_clear_statistics(stat_ids)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
