@@ -76,11 +76,15 @@ def _power(
 
 
 def _energy(key: str, name: str, value_fn: Callable[[ForecastSummary], _ValueType]) -> HeliosSensorDescription:
+    # No state_class: these are forecast values, not a metered total. The ENERGY device
+    # class forbids `measurement` (HA rejects energy + measurement), and `total` /
+    # `total_increasing` would wrongly imply an accumulating meter. The long-term
+    # statistics the card reads are written directly by the coordinator, not derived
+    # from these sensors' state_class.
     return HeliosSensorDescription(
         key=key,
         name=name,
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         suggested_display_precision=2,
         value_fn=value_fn,

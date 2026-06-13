@@ -1,13 +1,18 @@
 {
   "domain": "helios_forecast",
   "name": "Helios Forecast",
-  "codeowners": ["@ReikanYsora"],
+  "codeowners": [
+    "@ReikanYsora"
+  ],
   "config_flow": true,
-  "dependencies": ["recorder", "websocket_api"],
+  "dependencies": [
+    "recorder",
+    "websocket_api"
+  ],
   "documentation": "https://github.com/ReikanYsora/Helios-Forecast",
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/ReikanYsora/Helios-Forecast/issues",
   "requirements": [],
-  "version": "2026.7.3"
+  "version": "2026.7.4"
 }

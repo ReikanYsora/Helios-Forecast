@@ -39,9 +39,10 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Add another panel array, edit the settings, or save.",
+        "description": "Add a panel array, edit an existing one, change the settings, or save.",
         "menu_options": {
-          "add_array": "Add another panel array",
+          "add_array": "Add a panel array",
+          "edit_array": "Edit a panel array",
           "settings": "Edit settings",
           "save": "Save and finish"
         }
@@ -55,6 +56,26 @@
           "latitude": "Panel latitude (optional override)",
           "longitude": "Panel longitude (optional override)",
           "tracker": "Sun tracker"
+        }
+      },
+      "edit_array": {
+        "title": "Edit a panel array",
+        "description": "Pick the array to edit or remove.",
+        "data": {
+          "array": "Array"
+        }
+      },
+      "edit_array_values": {
+        "title": "Edit panel array",
+        "description": "Editing {array}. Change its values, or tick remove to delete it.",
+        "data": {
+          "tilt": "Tilt (degrees, 0 = flat, 90 = vertical)",
+          "azimuth": "Azimuth (degrees from north, 90 = east, 180 = south, 270 = west)",
+          "kwp": "Peak power (kWp)",
+          "latitude": "Panel latitude (optional override)",
+          "longitude": "Panel longitude (optional override)",
+          "tracker": "Sun tracker",
+          "remove": "Remove this array"
         }
       },
       "settings": {

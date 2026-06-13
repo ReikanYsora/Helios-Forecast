@@ -19,6 +19,15 @@ from homeassistant.components.recorder.statistics import (
     async_import_statistics,
     statistics_during_period,
 )
+
+# `mean_type` replaces the deprecated `has_mean` in StatisticMetaData (mandatory from HA 2026.11).
+# Imported defensively so the integration still loads on cores predating StatisticMeanType.
+try:
+    from homeassistant.components.recorder.models import StatisticMeanType
+
+    _MEAN_TYPE_ARITHMETIC = StatisticMeanType.ARITHMETIC
+except ImportError:  # pragma: no cover - older HA cores
+    _MEAN_TYPE_ARITHMETIC = None
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
@@ -253,6 +262,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 "statistic_id": entity_id,
                 "unit_of_measurement": field.unit,
             }
+            if _MEAN_TYPE_ARITHMETIC is not None:
+                metadata["mean_type"] = _MEAN_TYPE_ARITHMETIC
             async_import_statistics(self.hass, metadata, rows)
 
     def _compute_archive_points(self, now, weather, store, layout, lat, lon, cap, residual_map):
@@ -298,6 +309,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 "statistic_id": entity_id,
                 "unit_of_measurement": unit,
             }
+            if _MEAN_TYPE_ARITHMETIC is not None:
+                metadata["mean_type"] = _MEAN_TYPE_ARITHMETIC
             async_import_statistics(self.hass, metadata, rows)
 
     async def _build_residual_map(self, data, lat, lon, layout, weather, store, now):
