@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Atrašanās vieta un invertora ierobežojums. Atstājiet atrašanās vietu tukšu, lai izmantotu jūsu Home Assistant mājas atrašanās vietu.",
+        "data": {
+          "name": "Nosaukums",
+          "latitude": "Platums (neobligāti)",
+          "longitude": "Garums (neobligāti)",
+          "inverter_max_kw": "Invertora maksimālā jauda (kW, neobligāti)",
+          "production_entity": "PV ražošanas sensors (apgūtajai korekcijai)",
+          "trend_anchor_hour": "Šodienas tendences atskaites stunda (0-23, noklusējums 6)"
+        }
+      },
+      "array": {
+        "title": "Paneļu masīvs",
+        "description": "Viena grupa vienādi orientētu paneļu. Pievienojiet vairākus nākamajā ekrānā, ja jūsu paneļi ir vērsti dažādos virzienos.",
+        "data": {
+          "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
+          "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
+          "kwp": "Maksimālā jauda (kWp)",
+          "tracker": "Saules sekotājs",
+          "latitude": "Paneļa platums (neobligāta aizstāšana)",
+          "longitude": "Paneļa garums (neobligāta aizstāšana)"
+        }
+      },
+      "menu": {
+        "title": "Paneļu masīvi",
+        "description": "Pievienojiet vēl vienu masīvu vai pabeidziet iestatīšanu.",
+        "menu_options": {
+          "add_array": "Pievienot vēl vienu masīvu",
+          "finish": "Pabeigt"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Pievienojiet paneļu masīvu, rediģējiet esošu, mainiet iestatījumus vai saglabājiet.",
+        "menu_options": {
+          "add_array": "Pievienot paneļu masīvu",
+          "edit_array": "Rediģēt paneļu masīvu",
+          "settings": "Rediģēt iestatījumus",
+          "save": "Saglabāt un pabeigt"
+        }
+      },
+      "add_array": {
+        "title": "Pievienot paneļu masīvu",
+        "data": {
+          "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
+          "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
+          "kwp": "Maksimālā jauda (kWp)",
+          "latitude": "Paneļa platums (neobligāta aizstāšana)",
+          "longitude": "Paneļa garums (neobligāta aizstāšana)",
+          "tracker": "Saules sekotājs"
+        }
+      },
+      "edit_array": {
+        "title": "Rediģēt paneļu masīvu",
+        "description": "Izvēlieties rediģējamo vai noņemamo masīvu.",
+        "data": {
+          "array": "Masīvs"
+        }
+      },
+      "edit_array_values": {
+        "title": "Rediģēt paneļu masīvu",
+        "description": "Tiek rediģēts {array}. Mainiet tā vērtības vai atzīmējiet noņemšanu, lai to dzēstu.",
+        "data": {
+          "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
+          "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
+          "kwp": "Maksimālā jauda (kWp)",
+          "latitude": "Paneļa platums (neobligāta aizstāšana)",
+          "longitude": "Paneļa garums (neobligāta aizstāšana)",
+          "tracker": "Saules sekotājs",
+          "remove": "Noņemt šo masīvu"
+        }
+      },
+      "settings": {
+        "title": "Iestatījumi",
+        "data": {
+          "inverter_max_kw": "Invertora maksimālā jauda (kW, neobligāti)",
+          "latitude": "Platums",
+          "longitude": "Garums",
+          "production_entity": "PV ražošanas sensors (apgūtajai korekcijai)",
+          "trend_anchor_hour": "Šodienas tendences atskaites stunda (0-23, noklusējums 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Nav (fiksēts)",
+        "dual-axis": "Divasu (seko saulei)",
+        "single-axis-h": "Vienasu horizontāls (slīpums seko)",
+        "single-axis-v": "Vienasu vertikāls (azimuts seko)"
+      }
+    }
+  }
+}

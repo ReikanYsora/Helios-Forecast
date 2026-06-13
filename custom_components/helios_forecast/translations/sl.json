@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Lokacija in omejitev razsmernika. Pustite lokacijo prazno, da uporabite dom v Home Assistantu.",
+        "data": {
+          "name": "Ime",
+          "latitude": "Zemljepisna širina (neobvezno)",
+          "longitude": "Zemljepisna dolžina (neobvezno)",
+          "inverter_max_kw": "Najv. izhodna moč razsmernika (kW, neobvezno)",
+          "production_entity": "Senzor proizvodnje PV (za naučeni popravek)",
+          "trend_anchor_hour": "Referenčna ura za današnji trend (0-23, privzeto 6)"
+        }
+      },
+      "array": {
+        "title": "Polje panelov",
+        "description": "Ena skupina enako usmerjenih panelov. Na naslednjem zaslonu dodajte še druge, če so vaši paneli obrnjeni v različne smeri.",
+        "data": {
+          "tilt": "Naklon (stopinje, 0 = ravno, 90 = navpično)",
+          "azimuth": "Azimut (stopinje od severa, 90 = vzhod, 180 = jug, 270 = zahod)",
+          "kwp": "Vršna moč (kWp)",
+          "tracker": "Sledilnik soncu",
+          "latitude": "Zemljepisna širina panela (neobvezna prepis)",
+          "longitude": "Zemljepisna dolžina panela (neobvezna prepis)"
+        }
+      },
+      "menu": {
+        "title": "Polja panelov",
+        "description": "Dodajte še eno polje ali zaključite nastavitev.",
+        "menu_options": {
+          "add_array": "Dodaj še eno polje",
+          "finish": "Zaključi"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Dodajte polje panelov, uredite obstoječega, spremenite nastavitve ali shranite.",
+        "menu_options": {
+          "add_array": "Dodaj polje panelov",
+          "edit_array": "Uredi polje panelov",
+          "settings": "Uredi nastavitve",
+          "save": "Shrani in zaključi"
+        }
+      },
+      "add_array": {
+        "title": "Dodaj polje panelov",
+        "data": {
+          "tilt": "Naklon (stopinje, 0 = ravno, 90 = navpično)",
+          "azimuth": "Azimut (stopinje od severa, 90 = vzhod, 180 = jug, 270 = zahod)",
+          "kwp": "Vršna moč (kWp)",
+          "latitude": "Zemljepisna širina panela (neobvezna prepis)",
+          "longitude": "Zemljepisna dolžina panela (neobvezna prepis)",
+          "tracker": "Sledilnik soncu"
+        }
+      },
+      "edit_array": {
+        "title": "Uredi polje panelov",
+        "description": "Izberite polje za urejanje ali odstranitev.",
+        "data": {
+          "array": "Polje"
+        }
+      },
+      "edit_array_values": {
+        "title": "Uredi polje panelov",
+        "description": "Urejanje {array}. Spremenite vrednosti ali označite odstrani za izbris.",
+        "data": {
+          "tilt": "Naklon (stopinje, 0 = ravno, 90 = navpično)",
+          "azimuth": "Azimut (stopinje od severa, 90 = vzhod, 180 = jug, 270 = zahod)",
+          "kwp": "Vršna moč (kWp)",
+          "latitude": "Zemljepisna širina panela (neobvezna prepis)",
+          "longitude": "Zemljepisna dolžina panela (neobvezna prepis)",
+          "tracker": "Sledilnik soncu",
+          "remove": "Odstrani to polje"
+        }
+      },
+      "settings": {
+        "title": "Nastavitve",
+        "data": {
+          "inverter_max_kw": "Najv. izhodna moč razsmernika (kW, neobvezno)",
+          "latitude": "Zemljepisna širina",
+          "longitude": "Zemljepisna dolžina",
+          "production_entity": "Senzor proizvodnje PV (za naučeni popravek)",
+          "trend_anchor_hour": "Referenčna ura za današnji trend (0-23, privzeto 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Brez (fiksno)",
+        "dual-axis": "Dvoosni (sledi soncu)",
+        "single-axis-h": "Enoosni vodoravni (sledi naklon)",
+        "single-axis-v": "Enoosni navpični (sledi azimut)"
+      }
+    }
+  }
+}

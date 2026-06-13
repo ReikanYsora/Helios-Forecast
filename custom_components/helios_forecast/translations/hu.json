@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Hely és inverter korlát. Hagyd üresen a helyet a Home Assistant otthoni helyének használatához.",
+        "data": {
+          "name": "Név",
+          "latitude": "Szélességi fok (opcionális)",
+          "longitude": "Hosszúsági fok (opcionális)",
+          "inverter_max_kw": "Inverter maximális teljesítménye (kW, opcionális)",
+          "production_entity": "PV termelés érzékelő (a tanult korrekcióhoz)",
+          "trend_anchor_hour": "Mai trend referenciaórája (0-23, alapértelmezett 6)"
+        }
+      },
+      "array": {
+        "title": "Panelcsoport",
+        "description": "Egy azonos tájolású panelcsoport. A következő képernyőn adj hozzá továbbiakat, ha a paneljeid más irányba néznek.",
+        "data": {
+          "tilt": "Dőlésszög (fok, 0 = vízszintes, 90 = függőleges)",
+          "azimuth": "Azimut (fok északtól, 90 = kelet, 180 = dél, 270 = nyugat)",
+          "kwp": "Csúcsteljesítmény (kWp)",
+          "tracker": "Napkövető",
+          "latitude": "Panel szélességi foka (opcionális felülírás)",
+          "longitude": "Panel hosszúsági foka (opcionális felülírás)"
+        }
+      },
+      "menu": {
+        "title": "Panelcsoportok",
+        "description": "Adj hozzá egy újabb csoportot, vagy fejezd be a beállítást.",
+        "menu_options": {
+          "add_array": "Újabb csoport hozzáadása",
+          "finish": "Befejezés"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Adj hozzá egy panelcsoportot, szerkessz egy meglévőt, módosítsd a beállításokat, vagy ments.",
+        "menu_options": {
+          "add_array": "Panelcsoport hozzáadása",
+          "edit_array": "Panelcsoport szerkesztése",
+          "settings": "Beállítások szerkesztése",
+          "save": "Mentés és befejezés"
+        }
+      },
+      "add_array": {
+        "title": "Panelcsoport hozzáadása",
+        "data": {
+          "tilt": "Dőlésszög (fok, 0 = vízszintes, 90 = függőleges)",
+          "azimuth": "Azimut (fok északtól, 90 = kelet, 180 = dél, 270 = nyugat)",
+          "kwp": "Csúcsteljesítmény (kWp)",
+          "latitude": "Panel szélességi foka (opcionális felülírás)",
+          "longitude": "Panel hosszúsági foka (opcionális felülírás)",
+          "tracker": "Napkövető"
+        }
+      },
+      "edit_array": {
+        "title": "Panelcsoport szerkesztése",
+        "description": "Válaszd ki a szerkesztendő vagy eltávolítandó csoportot.",
+        "data": {
+          "array": "Csoport"
+        }
+      },
+      "edit_array_values": {
+        "title": "Panelcsoport szerkesztése",
+        "description": "A(z) {array} szerkesztése. Módosítsd az értékeit, vagy pipáld be az eltávolítást a törléshez.",
+        "data": {
+          "tilt": "Dőlésszög (fok, 0 = vízszintes, 90 = függőleges)",
+          "azimuth": "Azimut (fok északtól, 90 = kelet, 180 = dél, 270 = nyugat)",
+          "kwp": "Csúcsteljesítmény (kWp)",
+          "latitude": "Panel szélességi foka (opcionális felülírás)",
+          "longitude": "Panel hosszúsági foka (opcionális felülírás)",
+          "tracker": "Napkövető",
+          "remove": "Csoport eltávolítása"
+        }
+      },
+      "settings": {
+        "title": "Beállítások",
+        "data": {
+          "inverter_max_kw": "Inverter maximális teljesítménye (kW, opcionális)",
+          "latitude": "Szélességi fok",
+          "longitude": "Hosszúsági fok",
+          "production_entity": "PV termelés érzékelő (a tanult korrekcióhoz)",
+          "trend_anchor_hour": "Mai trend referenciaórája (0-23, alapértelmezett 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Nincs (rögzített)",
+        "dual-axis": "Kéttengelyes (követi a napot)",
+        "single-axis-h": "Egytengelyes vízszintes (dőlésszög követ)",
+        "single-axis-v": "Egytengelyes függőleges (azimut követ)"
+      }
+    }
+  }
+}

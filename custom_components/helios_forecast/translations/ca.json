@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Ubicació i límit de l'inversor. Deixeu la ubicació en blanc per fer servir la de casa de Home Assistant.",
+        "data": {
+          "name": "Nom",
+          "latitude": "Latitud (opcional)",
+          "longitude": "Longitud (opcional)",
+          "inverter_max_kw": "Sortida màxima de l'inversor (kW, opcional)",
+          "production_entity": "Sensor de producció fotovoltaica (per a la correcció apresa)",
+          "trend_anchor_hour": "Hora de referència de la tendència d'avui (0-23, per defecte 6)"
+        }
+      },
+      "array": {
+        "title": "Grup de panells",
+        "description": "Un grup de panells amb la mateixa orientació. Afegiu-ne més a la pantalla següent si els vostres panells miren en direccions diferents.",
+        "data": {
+          "tilt": "Inclinació (graus, 0 = pla, 90 = vertical)",
+          "azimuth": "Azimut (graus des del nord, 90 = est, 180 = sud, 270 = oest)",
+          "kwp": "Potència pic (kWp)",
+          "tracker": "Seguidor solar",
+          "latitude": "Latitud del panell (substitució opcional)",
+          "longitude": "Longitud del panell (substitució opcional)"
+        }
+      },
+      "menu": {
+        "title": "Grups de panells",
+        "description": "Afegiu un altre grup o finalitzeu la configuració.",
+        "menu_options": {
+          "add_array": "Afegeix un altre grup",
+          "finish": "Finalitza"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Afegiu un grup de panells, editeu-ne un d'existent, canvieu la configuració o deseu.",
+        "menu_options": {
+          "add_array": "Afegeix un grup de panells",
+          "edit_array": "Edita un grup de panells",
+          "settings": "Edita la configuració",
+          "save": "Desa i finalitza"
+        }
+      },
+      "add_array": {
+        "title": "Afegeix un grup de panells",
+        "data": {
+          "tilt": "Inclinació (graus, 0 = pla, 90 = vertical)",
+          "azimuth": "Azimut (graus des del nord, 90 = est, 180 = sud, 270 = oest)",
+          "kwp": "Potència pic (kWp)",
+          "latitude": "Latitud del panell (substitució opcional)",
+          "longitude": "Longitud del panell (substitució opcional)",
+          "tracker": "Seguidor solar"
+        }
+      },
+      "edit_array": {
+        "title": "Edita un grup de panells",
+        "description": "Trieu el grup que voleu editar o eliminar.",
+        "data": {
+          "array": "Grup"
+        }
+      },
+      "edit_array_values": {
+        "title": "Edita el grup de panells",
+        "description": "S'està editant {array}. Canvieu-ne els valors o marqueu eliminar per esborrar-lo.",
+        "data": {
+          "tilt": "Inclinació (graus, 0 = pla, 90 = vertical)",
+          "azimuth": "Azimut (graus des del nord, 90 = est, 180 = sud, 270 = oest)",
+          "kwp": "Potència pic (kWp)",
+          "latitude": "Latitud del panell (substitució opcional)",
+          "longitude": "Longitud del panell (substitució opcional)",
+          "tracker": "Seguidor solar",
+          "remove": "Elimina aquest grup"
+        }
+      },
+      "settings": {
+        "title": "Configuració",
+        "data": {
+          "inverter_max_kw": "Sortida màxima de l'inversor (kW, opcional)",
+          "latitude": "Latitud",
+          "longitude": "Longitud",
+          "production_entity": "Sensor de producció fotovoltaica (per a la correcció apresa)",
+          "trend_anchor_hour": "Hora de referència de la tendència d'avui (0-23, per defecte 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Cap (fix)",
+        "dual-axis": "Doble eix (segueix el sol)",
+        "single-axis-h": "Eix únic horitzontal (segueix la inclinació)",
+        "single-axis-v": "Eix únic vertical (segueix l'azimut)"
+      }
+    }
+  }
+}

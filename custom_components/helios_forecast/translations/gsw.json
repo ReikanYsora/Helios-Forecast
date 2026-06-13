@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Standort und Wächselrichter-Grenze. Lass de Standort läär, zum dis Home-Assistant-Dihei znää.",
+        "data": {
+          "name": "Name",
+          "latitude": "Breitegrad (fakultativ)",
+          "longitude": "Längegrad (fakultativ)",
+          "inverter_max_kw": "Maximali Leischtig vom Wächselrichter (kW, fakultativ)",
+          "production_entity": "PV-Produktionssensor (für di glehrnti Korrektur)",
+          "trend_anchor_hour": "Referänzstund für de Tagestrend (0-23, Standard 6)"
+        }
+      },
+      "array": {
+        "title": "Panel-Gruppe",
+        "description": "Ei Gruppe vo gliich usgrichtete Panels. Füeg uf de nöchschte Siite meh dezue, wänn dini Panels in verschiideni Richtige zeiged.",
+        "data": {
+          "tilt": "Neigig (Grad, 0 = flach, 90 = senkrächt)",
+          "azimuth": "Azimut (Grad vo Norde us, 90 = Oschte, 180 = Süüde, 270 = Weschte)",
+          "kwp": "Spitzeleischtig (kWp)",
+          "tracker": "Sunne-Tracker",
+          "latitude": "Breitegrad vom Panel (fakultativi Überschriibig)",
+          "longitude": "Längegrad vom Panel (fakultativi Überschriibig)"
+        }
+      },
+      "menu": {
+        "title": "Panel-Gruppe",
+        "description": "Füeg e wiiteri Gruppe dezue oder schliess d Iirichtig ab.",
+        "menu_options": {
+          "add_array": "E wiiteri Gruppe dezuefüege",
+          "finish": "Fertig"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Füeg e Panel-Gruppe dezue, bearbeit eini, änder d Iistellige oder speicher.",
+        "menu_options": {
+          "add_array": "E Panel-Gruppe dezuefüege",
+          "edit_array": "E Panel-Gruppe bearbeite",
+          "settings": "Iistellige bearbeite",
+          "save": "Speichere und abschliesse"
+        }
+      },
+      "add_array": {
+        "title": "E Panel-Gruppe dezuefüege",
+        "data": {
+          "tilt": "Neigig (Grad, 0 = flach, 90 = senkrächt)",
+          "azimuth": "Azimut (Grad vo Norde us, 90 = Oschte, 180 = Süüde, 270 = Weschte)",
+          "kwp": "Spitzeleischtig (kWp)",
+          "latitude": "Breitegrad vom Panel (fakultativi Überschriibig)",
+          "longitude": "Längegrad vom Panel (fakultativi Überschriibig)",
+          "tracker": "Sunne-Tracker"
+        }
+      },
+      "edit_array": {
+        "title": "E Panel-Gruppe bearbeite",
+        "description": "Wähl di Gruppe zum bearbeite oder entferne.",
+        "data": {
+          "array": "Gruppe"
+        }
+      },
+      "edit_array_values": {
+        "title": "Panel-Gruppe bearbeite",
+        "description": "{array} wird bearbeitet. Änder d Wärt oder hak Entferne aa, zum si z lösche.",
+        "data": {
+          "tilt": "Neigig (Grad, 0 = flach, 90 = senkrächt)",
+          "azimuth": "Azimut (Grad vo Norde us, 90 = Oschte, 180 = Süüde, 270 = Weschte)",
+          "kwp": "Spitzeleischtig (kWp)",
+          "latitude": "Breitegrad vom Panel (fakultativi Überschriibig)",
+          "longitude": "Längegrad vom Panel (fakultativi Überschriibig)",
+          "tracker": "Sunne-Tracker",
+          "remove": "Die Gruppe entferne"
+        }
+      },
+      "settings": {
+        "title": "Iistellige",
+        "data": {
+          "inverter_max_kw": "Maximali Leischtig vom Wächselrichter (kW, fakultativ)",
+          "latitude": "Breitegrad",
+          "longitude": "Längegrad",
+          "production_entity": "PV-Produktionssensor (für di glehrnti Korrektur)",
+          "trend_anchor_hour": "Referänzstund für de Tagestrend (0-23, Standard 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Kei (fix)",
+        "dual-axis": "Zwöiachsig (folgt de Sunne)",
+        "single-axis-h": "Eiachsig horizontal (Neigig folgt)",
+        "single-axis-v": "Eiachsig vertikal (Azimut folgt)"
+      }
+    }
+  }
+}

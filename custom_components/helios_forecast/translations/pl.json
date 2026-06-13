@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Lokalizacja i limit falownika. Pozostaw lokalizację pustą, aby użyć adresu domowego Home Assistant.",
+        "data": {
+          "name": "Nazwa",
+          "latitude": "Szerokość geograficzna (opcjonalnie)",
+          "longitude": "Długość geograficzna (opcjonalnie)",
+          "inverter_max_kw": "Maksymalna moc falownika (kW, opcjonalnie)",
+          "production_entity": "Czujnik produkcji PV (do uczonej korekcji)",
+          "trend_anchor_hour": "Godzina odniesienia trendu dziennego (0-23, domyślnie 6)"
+        }
+      },
+      "array": {
+        "title": "Grupa paneli",
+        "description": "Jedna grupa paneli o tej samej orientacji. Jeśli panele są skierowane w różne strony, dodaj kolejne na następnym ekranie.",
+        "data": {
+          "tilt": "Nachylenie (stopnie, 0 = poziomo, 90 = pionowo)",
+          "azimuth": "Azymut (stopnie od północy, 90 = wschód, 180 = południe, 270 = zachód)",
+          "kwp": "Moc szczytowa (kWp)",
+          "tracker": "Tracker słoneczny",
+          "latitude": "Szerokość geograficzna paneli (opcjonalne nadpisanie)",
+          "longitude": "Długość geograficzna paneli (opcjonalne nadpisanie)"
+        }
+      },
+      "menu": {
+        "title": "Grupy paneli",
+        "description": "Dodaj kolejną grupę lub zakończ konfigurację.",
+        "menu_options": {
+          "add_array": "Dodaj kolejną grupę",
+          "finish": "Zakończ"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Dodaj grupę paneli, edytuj istniejącą, zmień ustawienia lub zapisz.",
+        "menu_options": {
+          "add_array": "Dodaj grupę paneli",
+          "edit_array": "Edytuj grupę paneli",
+          "settings": "Edytuj ustawienia",
+          "save": "Zapisz i zakończ"
+        }
+      },
+      "add_array": {
+        "title": "Dodaj grupę paneli",
+        "data": {
+          "tilt": "Nachylenie (stopnie, 0 = poziomo, 90 = pionowo)",
+          "azimuth": "Azymut (stopnie od północy, 90 = wschód, 180 = południe, 270 = zachód)",
+          "kwp": "Moc szczytowa (kWp)",
+          "latitude": "Szerokość geograficzna paneli (opcjonalne nadpisanie)",
+          "longitude": "Długość geograficzna paneli (opcjonalne nadpisanie)",
+          "tracker": "Tracker słoneczny"
+        }
+      },
+      "edit_array": {
+        "title": "Edytuj grupę paneli",
+        "description": "Wybierz grupę do edycji lub usunięcia.",
+        "data": {
+          "array": "Grupa"
+        }
+      },
+      "edit_array_values": {
+        "title": "Edytuj grupę paneli",
+        "description": "Edycja {array}. Zmień wartości lub zaznacz usuwanie, aby ją skasować.",
+        "data": {
+          "tilt": "Nachylenie (stopnie, 0 = poziomo, 90 = pionowo)",
+          "azimuth": "Azymut (stopnie od północy, 90 = wschód, 180 = południe, 270 = zachód)",
+          "kwp": "Moc szczytowa (kWp)",
+          "latitude": "Szerokość geograficzna paneli (opcjonalne nadpisanie)",
+          "longitude": "Długość geograficzna paneli (opcjonalne nadpisanie)",
+          "tracker": "Tracker słoneczny",
+          "remove": "Usuń tę grupę"
+        }
+      },
+      "settings": {
+        "title": "Ustawienia",
+        "data": {
+          "inverter_max_kw": "Maksymalna moc falownika (kW, opcjonalnie)",
+          "latitude": "Szerokość geograficzna",
+          "longitude": "Długość geograficzna",
+          "production_entity": "Czujnik produkcji PV (do uczonej korekcji)",
+          "trend_anchor_hour": "Godzina odniesienia trendu dziennego (0-23, domyślnie 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Brak (stały)",
+        "dual-axis": "Dwuosiowy (podąża za słońcem)",
+        "single-axis-h": "Jednoosiowy poziomy (zmienia nachylenie)",
+        "single-axis-v": "Jednoosiowy pionowy (zmienia azymut)"
+      }
+    }
+  }
+}

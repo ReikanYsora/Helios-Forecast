@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Standuert an Inverter-Limit. Loosst de Standuert eidel fir Ären Home Assistant Doheem ze benotzen.",
+        "data": {
+          "name": "Numm",
+          "latitude": "Breedegrad (optional)",
+          "longitude": "Längegrad (optional)",
+          "inverter_max_kw": "Maximal Inverter-Leeschtung (kW, optional)",
+          "production_entity": "PV-Produktiouns-Sensor (fir déi geléiert Korrektur)",
+          "trend_anchor_hour": "Referenzstonn fir den Dagestrend (0-23, Standard 6)"
+        }
+      },
+      "array": {
+        "title": "Panneau-Grupp",
+        "description": "Eng Grupp vu Pannoe mat der selwechter Ausriichtung. Füügt op der nächster Säit méi derbäi, wann Är Pannoe a verschidde Richtungen weisen.",
+        "data": {
+          "tilt": "Neigung (Grad, 0 = flaach, 90 = vertikal)",
+          "azimuth": "Azimut (Grad vun Norden, 90 = Osten, 180 = Süden, 270 = Westen)",
+          "kwp": "Spëtzeleeschtung (kWp)",
+          "tracker": "Sonnen-Tracker",
+          "latitude": "Panneau-Breedegrad (optionalen Iwwerschreiwen)",
+          "longitude": "Panneau-Längegrad (optionalen Iwwerschreiwen)"
+        }
+      },
+      "menu": {
+        "title": "Panneau-Gruppen",
+        "description": "Füügt eng weider Grupp derbäi, oder schléisst d'Astellung of.",
+        "menu_options": {
+          "add_array": "Eng weider Grupp derbäisetzen",
+          "finish": "Ofschléissen"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Füügt eng Panneau-Grupp derbäi, ännert eng bestoend, ännert d'Astellungen, oder späichert.",
+        "menu_options": {
+          "add_array": "Eng Panneau-Grupp derbäisetzen",
+          "edit_array": "Eng Panneau-Grupp änneren",
+          "settings": "Astellungen änneren",
+          "save": "Späicheren an ofschléissen"
+        }
+      },
+      "add_array": {
+        "title": "Eng Panneau-Grupp derbäisetzen",
+        "data": {
+          "tilt": "Neigung (Grad, 0 = flaach, 90 = vertikal)",
+          "azimuth": "Azimut (Grad vun Norden, 90 = Osten, 180 = Süden, 270 = Westen)",
+          "kwp": "Spëtzeleeschtung (kWp)",
+          "latitude": "Panneau-Breedegrad (optionalen Iwwerschreiwen)",
+          "longitude": "Panneau-Längegrad (optionalen Iwwerschreiwen)",
+          "tracker": "Sonnen-Tracker"
+        }
+      },
+      "edit_array": {
+        "title": "Eng Panneau-Grupp änneren",
+        "description": "Wielt d'Grupp aus, déi geännert oder geläscht soll ginn.",
+        "data": {
+          "array": "Grupp"
+        }
+      },
+      "edit_array_values": {
+        "title": "Panneau-Grupp änneren",
+        "description": "{array} gëtt geännert. Ännert d'Wäerter, oder hakt Läschen un fir se ze läschen.",
+        "data": {
+          "tilt": "Neigung (Grad, 0 = flaach, 90 = vertikal)",
+          "azimuth": "Azimut (Grad vun Norden, 90 = Osten, 180 = Süden, 270 = Westen)",
+          "kwp": "Spëtzeleeschtung (kWp)",
+          "latitude": "Panneau-Breedegrad (optionalen Iwwerschreiwen)",
+          "longitude": "Panneau-Längegrad (optionalen Iwwerschreiwen)",
+          "tracker": "Sonnen-Tracker",
+          "remove": "Dës Grupp läschen"
+        }
+      },
+      "settings": {
+        "title": "Astellungen",
+        "data": {
+          "inverter_max_kw": "Maximal Inverter-Leeschtung (kW, optional)",
+          "latitude": "Breedegrad",
+          "longitude": "Längegrad",
+          "production_entity": "PV-Produktiouns-Sensor (fir déi geléiert Korrektur)",
+          "trend_anchor_hour": "Referenzstonn fir den Dagestrend (0-23, Standard 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Keen (fix)",
+        "dual-axis": "Zwee-Achsen (follegt der Sonn)",
+        "single-axis-h": "Eng-Achs horizontal (Neigung follegt)",
+        "single-axis-v": "Eng-Achs vertikal (Azimut follegt)"
+      }
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Posizione e limite dell'inverter. Lascia vuota la posizione per usare quella di casa in Home Assistant.",
+        "data": {
+          "name": "Nome",
+          "latitude": "Latitudine (opzionale)",
+          "longitude": "Longitudine (opzionale)",
+          "inverter_max_kw": "Potenza massima dell'inverter (kW, opzionale)",
+          "production_entity": "Sensore di produzione fotovoltaica (per la correzione appresa)",
+          "trend_anchor_hour": "Ora di riferimento per l'andamento odierno (0-23, predefinito 6)"
+        }
+      },
+      "array": {
+        "title": "Stringa di pannelli",
+        "description": "Un gruppo di pannelli con lo stesso orientamento. Aggiungine altri nella schermata successiva se i pannelli sono rivolti in direzioni diverse.",
+        "data": {
+          "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
+          "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
+          "kwp": "Potenza di picco (kWp)",
+          "tracker": "Inseguitore solare",
+          "latitude": "Latitudine dei pannelli (override opzionale)",
+          "longitude": "Longitudine dei pannelli (override opzionale)"
+        }
+      },
+      "menu": {
+        "title": "Stringhe di pannelli",
+        "description": "Aggiungi un'altra stringa oppure completa la configurazione.",
+        "menu_options": {
+          "add_array": "Aggiungi un'altra stringa",
+          "finish": "Completa"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Aggiungi una stringa di pannelli, modificane una esistente, cambia le impostazioni o salva.",
+        "menu_options": {
+          "add_array": "Aggiungi una stringa di pannelli",
+          "edit_array": "Modifica una stringa di pannelli",
+          "settings": "Modifica impostazioni",
+          "save": "Salva e completa"
+        }
+      },
+      "add_array": {
+        "title": "Aggiungi una stringa di pannelli",
+        "data": {
+          "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
+          "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
+          "kwp": "Potenza di picco (kWp)",
+          "latitude": "Latitudine dei pannelli (override opzionale)",
+          "longitude": "Longitudine dei pannelli (override opzionale)",
+          "tracker": "Inseguitore solare"
+        }
+      },
+      "edit_array": {
+        "title": "Modifica una stringa di pannelli",
+        "description": "Scegli la stringa da modificare o rimuovere.",
+        "data": {
+          "array": "Stringa"
+        }
+      },
+      "edit_array_values": {
+        "title": "Modifica stringa di pannelli",
+        "description": "Modifica di {array}. Cambia i valori oppure seleziona rimuovi per eliminarla.",
+        "data": {
+          "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
+          "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
+          "kwp": "Potenza di picco (kWp)",
+          "latitude": "Latitudine dei pannelli (override opzionale)",
+          "longitude": "Longitudine dei pannelli (override opzionale)",
+          "tracker": "Inseguitore solare",
+          "remove": "Rimuovi questa stringa"
+        }
+      },
+      "settings": {
+        "title": "Impostazioni",
+        "data": {
+          "inverter_max_kw": "Potenza massima dell'inverter (kW, opzionale)",
+          "latitude": "Latitudine",
+          "longitude": "Longitudine",
+          "production_entity": "Sensore di produzione fotovoltaica (per la correzione appresa)",
+          "trend_anchor_hour": "Ora di riferimento per l'andamento odierno (0-23, predefinito 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Nessuno (fisso)",
+        "dual-axis": "Doppio asse (segue il sole)",
+        "single-axis-h": "Asse singolo orizzontale (segue l'inclinazione)",
+        "single-axis-v": "Asse singolo verticale (segue l'azimut)"
+      }
+    }
+  }
+}

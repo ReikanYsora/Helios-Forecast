@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "位置和逆变器上限。留空位置将使用您的 Home Assistant 家庭位置。",
+        "data": {
+          "name": "名称",
+          "latitude": "纬度（可选）",
+          "longitude": "经度（可选）",
+          "inverter_max_kw": "逆变器最大输出（kW，可选）",
+          "production_entity": "光伏发电传感器（用于自学习校正）",
+          "trend_anchor_hour": "当日趋势参考小时（0-23，默认 6）"
+        }
+      },
+      "array": {
+        "title": "光伏组件阵列",
+        "description": "一组朝向相同的光伏板。如果您的光伏板朝向不同，请在下一屏添加更多。",
+        "data": {
+          "tilt": "倾角（度，0 = 水平，90 = 垂直）",
+          "azimuth": "方位角（相对正北的度数，90 = 东，180 = 南，270 = 西）",
+          "kwp": "峰值功率（kWp）",
+          "tracker": "太阳跟踪器",
+          "latitude": "光伏板纬度（可选覆盖）",
+          "longitude": "光伏板经度（可选覆盖）"
+        }
+      },
+      "menu": {
+        "title": "光伏组件阵列",
+        "description": "再添加一个阵列，或完成设置。",
+        "menu_options": {
+          "add_array": "再添加一个阵列",
+          "finish": "完成"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "添加光伏组件阵列、编辑现有阵列、修改设置或保存。",
+        "menu_options": {
+          "add_array": "添加光伏组件阵列",
+          "edit_array": "编辑光伏组件阵列",
+          "settings": "编辑设置",
+          "save": "保存并完成"
+        }
+      },
+      "add_array": {
+        "title": "添加光伏组件阵列",
+        "data": {
+          "tilt": "倾角（度，0 = 水平，90 = 垂直）",
+          "azimuth": "方位角（相对正北的度数，90 = 东，180 = 南，270 = 西）",
+          "kwp": "峰值功率（kWp）",
+          "latitude": "光伏板纬度（可选覆盖）",
+          "longitude": "光伏板经度（可选覆盖）",
+          "tracker": "太阳跟踪器"
+        }
+      },
+      "edit_array": {
+        "title": "编辑光伏组件阵列",
+        "description": "选择要编辑或删除的阵列。",
+        "data": {
+          "array": "阵列"
+        }
+      },
+      "edit_array_values": {
+        "title": "编辑光伏组件阵列",
+        "description": "正在编辑 {array}。修改其数值，或勾选删除以将其移除。",
+        "data": {
+          "tilt": "倾角（度，0 = 水平，90 = 垂直）",
+          "azimuth": "方位角（相对正北的度数，90 = 东，180 = 南，270 = 西）",
+          "kwp": "峰值功率（kWp）",
+          "latitude": "光伏板纬度（可选覆盖）",
+          "longitude": "光伏板经度（可选覆盖）",
+          "tracker": "太阳跟踪器",
+          "remove": "删除此阵列"
+        }
+      },
+      "settings": {
+        "title": "设置",
+        "data": {
+          "inverter_max_kw": "逆变器最大输出（kW，可选）",
+          "latitude": "纬度",
+          "longitude": "经度",
+          "production_entity": "光伏发电传感器（用于自学习校正）",
+          "trend_anchor_hour": "当日趋势参考小时（0-23，默认 6）"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "无（固定）",
+        "dual-axis": "双轴（跟随太阳）",
+        "single-axis-h": "单轴水平（倾角跟随）",
+        "single-axis-v": "单轴垂直（方位角跟随）"
+      }
+    }
+  }
+}

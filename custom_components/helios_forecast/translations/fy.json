@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Lokaasje en omsetterlimyt. Lit de lokaasje leech om dyn Home Assistant-thús te brûken.",
+        "data": {
+          "name": "Namme",
+          "latitude": "Breedtegraad (opsjoneel)",
+          "longitude": "Lingtegraad (opsjoneel)",
+          "inverter_max_kw": "Maksimaal omsettervermogen (kW, opsjoneel)",
+          "production_entity": "PV-produksjesensor (foar de oanleare korreksje)",
+          "trend_anchor_hour": "Referinsjeoere foar trend fan hjoed (0-23, standert 6)"
+        }
+      },
+      "array": {
+        "title": "Panielgroep",
+        "description": "Ien groep panielen mei deselde oriïntaasje. Foegje op it folgjende skerm mear ta as dyn panielen ferskillende kanten op steane.",
+        "data": {
+          "tilt": "Helling (graden, 0 = flak, 90 = fertikaal)",
+          "azimuth": "Azimut (graden fan it noarden, 90 = east, 180 = súd, 270 = west)",
+          "kwp": "Topfermogen (kWp)",
+          "tracker": "Sinnefolger",
+          "latitude": "Breedtegraad paniel (opsjonele oerstjoering)",
+          "longitude": "Lingtegraad paniel (opsjonele oerstjoering)"
+        }
+      },
+      "menu": {
+        "title": "Panielgroepen",
+        "description": "Foegje noch in groep ta, of slút de ynstelling ôf.",
+        "menu_options": {
+          "add_array": "Noch in groep tafoegje",
+          "finish": "Ofslute"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Foegje in panielgroep ta, bewurkje in besteande, feroarje de ynstellings, of bewarje.",
+        "menu_options": {
+          "add_array": "Panielgroep tafoegje",
+          "edit_array": "Panielgroep bewurkje",
+          "settings": "Ynstellings bewurkje",
+          "save": "Bewarje en ôfslute"
+        }
+      },
+      "add_array": {
+        "title": "Panielgroep tafoegje",
+        "data": {
+          "tilt": "Helling (graden, 0 = flak, 90 = fertikaal)",
+          "azimuth": "Azimut (graden fan it noarden, 90 = east, 180 = súd, 270 = west)",
+          "kwp": "Topfermogen (kWp)",
+          "latitude": "Breedtegraad paniel (opsjonele oerstjoering)",
+          "longitude": "Lingtegraad paniel (opsjonele oerstjoering)",
+          "tracker": "Sinnefolger"
+        }
+      },
+      "edit_array": {
+        "title": "Panielgroep bewurkje",
+        "description": "Kies de groep om te bewurkjen of te ferwiderjen.",
+        "data": {
+          "array": "Groep"
+        }
+      },
+      "edit_array_values": {
+        "title": "Panielgroep bewurkje",
+        "description": "{array} wurdt bewurke. Feroarje de wearden, of finkje ferwiderje oan om dy te wiskjen.",
+        "data": {
+          "tilt": "Helling (graden, 0 = flak, 90 = fertikaal)",
+          "azimuth": "Azimut (graden fan it noarden, 90 = east, 180 = súd, 270 = west)",
+          "kwp": "Topfermogen (kWp)",
+          "latitude": "Breedtegraad paniel (opsjonele oerstjoering)",
+          "longitude": "Lingtegraad paniel (opsjonele oerstjoering)",
+          "tracker": "Sinnefolger",
+          "remove": "Dizze groep ferwiderje"
+        }
+      },
+      "settings": {
+        "title": "Ynstellings",
+        "data": {
+          "inverter_max_kw": "Maksimaal omsettervermogen (kW, opsjoneel)",
+          "latitude": "Breedtegraad",
+          "longitude": "Lingtegraad",
+          "production_entity": "PV-produksjesensor (foar de oanleare korreksje)",
+          "trend_anchor_hour": "Referinsjeoere foar trend fan hjoed (0-23, standert 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Gjin (fêst)",
+        "dual-axis": "Twa-assich (folget de sinne)",
+        "single-axis-h": "Ien-assich horizontaal (helling folget)",
+        "single-axis-v": "Ien-assich fertikaal (azimut folget)"
+      }
+    }
+  }
+}

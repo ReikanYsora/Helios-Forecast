@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Plassering og vekselrettargrense. La plasseringa stå tom for å bruke heimen din i Home Assistant.",
+        "data": {
+          "name": "Namn",
+          "latitude": "Breiddegrad (valfritt)",
+          "longitude": "Lengdegrad (valfritt)",
+          "inverter_max_kw": "Maks effekt frå vekselrettar (kW, valfritt)",
+          "production_entity": "Sensor for solcelleproduksjon (for den lærte korrigeringa)",
+          "trend_anchor_hour": "Referansetime for dagens trend (0-23, standard 6)"
+        }
+      },
+      "array": {
+        "title": "Panelgruppe",
+        "description": "Éi gruppe med panel som vender same vegen. Legg til fleire på neste skjerm dersom panela dine vender ulike vegar.",
+        "data": {
+          "tilt": "Helling (gradar, 0 = flatt, 90 = loddrett)",
+          "azimuth": "Asimut (gradar frå nord, 90 = aust, 180 = sør, 270 = vest)",
+          "kwp": "Toppeffekt (kWp)",
+          "tracker": "Solfølgjar",
+          "latitude": "Breiddegrad for panel (valfri overstyring)",
+          "longitude": "Lengdegrad for panel (valfri overstyring)"
+        }
+      },
+      "menu": {
+        "title": "Panelgrupper",
+        "description": "Legg til ei ny gruppe, eller fullfør oppsettet.",
+        "menu_options": {
+          "add_array": "Legg til ei ny gruppe",
+          "finish": "Fullfør"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Legg til ei panelgruppe, rediger ei eksisterande, endre innstillingane, eller lagre.",
+        "menu_options": {
+          "add_array": "Legg til ei panelgruppe",
+          "edit_array": "Rediger ei panelgruppe",
+          "settings": "Rediger innstillingar",
+          "save": "Lagre og fullfør"
+        }
+      },
+      "add_array": {
+        "title": "Legg til ei panelgruppe",
+        "data": {
+          "tilt": "Helling (gradar, 0 = flatt, 90 = loddrett)",
+          "azimuth": "Asimut (gradar frå nord, 90 = aust, 180 = sør, 270 = vest)",
+          "kwp": "Toppeffekt (kWp)",
+          "latitude": "Breiddegrad for panel (valfri overstyring)",
+          "longitude": "Lengdegrad for panel (valfri overstyring)",
+          "tracker": "Solfølgjar"
+        }
+      },
+      "edit_array": {
+        "title": "Rediger ei panelgruppe",
+        "description": "Vel gruppa du vil redigere eller fjerne.",
+        "data": {
+          "array": "Gruppe"
+        }
+      },
+      "edit_array_values": {
+        "title": "Rediger panelgruppe",
+        "description": "Redigerer {array}. Endre verdiane, eller kryss av for fjern for å slette ho.",
+        "data": {
+          "tilt": "Helling (gradar, 0 = flatt, 90 = loddrett)",
+          "azimuth": "Asimut (gradar frå nord, 90 = aust, 180 = sør, 270 = vest)",
+          "kwp": "Toppeffekt (kWp)",
+          "latitude": "Breiddegrad for panel (valfri overstyring)",
+          "longitude": "Lengdegrad for panel (valfri overstyring)",
+          "tracker": "Solfølgjar",
+          "remove": "Fjern denne gruppa"
+        }
+      },
+      "settings": {
+        "title": "Innstillingar",
+        "data": {
+          "inverter_max_kw": "Maks effekt frå vekselrettar (kW, valfritt)",
+          "latitude": "Breiddegrad",
+          "longitude": "Lengdegrad",
+          "production_entity": "Sensor for solcelleproduksjon (for den lærte korrigeringa)",
+          "trend_anchor_hour": "Referansetime for dagens trend (0-23, standard 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Ingen (fast)",
+        "dual-axis": "Toakslet (følgjer sola)",
+        "single-axis-h": "Eittakslet vassrett (hellinga følgjer)",
+        "single-axis-v": "Eittakslet loddrett (asimut følgjer)"
+      }
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Location and inverter limit. Leave the location blank to use your Home Assistant home.",
+        "data": {
+          "name": "Name",
+          "latitude": "Latitude (optional)",
+          "longitude": "Longitude (optional)",
+          "inverter_max_kw": "Inverter max output (kW, optional)",
+          "production_entity": "PV production sensor (for the learned correction)",
+          "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)"
+        }
+      },
+      "array": {
+        "title": "Panel array",
+        "description": "One group of co-oriented panels. Add more on the next screen if your panels face different directions.",
+        "data": {
+          "tilt": "Tilt (degrees, 0 = flat, 90 = vertical)",
+          "azimuth": "Azimuth (degrees from north, 90 = east, 180 = south, 270 = west)",
+          "kwp": "Peak power (kWp)",
+          "tracker": "Sun tracker",
+          "latitude": "Panel latitude (optional override)",
+          "longitude": "Panel longitude (optional override)"
+        }
+      },
+      "menu": {
+        "title": "Panel arrays",
+        "description": "Add another array, or finish the setup.",
+        "menu_options": {
+          "add_array": "Add another array",
+          "finish": "Finish"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Add a panel array, edit an existing one, change the settings, or save.",
+        "menu_options": {
+          "add_array": "Add a panel array",
+          "edit_array": "Edit a panel array",
+          "settings": "Edit settings",
+          "save": "Save and finish"
+        }
+      },
+      "add_array": {
+        "title": "Add a panel array",
+        "data": {
+          "tilt": "Tilt (degrees, 0 = flat, 90 = vertical)",
+          "azimuth": "Azimuth (degrees from north, 90 = east, 180 = south, 270 = west)",
+          "kwp": "Peak power (kWp)",
+          "latitude": "Panel latitude (optional override)",
+          "longitude": "Panel longitude (optional override)",
+          "tracker": "Sun tracker"
+        }
+      },
+      "edit_array": {
+        "title": "Edit a panel array",
+        "description": "Pick the array to edit or remove.",
+        "data": {
+          "array": "Array"
+        }
+      },
+      "edit_array_values": {
+        "title": "Edit panel array",
+        "description": "Editing {array}. Change its values, or tick remove to delete it.",
+        "data": {
+          "tilt": "Tilt (degrees, 0 = flat, 90 = vertical)",
+          "azimuth": "Azimuth (degrees from north, 90 = east, 180 = south, 270 = west)",
+          "kwp": "Peak power (kWp)",
+          "latitude": "Panel latitude (optional override)",
+          "longitude": "Panel longitude (optional override)",
+          "tracker": "Sun tracker",
+          "remove": "Remove this array"
+        }
+      },
+      "settings": {
+        "title": "Settings",
+        "data": {
+          "inverter_max_kw": "Inverter max output (kW, optional)",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "production_entity": "PV production sensor (for the learned correction)",
+          "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "None (fixed)",
+        "dual-axis": "Dual-axis (follows the sun)",
+        "single-axis-h": "Single-axis horizontal (tilt follows)",
+        "single-axis-v": "Single-axis vertical (azimuth follows)"
+      }
+    }
+  }
+}

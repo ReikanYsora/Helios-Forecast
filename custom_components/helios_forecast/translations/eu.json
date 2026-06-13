@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Kokapena eta inbertsorearen muga. Utzi kokapena hutsik zure Home Assistant etxea erabiltzeko.",
+        "data": {
+          "name": "Izena",
+          "latitude": "Latitudea (aukerakoa)",
+          "longitude": "Longitudea (aukerakoa)",
+          "inverter_max_kw": "Inbertsorearen gehienezko irteera (kW, aukerakoa)",
+          "production_entity": "PV ekoizpen-sentsorea (ikasitako zuzenketarako)",
+          "trend_anchor_hour": "Gaurko joeraren erreferentzia-ordua (0-23, lehenetsia 6)"
+        }
+      },
+      "array": {
+        "title": "Panel-multzoa",
+        "description": "Norabide berera begira dauden panelen talde bat. Gehitu gehiago hurrengo pantailan zure panelek norabide desberdinetara begiratzen badute.",
+        "data": {
+          "tilt": "Inklinazioa (graduak, 0 = laua, 90 = bertikala)",
+          "azimuth": "Azimuta (graduak iparraldetik, 90 = ekialdea, 180 = hegoaldea, 270 = mendebaldea)",
+          "kwp": "Gailur-potentzia (kWp)",
+          "tracker": "Eguzki-jarraitzailea",
+          "latitude": "Panelaren latitudea (aukerako gainidazketa)",
+          "longitude": "Panelaren longitudea (aukerako gainidazketa)"
+        }
+      },
+      "menu": {
+        "title": "Panel-multzoak",
+        "description": "Gehitu beste multzo bat, edo amaitu konfigurazioa.",
+        "menu_options": {
+          "add_array": "Gehitu beste multzo bat",
+          "finish": "Amaitu"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Gehitu panel-multzo bat, editatu lehendik dagoen bat, aldatu ezarpenak, edo gorde.",
+        "menu_options": {
+          "add_array": "Gehitu panel-multzo bat",
+          "edit_array": "Editatu panel-multzo bat",
+          "settings": "Editatu ezarpenak",
+          "save": "Gorde eta amaitu"
+        }
+      },
+      "add_array": {
+        "title": "Gehitu panel-multzo bat",
+        "data": {
+          "tilt": "Inklinazioa (graduak, 0 = laua, 90 = bertikala)",
+          "azimuth": "Azimuta (graduak iparraldetik, 90 = ekialdea, 180 = hegoaldea, 270 = mendebaldea)",
+          "kwp": "Gailur-potentzia (kWp)",
+          "latitude": "Panelaren latitudea (aukerako gainidazketa)",
+          "longitude": "Panelaren longitudea (aukerako gainidazketa)",
+          "tracker": "Eguzki-jarraitzailea"
+        }
+      },
+      "edit_array": {
+        "title": "Editatu panel-multzo bat",
+        "description": "Aukeratu editatu edo kendu nahi duzun multzoa.",
+        "data": {
+          "array": "Multzoa"
+        }
+      },
+      "edit_array_values": {
+        "title": "Editatu panel-multzoa",
+        "description": "{array} editatzen. Aldatu bere balioak, edo markatu kentzea ezabatzeko.",
+        "data": {
+          "tilt": "Inklinazioa (graduak, 0 = laua, 90 = bertikala)",
+          "azimuth": "Azimuta (graduak iparraldetik, 90 = ekialdea, 180 = hegoaldea, 270 = mendebaldea)",
+          "kwp": "Gailur-potentzia (kWp)",
+          "latitude": "Panelaren latitudea (aukerako gainidazketa)",
+          "longitude": "Panelaren longitudea (aukerako gainidazketa)",
+          "tracker": "Eguzki-jarraitzailea",
+          "remove": "Kendu multzo hau"
+        }
+      },
+      "settings": {
+        "title": "Ezarpenak",
+        "data": {
+          "inverter_max_kw": "Inbertsorearen gehienezko irteera (kW, aukerakoa)",
+          "latitude": "Latitudea",
+          "longitude": "Longitudea",
+          "production_entity": "PV ekoizpen-sentsorea (ikasitako zuzenketarako)",
+          "trend_anchor_hour": "Gaurko joeraren erreferentzia-ordua (0-23, lehenetsia 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Bat ere ez (finkoa)",
+        "dual-axis": "Ardatz bikoitza (eguzkia jarraitzen du)",
+        "single-axis-h": "Ardatz bakarra horizontala (inklinazioa jarraitzen du)",
+        "single-axis-v": "Ardatz bakarra bertikala (azimuta jarraitzen du)"
+      }
+    }
+  }
+}

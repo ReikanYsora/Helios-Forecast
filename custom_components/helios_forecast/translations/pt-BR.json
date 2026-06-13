@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Localização e limite do inversor. Deixe a localização em branco para usar a do seu Home Assistant.",
+        "data": {
+          "name": "Nome",
+          "latitude": "Latitude (opcional)",
+          "longitude": "Longitude (opcional)",
+          "inverter_max_kw": "Potência máxima do inversor (kW, opcional)",
+          "production_entity": "Sensor de produção fotovoltaica (para a correção aprendida)",
+          "trend_anchor_hour": "Hora de referência da tendência do dia (0-23, padrão 6)"
+        }
+      },
+      "array": {
+        "title": "Conjunto de painéis",
+        "description": "Um grupo de painéis com a mesma orientação. Adicione mais na próxima tela se seus painéis tiverem orientações diferentes.",
+        "data": {
+          "tilt": "Inclinação (graus, 0 = plano, 90 = vertical)",
+          "azimuth": "Azimute (graus a partir do norte, 90 = leste, 180 = sul, 270 = oeste)",
+          "kwp": "Potência de pico (kWp)",
+          "tracker": "Rastreador solar",
+          "latitude": "Latitude do painel (substituição opcional)",
+          "longitude": "Longitude do painel (substituição opcional)"
+        }
+      },
+      "menu": {
+        "title": "Conjuntos de painéis",
+        "description": "Adicione outro conjunto ou conclua a configuração.",
+        "menu_options": {
+          "add_array": "Adicionar outro conjunto",
+          "finish": "Concluir"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Adicione um conjunto de painéis, edite um existente, altere as configurações ou salve.",
+        "menu_options": {
+          "add_array": "Adicionar um conjunto de painéis",
+          "edit_array": "Editar um conjunto de painéis",
+          "settings": "Editar configurações",
+          "save": "Salvar e concluir"
+        }
+      },
+      "add_array": {
+        "title": "Adicionar um conjunto de painéis",
+        "data": {
+          "tilt": "Inclinação (graus, 0 = plano, 90 = vertical)",
+          "azimuth": "Azimute (graus a partir do norte, 90 = leste, 180 = sul, 270 = oeste)",
+          "kwp": "Potência de pico (kWp)",
+          "latitude": "Latitude do painel (substituição opcional)",
+          "longitude": "Longitude do painel (substituição opcional)",
+          "tracker": "Rastreador solar"
+        }
+      },
+      "edit_array": {
+        "title": "Editar um conjunto de painéis",
+        "description": "Escolha o conjunto a editar ou remover.",
+        "data": {
+          "array": "Conjunto"
+        }
+      },
+      "edit_array_values": {
+        "title": "Editar conjunto de painéis",
+        "description": "Editando {array}. Altere seus valores ou marque remover para excluí-lo.",
+        "data": {
+          "tilt": "Inclinação (graus, 0 = plano, 90 = vertical)",
+          "azimuth": "Azimute (graus a partir do norte, 90 = leste, 180 = sul, 270 = oeste)",
+          "kwp": "Potência de pico (kWp)",
+          "latitude": "Latitude do painel (substituição opcional)",
+          "longitude": "Longitude do painel (substituição opcional)",
+          "tracker": "Rastreador solar",
+          "remove": "Remover este conjunto"
+        }
+      },
+      "settings": {
+        "title": "Configurações",
+        "data": {
+          "inverter_max_kw": "Potência máxima do inversor (kW, opcional)",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "production_entity": "Sensor de produção fotovoltaica (para a correção aprendida)",
+          "trend_anchor_hour": "Hora de referência da tendência do dia (0-23, padrão 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Nenhum (fixo)",
+        "dual-axis": "Dois eixos (segue o sol)",
+        "single-axis-h": "Eixo único horizontal (inclinação segue)",
+        "single-axis-v": "Eixo único vertical (azimute segue)"
+      }
+    }
+  }
+}

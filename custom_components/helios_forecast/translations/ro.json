@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Locația și limita invertorului. Lăsați locația necompletată pentru a folosi domiciliul din Home Assistant.",
+        "data": {
+          "name": "Nume",
+          "latitude": "Latitudine (opțional)",
+          "longitude": "Longitudine (opțional)",
+          "inverter_max_kw": "Putere maximă invertor (kW, opțional)",
+          "production_entity": "Senzor producție fotovoltaică (pentru corecția învățată)",
+          "trend_anchor_hour": "Ora de referință pentru tendința zilei (0-23, implicit 6)"
+        }
+      },
+      "array": {
+        "title": "Grup de panouri",
+        "description": "Un grup de panouri cu aceeași orientare. Adăugați altele pe ecranul următor dacă panourile sunt orientate diferit.",
+        "data": {
+          "tilt": "Înclinare (grade, 0 = orizontal, 90 = vertical)",
+          "azimuth": "Azimut (grade de la nord, 90 = est, 180 = sud, 270 = vest)",
+          "kwp": "Putere de vârf (kWp)",
+          "tracker": "Urmăritor solar",
+          "latitude": "Latitudine panou (suprascriere opțională)",
+          "longitude": "Longitudine panou (suprascriere opțională)"
+        }
+      },
+      "menu": {
+        "title": "Grupuri de panouri",
+        "description": "Adăugați un alt grup sau finalizați configurarea.",
+        "menu_options": {
+          "add_array": "Adăugați un alt grup",
+          "finish": "Finalizare"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Adăugați un grup de panouri, editați unul existent, modificați setările sau salvați.",
+        "menu_options": {
+          "add_array": "Adăugați un grup de panouri",
+          "edit_array": "Editați un grup de panouri",
+          "settings": "Editați setările",
+          "save": "Salvare și finalizare"
+        }
+      },
+      "add_array": {
+        "title": "Adăugați un grup de panouri",
+        "data": {
+          "tilt": "Înclinare (grade, 0 = orizontal, 90 = vertical)",
+          "azimuth": "Azimut (grade de la nord, 90 = est, 180 = sud, 270 = vest)",
+          "kwp": "Putere de vârf (kWp)",
+          "latitude": "Latitudine panou (suprascriere opțională)",
+          "longitude": "Longitudine panou (suprascriere opțională)",
+          "tracker": "Urmăritor solar"
+        }
+      },
+      "edit_array": {
+        "title": "Editați un grup de panouri",
+        "description": "Alegeți grupul de editat sau de eliminat.",
+        "data": {
+          "array": "Grup"
+        }
+      },
+      "edit_array_values": {
+        "title": "Editați grupul de panouri",
+        "description": "Se editează {array}. Modificați valorile sau bifați eliminarea pentru a-l șterge.",
+        "data": {
+          "tilt": "Înclinare (grade, 0 = orizontal, 90 = vertical)",
+          "azimuth": "Azimut (grade de la nord, 90 = est, 180 = sud, 270 = vest)",
+          "kwp": "Putere de vârf (kWp)",
+          "latitude": "Latitudine panou (suprascriere opțională)",
+          "longitude": "Longitudine panou (suprascriere opțională)",
+          "tracker": "Urmăritor solar",
+          "remove": "Eliminați acest grup"
+        }
+      },
+      "settings": {
+        "title": "Setări",
+        "data": {
+          "inverter_max_kw": "Putere maximă invertor (kW, opțional)",
+          "latitude": "Latitudine",
+          "longitude": "Longitudine",
+          "production_entity": "Senzor producție fotovoltaică (pentru corecția învățată)",
+          "trend_anchor_hour": "Ora de referință pentru tendința zilei (0-23, implicit 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Niciunul (fix)",
+        "dual-axis": "Pe două axe (urmărește soarele)",
+        "single-axis-h": "Pe o axă orizontală (urmărește înclinarea)",
+        "single-axis-v": "Pe o axă verticală (urmărește azimutul)"
+      }
+    }
+  }
+}

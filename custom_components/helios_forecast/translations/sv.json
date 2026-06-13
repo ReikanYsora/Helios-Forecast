@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Plats och växelriktargräns. Lämna platsen tom för att använda din Home Assistant-hemposition.",
+        "data": {
+          "name": "Namn",
+          "latitude": "Latitud (valfritt)",
+          "longitude": "Longitud (valfritt)",
+          "inverter_max_kw": "Växelriktarens maxeffekt (kW, valfritt)",
+          "production_entity": "Sensor för solelproduktion (för den inlärda korrigeringen)",
+          "trend_anchor_hour": "Referenstimme för dagens trend (0-23, standard 6)"
+        }
+      },
+      "array": {
+        "title": "Panelgrupp",
+        "description": "En grupp av paneler med samma orientering. Lägg till fler på nästa skärm om dina paneler är riktade åt olika håll.",
+        "data": {
+          "tilt": "Lutning (grader, 0 = platt, 90 = lodrät)",
+          "azimuth": "Azimut (grader från norr, 90 = öster, 180 = söder, 270 = väster)",
+          "kwp": "Toppeffekt (kWp)",
+          "tracker": "Solföljare",
+          "latitude": "Panelens latitud (valfri åsidosättning)",
+          "longitude": "Panelens longitud (valfri åsidosättning)"
+        }
+      },
+      "menu": {
+        "title": "Panelgrupper",
+        "description": "Lägg till ytterligare en grupp eller slutför konfigurationen.",
+        "menu_options": {
+          "add_array": "Lägg till ytterligare en grupp",
+          "finish": "Slutför"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Lägg till en panelgrupp, redigera en befintlig, ändra inställningarna eller spara.",
+        "menu_options": {
+          "add_array": "Lägg till en panelgrupp",
+          "edit_array": "Redigera en panelgrupp",
+          "settings": "Redigera inställningar",
+          "save": "Spara och slutför"
+        }
+      },
+      "add_array": {
+        "title": "Lägg till en panelgrupp",
+        "data": {
+          "tilt": "Lutning (grader, 0 = platt, 90 = lodrät)",
+          "azimuth": "Azimut (grader från norr, 90 = öster, 180 = söder, 270 = väster)",
+          "kwp": "Toppeffekt (kWp)",
+          "latitude": "Panelens latitud (valfri åsidosättning)",
+          "longitude": "Panelens longitud (valfri åsidosättning)",
+          "tracker": "Solföljare"
+        }
+      },
+      "edit_array": {
+        "title": "Redigera en panelgrupp",
+        "description": "Välj gruppen som ska redigeras eller tas bort.",
+        "data": {
+          "array": "Grupp"
+        }
+      },
+      "edit_array_values": {
+        "title": "Redigera panelgrupp",
+        "description": "Redigerar {array}. Ändra dess värden eller markera ta bort för att radera den.",
+        "data": {
+          "tilt": "Lutning (grader, 0 = platt, 90 = lodrät)",
+          "azimuth": "Azimut (grader från norr, 90 = öster, 180 = söder, 270 = väster)",
+          "kwp": "Toppeffekt (kWp)",
+          "latitude": "Panelens latitud (valfri åsidosättning)",
+          "longitude": "Panelens longitud (valfri åsidosättning)",
+          "tracker": "Solföljare",
+          "remove": "Ta bort denna grupp"
+        }
+      },
+      "settings": {
+        "title": "Inställningar",
+        "data": {
+          "inverter_max_kw": "Växelriktarens maxeffekt (kW, valfritt)",
+          "latitude": "Latitud",
+          "longitude": "Longitud",
+          "production_entity": "Sensor för solelproduktion (för den inlärda korrigeringen)",
+          "trend_anchor_hour": "Referenstimme för dagens trend (0-23, standard 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Ingen (fast)",
+        "dual-axis": "Tvåaxlig (följer solen)",
+        "single-axis-h": "Enaxlig horisontell (lutning följer)",
+        "single-axis-v": "Enaxlig vertikal (azimut följer)"
+      }
+    }
+  }
+}

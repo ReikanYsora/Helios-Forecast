@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Locatie en omvormerlimiet. Laat de locatie leeg om je Home Assistant-thuislocatie te gebruiken.",
+        "data": {
+          "name": "Naam",
+          "latitude": "Breedtegraad (optioneel)",
+          "longitude": "Lengtegraad (optioneel)",
+          "inverter_max_kw": "Max. uitgangsvermogen omvormer (kW, optioneel)",
+          "production_entity": "PV-productiesensor (voor de aangeleerde correctie)",
+          "trend_anchor_hour": "Referentie-uur voor dagtrend (0-23, standaard 6)"
+        }
+      },
+      "array": {
+        "title": "Paneelgroep",
+        "description": "Eén groep panelen met dezelfde oriëntatie. Voeg op het volgende scherm meer groepen toe als je panelen verschillende kanten op wijzen.",
+        "data": {
+          "tilt": "Hellingshoek (graden, 0 = plat, 90 = verticaal)",
+          "azimuth": "Azimut (graden vanaf noord, 90 = oost, 180 = zuid, 270 = west)",
+          "kwp": "Piekvermogen (kWp)",
+          "tracker": "Zonnevolger",
+          "latitude": "Breedtegraad paneel (optionele overschrijving)",
+          "longitude": "Lengtegraad paneel (optionele overschrijving)"
+        }
+      },
+      "menu": {
+        "title": "Paneelgroepen",
+        "description": "Voeg nog een groep toe of rond de installatie af.",
+        "menu_options": {
+          "add_array": "Nog een groep toevoegen",
+          "finish": "Voltooien"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Voeg een paneelgroep toe, bewerk een bestaande, wijzig de instellingen of sla op.",
+        "menu_options": {
+          "add_array": "Een paneelgroep toevoegen",
+          "edit_array": "Een paneelgroep bewerken",
+          "settings": "Instellingen bewerken",
+          "save": "Opslaan en voltooien"
+        }
+      },
+      "add_array": {
+        "title": "Een paneelgroep toevoegen",
+        "data": {
+          "tilt": "Hellingshoek (graden, 0 = plat, 90 = verticaal)",
+          "azimuth": "Azimut (graden vanaf noord, 90 = oost, 180 = zuid, 270 = west)",
+          "kwp": "Piekvermogen (kWp)",
+          "latitude": "Breedtegraad paneel (optionele overschrijving)",
+          "longitude": "Lengtegraad paneel (optionele overschrijving)",
+          "tracker": "Zonnevolger"
+        }
+      },
+      "edit_array": {
+        "title": "Een paneelgroep bewerken",
+        "description": "Kies de groep die je wilt bewerken of verwijderen.",
+        "data": {
+          "array": "Groep"
+        }
+      },
+      "edit_array_values": {
+        "title": "Paneelgroep bewerken",
+        "description": "Bezig met {array}. Wijzig de waarden of vink verwijderen aan om de groep te verwijderen.",
+        "data": {
+          "tilt": "Hellingshoek (graden, 0 = plat, 90 = verticaal)",
+          "azimuth": "Azimut (graden vanaf noord, 90 = oost, 180 = zuid, 270 = west)",
+          "kwp": "Piekvermogen (kWp)",
+          "latitude": "Breedtegraad paneel (optionele overschrijving)",
+          "longitude": "Lengtegraad paneel (optionele overschrijving)",
+          "tracker": "Zonnevolger",
+          "remove": "Deze groep verwijderen"
+        }
+      },
+      "settings": {
+        "title": "Instellingen",
+        "data": {
+          "inverter_max_kw": "Max. uitgangsvermogen omvormer (kW, optioneel)",
+          "latitude": "Breedtegraad",
+          "longitude": "Lengtegraad",
+          "production_entity": "PV-productiesensor (voor de aangeleerde correctie)",
+          "trend_anchor_hour": "Referentie-uur voor dagtrend (0-23, standaard 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Geen (vast)",
+        "dual-axis": "Dubbele as (volgt de zon)",
+        "single-axis-h": "Enkele as horizontaal (hellingshoek volgt)",
+        "single-axis-v": "Enkele as verticaal (azimut volgt)"
+      }
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Lleoliad a therfyn yr gwrthdröydd. Gadewch y lleoliad yn wag i ddefnyddio cartref eich Home Assistant.",
+        "data": {
+          "name": "Enw",
+          "latitude": "Lledred (dewisol)",
+          "longitude": "Hydred (dewisol)",
+          "inverter_max_kw": "Allbwn mwyaf y gwrthdröydd (kW, dewisol)",
+          "production_entity": "Synhwyrydd cynhyrchu PV (ar gyfer y cywiriad dysgedig)",
+          "trend_anchor_hour": "Awr gyfeirio tueddiad heddiw (0-23, rhagosodiad 6)"
+        }
+      },
+      "array": {
+        "title": "Cyfres baneli",
+        "description": "Un grŵp o baneli sydd â'r un cyfeiriad. Ychwanegwch ragor ar y sgrin nesaf os yw'ch paneli'n wynebu cyfeiriadau gwahanol.",
+        "data": {
+          "tilt": "Goleddf (graddau, 0 = gwastad, 90 = fertigol)",
+          "azimuth": "Asimwth (graddau o'r gogledd, 90 = dwyrain, 180 = de, 270 = gorllewin)",
+          "kwp": "Pŵer brig (kWp)",
+          "tracker": "Tracydd haul",
+          "latitude": "Lledred y panel (gwrthwneud dewisol)",
+          "longitude": "Hydred y panel (gwrthwneud dewisol)"
+        }
+      },
+      "menu": {
+        "title": "Cyfresi baneli",
+        "description": "Ychwanegwch gyfres arall, neu gorffennwch y gosod.",
+        "menu_options": {
+          "add_array": "Ychwanegu cyfres arall",
+          "finish": "Gorffen"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Ychwanegwch gyfres baneli, golygwch un sy'n bodoli, newidiwch y gosodiadau, neu cadwch.",
+        "menu_options": {
+          "add_array": "Ychwanegu cyfres baneli",
+          "edit_array": "Golygu cyfres baneli",
+          "settings": "Golygu gosodiadau",
+          "save": "Cadw a gorffen"
+        }
+      },
+      "add_array": {
+        "title": "Ychwanegu cyfres baneli",
+        "data": {
+          "tilt": "Goleddf (graddau, 0 = gwastad, 90 = fertigol)",
+          "azimuth": "Asimwth (graddau o'r gogledd, 90 = dwyrain, 180 = de, 270 = gorllewin)",
+          "kwp": "Pŵer brig (kWp)",
+          "latitude": "Lledred y panel (gwrthwneud dewisol)",
+          "longitude": "Hydred y panel (gwrthwneud dewisol)",
+          "tracker": "Tracydd haul"
+        }
+      },
+      "edit_array": {
+        "title": "Golygu cyfres baneli",
+        "description": "Dewiswch y gyfres i'w golygu neu i'w thynnu.",
+        "data": {
+          "array": "Cyfres"
+        }
+      },
+      "edit_array_values": {
+        "title": "Golygu cyfres baneli",
+        "description": "Yn golygu {array}. Newidiwch ei gwerthoedd, neu ticiwch tynnu i'w dileu.",
+        "data": {
+          "tilt": "Goleddf (graddau, 0 = gwastad, 90 = fertigol)",
+          "azimuth": "Asimwth (graddau o'r gogledd, 90 = dwyrain, 180 = de, 270 = gorllewin)",
+          "kwp": "Pŵer brig (kWp)",
+          "latitude": "Lledred y panel (gwrthwneud dewisol)",
+          "longitude": "Hydred y panel (gwrthwneud dewisol)",
+          "tracker": "Tracydd haul",
+          "remove": "Tynnu'r gyfres hon"
+        }
+      },
+      "settings": {
+        "title": "Gosodiadau",
+        "data": {
+          "inverter_max_kw": "Allbwn mwyaf y gwrthdröydd (kW, dewisol)",
+          "latitude": "Lledred",
+          "longitude": "Hydred",
+          "production_entity": "Synhwyrydd cynhyrchu PV (ar gyfer y cywiriad dysgedig)",
+          "trend_anchor_hour": "Awr gyfeirio tueddiad heddiw (0-23, rhagosodiad 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Dim (sefydlog)",
+        "dual-axis": "Echelin ddeuol (yn dilyn yr haul)",
+        "single-axis-h": "Echelin sengl lorweddol (goleddf yn dilyn)",
+        "single-axis-v": "Echelin sengl fertigol (asimwth yn dilyn)"
+      }
+    }
+  }
+}

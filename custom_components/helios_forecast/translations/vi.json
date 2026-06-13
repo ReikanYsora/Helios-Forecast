@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Vị trí và giới hạn biến tần. Để trống vị trí để dùng vị trí nhà trong Home Assistant.",
+        "data": {
+          "name": "Tên",
+          "latitude": "Vĩ độ (tùy chọn)",
+          "longitude": "Kinh độ (tùy chọn)",
+          "inverter_max_kw": "Công suất tối đa của biến tần (kW, tùy chọn)",
+          "production_entity": "Cảm biến sản lượng điện mặt trời (dùng cho hiệu chỉnh tự học)",
+          "trend_anchor_hour": "Giờ tham chiếu cho xu hướng hôm nay (0-23, mặc định 6)"
+        }
+      },
+      "array": {
+        "title": "Dàn tấm pin",
+        "description": "Một nhóm các tấm pin cùng hướng. Thêm nhóm khác ở màn hình tiếp theo nếu các tấm pin của bạn quay theo những hướng khác nhau.",
+        "data": {
+          "tilt": "Độ nghiêng (độ, 0 = nằm phẳng, 90 = thẳng đứng)",
+          "azimuth": "Góc phương vị (độ tính từ hướng bắc, 90 = đông, 180 = nam, 270 = tây)",
+          "kwp": "Công suất đỉnh (kWp)",
+          "tracker": "Bộ theo dõi mặt trời",
+          "latitude": "Vĩ độ tấm pin (ghi đè tùy chọn)",
+          "longitude": "Kinh độ tấm pin (ghi đè tùy chọn)"
+        }
+      },
+      "menu": {
+        "title": "Các dàn tấm pin",
+        "description": "Thêm một dàn khác, hoặc hoàn tất cài đặt.",
+        "menu_options": {
+          "add_array": "Thêm một dàn khác",
+          "finish": "Hoàn tất"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Thêm một dàn tấm pin, chỉnh sửa dàn hiện có, thay đổi cài đặt, hoặc lưu.",
+        "menu_options": {
+          "add_array": "Thêm một dàn tấm pin",
+          "edit_array": "Chỉnh sửa một dàn tấm pin",
+          "settings": "Chỉnh sửa cài đặt",
+          "save": "Lưu và hoàn tất"
+        }
+      },
+      "add_array": {
+        "title": "Thêm một dàn tấm pin",
+        "data": {
+          "tilt": "Độ nghiêng (độ, 0 = nằm phẳng, 90 = thẳng đứng)",
+          "azimuth": "Góc phương vị (độ tính từ hướng bắc, 90 = đông, 180 = nam, 270 = tây)",
+          "kwp": "Công suất đỉnh (kWp)",
+          "latitude": "Vĩ độ tấm pin (ghi đè tùy chọn)",
+          "longitude": "Kinh độ tấm pin (ghi đè tùy chọn)",
+          "tracker": "Bộ theo dõi mặt trời"
+        }
+      },
+      "edit_array": {
+        "title": "Chỉnh sửa một dàn tấm pin",
+        "description": "Chọn dàn cần chỉnh sửa hoặc xóa.",
+        "data": {
+          "array": "Dàn"
+        }
+      },
+      "edit_array_values": {
+        "title": "Chỉnh sửa dàn tấm pin",
+        "description": "Đang chỉnh sửa {array}. Thay đổi các giá trị, hoặc đánh dấu xóa để xóa dàn này.",
+        "data": {
+          "tilt": "Độ nghiêng (độ, 0 = nằm phẳng, 90 = thẳng đứng)",
+          "azimuth": "Góc phương vị (độ tính từ hướng bắc, 90 = đông, 180 = nam, 270 = tây)",
+          "kwp": "Công suất đỉnh (kWp)",
+          "latitude": "Vĩ độ tấm pin (ghi đè tùy chọn)",
+          "longitude": "Kinh độ tấm pin (ghi đè tùy chọn)",
+          "tracker": "Bộ theo dõi mặt trời",
+          "remove": "Xóa dàn này"
+        }
+      },
+      "settings": {
+        "title": "Cài đặt",
+        "data": {
+          "inverter_max_kw": "Công suất tối đa của biến tần (kW, tùy chọn)",
+          "latitude": "Vĩ độ",
+          "longitude": "Kinh độ",
+          "production_entity": "Cảm biến sản lượng điện mặt trời (dùng cho hiệu chỉnh tự học)",
+          "trend_anchor_hour": "Giờ tham chiếu cho xu hướng hôm nay (0-23, mặc định 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Không có (cố định)",
+        "dual-axis": "Hai trục (theo mặt trời)",
+        "single-axis-h": "Một trục ngang (độ nghiêng tự điều chỉnh)",
+        "single-axis-v": "Một trục dọc (góc phương vị tự điều chỉnh)"
+      }
+    }
+  }
+}

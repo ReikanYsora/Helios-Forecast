@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Placering og inverterbegrænsning. Lad placeringen være tom for at bruge dit Home Assistant-hjem.",
+        "data": {
+          "name": "Navn",
+          "latitude": "Breddegrad (valgfrit)",
+          "longitude": "Længdegrad (valgfrit)",
+          "inverter_max_kw": "Inverterens maksimale effekt (kW, valgfrit)",
+          "production_entity": "Sensor for solcelleproduktion (til den lærte korrektion)",
+          "trend_anchor_hour": "Referencetime for dagens tendens (0-23, standard 6)"
+        }
+      },
+      "array": {
+        "title": "Panelgruppe",
+        "description": "Én gruppe af ens orienterede paneler. Tilføj flere på næste skærm, hvis dine paneler vender forskelligt.",
+        "data": {
+          "tilt": "Hældning (grader, 0 = flad, 90 = lodret)",
+          "azimuth": "Azimut (grader fra nord, 90 = øst, 180 = syd, 270 = vest)",
+          "kwp": "Spidseffekt (kWp)",
+          "tracker": "Solfølger",
+          "latitude": "Panelets breddegrad (valgfri tilsidesættelse)",
+          "longitude": "Panelets længdegrad (valgfri tilsidesættelse)"
+        }
+      },
+      "menu": {
+        "title": "Panelgrupper",
+        "description": "Tilføj en ny gruppe, eller afslut opsætningen.",
+        "menu_options": {
+          "add_array": "Tilføj en ny gruppe",
+          "finish": "Afslut"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Tilføj en panelgruppe, rediger en eksisterende, skift indstillingerne, eller gem.",
+        "menu_options": {
+          "add_array": "Tilføj en panelgruppe",
+          "edit_array": "Rediger en panelgruppe",
+          "settings": "Rediger indstillinger",
+          "save": "Gem og afslut"
+        }
+      },
+      "add_array": {
+        "title": "Tilføj en panelgruppe",
+        "data": {
+          "tilt": "Hældning (grader, 0 = flad, 90 = lodret)",
+          "azimuth": "Azimut (grader fra nord, 90 = øst, 180 = syd, 270 = vest)",
+          "kwp": "Spidseffekt (kWp)",
+          "latitude": "Panelets breddegrad (valgfri tilsidesættelse)",
+          "longitude": "Panelets længdegrad (valgfri tilsidesættelse)",
+          "tracker": "Solfølger"
+        }
+      },
+      "edit_array": {
+        "title": "Rediger en panelgruppe",
+        "description": "Vælg den gruppe, der skal redigeres eller fjernes.",
+        "data": {
+          "array": "Gruppe"
+        }
+      },
+      "edit_array_values": {
+        "title": "Rediger panelgruppe",
+        "description": "Redigerer {array}. Skift dens værdier, eller markér fjern for at slette den.",
+        "data": {
+          "tilt": "Hældning (grader, 0 = flad, 90 = lodret)",
+          "azimuth": "Azimut (grader fra nord, 90 = øst, 180 = syd, 270 = vest)",
+          "kwp": "Spidseffekt (kWp)",
+          "latitude": "Panelets breddegrad (valgfri tilsidesættelse)",
+          "longitude": "Panelets længdegrad (valgfri tilsidesættelse)",
+          "tracker": "Solfølger",
+          "remove": "Fjern denne gruppe"
+        }
+      },
+      "settings": {
+        "title": "Indstillinger",
+        "data": {
+          "inverter_max_kw": "Inverterens maksimale effekt (kW, valgfrit)",
+          "latitude": "Breddegrad",
+          "longitude": "Længdegrad",
+          "production_entity": "Sensor for solcelleproduktion (til den lærte korrektion)",
+          "trend_anchor_hour": "Referencetime for dagens tendens (0-23, standard 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Ingen (fast)",
+        "dual-axis": "Toakset (følger solen)",
+        "single-axis-h": "Enakset vandret (hældning følger)",
+        "single-axis-v": "Enakset lodret (azimut følger)"
+      }
+    }
+  }
+}

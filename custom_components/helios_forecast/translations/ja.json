@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "設置場所とインバーターの上限。Home Assistant の自宅を使用する場合は場所を空欄のままにしてください。",
+        "data": {
+          "name": "名前",
+          "latitude": "緯度（任意）",
+          "longitude": "経度（任意）",
+          "inverter_max_kw": "インバーターの最大出力（kW、任意）",
+          "production_entity": "発電量センサー（学習補正に使用）",
+          "trend_anchor_hour": "本日の傾向の基準時刻（0〜23、既定値 6）"
+        }
+      },
+      "array": {
+        "title": "パネルアレイ",
+        "description": "同じ向きのパネル 1 グループです。パネルの向きが異なる場合は、次の画面で追加してください。",
+        "data": {
+          "tilt": "傾斜角（度、0 = 水平、90 = 垂直）",
+          "azimuth": "方位角（北からの度数、90 = 東、180 = 南、270 = 西）",
+          "kwp": "ピーク出力（kWp）",
+          "tracker": "太陽追尾装置",
+          "latitude": "パネルの緯度（任意の上書き）",
+          "longitude": "パネルの経度（任意の上書き）"
+        }
+      },
+      "menu": {
+        "title": "パネルアレイ",
+        "description": "別のアレイを追加するか、設定を完了します。",
+        "menu_options": {
+          "add_array": "別のアレイを追加",
+          "finish": "完了"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "パネルアレイの追加、既存アレイの編集、設定の変更、または保存を行います。",
+        "menu_options": {
+          "add_array": "パネルアレイを追加",
+          "edit_array": "パネルアレイを編集",
+          "settings": "設定を編集",
+          "save": "保存して完了"
+        }
+      },
+      "add_array": {
+        "title": "パネルアレイを追加",
+        "data": {
+          "tilt": "傾斜角（度、0 = 水平、90 = 垂直）",
+          "azimuth": "方位角（北からの度数、90 = 東、180 = 南、270 = 西）",
+          "kwp": "ピーク出力（kWp）",
+          "latitude": "パネルの緯度（任意の上書き）",
+          "longitude": "パネルの経度（任意の上書き）",
+          "tracker": "太陽追尾装置"
+        }
+      },
+      "edit_array": {
+        "title": "パネルアレイを編集",
+        "description": "編集または削除するアレイを選択してください。",
+        "data": {
+          "array": "アレイ"
+        }
+      },
+      "edit_array_values": {
+        "title": "パネルアレイを編集",
+        "description": "{array} を編集しています。値を変更するか、削除にチェックを入れて削除してください。",
+        "data": {
+          "tilt": "傾斜角（度、0 = 水平、90 = 垂直）",
+          "azimuth": "方位角（北からの度数、90 = 東、180 = 南、270 = 西）",
+          "kwp": "ピーク出力（kWp）",
+          "latitude": "パネルの緯度（任意の上書き）",
+          "longitude": "パネルの経度（任意の上書き）",
+          "tracker": "太陽追尾装置",
+          "remove": "このアレイを削除"
+        }
+      },
+      "settings": {
+        "title": "設定",
+        "data": {
+          "inverter_max_kw": "インバーターの最大出力（kW、任意）",
+          "latitude": "緯度",
+          "longitude": "経度",
+          "production_entity": "発電量センサー（学習補正に使用）",
+          "trend_anchor_hour": "本日の傾向の基準時刻（0〜23、既定値 6）"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "なし（固定）",
+        "dual-axis": "2 軸（太陽を追尾）",
+        "single-axis-h": "水平単軸（傾斜角が追従）",
+        "single-axis-v": "垂直単軸（方位角が追従）"
+      }
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Helios Forecast",
+        "description": "Standort und Wechselrichter-Grenze. Lasse den Standort leer, um den Standort deiner Home-Assistant-Installation zu verwenden.",
+        "data": {
+          "name": "Name",
+          "latitude": "Breitengrad (optional)",
+          "longitude": "Längengrad (optional)",
+          "inverter_max_kw": "Maximale Wechselrichter-Leistung (kW, optional)",
+          "production_entity": "PV-Erzeugungssensor (für die gelernte Korrektur)",
+          "trend_anchor_hour": "Referenzstunde für den Tagestrend (0-23, Standard 6)"
+        }
+      },
+      "array": {
+        "title": "Modulfeld",
+        "description": "Eine Gruppe gleich ausgerichteter Module. Füge auf dem nächsten Bildschirm weitere hinzu, wenn deine Module in verschiedene Richtungen zeigen.",
+        "data": {
+          "tilt": "Neigung (Grad, 0 = flach, 90 = senkrecht)",
+          "azimuth": "Azimut (Grad ab Norden, 90 = Ost, 180 = Süd, 270 = West)",
+          "kwp": "Spitzenleistung (kWp)",
+          "tracker": "Sonnen-Nachführung",
+          "latitude": "Modul-Breitengrad (optional, überschreibt)",
+          "longitude": "Modul-Längengrad (optional, überschreibt)"
+        }
+      },
+      "menu": {
+        "title": "Modulfelder",
+        "description": "Füge ein weiteres Feld hinzu oder schließe die Einrichtung ab.",
+        "menu_options": {
+          "add_array": "Weiteres Feld hinzufügen",
+          "finish": "Fertigstellen"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Helios Forecast",
+        "description": "Füge ein Modulfeld hinzu, bearbeite ein bestehendes, ändere die Einstellungen oder speichere.",
+        "menu_options": {
+          "add_array": "Modulfeld hinzufügen",
+          "edit_array": "Modulfeld bearbeiten",
+          "settings": "Einstellungen bearbeiten",
+          "save": "Speichern und beenden"
+        }
+      },
+      "add_array": {
+        "title": "Modulfeld hinzufügen",
+        "data": {
+          "tilt": "Neigung (Grad, 0 = flach, 90 = senkrecht)",
+          "azimuth": "Azimut (Grad ab Norden, 90 = Ost, 180 = Süd, 270 = West)",
+          "kwp": "Spitzenleistung (kWp)",
+          "latitude": "Modul-Breitengrad (optional, überschreibt)",
+          "longitude": "Modul-Längengrad (optional, überschreibt)",
+          "tracker": "Sonnen-Nachführung"
+        }
+      },
+      "edit_array": {
+        "title": "Modulfeld bearbeiten",
+        "description": "Wähle das zu bearbeitende oder zu entfernende Feld.",
+        "data": {
+          "array": "Feld"
+        }
+      },
+      "edit_array_values": {
+        "title": "Modulfeld bearbeiten",
+        "description": "{array} wird bearbeitet. Ändere die Werte oder aktiviere Entfernen, um es zu löschen.",
+        "data": {
+          "tilt": "Neigung (Grad, 0 = flach, 90 = senkrecht)",
+          "azimuth": "Azimut (Grad ab Norden, 90 = Ost, 180 = Süd, 270 = West)",
+          "kwp": "Spitzenleistung (kWp)",
+          "latitude": "Modul-Breitengrad (optional, überschreibt)",
+          "longitude": "Modul-Längengrad (optional, überschreibt)",
+          "tracker": "Sonnen-Nachführung",
+          "remove": "Dieses Feld entfernen"
+        }
+      },
+      "settings": {
+        "title": "Einstellungen",
+        "data": {
+          "inverter_max_kw": "Maximale Wechselrichter-Leistung (kW, optional)",
+          "latitude": "Breitengrad",
+          "longitude": "Längengrad",
+          "production_entity": "PV-Erzeugungssensor (für die gelernte Korrektur)",
+          "trend_anchor_hour": "Referenzstunde für den Tagestrend (0-23, Standard 6)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "tracker": {
+      "options": {
+        "none": "Keine (fest)",
+        "dual-axis": "Zweiachsig (folgt der Sonne)",
+        "single-axis-h": "Einachsig horizontal (Neigung folgt)",
+        "single-axis-v": "Einachsig vertikal (Azimut folgt)"
+      }
+    }
+  }
+}
