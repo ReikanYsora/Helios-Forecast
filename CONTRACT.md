@@ -1,15 +1,20 @@
-# Data contract , Helios Solar Forecast
+# Data contract: Helios Solar Forecast
 
 > Status: FROZEN (2026-06-11). This is the agreed interface between the
 > integration and the Helios card. The model is ported against this schema;
 > any change from here is a deliberate revision, not a moving target.
+>
+> Revision (2026-06-27): the config model moved from one entry holding several
+> panel arrays to **one entry per panel line**. Every output surface is unchanged;
+> only the configuration shape (section 5) and its scoping changed.
 
-The integration owns one **config entry per PV system** (usually one). Every
-surface below is scoped to that entry.
+The integration owns one **config entry per panel line** (a group of co-oriented
+panels). Add it once per line. Every surface below is scoped to that entry, so
+each line gets its own device, entities and detail series.
 
 ---
 
-## How the card consumes the forecast , optional, two layers
+## How the card consumes the forecast: optional, two layers
 
 The card no longer computes the forecast. The forecast is **entirely optional**:
 with none configured in Home Assistant the card simply shows **no forecast curve
@@ -35,7 +40,7 @@ chip) on its existing Open-Meteo path. Only the forecast moves out.
 
 ---
 
-## 1. Energy dashboard provider (native HA) , what Helios-Forecast exposes
+## 1. Energy dashboard provider (native HA): what Helios-Forecast exposes
 
 The integration ships an `energy.py` platform exposing:
 
@@ -53,7 +58,7 @@ async def async_get_solar_forecast(hass, config_entry_id) -> dict:
   AND the surface the card's baseline layer reads (provider-agnostic: it is HA's
   own, not a Helios-only entity).
 
-## 2. Sensors , first-class output, for automations
+## 2. Sensors: first-class output for automations
 
 A proper, recorder-friendly entity set, grouped under one device per config
 entry. This is a primary deliverable, not a side effect: the integration is
@@ -66,28 +71,28 @@ model. The card does not depend on these entity names for its baseline layer.
 
 Days are numbered uniformly, **`day_1` = today** through **`day_7` = J+6**.
 
-Power , now / next hour:
+Power, now / next hour:
 
 | Entity | State | Notes |
 |---|---|---|
 | `sensor.helios_forecast_power_now` | predicted PV power now, **W** | `device_class: power`, `state_class: measurement` |
 | `sensor.helios_forecast_power_next_hour` | predicted average power over the next hour, **W** | |
 
-Peak , per day over the 7-day horizon:
+Peak, per day over the 7-day horizon:
 
 | Entity | State | Notes |
 |---|---|---|
 | `sensor.helios_forecast_peak_power_day_1` … `_day_7` | predicted peak power for day N, **W** | one entity per day, day 1 = today |
 | `sensor.helios_forecast_peak_time_day_1` … `_day_7` | clock time of day N's peak | `device_class: timestamp`, one per day |
 
-Energy , daily totals over the 7-day horizon:
+Energy, daily totals over the 7-day horizon:
 
 | Entity | State | Notes |
 |---|---|---|
 | `sensor.helios_forecast_energy_day_1` … `_day_7` | predicted daily total, **kWh** | `device_class: energy`, `state_class: total`, one per day |
 | `sensor.helios_forecast_energy_today_remaining` | predicted production left today, **kWh** | the one exception to day numbering, "remaining" only applies to today; drives "run the dishwasher if enough sun left" automations |
 
-Energy , intraday:
+Energy, intraday:
 
 | Entity | State | Notes |
 |---|---|---|
@@ -104,7 +109,7 @@ are inherently low-confidence for solar (cloud predictability collapses), to be
 stated plainly in the docs. The Helios card's visible window is unchanged: **J-2
 to J+2**, exactly as today; the extra forecast days live only in the entities.
 
-## 3. Enhanced detail series (Helios-Forecast only) , WebSocket API
+## 3. Enhanced detail series (Helios-Forecast only): WebSocket API
 
 The premium layer. A dense, raw + corrected curve, more than belongs in a state
 attribute. Travels over a WebSocket command, the same mechanism the card already
@@ -152,15 +157,19 @@ the card's "Graph detail" setting; the integration resamples server-side).
 ## 5. Config that moves into the integration (config flow)
 
 The card no longer carries these; they become Helios-Forecast's config entry.
+One entry describes one panel line, so the geometry is a single orientation, not
+a list.
 
-- Location (defaults to the HA home).
-- PV arrays: per array `tilt`, `azimuth`, `kwp`, tracker type, optional
-  coordinates + height.
-- Inverter max kW; inverter cutoff SoC %.
-- Entity wiring for the learning loop: PV production + battery SoC. Read from the
-  HA Energy dashboard preferences server-side where possible, otherwise picked in
-  the flow.
-- Optional solar-radiation sensor (W/m²).
+- Panel line geometry: `tilt`, `azimuth`, `kwp`, tracker type.
+- Location (defaults to the HA home), optional per entry.
+- Inverter max kW (optional clip).
+- The PV production sensor that drives the learned correction. It reads the
+  line's real production, curtailment included, so the forecast tracks what the
+  home actually harvests. No battery SoC input and no SoC cutoff: curtailment is
+  learned directly from production (see the 2026-06-12 revision that dropped the
+  SoC guard).
+- Today-trend reference hour: the local hour at which today's outlook reference
+  is frozen.
 
 ---
 
