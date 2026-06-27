@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "位置與逆變器上限。留空位置欄即使用您的 Home Assistant 住家位置。",
+        "title": "Helios Forecast — 面板線路",
+        "description": "為一條面板線路（一組朝向相同的面板）提供一個預測。每增加一條線路請再次新增此整合。留空位置欄即使用您的 Home Assistant 住家位置。",
         "data": {
-          "name": "名稱",
+          "name": "名稱（例如：南向屋頂）",
+          "tilt": "傾角（度，0 = 水平，90 = 垂直）",
+          "azimuth": "方位角（自正北起算的度數，90 = 東，180 = 南，270 = 西）",
+          "kwp": "尖峰功率（kWp）",
+          "tracker": "太陽追蹤器",
           "latitude": "緯度（選填）",
           "longitude": "經度（選填）",
           "inverter_max_kw": "逆變器最大輸出（kW，選填）",
           "production_entity": "太陽能發電量感測器（用於學習校正）",
           "trend_anchor_hour": "今日趨勢參考時刻（0-23，預設 6）"
-        }
-      },
-      "array": {
-        "title": "面板陣列",
-        "description": "一組朝向相同的面板。若您的面板朝向不同方向，請在下一個畫面新增更多陣列。",
-        "data": {
-          "tilt": "傾角（度，0 = 水平，90 = 垂直）",
-          "azimuth": "方位角（自正北起算的度數，90 = 東，180 = 南，270 = 西）",
-          "kwp": "尖峰功率（kWp）",
-          "tracker": "太陽追蹤器",
-          "latitude": "面板緯度（選填覆寫值）",
-          "longitude": "面板經度（選填覆寫值）"
-        }
-      },
-      "menu": {
-        "title": "面板陣列",
-        "description": "新增另一個陣列，或完成設定。",
-        "menu_options": {
-          "add_array": "新增另一個陣列",
-          "finish": "完成"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "新增面板陣列、編輯既有陣列、變更設定，或儲存。",
-        "menu_options": {
-          "add_array": "新增面板陣列",
-          "edit_array": "編輯面板陣列",
-          "settings": "編輯設定",
-          "save": "儲存並完成"
-        }
-      },
-      "add_array": {
-        "title": "新增面板陣列",
+        "title": "Helios Forecast — 面板線路",
+        "description": "編輯此面板線路的朝向與設定。",
         "data": {
           "tilt": "傾角（度，0 = 水平，90 = 垂直）",
           "azimuth": "方位角（自正北起算的度數，90 = 東，180 = 南，270 = 西）",
           "kwp": "尖峰功率（kWp）",
-          "latitude": "面板緯度（選填覆寫值）",
-          "longitude": "面板經度（選填覆寫值）",
-          "tracker": "太陽追蹤器"
-        }
-      },
-      "edit_array": {
-        "title": "編輯面板陣列",
-        "description": "選擇要編輯或移除的陣列。",
-        "data": {
-          "array": "陣列"
-        }
-      },
-      "edit_array_values": {
-        "title": "編輯面板陣列",
-        "description": "正在編輯 {array}。變更其數值，或勾選移除以刪除它。",
-        "data": {
-          "tilt": "傾角（度，0 = 水平，90 = 垂直）",
-          "azimuth": "方位角（自正北起算的度數，90 = 東，180 = 南，270 = 西）",
-          "kwp": "尖峰功率（kWp）",
-          "latitude": "面板緯度（選填覆寫值）",
-          "longitude": "面板經度（選填覆寫值）",
           "tracker": "太陽追蹤器",
-          "remove": "移除此陣列"
-        }
-      },
-      "settings": {
-        "title": "設定",
-        "data": {
+          "latitude": "緯度（選填）",
+          "longitude": "經度（選填）",
           "inverter_max_kw": "逆變器最大輸出（kW，選填）",
-          "latitude": "緯度",
-          "longitude": "經度",
           "production_entity": "太陽能發電量感測器（用於學習校正）",
           "trend_anchor_hour": "今日趨勢參考時刻（0-23，預設 6）"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}：單一項目中有多條面板線路",
+      "description": "「{name}」是在單一項目中設定了多個面板陣列，此方式已不再受支援。現在每條面板線路都需要擁有自己的項目，才能取得各自的預測實體。請刪除此項目，並為每條面板線路各新增一次 Helios Forecast。"
     }
   },
   "selector": {

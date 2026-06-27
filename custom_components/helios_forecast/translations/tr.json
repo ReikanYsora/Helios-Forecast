@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Konum ve inverter limiti. Home Assistant ev konumunuzu kullanmak için konumu boş bırakın.",
+        "title": "Helios Forecast — panel hattı",
+        "description": "Bir panel hattı (aynı yöne bakan bir panel grubu) için bir tahmin. Her ek hat için entegrasyonu yeniden ekleyin. Home Assistant ev konumunuzu kullanmak için konumu boş bırakın.",
         "data": {
-          "name": "Ad",
+          "name": "Ad (örn. Güney çatı)",
+          "tilt": "Eğim (derece, 0 = yatay, 90 = dikey)",
+          "azimuth": "Azimut (kuzeyden derece, 90 = doğu, 180 = güney, 270 = batı)",
+          "kwp": "Tepe güç (kWp)",
+          "tracker": "Güneş takip sistemi",
           "latitude": "Enlem (isteğe bağlı)",
           "longitude": "Boylam (isteğe bağlı)",
           "inverter_max_kw": "İnverter maks. çıkış (kW, isteğe bağlı)",
           "production_entity": "PV üretim sensörü (öğrenilen düzeltme için)",
           "trend_anchor_hour": "Bugünkü trend referans saati (0-23, varsayılan 6)"
-        }
-      },
-      "array": {
-        "title": "Panel dizisi",
-        "description": "Aynı yöne bakan bir panel grubu. Panelleriniz farklı yönlere bakıyorsa sonraki ekranda daha fazla ekleyin.",
-        "data": {
-          "tilt": "Eğim (derece, 0 = yatay, 90 = dikey)",
-          "azimuth": "Azimut (kuzeyden derece, 90 = doğu, 180 = güney, 270 = batı)",
-          "kwp": "Tepe güç (kWp)",
-          "tracker": "Güneş takip sistemi",
-          "latitude": "Panel enlemi (isteğe bağlı geçersiz kılma)",
-          "longitude": "Panel boylamı (isteğe bağlı geçersiz kılma)"
-        }
-      },
-      "menu": {
-        "title": "Panel dizileri",
-        "description": "Başka bir dizi ekleyin veya kurulumu tamamlayın.",
-        "menu_options": {
-          "add_array": "Başka bir dizi ekle",
-          "finish": "Bitir"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Bir panel dizisi ekleyin, mevcut birini düzenleyin, ayarları değiştirin veya kaydedin.",
-        "menu_options": {
-          "add_array": "Panel dizisi ekle",
-          "edit_array": "Panel dizisini düzenle",
-          "settings": "Ayarları düzenle",
-          "save": "Kaydet ve bitir"
-        }
-      },
-      "add_array": {
-        "title": "Panel dizisi ekle",
+        "title": "Helios Forecast — panel hattı",
+        "description": "Bu panel hattının yönünü ve ayarlarını düzenleyin.",
         "data": {
           "tilt": "Eğim (derece, 0 = yatay, 90 = dikey)",
           "azimuth": "Azimut (kuzeyden derece, 90 = doğu, 180 = güney, 270 = batı)",
           "kwp": "Tepe güç (kWp)",
-          "latitude": "Panel enlemi (isteğe bağlı geçersiz kılma)",
-          "longitude": "Panel boylamı (isteğe bağlı geçersiz kılma)",
-          "tracker": "Güneş takip sistemi"
-        }
-      },
-      "edit_array": {
-        "title": "Panel dizisini düzenle",
-        "description": "Düzenlenecek veya kaldırılacak diziyi seçin.",
-        "data": {
-          "array": "Dizi"
-        }
-      },
-      "edit_array_values": {
-        "title": "Panel dizisini düzenle",
-        "description": "{array} düzenleniyor. Değerlerini değiştirin veya silmek için kaldır seçeneğini işaretleyin.",
-        "data": {
-          "tilt": "Eğim (derece, 0 = yatay, 90 = dikey)",
-          "azimuth": "Azimut (kuzeyden derece, 90 = doğu, 180 = güney, 270 = batı)",
-          "kwp": "Tepe güç (kWp)",
-          "latitude": "Panel enlemi (isteğe bağlı geçersiz kılma)",
-          "longitude": "Panel boylamı (isteğe bağlı geçersiz kılma)",
           "tracker": "Güneş takip sistemi",
-          "remove": "Bu diziyi kaldır"
-        }
-      },
-      "settings": {
-        "title": "Ayarlar",
-        "data": {
+          "latitude": "Enlem (isteğe bağlı)",
+          "longitude": "Boylam (isteğe bağlı)",
           "inverter_max_kw": "İnverter maks. çıkış (kW, isteğe bağlı)",
-          "latitude": "Enlem",
-          "longitude": "Boylam",
           "production_entity": "PV üretim sensörü (öğrenilen düzeltme için)",
           "trend_anchor_hour": "Bugünkü trend referans saati (0-23, varsayılan 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: tek girişte birden fazla panel hattı",
+      "description": "\"{name}\" tek bir girişte birden fazla panel dizisiyle kuruldu ve bu artık desteklenmiyor. Her panel hattının artık kendi tahmin varlıklarına sahip olabilmesi için kendi girişine ihtiyacı var. Bu girişi silin ve her panel hattı için bir kez Helios Forecast ekleyin."
     }
   },
   "selector": {

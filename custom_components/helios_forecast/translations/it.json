@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Posizione e limite dell'inverter. Lascia vuota la posizione per usare quella di casa in Home Assistant.",
+        "title": "Helios Forecast — stringa di pannelli",
+        "description": "Una previsione per una stringa di pannelli (un gruppo di pannelli con lo stesso orientamento). Aggiungi di nuovo l'integrazione per ogni stringa aggiuntiva. Lascia vuota la posizione per usare quella di casa in Home Assistant.",
         "data": {
-          "name": "Nome",
+          "name": "Nome (es. Tetto sud)",
+          "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
+          "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
+          "kwp": "Potenza di picco (kWp)",
+          "tracker": "Inseguitore solare",
           "latitude": "Latitudine (opzionale)",
           "longitude": "Longitudine (opzionale)",
           "inverter_max_kw": "Potenza massima dell'inverter (kW, opzionale)",
           "production_entity": "Sensore di produzione fotovoltaica (per la correzione appresa)",
           "trend_anchor_hour": "Ora di riferimento per l'andamento odierno (0-23, predefinito 6)"
-        }
-      },
-      "array": {
-        "title": "Stringa di pannelli",
-        "description": "Un gruppo di pannelli con lo stesso orientamento. Aggiungine altri nella schermata successiva se i pannelli sono rivolti in direzioni diverse.",
-        "data": {
-          "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
-          "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
-          "kwp": "Potenza di picco (kWp)",
-          "tracker": "Inseguitore solare",
-          "latitude": "Latitudine dei pannelli (override opzionale)",
-          "longitude": "Longitudine dei pannelli (override opzionale)"
-        }
-      },
-      "menu": {
-        "title": "Stringhe di pannelli",
-        "description": "Aggiungi un'altra stringa oppure completa la configurazione.",
-        "menu_options": {
-          "add_array": "Aggiungi un'altra stringa",
-          "finish": "Completa"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Aggiungi una stringa di pannelli, modificane una esistente, cambia le impostazioni o salva.",
-        "menu_options": {
-          "add_array": "Aggiungi una stringa di pannelli",
-          "edit_array": "Modifica una stringa di pannelli",
-          "settings": "Modifica impostazioni",
-          "save": "Salva e completa"
-        }
-      },
-      "add_array": {
-        "title": "Aggiungi una stringa di pannelli",
+        "title": "Helios Forecast — stringa di pannelli",
+        "description": "Modifica l'orientamento e le impostazioni di questa stringa di pannelli.",
         "data": {
           "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
           "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
           "kwp": "Potenza di picco (kWp)",
-          "latitude": "Latitudine dei pannelli (override opzionale)",
-          "longitude": "Longitudine dei pannelli (override opzionale)",
-          "tracker": "Inseguitore solare"
-        }
-      },
-      "edit_array": {
-        "title": "Modifica una stringa di pannelli",
-        "description": "Scegli la stringa da modificare o rimuovere.",
-        "data": {
-          "array": "Stringa"
-        }
-      },
-      "edit_array_values": {
-        "title": "Modifica stringa di pannelli",
-        "description": "Modifica di {array}. Cambia i valori oppure seleziona rimuovi per eliminarla.",
-        "data": {
-          "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
-          "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
-          "kwp": "Potenza di picco (kWp)",
-          "latitude": "Latitudine dei pannelli (override opzionale)",
-          "longitude": "Longitudine dei pannelli (override opzionale)",
           "tracker": "Inseguitore solare",
-          "remove": "Rimuovi questa stringa"
-        }
-      },
-      "settings": {
-        "title": "Impostazioni",
-        "data": {
+          "latitude": "Latitudine (opzionale)",
+          "longitude": "Longitudine (opzionale)",
           "inverter_max_kw": "Potenza massima dell'inverter (kW, opzionale)",
-          "latitude": "Latitudine",
-          "longitude": "Longitudine",
           "production_entity": "Sensore di produzione fotovoltaica (per la correzione appresa)",
           "trend_anchor_hour": "Ora di riferimento per l'andamento odierno (0-23, predefinito 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: più stringhe di pannelli in una sola voce",
+      "description": "\"{name}\" è stato configurato con diverse stringhe di pannelli in un'unica voce, opzione non più supportata. Ora ogni stringa di pannelli necessita di una propria voce per avere le proprie entità di previsione. Elimina questa voce e aggiungi Helios Forecast una volta per ogni stringa di pannelli."
     }
   },
   "selector": {

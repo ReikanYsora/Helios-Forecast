@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "위치 및 인버터 한계값입니다. Home Assistant 홈 위치를 사용하려면 위치를 비워 두세요.",
+        "title": "Helios Forecast — 패널 라인",
+        "description": "하나의 패널 라인(같은 방향을 향하는 패널 그룹)에 대한 하나의 예측입니다. 라인을 추가할 때마다 이 통합을 다시 추가하세요. Home Assistant 홈 위치를 사용하려면 위치를 비워 두세요.",
         "data": {
-          "name": "이름",
+          "name": "이름 (예: 남쪽 지붕)",
+          "tilt": "경사각 (도, 0 = 수평, 90 = 수직)",
+          "azimuth": "방위각 (북쪽 기준 도, 90 = 동쪽, 180 = 남쪽, 270 = 서쪽)",
+          "kwp": "최대 출력 (kWp)",
+          "tracker": "태양 추적기",
           "latitude": "위도 (선택)",
           "longitude": "경도 (선택)",
           "inverter_max_kw": "인버터 최대 출력 (kW, 선택)",
           "production_entity": "PV 발전량 센서 (학습 보정용)",
           "trend_anchor_hour": "오늘 추세 기준 시각 (0-23, 기본값 6)"
-        }
-      },
-      "array": {
-        "title": "패널 어레이",
-        "description": "같은 방향을 향하는 패널 한 그룹입니다. 패널 방향이 서로 다르면 다음 화면에서 더 추가하세요.",
-        "data": {
-          "tilt": "경사각 (도, 0 = 수평, 90 = 수직)",
-          "azimuth": "방위각 (북쪽 기준 도, 90 = 동쪽, 180 = 남쪽, 270 = 서쪽)",
-          "kwp": "최대 출력 (kWp)",
-          "tracker": "태양 추적기",
-          "latitude": "패널 위도 (선택 재정의)",
-          "longitude": "패널 경도 (선택 재정의)"
-        }
-      },
-      "menu": {
-        "title": "패널 어레이",
-        "description": "어레이를 더 추가하거나 설정을 완료하세요.",
-        "menu_options": {
-          "add_array": "어레이 추가",
-          "finish": "완료"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "패널 어레이를 추가하거나, 기존 어레이를 편집하거나, 설정을 변경하거나, 저장하세요.",
-        "menu_options": {
-          "add_array": "패널 어레이 추가",
-          "edit_array": "패널 어레이 편집",
-          "settings": "설정 편집",
-          "save": "저장 후 완료"
-        }
-      },
-      "add_array": {
-        "title": "패널 어레이 추가",
+        "title": "Helios Forecast — 패널 라인",
+        "description": "이 패널 라인의 방향과 설정을 편집하세요.",
         "data": {
           "tilt": "경사각 (도, 0 = 수평, 90 = 수직)",
           "azimuth": "방위각 (북쪽 기준 도, 90 = 동쪽, 180 = 남쪽, 270 = 서쪽)",
           "kwp": "최대 출력 (kWp)",
-          "latitude": "패널 위도 (선택 재정의)",
-          "longitude": "패널 경도 (선택 재정의)",
-          "tracker": "태양 추적기"
-        }
-      },
-      "edit_array": {
-        "title": "패널 어레이 편집",
-        "description": "편집하거나 삭제할 어레이를 선택하세요.",
-        "data": {
-          "array": "어레이"
-        }
-      },
-      "edit_array_values": {
-        "title": "패널 어레이 편집",
-        "description": "{array} 편집 중입니다. 값을 변경하거나, 삭제하려면 제거를 선택하세요.",
-        "data": {
-          "tilt": "경사각 (도, 0 = 수평, 90 = 수직)",
-          "azimuth": "방위각 (북쪽 기준 도, 90 = 동쪽, 180 = 남쪽, 270 = 서쪽)",
-          "kwp": "최대 출력 (kWp)",
-          "latitude": "패널 위도 (선택 재정의)",
-          "longitude": "패널 경도 (선택 재정의)",
           "tracker": "태양 추적기",
-          "remove": "이 어레이 제거"
-        }
-      },
-      "settings": {
-        "title": "설정",
-        "data": {
+          "latitude": "위도 (선택)",
+          "longitude": "경도 (선택)",
           "inverter_max_kw": "인버터 최대 출력 (kW, 선택)",
-          "latitude": "위도",
-          "longitude": "경도",
           "production_entity": "PV 발전량 센서 (학습 보정용)",
           "trend_anchor_hour": "오늘 추세 기준 시각 (0-23, 기본값 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: 한 항목에 여러 패널 라인",
+      "description": "\"{name}\"은(는) 하나의 항목에 여러 패널 어레이로 설정되어 있으며, 이는 더 이상 지원되지 않습니다. 이제 각 패널 라인이 자체 예측 엔터티를 갖도록 각각 별도의 항목이 필요합니다. 이 항목을 삭제하고 패널 라인마다 Helios Forecast를 한 번씩 추가하세요."
     }
   },
   "selector": {

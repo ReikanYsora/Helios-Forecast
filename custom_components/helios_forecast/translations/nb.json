@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Plassering og vekselrettergrense. La plasseringen stå tom for å bruke hjemmet ditt i Home Assistant.",
+        "title": "Helios Forecast — panelrekke",
+        "description": "Én prognose for én panelrekke (en gruppe paneler med samme orientering). Legg til integrasjonen på nytt for hver ekstra rekke. La plasseringen stå tom for å bruke hjemmet ditt i Home Assistant.",
         "data": {
-          "name": "Navn",
+          "name": "Navn (f.eks. Sørtak)",
+          "tilt": "Helning (grader, 0 = flatt, 90 = loddrett)",
+          "azimuth": "Asimut (grader fra nord, 90 = øst, 180 = sør, 270 = vest)",
+          "kwp": "Toppeffekt (kWp)",
+          "tracker": "Solfølger",
           "latitude": "Breddegrad (valgfritt)",
           "longitude": "Lengdegrad (valgfritt)",
           "inverter_max_kw": "Maks utgangseffekt for vekselretter (kW, valgfritt)",
           "production_entity": "Sensor for solcelleproduksjon (for den lærte korrigeringen)",
           "trend_anchor_hour": "Referansetime for dagens trend (0-23, standard 6)"
-        }
-      },
-      "array": {
-        "title": "Panelgruppe",
-        "description": "Én gruppe paneler med samme orientering. Legg til flere på neste skjerm hvis panelene vender ulike retninger.",
-        "data": {
-          "tilt": "Helning (grader, 0 = flatt, 90 = loddrett)",
-          "azimuth": "Asimut (grader fra nord, 90 = øst, 180 = sør, 270 = vest)",
-          "kwp": "Toppeffekt (kWp)",
-          "tracker": "Solfølger",
-          "latitude": "Panelets breddegrad (valgfri overstyring)",
-          "longitude": "Panelets lengdegrad (valgfri overstyring)"
-        }
-      },
-      "menu": {
-        "title": "Panelgrupper",
-        "description": "Legg til en gruppe til, eller fullfør oppsettet.",
-        "menu_options": {
-          "add_array": "Legg til en gruppe til",
-          "finish": "Fullfør"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Legg til en panelgruppe, rediger en eksisterende, endre innstillingene eller lagre.",
-        "menu_options": {
-          "add_array": "Legg til en panelgruppe",
-          "edit_array": "Rediger en panelgruppe",
-          "settings": "Rediger innstillinger",
-          "save": "Lagre og fullfør"
-        }
-      },
-      "add_array": {
-        "title": "Legg til en panelgruppe",
+        "title": "Helios Forecast — panelrekke",
+        "description": "Rediger orienteringen og innstillingene for denne panelrekken.",
         "data": {
           "tilt": "Helning (grader, 0 = flatt, 90 = loddrett)",
           "azimuth": "Asimut (grader fra nord, 90 = øst, 180 = sør, 270 = vest)",
           "kwp": "Toppeffekt (kWp)",
-          "latitude": "Panelets breddegrad (valgfri overstyring)",
-          "longitude": "Panelets lengdegrad (valgfri overstyring)",
-          "tracker": "Solfølger"
-        }
-      },
-      "edit_array": {
-        "title": "Rediger en panelgruppe",
-        "description": "Velg gruppen du vil redigere eller fjerne.",
-        "data": {
-          "array": "Gruppe"
-        }
-      },
-      "edit_array_values": {
-        "title": "Rediger panelgruppe",
-        "description": "Redigerer {array}. Endre verdiene, eller kryss av for fjern for å slette den.",
-        "data": {
-          "tilt": "Helning (grader, 0 = flatt, 90 = loddrett)",
-          "azimuth": "Asimut (grader fra nord, 90 = øst, 180 = sør, 270 = vest)",
-          "kwp": "Toppeffekt (kWp)",
-          "latitude": "Panelets breddegrad (valgfri overstyring)",
-          "longitude": "Panelets lengdegrad (valgfri overstyring)",
           "tracker": "Solfølger",
-          "remove": "Fjern denne gruppen"
-        }
-      },
-      "settings": {
-        "title": "Innstillinger",
-        "data": {
+          "latitude": "Breddegrad (valgfritt)",
+          "longitude": "Lengdegrad (valgfritt)",
           "inverter_max_kw": "Maks utgangseffekt for vekselretter (kW, valgfritt)",
-          "latitude": "Breddegrad",
-          "longitude": "Lengdegrad",
           "production_entity": "Sensor for solcelleproduksjon (for den lærte korrigeringen)",
           "trend_anchor_hour": "Referansetime for dagens trend (0-23, standard 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: flere panelrekker i én oppføring",
+      "description": "«{name}» ble satt opp med flere panelgrupper i én enkelt oppføring, noe som ikke lenger støttes. Hver panelrekke trenger nå sin egen oppføring for å få sine egne prognoseentiteter. Slett denne oppføringen og legg til Helios Forecast én gang per panelrekke."
     }
   },
   "selector": {

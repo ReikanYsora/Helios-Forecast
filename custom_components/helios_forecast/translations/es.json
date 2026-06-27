@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Ubicación y límite del inversor. Deja la ubicación en blanco para usar la de tu Home Assistant.",
+        "title": "Helios Forecast — línea de paneles",
+        "description": "Un pronóstico para una línea de paneles (un grupo de paneles con la misma orientación). Añade la integración de nuevo por cada línea adicional. Deja la ubicación en blanco para usar la de tu Home Assistant.",
         "data": {
-          "name": "Nombre",
+          "name": "Nombre (p. ej. Tejado sur)",
+          "tilt": "Inclinación (grados, 0 = horizontal, 90 = vertical)",
+          "azimuth": "Azimut (grados desde el norte, 90 = este, 180 = sur, 270 = oeste)",
+          "kwp": "Potencia pico (kWp)",
+          "tracker": "Seguidor solar",
           "latitude": "Latitud (opcional)",
           "longitude": "Longitud (opcional)",
           "inverter_max_kw": "Potencia máxima del inversor (kW, opcional)",
           "production_entity": "Sensor de producción fotovoltaica (para la corrección aprendida)",
           "trend_anchor_hour": "Hora de referencia para la tendencia de hoy (0-23, predeterminado 6)"
-        }
-      },
-      "array": {
-        "title": "Grupo de paneles",
-        "description": "Un grupo de paneles con la misma orientación. Añade más en la siguiente pantalla si tus paneles miran en direcciones distintas.",
-        "data": {
-          "tilt": "Inclinación (grados, 0 = horizontal, 90 = vertical)",
-          "azimuth": "Azimut (grados desde el norte, 90 = este, 180 = sur, 270 = oeste)",
-          "kwp": "Potencia pico (kWp)",
-          "tracker": "Seguidor solar",
-          "latitude": "Latitud del panel (anulación opcional)",
-          "longitude": "Longitud del panel (anulación opcional)"
-        }
-      },
-      "menu": {
-        "title": "Grupos de paneles",
-        "description": "Añade otro grupo o finaliza la configuración.",
-        "menu_options": {
-          "add_array": "Añadir otro grupo",
-          "finish": "Finalizar"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Añade un grupo de paneles, edita uno existente, cambia los ajustes o guarda.",
-        "menu_options": {
-          "add_array": "Añadir un grupo de paneles",
-          "edit_array": "Editar un grupo de paneles",
-          "settings": "Editar ajustes",
-          "save": "Guardar y finalizar"
-        }
-      },
-      "add_array": {
-        "title": "Añadir un grupo de paneles",
+        "title": "Helios Forecast — línea de paneles",
+        "description": "Edita la orientación y los ajustes de esta línea de paneles.",
         "data": {
           "tilt": "Inclinación (grados, 0 = horizontal, 90 = vertical)",
           "azimuth": "Azimut (grados desde el norte, 90 = este, 180 = sur, 270 = oeste)",
           "kwp": "Potencia pico (kWp)",
-          "latitude": "Latitud del panel (anulación opcional)",
-          "longitude": "Longitud del panel (anulación opcional)",
-          "tracker": "Seguidor solar"
-        }
-      },
-      "edit_array": {
-        "title": "Editar un grupo de paneles",
-        "description": "Elige el grupo que quieres editar o eliminar.",
-        "data": {
-          "array": "Grupo"
-        }
-      },
-      "edit_array_values": {
-        "title": "Editar grupo de paneles",
-        "description": "Editando {array}. Cambia sus valores o marca eliminar para borrarlo.",
-        "data": {
-          "tilt": "Inclinación (grados, 0 = horizontal, 90 = vertical)",
-          "azimuth": "Azimut (grados desde el norte, 90 = este, 180 = sur, 270 = oeste)",
-          "kwp": "Potencia pico (kWp)",
-          "latitude": "Latitud del panel (anulación opcional)",
-          "longitude": "Longitud del panel (anulación opcional)",
           "tracker": "Seguidor solar",
-          "remove": "Eliminar este grupo"
-        }
-      },
-      "settings": {
-        "title": "Ajustes",
-        "data": {
+          "latitude": "Latitud (opcional)",
+          "longitude": "Longitud (opcional)",
           "inverter_max_kw": "Potencia máxima del inversor (kW, opcional)",
-          "latitude": "Latitud",
-          "longitude": "Longitud",
           "production_entity": "Sensor de producción fotovoltaica (para la corrección aprendida)",
           "trend_anchor_hour": "Hora de referencia para la tendencia de hoy (0-23, predeterminado 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: varias líneas de paneles en una sola entrada",
+      "description": "«{name}» se configuró con varios grupos de paneles en una sola entrada, lo cual ya no es compatible. Ahora cada línea de paneles necesita su propia entrada para obtener sus propias entidades de pronóstico. Elimina esta entrada y añade Helios Forecast una vez por cada línea de paneles."
     }
   },
   "selector": {

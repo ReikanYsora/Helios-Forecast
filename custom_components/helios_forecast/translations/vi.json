@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Vị trí và giới hạn biến tần. Để trống vị trí để dùng vị trí nhà trong Home Assistant.",
+        "title": "Helios Forecast — hàng tấm pin",
+        "description": "Một dự báo cho một hàng tấm pin (một nhóm các tấm pin cùng hướng). Thêm lại tích hợp cho mỗi hàng bổ sung. Để trống vị trí để dùng vị trí nhà trong Home Assistant.",
         "data": {
-          "name": "Tên",
+          "name": "Tên (ví dụ: Mái phía nam)",
+          "tilt": "Độ nghiêng (độ, 0 = nằm phẳng, 90 = thẳng đứng)",
+          "azimuth": "Góc phương vị (độ tính từ hướng bắc, 90 = đông, 180 = nam, 270 = tây)",
+          "kwp": "Công suất đỉnh (kWp)",
+          "tracker": "Bộ theo dõi mặt trời",
           "latitude": "Vĩ độ (tùy chọn)",
           "longitude": "Kinh độ (tùy chọn)",
           "inverter_max_kw": "Công suất tối đa của biến tần (kW, tùy chọn)",
           "production_entity": "Cảm biến sản lượng điện mặt trời (dùng cho hiệu chỉnh tự học)",
           "trend_anchor_hour": "Giờ tham chiếu cho xu hướng hôm nay (0-23, mặc định 6)"
-        }
-      },
-      "array": {
-        "title": "Dàn tấm pin",
-        "description": "Một nhóm các tấm pin cùng hướng. Thêm nhóm khác ở màn hình tiếp theo nếu các tấm pin của bạn quay theo những hướng khác nhau.",
-        "data": {
-          "tilt": "Độ nghiêng (độ, 0 = nằm phẳng, 90 = thẳng đứng)",
-          "azimuth": "Góc phương vị (độ tính từ hướng bắc, 90 = đông, 180 = nam, 270 = tây)",
-          "kwp": "Công suất đỉnh (kWp)",
-          "tracker": "Bộ theo dõi mặt trời",
-          "latitude": "Vĩ độ tấm pin (ghi đè tùy chọn)",
-          "longitude": "Kinh độ tấm pin (ghi đè tùy chọn)"
-        }
-      },
-      "menu": {
-        "title": "Các dàn tấm pin",
-        "description": "Thêm một dàn khác, hoặc hoàn tất cài đặt.",
-        "menu_options": {
-          "add_array": "Thêm một dàn khác",
-          "finish": "Hoàn tất"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Thêm một dàn tấm pin, chỉnh sửa dàn hiện có, thay đổi cài đặt, hoặc lưu.",
-        "menu_options": {
-          "add_array": "Thêm một dàn tấm pin",
-          "edit_array": "Chỉnh sửa một dàn tấm pin",
-          "settings": "Chỉnh sửa cài đặt",
-          "save": "Lưu và hoàn tất"
-        }
-      },
-      "add_array": {
-        "title": "Thêm một dàn tấm pin",
+        "title": "Helios Forecast — hàng tấm pin",
+        "description": "Chỉnh sửa hướng và cài đặt của hàng tấm pin này.",
         "data": {
           "tilt": "Độ nghiêng (độ, 0 = nằm phẳng, 90 = thẳng đứng)",
           "azimuth": "Góc phương vị (độ tính từ hướng bắc, 90 = đông, 180 = nam, 270 = tây)",
           "kwp": "Công suất đỉnh (kWp)",
-          "latitude": "Vĩ độ tấm pin (ghi đè tùy chọn)",
-          "longitude": "Kinh độ tấm pin (ghi đè tùy chọn)",
-          "tracker": "Bộ theo dõi mặt trời"
-        }
-      },
-      "edit_array": {
-        "title": "Chỉnh sửa một dàn tấm pin",
-        "description": "Chọn dàn cần chỉnh sửa hoặc xóa.",
-        "data": {
-          "array": "Dàn"
-        }
-      },
-      "edit_array_values": {
-        "title": "Chỉnh sửa dàn tấm pin",
-        "description": "Đang chỉnh sửa {array}. Thay đổi các giá trị, hoặc đánh dấu xóa để xóa dàn này.",
-        "data": {
-          "tilt": "Độ nghiêng (độ, 0 = nằm phẳng, 90 = thẳng đứng)",
-          "azimuth": "Góc phương vị (độ tính từ hướng bắc, 90 = đông, 180 = nam, 270 = tây)",
-          "kwp": "Công suất đỉnh (kWp)",
-          "latitude": "Vĩ độ tấm pin (ghi đè tùy chọn)",
-          "longitude": "Kinh độ tấm pin (ghi đè tùy chọn)",
           "tracker": "Bộ theo dõi mặt trời",
-          "remove": "Xóa dàn này"
-        }
-      },
-      "settings": {
-        "title": "Cài đặt",
-        "data": {
+          "latitude": "Vĩ độ (tùy chọn)",
+          "longitude": "Kinh độ (tùy chọn)",
           "inverter_max_kw": "Công suất tối đa của biến tần (kW, tùy chọn)",
-          "latitude": "Vĩ độ",
-          "longitude": "Kinh độ",
           "production_entity": "Cảm biến sản lượng điện mặt trời (dùng cho hiệu chỉnh tự học)",
           "trend_anchor_hour": "Giờ tham chiếu cho xu hướng hôm nay (0-23, mặc định 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: nhiều hàng tấm pin trong một mục",
+      "description": "\"{name}\" đã được thiết lập với nhiều dàn tấm pin trong một mục duy nhất, điều này không còn được hỗ trợ. Mỗi hàng tấm pin giờ đây cần mục riêng của nó để có các thực thể dự báo riêng. Xóa mục này và thêm Helios Forecast một lần cho mỗi hàng tấm pin."
     }
   },
   "selector": {

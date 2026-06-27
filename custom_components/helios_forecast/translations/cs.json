@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Poloha a limit střídače. Ponechte pole polohy prázdné pro použití domácí polohy z Home Assistant.",
+        "title": "Helios Forecast — linie panelů",
+        "description": "Jedna předpověď pro jednu linii panelů (skupina shodně orientovaných panelů). Pro každou další linii přidejte integraci znovu. Ponechte pole polohy prázdné pro použití domácí polohy z Home Assistant.",
         "data": {
-          "name": "Název",
+          "name": "Název (např. Jižní střecha)",
+          "tilt": "Sklon (stupně, 0 = vodorovně, 90 = svisle)",
+          "azimuth": "Azimut (stupně od severu, 90 = východ, 180 = jih, 270 = západ)",
+          "kwp": "Špičkový výkon (kWp)",
+          "tracker": "Sledovač slunce",
           "latitude": "Zeměpisná šířka (volitelné)",
           "longitude": "Zeměpisná délka (volitelné)",
           "inverter_max_kw": "Maximální výkon střídače (kW, volitelné)",
           "production_entity": "Senzor výroby FV (pro naučenou korekci)",
           "trend_anchor_hour": "Referenční hodina denního trendu (0-23, výchozí 6)"
-        }
-      },
-      "array": {
-        "title": "Pole panelů",
-        "description": "Jedna skupina shodně orientovaných panelů. Pokud jsou vaše panely orientovány různými směry, přidejte další na následující obrazovce.",
-        "data": {
-          "tilt": "Sklon (stupně, 0 = vodorovně, 90 = svisle)",
-          "azimuth": "Azimut (stupně od severu, 90 = východ, 180 = jih, 270 = západ)",
-          "kwp": "Špičkový výkon (kWp)",
-          "tracker": "Sledovač slunce",
-          "latitude": "Zeměpisná šířka panelu (volitelné přepsání)",
-          "longitude": "Zeměpisná délka panelu (volitelné přepsání)"
-        }
-      },
-      "menu": {
-        "title": "Pole panelů",
-        "description": "Přidejte další pole nebo dokončete nastavení.",
-        "menu_options": {
-          "add_array": "Přidat další pole",
-          "finish": "Dokončit"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Přidejte pole panelů, upravte stávající, změňte nastavení nebo uložte.",
-        "menu_options": {
-          "add_array": "Přidat pole panelů",
-          "edit_array": "Upravit pole panelů",
-          "settings": "Upravit nastavení",
-          "save": "Uložit a dokončit"
-        }
-      },
-      "add_array": {
-        "title": "Přidat pole panelů",
+        "title": "Helios Forecast — linie panelů",
+        "description": "Upravte orientaci a nastavení této linie panelů.",
         "data": {
           "tilt": "Sklon (stupně, 0 = vodorovně, 90 = svisle)",
           "azimuth": "Azimut (stupně od severu, 90 = východ, 180 = jih, 270 = západ)",
           "kwp": "Špičkový výkon (kWp)",
-          "latitude": "Zeměpisná šířka panelu (volitelné přepsání)",
-          "longitude": "Zeměpisná délka panelu (volitelné přepsání)",
-          "tracker": "Sledovač slunce"
-        }
-      },
-      "edit_array": {
-        "title": "Upravit pole panelů",
-        "description": "Vyberte pole, které chcete upravit nebo odebrat.",
-        "data": {
-          "array": "Pole"
-        }
-      },
-      "edit_array_values": {
-        "title": "Upravit pole panelů",
-        "description": "Úprava {array}. Změňte jeho hodnoty nebo zaškrtněte odebrat pro jeho smazání.",
-        "data": {
-          "tilt": "Sklon (stupně, 0 = vodorovně, 90 = svisle)",
-          "azimuth": "Azimut (stupně od severu, 90 = východ, 180 = jih, 270 = západ)",
-          "kwp": "Špičkový výkon (kWp)",
-          "latitude": "Zeměpisná šířka panelu (volitelné přepsání)",
-          "longitude": "Zeměpisná délka panelu (volitelné přepsání)",
           "tracker": "Sledovač slunce",
-          "remove": "Odebrat toto pole"
-        }
-      },
-      "settings": {
-        "title": "Nastavení",
-        "data": {
+          "latitude": "Zeměpisná šířka (volitelné)",
+          "longitude": "Zeměpisná délka (volitelné)",
           "inverter_max_kw": "Maximální výkon střídače (kW, volitelné)",
-          "latitude": "Zeměpisná šířka",
-          "longitude": "Zeměpisná délka",
           "production_entity": "Senzor výroby FV (pro naučenou korekci)",
           "trend_anchor_hour": "Referenční hodina denního trendu (0-23, výchozí 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: více linií panelů v jednom záznamu",
+      "description": "„{name}“ byl nastaven s několika poli panelů v jednom záznamu, což již není podporováno. Každá linie panelů nyní potřebuje vlastní záznam, aby měla vlastní entity předpovědi. Smažte tento záznam a přidejte Helios Forecast jednou pro každou linii panelů."
     }
   },
   "selector": {

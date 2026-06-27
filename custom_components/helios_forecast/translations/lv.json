@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Atrašanās vieta un invertora ierobežojums. Atstājiet atrašanās vietu tukšu, lai izmantotu jūsu Home Assistant mājas atrašanās vietu.",
+        "title": "Helios Forecast — paneļu līnija",
+        "description": "Viena prognoze vienai paneļu līnijai (vienādi orientētu paneļu grupai). Katrai papildu līnijai pievienojiet integrāciju vēlreiz. Atstājiet atrašanās vietu tukšu, lai izmantotu jūsu Home Assistant mājas atrašanās vietu.",
         "data": {
-          "name": "Nosaukums",
+          "name": "Nosaukums (piem., Dienvidu jumts)",
+          "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
+          "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
+          "kwp": "Maksimālā jauda (kWp)",
+          "tracker": "Saules sekotājs",
           "latitude": "Platums (neobligāti)",
           "longitude": "Garums (neobligāti)",
           "inverter_max_kw": "Invertora maksimālā jauda (kW, neobligāti)",
           "production_entity": "PV ražošanas sensors (apgūtajai korekcijai)",
           "trend_anchor_hour": "Šodienas tendences atskaites stunda (0-23, noklusējums 6)"
-        }
-      },
-      "array": {
-        "title": "Paneļu masīvs",
-        "description": "Viena grupa vienādi orientētu paneļu. Pievienojiet vairākus nākamajā ekrānā, ja jūsu paneļi ir vērsti dažādos virzienos.",
-        "data": {
-          "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
-          "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
-          "kwp": "Maksimālā jauda (kWp)",
-          "tracker": "Saules sekotājs",
-          "latitude": "Paneļa platums (neobligāta aizstāšana)",
-          "longitude": "Paneļa garums (neobligāta aizstāšana)"
-        }
-      },
-      "menu": {
-        "title": "Paneļu masīvi",
-        "description": "Pievienojiet vēl vienu masīvu vai pabeidziet iestatīšanu.",
-        "menu_options": {
-          "add_array": "Pievienot vēl vienu masīvu",
-          "finish": "Pabeigt"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Pievienojiet paneļu masīvu, rediģējiet esošu, mainiet iestatījumus vai saglabājiet.",
-        "menu_options": {
-          "add_array": "Pievienot paneļu masīvu",
-          "edit_array": "Rediģēt paneļu masīvu",
-          "settings": "Rediģēt iestatījumus",
-          "save": "Saglabāt un pabeigt"
-        }
-      },
-      "add_array": {
-        "title": "Pievienot paneļu masīvu",
+        "title": "Helios Forecast — paneļu līnija",
+        "description": "Rediģējiet šīs paneļu līnijas orientāciju un iestatījumus.",
         "data": {
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
           "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
           "kwp": "Maksimālā jauda (kWp)",
-          "latitude": "Paneļa platums (neobligāta aizstāšana)",
-          "longitude": "Paneļa garums (neobligāta aizstāšana)",
-          "tracker": "Saules sekotājs"
-        }
-      },
-      "edit_array": {
-        "title": "Rediģēt paneļu masīvu",
-        "description": "Izvēlieties rediģējamo vai noņemamo masīvu.",
-        "data": {
-          "array": "Masīvs"
-        }
-      },
-      "edit_array_values": {
-        "title": "Rediģēt paneļu masīvu",
-        "description": "Tiek rediģēts {array}. Mainiet tā vērtības vai atzīmējiet noņemšanu, lai to dzēstu.",
-        "data": {
-          "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
-          "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
-          "kwp": "Maksimālā jauda (kWp)",
-          "latitude": "Paneļa platums (neobligāta aizstāšana)",
-          "longitude": "Paneļa garums (neobligāta aizstāšana)",
           "tracker": "Saules sekotājs",
-          "remove": "Noņemt šo masīvu"
-        }
-      },
-      "settings": {
-        "title": "Iestatījumi",
-        "data": {
+          "latitude": "Platums (neobligāti)",
+          "longitude": "Garums (neobligāti)",
           "inverter_max_kw": "Invertora maksimālā jauda (kW, neobligāti)",
-          "latitude": "Platums",
-          "longitude": "Garums",
           "production_entity": "PV ražošanas sensors (apgūtajai korekcijai)",
           "trend_anchor_hour": "Šodienas tendences atskaites stunda (0-23, noklusējums 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: vairākas paneļu līnijas vienā ierakstā",
+      "description": "“{name}” tika iestatīts ar vairākiem paneļu masīviem vienā ierakstā, kas vairs netiek atbalstīts. Tagad katrai paneļu līnijai ir nepieciešams savs ieraksts, lai tā iegūtu savas prognozes entītijas. Dzēsiet šo ierakstu un pievienojiet Helios Forecast vienreiz katrai paneļu līnijai."
     }
   },
   "selector": {

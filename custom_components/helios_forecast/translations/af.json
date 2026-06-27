@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Ligging en omsetterperk. Laat die ligging leeg om jou Home Assistant-tuiste te gebruik.",
+        "title": "Helios Forecast — paneellyn",
+        "description": "Een voorspelling vir een paneellyn ('n groep panele met dieselfde orientasie). Voeg die integrasie weer by vir elke bykomende lyn. Laat die ligging leeg om jou Home Assistant-tuiste te gebruik.",
         "data": {
-          "name": "Naam",
+          "name": "Naam (bv. Suiddak)",
+          "tilt": "Helling (grade, 0 = plat, 90 = vertikaal)",
+          "azimuth": "Asimut (grade vanaf noord, 90 = oos, 180 = suid, 270 = wes)",
+          "kwp": "Piekvermoe (kWp)",
+          "tracker": "Sonvolger",
           "latitude": "Breedtegraad (opsioneel)",
           "longitude": "Lengtegraad (opsioneel)",
           "inverter_max_kw": "Omsetter se maksimum uitset (kW, opsioneel)",
           "production_entity": "PV-produksiesensor (vir die aangeleerde regstelling)",
           "trend_anchor_hour": "Verwysingsuur vir vandag se neiging (0-23, verstek 6)"
-        }
-      },
-      "array": {
-        "title": "Paneelgroep",
-        "description": "Een groep panele met dieselfde orientasie. Voeg meer op die volgende skerm by as jou panele in verskillende rigtings wys.",
-        "data": {
-          "tilt": "Helling (grade, 0 = plat, 90 = vertikaal)",
-          "azimuth": "Asimut (grade vanaf noord, 90 = oos, 180 = suid, 270 = wes)",
-          "kwp": "Piekvermoe (kWp)",
-          "tracker": "Sonvolger",
-          "latitude": "Paneel se breedtegraad (opsionele oorskryf)",
-          "longitude": "Paneel se lengtegraad (opsionele oorskryf)"
-        }
-      },
-      "menu": {
-        "title": "Paneelgroepe",
-        "description": "Voeg nog 'n groep by, of voltooi die opstelling.",
-        "menu_options": {
-          "add_array": "Voeg nog 'n groep by",
-          "finish": "Voltooi"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Voeg 'n paneelgroep by, wysig 'n bestaande een, verander die instellings, of stoor.",
-        "menu_options": {
-          "add_array": "Voeg 'n paneelgroep by",
-          "edit_array": "Wysig 'n paneelgroep",
-          "settings": "Wysig instellings",
-          "save": "Stoor en voltooi"
-        }
-      },
-      "add_array": {
-        "title": "Voeg 'n paneelgroep by",
+        "title": "Helios Forecast — paneellyn",
+        "description": "Wysig hierdie paneellyn se orientasie en instellings.",
         "data": {
           "tilt": "Helling (grade, 0 = plat, 90 = vertikaal)",
           "azimuth": "Asimut (grade vanaf noord, 90 = oos, 180 = suid, 270 = wes)",
           "kwp": "Piekvermoe (kWp)",
-          "latitude": "Paneel se breedtegraad (opsionele oorskryf)",
-          "longitude": "Paneel se lengtegraad (opsionele oorskryf)",
-          "tracker": "Sonvolger"
-        }
-      },
-      "edit_array": {
-        "title": "Wysig 'n paneelgroep",
-        "description": "Kies die groep om te wysig of te verwyder.",
-        "data": {
-          "array": "Groep"
-        }
-      },
-      "edit_array_values": {
-        "title": "Wysig paneelgroep",
-        "description": "Besig om {array} te wysig. Verander die waardes, of merk verwyder om dit uit te vee.",
-        "data": {
-          "tilt": "Helling (grade, 0 = plat, 90 = vertikaal)",
-          "azimuth": "Asimut (grade vanaf noord, 90 = oos, 180 = suid, 270 = wes)",
-          "kwp": "Piekvermoe (kWp)",
-          "latitude": "Paneel se breedtegraad (opsionele oorskryf)",
-          "longitude": "Paneel se lengtegraad (opsionele oorskryf)",
           "tracker": "Sonvolger",
-          "remove": "Verwyder hierdie groep"
-        }
-      },
-      "settings": {
-        "title": "Instellings",
-        "data": {
+          "latitude": "Breedtegraad (opsioneel)",
+          "longitude": "Lengtegraad (opsioneel)",
           "inverter_max_kw": "Omsetter se maksimum uitset (kW, opsioneel)",
-          "latitude": "Breedtegraad",
-          "longitude": "Lengtegraad",
           "production_entity": "PV-produksiesensor (vir die aangeleerde regstelling)",
           "trend_anchor_hour": "Verwysingsuur vir vandag se neiging (0-23, verstek 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: meervoudige paneellyne in een inskrywing",
+      "description": "\"{name}\" is met verskeie paneelgroepe in 'n enkele inskrywing opgestel, wat nie meer ondersteun word nie. Elke paneellyn benodig nou sy eie inskrywing sodat dit sy eie voorspellingsentiteite kry. Vee hierdie inskrywing uit en voeg Helios Forecast een keer per paneellyn by."
     }
   },
   "selector": {

@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Staðsetning og hámark invertara. Skildu staðsetninguna eftir auða til að nota heimili Home Assistant.",
+        "title": "Helios Forecast — spjaldalína",
+        "description": "Ein spá fyrir eina spjaldalínu (hóp samstilltra spjalda). Bættu samþættingunni við aftur fyrir hverja viðbótarlínu. Skildu staðsetninguna eftir auða til að nota heimili Home Assistant.",
         "data": {
-          "name": "Nafn",
+          "name": "Nafn (t.d. Suðurþak)",
+          "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",
+          "azimuth": "Áttarhorn (gráður frá norðri, 90 = austur, 180 = suður, 270 = vestur)",
+          "kwp": "Hámarksafl (kWp)",
+          "tracker": "Sólarrakari",
           "latitude": "Breiddargráða (valfrjálst)",
           "longitude": "Lengdargráða (valfrjálst)",
           "inverter_max_kw": "Hámarksafl invertara (kW, valfrjálst)",
           "production_entity": "Skynjari sólarframleiðslu (fyrir lærða leiðréttingu)",
           "trend_anchor_hour": "Viðmiðunarstund dagsleitni (0-23, sjálfgefið 6)"
-        }
-      },
-      "array": {
-        "title": "Spjaldaröð",
-        "description": "Einn hópur samstilltra spjalda. Bættu fleiri við á næsta skjá ef spjöldin þín snúa í mismunandi áttir.",
-        "data": {
-          "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",
-          "azimuth": "Áttarhorn (gráður frá norðri, 90 = austur, 180 = suður, 270 = vestur)",
-          "kwp": "Hámarksafl (kWp)",
-          "tracker": "Sólarrakari",
-          "latitude": "Breiddargráða spjalda (valfrjáls yfirskrift)",
-          "longitude": "Lengdargráða spjalda (valfrjáls yfirskrift)"
-        }
-      },
-      "menu": {
-        "title": "Spjaldaraðir",
-        "description": "Bættu við annarri röð eða ljúktu uppsetningunni.",
-        "menu_options": {
-          "add_array": "Bæta við annarri röð",
-          "finish": "Ljúka"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Bættu við spjaldaröð, breyttu núverandi röð, breyttu stillingum eða vistaðu.",
-        "menu_options": {
-          "add_array": "Bæta við spjaldaröð",
-          "edit_array": "Breyta spjaldaröð",
-          "settings": "Breyta stillingum",
-          "save": "Vista og ljúka"
-        }
-      },
-      "add_array": {
-        "title": "Bæta við spjaldaröð",
+        "title": "Helios Forecast — spjaldalína",
+        "description": "Breyttu stefnu og stillingum þessarar spjaldalínu.",
         "data": {
           "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",
           "azimuth": "Áttarhorn (gráður frá norðri, 90 = austur, 180 = suður, 270 = vestur)",
           "kwp": "Hámarksafl (kWp)",
-          "latitude": "Breiddargráða spjalda (valfrjáls yfirskrift)",
-          "longitude": "Lengdargráða spjalda (valfrjáls yfirskrift)",
-          "tracker": "Sólarrakari"
-        }
-      },
-      "edit_array": {
-        "title": "Breyta spjaldaröð",
-        "description": "Veldu röðina sem á að breyta eða fjarlægja.",
-        "data": {
-          "array": "Röð"
-        }
-      },
-      "edit_array_values": {
-        "title": "Breyta spjaldaröð",
-        "description": "Verið að breyta {array}. Breyttu gildunum eða hakaðu við fjarlægja til að eyða henni.",
-        "data": {
-          "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",
-          "azimuth": "Áttarhorn (gráður frá norðri, 90 = austur, 180 = suður, 270 = vestur)",
-          "kwp": "Hámarksafl (kWp)",
-          "latitude": "Breiddargráða spjalda (valfrjáls yfirskrift)",
-          "longitude": "Lengdargráða spjalda (valfrjáls yfirskrift)",
           "tracker": "Sólarrakari",
-          "remove": "Fjarlægja þessa röð"
-        }
-      },
-      "settings": {
-        "title": "Stillingar",
-        "data": {
+          "latitude": "Breiddargráða (valfrjálst)",
+          "longitude": "Lengdargráða (valfrjálst)",
           "inverter_max_kw": "Hámarksafl invertara (kW, valfrjálst)",
-          "latitude": "Breiddargráða",
-          "longitude": "Lengdargráða",
           "production_entity": "Skynjari sólarframleiðslu (fyrir lærða leiðréttingu)",
           "trend_anchor_hour": "Viðmiðunarstund dagsleitni (0-23, sjálfgefið 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: margar spjaldalínur í einni færslu",
+      "description": "„{name}“ var sett upp með nokkrum spjaldaröðum í einni færslu, sem er ekki lengur stutt. Hver spjaldalína þarf nú sína eigin færslu til að fá sínar eigin spáeiningar. Eyddu þessari færslu og bættu Helios Forecast við einu sinni fyrir hverja spjaldalínu."
     }
   },
   "selector": {

@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Loko kaj limo de la inverter. Lasu la lokon malplena por uzi vian hejmon de Home Assistant.",
+        "title": "Helios Forecast — panellinio",
+        "description": "Unu prognozo por unu panellinio (grupo de same orientitaj paneloj). Aldonu la integriĝon denove por ĉiu plia linio. Lasu la lokon malplena por uzi vian hejmon de Home Assistant.",
         "data": {
-          "name": "Nomo",
+          "name": "Nomo (ekz. Suda tegmento)",
+          "tilt": "Klino (gradoj, 0 = plata, 90 = vertikala)",
+          "azimuth": "Azimuto (gradoj de nordo, 90 = oriento, 180 = sudo, 270 = okcidento)",
+          "kwp": "Pinta potenco (kWp)",
+          "tracker": "Sunsekvilo",
           "latitude": "Latitudo (nedeviga)",
           "longitude": "Longitudo (nedeviga)",
           "inverter_max_kw": "Maksimuma eligo de la inverter (kW, nedeviga)",
           "production_entity": "Sensilo de PV-produktado (por la lernita korekto)",
           "trend_anchor_hour": "Referenca horo de la hodiaŭa tendenco (0-23, defaŭlte 6)"
-        }
-      },
-      "array": {
-        "title": "Panelaro",
-        "description": "Unu grupo de same orientitaj paneloj. Aldonu pliajn en la sekva ekrano se viaj paneloj rigardas malsamajn direktojn.",
-        "data": {
-          "tilt": "Klino (gradoj, 0 = plata, 90 = vertikala)",
-          "azimuth": "Azimuto (gradoj de nordo, 90 = oriento, 180 = sudo, 270 = okcidento)",
-          "kwp": "Pinta potenco (kWp)",
-          "tracker": "Sunsekvilo",
-          "latitude": "Latitudo de panelo (nedeviga anstataŭigo)",
-          "longitude": "Longitudo de panelo (nedeviga anstataŭigo)"
-        }
-      },
-      "menu": {
-        "title": "Panelaroj",
-        "description": "Aldonu alian panelaron, aŭ finu la agordon.",
-        "menu_options": {
-          "add_array": "Aldoni alian panelaron",
-          "finish": "Fini"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Aldonu panelaron, redaktu ekzistantan, ŝanĝu la agordojn, aŭ konservu.",
-        "menu_options": {
-          "add_array": "Aldoni panelaron",
-          "edit_array": "Redakti panelaron",
-          "settings": "Redakti agordojn",
-          "save": "Konservi kaj fini"
-        }
-      },
-      "add_array": {
-        "title": "Aldoni panelaron",
+        "title": "Helios Forecast — panellinio",
+        "description": "Redaktu la orientiĝon kaj agordojn de ĉi tiu panellinio.",
         "data": {
           "tilt": "Klino (gradoj, 0 = plata, 90 = vertikala)",
           "azimuth": "Azimuto (gradoj de nordo, 90 = oriento, 180 = sudo, 270 = okcidento)",
           "kwp": "Pinta potenco (kWp)",
-          "latitude": "Latitudo de panelo (nedeviga anstataŭigo)",
-          "longitude": "Longitudo de panelo (nedeviga anstataŭigo)",
-          "tracker": "Sunsekvilo"
-        }
-      },
-      "edit_array": {
-        "title": "Redakti panelaron",
-        "description": "Elektu la panelaron por redakti aŭ forigi.",
-        "data": {
-          "array": "Panelaro"
-        }
-      },
-      "edit_array_values": {
-        "title": "Redakti panelaron",
-        "description": "Redaktado de {array}. Ŝanĝu ĝiajn valorojn, aŭ marku forigon por forigi ĝin.",
-        "data": {
-          "tilt": "Klino (gradoj, 0 = plata, 90 = vertikala)",
-          "azimuth": "Azimuto (gradoj de nordo, 90 = oriento, 180 = sudo, 270 = okcidento)",
-          "kwp": "Pinta potenco (kWp)",
-          "latitude": "Latitudo de panelo (nedeviga anstataŭigo)",
-          "longitude": "Longitudo de panelo (nedeviga anstataŭigo)",
           "tracker": "Sunsekvilo",
-          "remove": "Forigi ĉi tiun panelaron"
-        }
-      },
-      "settings": {
-        "title": "Agordoj",
-        "data": {
+          "latitude": "Latitudo (nedeviga)",
+          "longitude": "Longitudo (nedeviga)",
           "inverter_max_kw": "Maksimuma eligo de la inverter (kW, nedeviga)",
-          "latitude": "Latitudo",
-          "longitude": "Longitudo",
           "production_entity": "Sensilo de PV-produktado (por la lernita korekto)",
           "trend_anchor_hour": "Referenca horo de la hodiaŭa tendenco (0-23, defaŭlte 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: pluraj panellinioj en unu enskribo",
+      "description": "«{name}» estis agordita kun pluraj panelaroj en unu sola enskribo, kio ne plu estas subtenata. Ĉiu panellinio nun bezonas sian propran enskribon por ke ĝi ricevu siajn proprajn prognozajn entojn. Forigu ĉi tiun enskribon kaj aldonu Helios Forecast unufoje por ĉiu panellinio."
     }
   },
   "selector": {

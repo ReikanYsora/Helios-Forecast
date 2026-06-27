@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Lokacija i ograničenje invertera. Ostavite lokaciju praznom da biste koristili svoj Home Assistant dom.",
+        "title": "Helios Forecast — linija panela",
+        "description": "Jedna prognoza za jednu liniju panela (grupa istoorijentisanih panela). Dodajte integraciju ponovo za svaku dodatnu liniju. Ostavite lokaciju praznom da biste koristili svoj Home Assistant dom.",
         "data": {
-          "name": "Naziv",
+          "name": "Naziv (npr. Južni krov)",
+          "tilt": "Nagib (stepeni, 0 = ravno, 90 = uspravno)",
+          "azimuth": "Azimut (stepeni od sjevera, 90 = istok, 180 = jug, 270 = zapad)",
+          "kwp": "Vršna snaga (kWp)",
+          "tracker": "Praćenje sunca",
           "latitude": "Geografska širina (opcionalno)",
           "longitude": "Geografska dužina (opcionalno)",
           "inverter_max_kw": "Maksimalna izlazna snaga invertera (kW, opcionalno)",
           "production_entity": "Senzor PV proizvodnje (za naučenu korekciju)",
           "trend_anchor_hour": "Referentni sat za današnji trend (0-23, zadano 6)"
-        }
-      },
-      "array": {
-        "title": "Niz panela",
-        "description": "Jedna grupa istoorijentisanih panela. Dodajte još na sljedećem ekranu ako su vaši paneli okrenuti u različitim smjerovima.",
-        "data": {
-          "tilt": "Nagib (stepeni, 0 = ravno, 90 = uspravno)",
-          "azimuth": "Azimut (stepeni od sjevera, 90 = istok, 180 = jug, 270 = zapad)",
-          "kwp": "Vršna snaga (kWp)",
-          "tracker": "Praćenje sunca",
-          "latitude": "Geografska širina panela (opcionalna zamjena)",
-          "longitude": "Geografska dužina panela (opcionalna zamjena)"
-        }
-      },
-      "menu": {
-        "title": "Nizovi panela",
-        "description": "Dodajte još jedan niz ili završite postavljanje.",
-        "menu_options": {
-          "add_array": "Dodaj još jedan niz",
-          "finish": "Završi"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Dodajte niz panela, uredite postojeći, promijenite postavke ili sačuvajte.",
-        "menu_options": {
-          "add_array": "Dodaj niz panela",
-          "edit_array": "Uredi niz panela",
-          "settings": "Uredi postavke",
-          "save": "Sačuvaj i završi"
-        }
-      },
-      "add_array": {
-        "title": "Dodaj niz panela",
+        "title": "Helios Forecast — linija panela",
+        "description": "Uredite orijentaciju i postavke ove linije panela.",
         "data": {
           "tilt": "Nagib (stepeni, 0 = ravno, 90 = uspravno)",
           "azimuth": "Azimut (stepeni od sjevera, 90 = istok, 180 = jug, 270 = zapad)",
           "kwp": "Vršna snaga (kWp)",
-          "latitude": "Geografska širina panela (opcionalna zamjena)",
-          "longitude": "Geografska dužina panela (opcionalna zamjena)",
-          "tracker": "Praćenje sunca"
-        }
-      },
-      "edit_array": {
-        "title": "Uredi niz panela",
-        "description": "Odaberite niz za uređivanje ili uklanjanje.",
-        "data": {
-          "array": "Niz"
-        }
-      },
-      "edit_array_values": {
-        "title": "Uredi niz panela",
-        "description": "Uređivanje {array}. Promijenite njegove vrijednosti ili označite uklanjanje da biste ga izbrisali.",
-        "data": {
-          "tilt": "Nagib (stepeni, 0 = ravno, 90 = uspravno)",
-          "azimuth": "Azimut (stepeni od sjevera, 90 = istok, 180 = jug, 270 = zapad)",
-          "kwp": "Vršna snaga (kWp)",
-          "latitude": "Geografska širina panela (opcionalna zamjena)",
-          "longitude": "Geografska dužina panela (opcionalna zamjena)",
           "tracker": "Praćenje sunca",
-          "remove": "Ukloni ovaj niz"
-        }
-      },
-      "settings": {
-        "title": "Postavke",
-        "data": {
+          "latitude": "Geografska širina (opcionalno)",
+          "longitude": "Geografska dužina (opcionalno)",
           "inverter_max_kw": "Maksimalna izlazna snaga invertera (kW, opcionalno)",
-          "latitude": "Geografska širina",
-          "longitude": "Geografska dužina",
           "production_entity": "Senzor PV proizvodnje (za naučenu korekciju)",
           "trend_anchor_hour": "Referentni sat za današnji trend (0-23, zadano 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: više linija panela u jednom unosu",
+      "description": "\"{name}\" je postavljen s nekoliko nizova panela u jednom unosu, što više nije podržano. Svaka linija panela sada treba vlastiti unos kako bi dobila vlastite entitete prognoze. Izbrišite ovaj unos i dodajte Helios Forecast jednom po liniji panela."
     }
   },
   "selector": {

@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Vieta ir inverterio riba. Palikite vietą tuščią, kad būtų naudojama jūsų Home Assistant namų vieta.",
+        "title": "Helios Forecast — skydelių linija",
+        "description": "Viena prognozė vienai skydelių linijai (vienodos orientacijos skydelių grupei). Kiekvienai papildomai linijai pridėkite integraciją iš naujo. Palikite vietą tuščią, kad būtų naudojama jūsų Home Assistant namų vieta.",
         "data": {
-          "name": "Pavadinimas",
+          "name": "Pavadinimas (pvz., Pietinis stogas)",
+          "tilt": "Pasvirimas (laipsniais, 0 = horizontaliai, 90 = vertikaliai)",
+          "azimuth": "Azimutas (laipsniais nuo šiaurės, 90 = rytai, 180 = pietūs, 270 = vakarai)",
+          "kwp": "Didžiausia galia (kWp)",
+          "tracker": "Saulės sekiklis",
           "latitude": "Platuma (nebūtina)",
           "longitude": "Ilguma (nebūtina)",
           "inverter_max_kw": "Didžiausia inverterio galia (kW, nebūtina)",
           "production_entity": "PV gamybos jutiklis (išmoktai korekcijai)",
           "trend_anchor_hour": "Šios dienos tendencijos atskaitos valanda (0-23, numatyta 6)"
-        }
-      },
-      "array": {
-        "title": "Skydelių grupė",
-        "description": "Viena vienodos orientacijos skydelių grupė. Jei skydeliai nukreipti į skirtingas puses, kitame ekrane pridėkite daugiau.",
-        "data": {
-          "tilt": "Pasvirimas (laipsniais, 0 = horizontaliai, 90 = vertikaliai)",
-          "azimuth": "Azimutas (laipsniais nuo šiaurės, 90 = rytai, 180 = pietūs, 270 = vakarai)",
-          "kwp": "Didžiausia galia (kWp)",
-          "tracker": "Saulės sekiklis",
-          "latitude": "Skydelio platuma (nebūtinas perrašymas)",
-          "longitude": "Skydelio ilguma (nebūtinas perrašymas)"
-        }
-      },
-      "menu": {
-        "title": "Skydelių grupės",
-        "description": "Pridėkite dar vieną grupę arba užbaikite sąranką.",
-        "menu_options": {
-          "add_array": "Pridėti dar vieną grupę",
-          "finish": "Užbaigti"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Pridėkite skydelių grupę, redaguokite esamą, pakeiskite nustatymus arba įrašykite.",
-        "menu_options": {
-          "add_array": "Pridėti skydelių grupę",
-          "edit_array": "Redaguoti skydelių grupę",
-          "settings": "Redaguoti nustatymus",
-          "save": "Įrašyti ir užbaigti"
-        }
-      },
-      "add_array": {
-        "title": "Pridėti skydelių grupę",
+        "title": "Helios Forecast — skydelių linija",
+        "description": "Redaguokite šios skydelių linijos orientaciją ir nustatymus.",
         "data": {
           "tilt": "Pasvirimas (laipsniais, 0 = horizontaliai, 90 = vertikaliai)",
           "azimuth": "Azimutas (laipsniais nuo šiaurės, 90 = rytai, 180 = pietūs, 270 = vakarai)",
           "kwp": "Didžiausia galia (kWp)",
-          "latitude": "Skydelio platuma (nebūtinas perrašymas)",
-          "longitude": "Skydelio ilguma (nebūtinas perrašymas)",
-          "tracker": "Saulės sekiklis"
-        }
-      },
-      "edit_array": {
-        "title": "Redaguoti skydelių grupę",
-        "description": "Pasirinkite redaguotiną arba šalintiną grupę.",
-        "data": {
-          "array": "Grupė"
-        }
-      },
-      "edit_array_values": {
-        "title": "Redaguoti skydelių grupę",
-        "description": "Redaguojama {array}. Pakeiskite jos reikšmes arba pažymėkite šalinti, kad ją ištrintumėte.",
-        "data": {
-          "tilt": "Pasvirimas (laipsniais, 0 = horizontaliai, 90 = vertikaliai)",
-          "azimuth": "Azimutas (laipsniais nuo šiaurės, 90 = rytai, 180 = pietūs, 270 = vakarai)",
-          "kwp": "Didžiausia galia (kWp)",
-          "latitude": "Skydelio platuma (nebūtinas perrašymas)",
-          "longitude": "Skydelio ilguma (nebūtinas perrašymas)",
           "tracker": "Saulės sekiklis",
-          "remove": "Šalinti šią grupę"
-        }
-      },
-      "settings": {
-        "title": "Nustatymai",
-        "data": {
+          "latitude": "Platuma (nebūtina)",
+          "longitude": "Ilguma (nebūtina)",
           "inverter_max_kw": "Didžiausia inverterio galia (kW, nebūtina)",
-          "latitude": "Platuma",
-          "longitude": "Ilguma",
           "production_entity": "PV gamybos jutiklis (išmoktai korekcijai)",
           "trend_anchor_hour": "Šios dienos tendencijos atskaitos valanda (0-23, numatyta 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: keletas skydelių linijų viename įraše",
+      "description": "„{name}“ buvo sukonfigūruotas su keliomis skydelių grupėmis viename įraše, o tai nebepalaikoma. Dabar kiekvienai skydelių linijai reikia savo įrašo, kad ji gautų savo prognozės objektus. Pašalinkite šį įrašą ir pridėkite Helios Forecast po vieną kartą kiekvienai skydelių linijai."
     }
   },
   "selector": {

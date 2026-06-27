@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Sijainti ja invertterin raja. Jätä sijainti tyhjäksi käyttääksesi Home Assistant -kotisi sijaintia.",
+        "title": "Helios Forecast — paneelilinja",
+        "description": "Yksi ennuste yhdelle paneelilinjalle (samaan suuntaan asennettujen paneelien ryhmä). Lisää integraatio uudelleen jokaiselle lisälinjalle. Jätä sijainti tyhjäksi käyttääksesi Home Assistant -kotisi sijaintia.",
         "data": {
-          "name": "Nimi",
+          "name": "Nimi (esim. Eteläkatto)",
+          "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",
+          "azimuth": "Atsimuutti (astetta pohjoisesta, 90 = itä, 180 = etelä, 270 = länsi)",
+          "kwp": "Huipputeho (kWp)",
+          "tracker": "Aurinkoseuranta",
           "latitude": "Leveysaste (valinnainen)",
           "longitude": "Pituusaste (valinnainen)",
           "inverter_max_kw": "Invertterin enimmäisteho (kW, valinnainen)",
           "production_entity": "Aurinkotuotannon anturi (opitulle korjaukselle)",
           "trend_anchor_hour": "Tämän päivän trendin viitetunti (0-23, oletus 6)"
-        }
-      },
-      "array": {
-        "title": "Paneeliryhmä",
-        "description": "Yksi samaan suuntaan asennettujen paneelien ryhmä. Lisää useampia seuraavalla näytöllä, jos paneelisi osoittavat eri suuntiin.",
-        "data": {
-          "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",
-          "azimuth": "Atsimuutti (astetta pohjoisesta, 90 = itä, 180 = etelä, 270 = länsi)",
-          "kwp": "Huipputeho (kWp)",
-          "tracker": "Aurinkoseuranta",
-          "latitude": "Paneelin leveysaste (valinnainen ohitus)",
-          "longitude": "Paneelin pituusaste (valinnainen ohitus)"
-        }
-      },
-      "menu": {
-        "title": "Paneeliryhmät",
-        "description": "Lisää uusi ryhmä tai viimeistele asennus.",
-        "menu_options": {
-          "add_array": "Lisää uusi ryhmä",
-          "finish": "Valmis"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Lisää paneeliryhmä, muokkaa olemassa olevaa, muuta asetuksia tai tallenna.",
-        "menu_options": {
-          "add_array": "Lisää paneeliryhmä",
-          "edit_array": "Muokkaa paneeliryhmää",
-          "settings": "Muokkaa asetuksia",
-          "save": "Tallenna ja viimeistele"
-        }
-      },
-      "add_array": {
-        "title": "Lisää paneeliryhmä",
+        "title": "Helios Forecast — paneelilinja",
+        "description": "Muokkaa tämän paneelilinjan suuntausta ja asetuksia.",
         "data": {
           "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",
           "azimuth": "Atsimuutti (astetta pohjoisesta, 90 = itä, 180 = etelä, 270 = länsi)",
           "kwp": "Huipputeho (kWp)",
-          "latitude": "Paneelin leveysaste (valinnainen ohitus)",
-          "longitude": "Paneelin pituusaste (valinnainen ohitus)",
-          "tracker": "Aurinkoseuranta"
-        }
-      },
-      "edit_array": {
-        "title": "Muokkaa paneeliryhmää",
-        "description": "Valitse muokattava tai poistettava ryhmä.",
-        "data": {
-          "array": "Ryhmä"
-        }
-      },
-      "edit_array_values": {
-        "title": "Muokkaa paneeliryhmää",
-        "description": "Muokataan ryhmää {array}. Muuta sen arvoja tai rastita poisto poistaaksesi sen.",
-        "data": {
-          "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",
-          "azimuth": "Atsimuutti (astetta pohjoisesta, 90 = itä, 180 = etelä, 270 = länsi)",
-          "kwp": "Huipputeho (kWp)",
-          "latitude": "Paneelin leveysaste (valinnainen ohitus)",
-          "longitude": "Paneelin pituusaste (valinnainen ohitus)",
           "tracker": "Aurinkoseuranta",
-          "remove": "Poista tämä ryhmä"
-        }
-      },
-      "settings": {
-        "title": "Asetukset",
-        "data": {
+          "latitude": "Leveysaste (valinnainen)",
+          "longitude": "Pituusaste (valinnainen)",
           "inverter_max_kw": "Invertterin enimmäisteho (kW, valinnainen)",
-          "latitude": "Leveysaste",
-          "longitude": "Pituusaste",
           "production_entity": "Aurinkotuotannon anturi (opitulle korjaukselle)",
           "trend_anchor_hour": "Tämän päivän trendin viitetunti (0-23, oletus 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: useita paneelilinjoja yhdessä merkinnässä",
+      "description": "\"{name}\" määritettiin useilla paneeliryhmillä yhteen merkintään, mitä ei enää tueta. Jokainen paneelilinja tarvitsee nyt oman merkintänsä, jotta se saa omat ennusteentiteettinsä. Poista tämä merkintä ja lisää Helios Forecast kerran kutakin paneelilinjaa kohti."
     }
   },
   "selector": {

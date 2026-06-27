@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Asukoht ja inverteri piirang. Jäta asukoht tühjaks, et kasutada oma Home Assistanti kodu asukohta.",
+        "title": "Helios Forecast — paneeliliin",
+        "description": "Üks prognoos ühe paneeliliini kohta (ühesuunaliselt paigaldatud paneelide rühm). Lisa integratsioon uuesti iga täiendava liini jaoks. Jäta asukoht tühjaks, et kasutada oma Home Assistanti kodu asukohta.",
         "data": {
-          "name": "Nimi",
+          "name": "Nimi (nt Lõunakatus)",
+          "tilt": "Kalle (kraadides, 0 = lapik, 90 = vertikaalne)",
+          "azimuth": "Asimuut (kraadid põhjast, 90 = ida, 180 = lõuna, 270 = lääs)",
+          "kwp": "Tippvõimsus (kWp)",
+          "tracker": "Päikese jälgija",
           "latitude": "Laiuskraad (valikuline)",
           "longitude": "Pikkuskraad (valikuline)",
           "inverter_max_kw": "Inverteri maksimaalne väljund (kW, valikuline)",
           "production_entity": "PV tootmisandur (õpitava korrektsiooni jaoks)",
           "trend_anchor_hour": "Tänase trendi võrdlustund (0-23, vaikimisi 6)"
-        }
-      },
-      "array": {
-        "title": "Paneelide rühm",
-        "description": "Üks ühesuunaliselt paigaldatud paneelide rühm. Kui sinu paneelid on suunatud eri suundadesse, lisa järgmisel kuval veel rühmi.",
-        "data": {
-          "tilt": "Kalle (kraadides, 0 = lapik, 90 = vertikaalne)",
-          "azimuth": "Asimuut (kraadid põhjast, 90 = ida, 180 = lõuna, 270 = lääs)",
-          "kwp": "Tippvõimsus (kWp)",
-          "tracker": "Päikese jälgija",
-          "latitude": "Paneeli laiuskraad (valikuline alistamine)",
-          "longitude": "Paneeli pikkuskraad (valikuline alistamine)"
-        }
-      },
-      "menu": {
-        "title": "Paneelide rühmad",
-        "description": "Lisa veel üks rühm või lõpeta seadistamine.",
-        "menu_options": {
-          "add_array": "Lisa veel üks rühm",
-          "finish": "Lõpeta"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Lisa paneelide rühm, muuda olemasolevat, muuda seadeid või salvesta.",
-        "menu_options": {
-          "add_array": "Lisa paneelide rühm",
-          "edit_array": "Muuda paneelide rühma",
-          "settings": "Muuda seadeid",
-          "save": "Salvesta ja lõpeta"
-        }
-      },
-      "add_array": {
-        "title": "Lisa paneelide rühm",
+        "title": "Helios Forecast — paneeliliin",
+        "description": "Muuda selle paneeliliini suunda ja seadeid.",
         "data": {
           "tilt": "Kalle (kraadides, 0 = lapik, 90 = vertikaalne)",
           "azimuth": "Asimuut (kraadid põhjast, 90 = ida, 180 = lõuna, 270 = lääs)",
           "kwp": "Tippvõimsus (kWp)",
-          "latitude": "Paneeli laiuskraad (valikuline alistamine)",
-          "longitude": "Paneeli pikkuskraad (valikuline alistamine)",
-          "tracker": "Päikese jälgija"
-        }
-      },
-      "edit_array": {
-        "title": "Muuda paneelide rühma",
-        "description": "Vali muudetav või eemaldatav rühm.",
-        "data": {
-          "array": "Rühm"
-        }
-      },
-      "edit_array_values": {
-        "title": "Muuda paneelide rühma",
-        "description": "Muudad rühma {array}. Muuda selle väärtusi või märgi eemaldamiseks linnuke.",
-        "data": {
-          "tilt": "Kalle (kraadides, 0 = lapik, 90 = vertikaalne)",
-          "azimuth": "Asimuut (kraadid põhjast, 90 = ida, 180 = lõuna, 270 = lääs)",
-          "kwp": "Tippvõimsus (kWp)",
-          "latitude": "Paneeli laiuskraad (valikuline alistamine)",
-          "longitude": "Paneeli pikkuskraad (valikuline alistamine)",
           "tracker": "Päikese jälgija",
-          "remove": "Eemalda see rühm"
-        }
-      },
-      "settings": {
-        "title": "Seaded",
-        "data": {
+          "latitude": "Laiuskraad (valikuline)",
+          "longitude": "Pikkuskraad (valikuline)",
           "inverter_max_kw": "Inverteri maksimaalne väljund (kW, valikuline)",
-          "latitude": "Laiuskraad",
-          "longitude": "Pikkuskraad",
           "production_entity": "PV tootmisandur (õpitava korrektsiooni jaoks)",
           "trend_anchor_hour": "Tänase trendi võrdlustund (0-23, vaikimisi 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: mitu paneeliliini ühes kirjes",
+      "description": "„{name}“ seadistati mitme paneelide rühmaga ühes kirjes, mida enam ei toetata. Iga paneeliliin vajab nüüd oma kirjet, et saada oma prognoosi olemid. Kustuta see kirje ja lisa Helios Forecast iga paneeliliini kohta üks kord."
     }
   },
   "selector": {

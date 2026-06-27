@@ -2,35 +2,19 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast",
-        "description": "Lokasi dan batas inverter. Kosongkan lokasi untuk memakai lokasi rumah Home Assistant Anda.",
+        "title": "Helios Forecast — baris panel",
+        "description": "Satu prakiraan untuk satu baris panel (kelompok panel dengan orientasi sama). Tambahkan integrasi lagi untuk setiap baris tambahan. Kosongkan lokasi untuk memakai lokasi rumah Home Assistant Anda.",
         "data": {
-          "name": "Nama",
+          "name": "Nama (mis. Atap selatan)",
+          "tilt": "Kemiringan (derajat, 0 = rata, 90 = tegak)",
+          "azimuth": "Azimut (derajat dari utara, 90 = timur, 180 = selatan, 270 = barat)",
+          "kwp": "Daya puncak (kWp)",
+          "tracker": "Pelacak matahari",
           "latitude": "Lintang (opsional)",
           "longitude": "Bujur (opsional)",
           "inverter_max_kw": "Output maksimum inverter (kW, opsional)",
           "production_entity": "Sensor produksi PV (untuk koreksi yang dipelajari)",
           "trend_anchor_hour": "Jam acuan tren hari ini (0-23, bawaan 6)"
-        }
-      },
-      "array": {
-        "title": "Larik panel",
-        "description": "Satu kelompok panel dengan orientasi sama. Tambahkan lagi di layar berikutnya jika panel Anda menghadap arah berbeda.",
-        "data": {
-          "tilt": "Kemiringan (derajat, 0 = rata, 90 = tegak)",
-          "azimuth": "Azimut (derajat dari utara, 90 = timur, 180 = selatan, 270 = barat)",
-          "kwp": "Daya puncak (kWp)",
-          "tracker": "Pelacak matahari",
-          "latitude": "Lintang panel (pengganti opsional)",
-          "longitude": "Bujur panel (pengganti opsional)"
-        }
-      },
-      "menu": {
-        "title": "Larik panel",
-        "description": "Tambahkan larik lain, atau selesaikan penyiapan.",
-        "menu_options": {
-          "add_array": "Tambah larik lain",
-          "finish": "Selesai"
         }
       }
     }
@@ -38,56 +22,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast",
-        "description": "Tambahkan larik panel, sunting yang ada, ubah pengaturan, atau simpan.",
-        "menu_options": {
-          "add_array": "Tambah larik panel",
-          "edit_array": "Sunting larik panel",
-          "settings": "Sunting pengaturan",
-          "save": "Simpan dan selesai"
-        }
-      },
-      "add_array": {
-        "title": "Tambah larik panel",
+        "title": "Helios Forecast — baris panel",
+        "description": "Sunting orientasi dan pengaturan baris panel ini.",
         "data": {
           "tilt": "Kemiringan (derajat, 0 = rata, 90 = tegak)",
           "azimuth": "Azimut (derajat dari utara, 90 = timur, 180 = selatan, 270 = barat)",
           "kwp": "Daya puncak (kWp)",
-          "latitude": "Lintang panel (pengganti opsional)",
-          "longitude": "Bujur panel (pengganti opsional)",
-          "tracker": "Pelacak matahari"
-        }
-      },
-      "edit_array": {
-        "title": "Sunting larik panel",
-        "description": "Pilih larik untuk disunting atau dihapus.",
-        "data": {
-          "array": "Larik"
-        }
-      },
-      "edit_array_values": {
-        "title": "Sunting larik panel",
-        "description": "Menyunting {array}. Ubah nilainya, atau centang hapus untuk menghapusnya.",
-        "data": {
-          "tilt": "Kemiringan (derajat, 0 = rata, 90 = tegak)",
-          "azimuth": "Azimut (derajat dari utara, 90 = timur, 180 = selatan, 270 = barat)",
-          "kwp": "Daya puncak (kWp)",
-          "latitude": "Lintang panel (pengganti opsional)",
-          "longitude": "Bujur panel (pengganti opsional)",
           "tracker": "Pelacak matahari",
-          "remove": "Hapus larik ini"
-        }
-      },
-      "settings": {
-        "title": "Pengaturan",
-        "data": {
+          "latitude": "Lintang (opsional)",
+          "longitude": "Bujur (opsional)",
           "inverter_max_kw": "Output maksimum inverter (kW, opsional)",
-          "latitude": "Lintang",
-          "longitude": "Bujur",
           "production_entity": "Sensor produksi PV (untuk koreksi yang dipelajari)",
           "trend_anchor_hour": "Jam acuan tren hari ini (0-23, bawaan 6)"
         }
       }
+    }
+  },
+  "issues": {
+    "legacy_multi_array": {
+      "title": "{name}: beberapa baris panel dalam satu entri",
+      "description": "\"{name}\" disiapkan dengan beberapa larik panel dalam satu entri, yang tidak lagi didukung. Kini setiap baris panel memerlukan entrinya sendiri agar mendapat entitas prakiraannya sendiri. Hapus entri ini dan tambahkan Helios Forecast sekali untuk setiap baris panel."
     }
   },
   "selector": {

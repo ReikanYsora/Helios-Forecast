@@ -21,12 +21,42 @@ if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
 
 
+_LEGACY_MULTI_ARRAY = "legacy_multi_array"
+
+
+def _legacy_issue_id(entry: ConfigEntry) -> str:
+    return f"{_LEGACY_MULTI_ARRAY}_{entry.entry_id}"
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Helios Solar Forecast from a config entry."""
     from homeassistant.const import Platform
+    from homeassistant.exceptions import ConfigEntryError
+    from homeassistant.helpers import issue_registry as ir
 
     from . import websocket
     from .coordinator import HeliosForecastCoordinator
+
+    # One entry now describes a single panel line. Entries created by an older
+    # version may still carry several arrays; those are no longer supported, so we
+    # stop here and raise a repair issue asking the user to recreate one entry per
+    # line. Once the issue is cleared/recreated, len(arrays) <= 1 and setup runs.
+    merged = {**entry.data, **entry.options}
+    if len(merged.get("arrays") or []) > 1:
+        ir.async_create_issue(
+            hass,
+            DOMAIN,
+            _legacy_issue_id(entry),
+            is_fixable=False,
+            severity=ir.IssueSeverity.ERROR,
+            translation_key=_LEGACY_MULTI_ARRAY,
+            translation_placeholders={"name": entry.title},
+        )
+        raise ConfigEntryError(
+            f"'{entry.title}' has several panel arrays in one entry, which is no longer "
+            "supported. Delete it and add one entry per panel line."
+        )
+    ir.async_delete_issue(hass, DOMAIN, _legacy_issue_id(entry))
 
     coordinator = HeliosForecastCoordinator(hass, entry)
     await coordinator.async_config_entry_first_refresh()
@@ -85,6 +115,13 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unloaded:
         hass.data[DOMAIN].pop(entry.entry_id)
     return unloaded
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Clear any legacy repair issue when the entry is deleted."""
+    from homeassistant.helpers import issue_registry as ir
+
+    ir.async_delete_issue(hass, DOMAIN, _legacy_issue_id(entry))
 
 
 async def _async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
