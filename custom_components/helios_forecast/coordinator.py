@@ -28,6 +28,42 @@ try:
     _MEAN_TYPE_ARITHMETIC = StatisticMeanType.ARITHMETIC
 except ImportError:  # pragma: no cover - older HA cores
     _MEAN_TYPE_ARITHMETIC = None
+
+# `unit_class` names the unit-conversion class HA uses to migrate a statistic's history if its unit
+# later changes; it is mandatory in StatisticMetaData from HA 2026.11. We derive the unit -> class
+# map from the core's own converters so the value always matches the installed core, and only set
+# the key on cores that declare it (older cores neither have nor warn about it). Units with no
+# converter (e.g. W/m² irradiance) map to None, the correct "not convertible" answer.
+try:
+    _SUPPORTS_UNIT_CLASS = "unit_class" in StatisticMetaData.__annotations__
+except (AttributeError, TypeError):  # pragma: no cover - older HA cores
+    _SUPPORTS_UNIT_CLASS = False
+
+
+def _build_unit_classes() -> Dict[str, Optional[str]]:
+    mapping: Dict[str, Optional[str]] = {}
+    try:
+        from homeassistant.util import unit_conversion as _uc
+    except ImportError:  # pragma: no cover - older HA cores
+        return mapping
+    for name in (
+        "PowerConverter",
+        "EnergyConverter",
+        "TemperatureConverter",
+        "SpeedConverter",
+        "DistanceConverter",
+        "UnitlessRatioConverter",
+    ):
+        converter = getattr(_uc, name, None)
+        unit_class = getattr(converter, "UNIT_CLASS", None)
+        if converter is None or unit_class is None:
+            continue
+        for unit in getattr(converter, "VALID_UNITS", ()):  # e.g. "W" -> "power"
+            mapping.setdefault(unit, unit_class)
+    return mapping
+
+
+_UNIT_CLASSES: Dict[str, Optional[str]] = _build_unit_classes()
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
@@ -264,6 +300,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             }
             if _MEAN_TYPE_ARITHMETIC is not None:
                 metadata["mean_type"] = _MEAN_TYPE_ARITHMETIC
+            if _SUPPORTS_UNIT_CLASS:
+                metadata["unit_class"] = _UNIT_CLASSES.get(field.unit)
             async_import_statistics(self.hass, metadata, rows)
 
     def _compute_archive_points(self, now, weather, store, layout, lat, lon, cap, residual_map):
@@ -311,6 +349,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             }
             if _MEAN_TYPE_ARITHMETIC is not None:
                 metadata["mean_type"] = _MEAN_TYPE_ARITHMETIC
+            if _SUPPORTS_UNIT_CLASS:
+                metadata["unit_class"] = _UNIT_CLASSES.get(unit)
             async_import_statistics(self.hass, metadata, rows)
 
     async def _build_residual_map(self, data, lat, lon, layout, weather, store, now):
