@@ -19,7 +19,6 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
-          ignore: brands
 
   import-check:
     # Installs Home Assistant and imports the HA-coupled modules, so a wrong API
