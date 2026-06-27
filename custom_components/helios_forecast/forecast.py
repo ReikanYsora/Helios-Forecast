@@ -37,6 +37,10 @@ class ForecastPoint:
     pv_raw_w: float
     pv_p10: Optional[float] = None
     pv_p90: Optional[float] = None
+    # Weather at this bucket, surfaced so the card can correlate a production dip with the
+    # irradiance / cloud at that exact instant when scrubbing (already computed for the model).
+    ghi: Optional[float] = None
+    cloud: Optional[float] = None
 
 
 def lerp_plain(a: float, b: float, f: float) -> float:
@@ -132,7 +136,15 @@ def build_forecast_series(
             else:
                 ratio = 1.0
             corrected = min(inverter_max_w, max(0.0, raw_w * ratio))
-            points.append(ForecastPoint(t=t, pv_w=corrected, pv_raw_w=raw_clamped))
+            points.append(
+                ForecastPoint(
+                    t=t,
+                    pv_w=corrected,
+                    pv_raw_w=raw_clamped,
+                    ghi=sample.ghi,
+                    cloud=sample.cloud,
+                )
+            )
         t += step
 
     return points
