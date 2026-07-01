@@ -31,7 +31,7 @@ from .power import PvLayout, WeatherSample, compute_pv_power_weighted
 LEARN_DAYS = 60
 AZ_STEP_DEG = 10
 ALT_STEP_DEG = 5
-N_AZ = round(360 / AZ_STEP_DEG)   # 36
+N_AZ = round(360 / AZ_STEP_DEG)  # 36
 N_ALT = round(90 / ALT_STEP_DEG)  # 18
 
 RECENCY_HALF_LIFE_MS = 30 * 24 * 3_600_000
@@ -75,7 +75,7 @@ class SkyResidualInput:
     lon: float
     layout: PvLayout
     production: Optional[List[ProductionBucket]]
-    cloud_times: List[float]   # epoch ms, ascending
+    cloud_times: List[float]  # epoch ms, ascending
     cloud: List[float]
     shortwave: List[float]
     direct: List[float]
@@ -243,8 +243,13 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
             conf_s[idx] = min(1.0, self_conf + nb_pull)
 
     return SkyResidualMap(
-        n_az=N_AZ, n_alt=N_ALT, m=m_s, conf=conf_s,
-        global_ratio=global_ratio, total_weight=global_sum_w, visited_cells=visited,
+        n_az=N_AZ,
+        n_alt=N_ALT,
+        m=m_s,
+        conf=conf_s,
+        global_ratio=global_ratio,
+        total_weight=global_sum_w,
+        visited_cells=visited,
     )
 
 

@@ -87,8 +87,14 @@ def test_build_library_drops_night() -> None:
     ]
     times = [_june_noon(h) for h in range(24)]
     weather = WeatherSeries(
-        times=times, cloud=[20.0] * 24, shortwave=[0.0] * 24, direct=[0.0] * 24,
-        diffuse=[0.0] * 24, temp=[20.0] * 24, wind=[5.0] * 24, snow=[0.0] * 24,
+        times=times,
+        cloud=[20.0] * 24,
+        shortwave=[0.0] * 24,
+        direct=[0.0] * 24,
+        diffuse=[0.0] * 24,
+        temp=[20.0] * 24,
+        wind=[5.0] * 24,
+        snow=[0.0] * 24,
     )
     lib = build_library(prod, weather, lat, lon)
     assert len(lib) == 1  # only the daytime bucket survives
@@ -106,8 +112,14 @@ def test_enrich_points_past_untouched_future_blended() -> None:
     lib = [AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=30.0, watt=2500.0) for _ in range(40)]
     times = [_june_noon(h) for h in range(24)]
     weather = WeatherSeries(
-        times=times, cloud=[30.0] * 24, shortwave=[0.0] * 24, direct=[0.0] * 24,
-        diffuse=[0.0] * 24, temp=[20.0] * 24, wind=[5.0] * 24, snow=[0.0] * 24,
+        times=times,
+        cloud=[30.0] * 24,
+        shortwave=[0.0] * 24,
+        direct=[0.0] * 24,
+        diffuse=[0.0] * 24,
+        temp=[20.0] * 24,
+        wind=[5.0] * 24,
+        snow=[0.0] * 24,
     )
     out = enrich_points([past, fut], lib, weather, lat, lon, now)
     # Past point is unchanged.

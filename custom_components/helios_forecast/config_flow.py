@@ -78,11 +78,21 @@ def _line_schema(
     fields[kwp_key] = vol.Coerce(float)
     fields[vol.Required(CONF_TRACKER, default=arr.get(CONF_TRACKER, TRACKER_NONE))] = _TRACKER
     # Settings. Location defaults to the HA home; the rest are optional overrides.
-    fields[vol.Optional(CONF_LATITUDE, description={"suggested_value": s.get(CONF_LATITUDE, home_lat)})] = vol.Coerce(float)
-    fields[vol.Optional(CONF_LONGITUDE, description={"suggested_value": s.get(CONF_LONGITUDE, home_lon)})] = vol.Coerce(float)
-    fields[vol.Optional(CONF_INVERTER_MAX_KW, description={"suggested_value": s.get(CONF_INVERTER_MAX_KW)})] = vol.Coerce(float)
-    fields[vol.Optional(CONF_PRODUCTION_ENTITY, description={"suggested_value": s.get(CONF_PRODUCTION_ENTITY)})] = _SENSOR
-    fields[vol.Optional(CONF_TREND_ANCHOR_HOUR, default=s.get(CONF_TREND_ANCHOR_HOUR, DEFAULT_TREND_ANCHOR_HOUR))] = _HOUR
+    fields[vol.Optional(CONF_LATITUDE, description={"suggested_value": s.get(CONF_LATITUDE, home_lat)})] = vol.Coerce(
+        float
+    )
+    fields[vol.Optional(CONF_LONGITUDE, description={"suggested_value": s.get(CONF_LONGITUDE, home_lon)})] = vol.Coerce(
+        float
+    )
+    fields[vol.Optional(CONF_INVERTER_MAX_KW, description={"suggested_value": s.get(CONF_INVERTER_MAX_KW)})] = (
+        vol.Coerce(float)
+    )
+    fields[vol.Optional(CONF_PRODUCTION_ENTITY, description={"suggested_value": s.get(CONF_PRODUCTION_ENTITY)})] = (
+        _SENSOR
+    )
+    fields[vol.Optional(CONF_TREND_ANCHOR_HOUR, default=s.get(CONF_TREND_ANCHOR_HOUR, DEFAULT_TREND_ANCHOR_HOUR))] = (
+        _HOUR
+    )
     return vol.Schema(fields)
 
 
@@ -98,8 +108,8 @@ def _entry_data(user_input: dict[str, Any]) -> tuple[str, dict[str, Any]]:
     return title, {**ui, CONF_ARRAYS: [line]}
 
 
-class HeliosForecastConfigFlow(ConfigFlow, domain=DOMAIN):
-    """Config flow for Helios Solar Forecast — one entry per panel line."""
+class HeliosForecastConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]  # HA passes `domain` to __init_subclass__
+    """Config flow for Helios Solar Forecast, one entry per panel line."""
 
     VERSION = 1
 

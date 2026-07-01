@@ -51,16 +51,11 @@ def sun_position(moment: datetime, lat: float, lon: float) -> SunPosition:
     ha = 15.0 * (hour + lon / 15.0 + eot / 60.0 - 12.0)
     ha = ((ha + 180.0) % 360.0 + 360.0) % 360.0 - 180.0
 
-    sin_a = (
-        math.sin(_D * lat) * math.sin(_D * decl)
-        + math.cos(_D * lat) * math.cos(_D * decl) * math.cos(_D * ha)
-    )
+    sin_a = math.sin(_D * lat) * math.sin(_D * decl) + math.cos(_D * lat) * math.cos(_D * decl) * math.cos(_D * ha)
     alt = math.asin(max(-1.0, min(1.0, sin_a))) / _D
     cos_alt = math.cos(alt * _D)
     cos_az = (
-        (math.sin(_D * decl) - math.sin(_D * lat) * sin_a) / (math.cos(_D * lat) * cos_alt)
-        if cos_alt > 1e-4
-        else 0.0
+        (math.sin(_D * decl) - math.sin(_D * lat) * sin_a) / (math.cos(_D * lat) * cos_alt) if cos_alt > 1e-4 else 0.0
     )
     az = math.acos(max(-1.0, min(1.0, cos_az))) / _D
     if ha > 0:

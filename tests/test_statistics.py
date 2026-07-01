@@ -39,8 +39,14 @@ def _h(hour: int) -> datetime:
 def _series(times, values) -> WeatherSeries:
     # Same value in every array so we can assert per-field plumbing cheaply.
     return WeatherSeries(
-        times=times, cloud=values, shortwave=values, direct=values,
-        diffuse=values, temp=values, wind=values, snow=values,
+        times=times,
+        cloud=values,
+        shortwave=values,
+        direct=values,
+        diffuse=values,
+        temp=values,
+        wind=values,
+        snow=values,
     )
 
 

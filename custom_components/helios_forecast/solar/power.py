@@ -37,7 +37,7 @@ class PvLayout:
     """Resolved PV layout. The list fields stay in lockstep per array."""
 
     orientations: List[PanelOrientation]
-    shares: List[float]                       # pre-normalised, sum to 1.0
+    shares: List[float]  # pre-normalised, sum to 1.0
     coords: List[Optional[Tuple[float, float]]]  # per-array (lat, lon) override or None
     total_kwp: float
 

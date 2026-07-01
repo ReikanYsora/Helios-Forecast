@@ -5,3 +5,9 @@ testpaths = ["tests"]
 [tool.ruff]
 target-version = "py313"
 line-length = 120
+
+[tool.mypy]
+python_version = "3.13"
+# The integration imports Home Assistant, which ships no type stubs here; ignore those so mypy
+# type-checks our own code without needing HA installed (the import-check CI job covers HA imports).
+ignore_missing_imports = true

@@ -48,27 +48,19 @@ def lerp_plain(a: float, b: float, f: float) -> float:
 
 
 def lerp_rad(a: Optional[float], b: Optional[float], f: float) -> Optional[float]:
-    """Interpolate a radiation field, guarding the missing / negative case."""
-    ba = not (a is not None and math.isfinite(a) and a >= 0)
-    bb = not (b is not None and math.isfinite(b) and b >= 0)
-    if ba and bb:
-        return None
-    if ba:
-        return b
-    if bb:
+    """Interpolate an irradiance field, guarding the missing / negative case."""
+    if a is None or not math.isfinite(a) or a < 0:
+        return b if (b is not None and math.isfinite(b) and b >= 0) else None
+    if b is None or not math.isfinite(b) or b < 0:
         return a
     return a + (b - a) * f
 
 
 def lerp_finite(a: Optional[float], b: Optional[float], f: float) -> Optional[float]:
     """Interpolate a temp / wind / snow field, guarding the missing case."""
-    ba = not (a is not None and math.isfinite(a))
-    bb = not (b is not None and math.isfinite(b))
-    if ba and bb:
-        return None
-    if ba:
-        return b
-    if bb:
+    if a is None or not math.isfinite(a):
+        return b if (b is not None and math.isfinite(b)) else None
+    if b is None or not math.isfinite(b):
         return a
     return a + (b - a) * f
 

@@ -33,14 +33,14 @@ class ForecastSummary:
     """Everything the integration exposes, derived once per coordinator refresh."""
 
     power_now_w: Optional[float]
-    power_now_low_w: Optional[float]        # analog P10 band at now, None when no band
-    power_now_high_w: Optional[float]       # analog P90 band at now, None when no band
+    power_now_low_w: Optional[float]  # analog P10 band at now, None when no band
+    power_now_high_w: Optional[float]  # analog P90 band at now, None when no band
     power_next_hour_w: Optional[float]
-    days: List[DayForecast]                 # day_1 (today) .. day_7
+    days: List[DayForecast]  # day_1 (today) .. day_7
     energy_today_remaining_kwh: Optional[float]
     energy_this_hour_kwh: Optional[float]
     energy_next_hour_kwh: Optional[float]
-    wh_hours: Dict[str, float]              # ISO UTC hour -> Wh, for the Energy dashboard
+    wh_hours: Dict[str, float]  # ISO UTC hour -> Wh, for the Energy dashboard
 
 
 def _value_at(points: List[ForecastPoint], t: datetime) -> Optional[float]:

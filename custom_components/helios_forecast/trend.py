@@ -25,7 +25,7 @@ FLAT_KWH = 0.1
 class TrendReference:
     """The frozen daily reference: today's predicted total at capture time."""
 
-    date: str              # local ISO date the reference belongs to
+    date: str  # local ISO date the reference belongs to
     kwh: float
     captured_at: datetime  # UTC
 
@@ -38,7 +38,7 @@ class TodayTrend:
     reference_kwh: Optional[float]
     reference_time: Optional[datetime]
     current_kwh: float
-    direction: str         # "up" | "down" | "flat" | "unknown"
+    direction: str  # "up" | "down" | "flat" | "unknown"
 
 
 def should_capture(reference: Optional[TrendReference], today_date: str, now_local: datetime, anchor_hour: int) -> bool:

@@ -20,50 +20,6 @@ from homeassistant.components.recorder.statistics import (
     statistics_during_period,
 )
 
-# `mean_type` replaces the deprecated `has_mean` in StatisticMetaData (mandatory from HA 2026.11).
-# Imported defensively so the integration still loads on cores predating StatisticMeanType.
-try:
-    from homeassistant.components.recorder.models import StatisticMeanType
-
-    _MEAN_TYPE_ARITHMETIC = StatisticMeanType.ARITHMETIC
-except ImportError:  # pragma: no cover - older HA cores
-    _MEAN_TYPE_ARITHMETIC = None
-
-# `unit_class` names the unit-conversion class HA uses to migrate a statistic's history if its unit
-# later changes; it is mandatory in StatisticMetaData from HA 2026.11. We derive the unit -> class
-# map from the core's own converters so the value always matches the installed core, and only set
-# the key on cores that declare it (older cores neither have nor warn about it). Units with no
-# converter (e.g. W/m² irradiance) map to None, the correct "not convertible" answer.
-try:
-    _SUPPORTS_UNIT_CLASS = "unit_class" in StatisticMetaData.__annotations__
-except (AttributeError, TypeError):  # pragma: no cover - older HA cores
-    _SUPPORTS_UNIT_CLASS = False
-
-
-def _build_unit_classes() -> Dict[str, Optional[str]]:
-    mapping: Dict[str, Optional[str]] = {}
-    try:
-        from homeassistant.util import unit_conversion as _uc
-    except ImportError:  # pragma: no cover - older HA cores
-        return mapping
-    for name in (
-        "PowerConverter",
-        "EnergyConverter",
-        "TemperatureConverter",
-        "SpeedConverter",
-        "DistanceConverter",
-        "UnitlessRatioConverter",
-    ):
-        converter = getattr(_uc, name, None)
-        unit_class = getattr(converter, "UNIT_CLASS", None)
-        if converter is None or unit_class is None:
-            continue
-        for unit in getattr(converter, "VALID_UNITS", ()):  # e.g. "W" -> "power"
-            mapping.setdefault(unit, unit_class)
-    return mapping
-
-
-_UNIT_CLASSES: Dict[str, Optional[str]] = _build_unit_classes()
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
@@ -101,6 +57,51 @@ from .solar.residual import (
     build_sky_residual_map,
 )
 from .summary import ForecastSummary, summarize
+
+# HA-version compat, both mandatory in StatisticMetaData from HA 2026.11 and imported defensively so
+# the integration still loads on older cores that lack them.
+# `mean_type` replaces the deprecated `has_mean`.
+try:
+    from homeassistant.components.recorder.models import StatisticMeanType
+
+    _MEAN_TYPE_ARITHMETIC = StatisticMeanType.ARITHMETIC
+except ImportError:  # pragma: no cover - older HA cores
+    _MEAN_TYPE_ARITHMETIC = None
+
+# `unit_class` names the unit-conversion class HA uses to migrate a statistic's history if its unit
+# later changes. We derive the unit -> class map from the core's own converters so the value always
+# matches the installed core, and only set the key on cores that declare it. Units with no converter
+# (e.g. W/m2 irradiance) map to None, the correct "not convertible" answer.
+try:
+    _SUPPORTS_UNIT_CLASS = "unit_class" in StatisticMetaData.__annotations__
+except (AttributeError, TypeError):  # pragma: no cover - older HA cores
+    _SUPPORTS_UNIT_CLASS = False
+
+
+def _build_unit_classes() -> Dict[str, Optional[str]]:
+    mapping: Dict[str, Optional[str]] = {}
+    try:
+        from homeassistant.util import unit_conversion as _uc
+    except ImportError:  # pragma: no cover - older HA cores
+        return mapping
+    for name in (
+        "PowerConverter",
+        "EnergyConverter",
+        "TemperatureConverter",
+        "SpeedConverter",
+        "DistanceConverter",
+        "UnitlessRatioConverter",
+    ):
+        converter = getattr(_uc, name, None)
+        unit_class = getattr(converter, "UNIT_CLASS", None)
+        if converter is None or unit_class is None:
+            continue
+        for unit in getattr(converter, "VALID_UNITS", ()):  # e.g. "W" -> "power"
+            mapping.setdefault(unit, unit_class)
+    return mapping
+
+
+_UNIT_CLASSES: Dict[str, Optional[str]] = _build_unit_classes()
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -176,8 +177,13 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                     continue
                 seen.add(key)
                 gti = await fetch_gti(
-                    session, lat, lon, orientation.tilt_deg, orientation.azimuth_deg,
-                    past_days=LEARN_DAYS, forecast_days=FORECAST_DAYS,
+                    session,
+                    lat,
+                    lon,
+                    orientation.tilt_deg,
+                    orientation.azimuth_deg,
+                    past_days=LEARN_DAYS,
+                    forecast_days=FORECAST_DAYS,
                 )
                 if gti is not None:
                     store[key] = gti
@@ -193,8 +199,15 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + timedelta(days=FORECAST_DAYS)
         points = build_forecast_series(
-            weather, store or None, layout, lat, lon,
-            inverter_max_w=cap, start=start, end=end, step_minutes=STEP_MINUTES,
+            weather,
+            store or None,
+            layout,
+            lat,
+            lon,
+            inverter_max_w=cap,
+            start=start,
+            end=end,
+            step_minutes=STEP_MINUTES,
             residual_map=residual_map,
         )
         # Analog-ensemble refinement: blend the median of past actual production under similar
@@ -229,9 +242,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         trend = await self._today_trend(data, now, summary)
 
-        return ForecastData(
-            points=points, summary=summary, observed=observed, reliability=reliability, trend=trend
-        )
+        return ForecastData(points=points, summary=summary, observed=observed, reliability=reliability, trend=trend)
 
     async def _today_trend(self, data, now, summary) -> TodayTrend:
         """Today's predicted total versus its frozen daily reference (default 06:00).
@@ -282,9 +293,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         cutoff = now.replace(minute=0, second=0, microsecond=0)
         registry = er.async_get(self.hass)
         for field in WEATHER_FIELDS:
-            entity_id = registry.async_get_entity_id(
-                "sensor", DOMAIN, f"{self.entry.entry_id}_{field.key}"
-            )
+            entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"{self.entry.entry_id}_{field.key}")
             if entity_id is None:
                 continue
             rows = hourly_statistics(weather.times, getattr(weather, field.attr), cutoff)
@@ -314,8 +323,15 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         cutoff = now.replace(minute=0, second=0, microsecond=0)
         arch_start = cutoff - timedelta(days=LEARN_DAYS)
         return build_forecast_series(
-            weather, store, layout, lat, lon,
-            inverter_max_w=cap, start=arch_start, end=cutoff, step_minutes=60,
+            weather,
+            store,
+            layout,
+            lat,
+            lon,
+            inverter_max_w=cap,
+            start=arch_start,
+            end=cutoff,
+            step_minutes=60,
             residual_map=residual_map,
         )
 
@@ -373,11 +389,20 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         return build_sky_residual_map(
             SkyResidualInput(
-                lat=lat, lon=lon, layout=layout, production=production,
+                lat=lat,
+                lon=lon,
+                layout=layout,
+                production=production,
                 cloud_times=[t.timestamp() * 1000.0 for t in weather.times],
-                cloud=weather.cloud, shortwave=weather.shortwave, direct=weather.direct,
-                diffuse=weather.diffuse, temp=weather.temp, wind=weather.wind, snow=weather.snow,
-                gti_store=store, now_ms=now.timestamp() * 1000.0,
+                cloud=weather.cloud,
+                shortwave=weather.shortwave,
+                direct=weather.direct,
+                diffuse=weather.diffuse,
+                temp=weather.temp,
+                wind=weather.wind,
+                snow=weather.snow,
+                gti_store=store,
+                now_ms=now.timestamp() * 1000.0,
             )
         )
 

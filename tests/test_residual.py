@@ -18,7 +18,6 @@ sys.path.insert(0, str(_REPO_ROOT))
 
 from custom_components.helios_forecast.forecast import build_forecast_series  # noqa: E402
 from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: E402
-from custom_components.helios_forecast.solar.gti import sample_gti  # noqa: E402
 from custom_components.helios_forecast.solar.irradiance import PanelOrientation, snow_cover_factor  # noqa: E402
 from custom_components.helios_forecast.solar.power import PvLayout, WeatherSample, compute_pv_power_weighted  # noqa: E402
 from custom_components.helios_forecast.solar.residual import (  # noqa: E402
@@ -38,12 +37,18 @@ _LAT, _LON = 48.8566, 2.3522
 
 # --- golden: sample_sky_residual ------------------------------------------------
 
+
 def test_sample_matches_card() -> None:
     data = json.loads((_REPO_ROOT / "tests" / "fixtures" / "sky_sample.json").read_text())
     mp = data["map"]
     sky_map = SkyResidualMap(
-        n_az=mp["nAz"], n_alt=mp["nAlt"], m=mp["m"], conf=mp["conf"],
-        global_ratio=mp["globalRatio"], total_weight=0.0, visited_cells=0,
+        n_az=mp["nAz"],
+        n_alt=mp["nAlt"],
+        m=mp["m"],
+        conf=mp["conf"],
+        global_ratio=mp["globalRatio"],
+        total_weight=0.0,
+        visited_cells=0,
     )
     for q in data["queries"]:
         got = sample_sky_residual(sky_map, q["az"], q["alt"])
@@ -51,6 +56,7 @@ def test_sample_matches_card() -> None:
 
 
 # --- helpers --------------------------------------------------------------------
+
 
 def test_nearest_cloud_idx() -> None:
     times = [0.0, 10.0, 20.0, 30.0]
@@ -61,6 +67,7 @@ def test_nearest_cloud_idx() -> None:
 
 
 # --- build scaffolding ----------------------------------------------------------
+
 
 def _layout() -> PvLayout:
     return PvLayout(orientations=[PanelOrientation(30, 180)], shares=[1.0], coords=[None], total_kwp=5.0)
@@ -77,8 +84,13 @@ def _midday_buckets() -> list[ProductionBucket]:
 
 def _constant_weather(n: int) -> dict:
     return {
-        "cloud": [10.0] * n, "shortwave": [600.0] * n, "direct": [450.0] * n,
-        "diffuse": [120.0] * n, "temp": [20.0] * n, "wind": [2.0] * n, "snow": [0.0] * n,
+        "cloud": [10.0] * n,
+        "shortwave": [600.0] * n,
+        "direct": [450.0] * n,
+        "diffuse": [120.0] * n,
+        "temp": [20.0] * n,
+        "wind": [2.0] * n,
+        "snow": [0.0] * n,
     }
 
 
@@ -88,8 +100,12 @@ def _model_kwh(bucket: ProductionBucket, inp: SkyResidualInput) -> float:
     mid = (bucket.start_ms + bucket.end_ms) / 2
     ci = _nearest_cloud_idx(inp.cloud_times, mid)
     sample = WeatherSample(
-        cloud=inp.cloud[ci], ghi=inp.shortwave[ci], direct=inp.direct[ci],
-        diffuse=inp.diffuse[ci], temp=inp.temp[ci], wind=inp.wind[ci],
+        cloud=inp.cloud[ci],
+        ghi=inp.shortwave[ci],
+        direct=inp.direct[ci],
+        diffuse=inp.diffuse[ci],
+        temp=inp.temp[ci],
+        wind=inp.wind[ci],
     )
     w_sum, w_n = 0.0, 0
     for s in range(LEARN_SUBSAMPLES):
@@ -104,9 +120,18 @@ def _input(buckets: list[ProductionBucket], **over) -> SkyResidualInput:
     times = [b.start_ms for b in buckets]
     w = _constant_weather(len(times))
     base = dict(
-        lat=_LAT, lon=_LON, layout=_layout(), production=buckets,
-        cloud_times=times, cloud=w["cloud"], shortwave=w["shortwave"], direct=w["direct"],
-        diffuse=w["diffuse"], temp=w["temp"], wind=w["wind"], snow=w["snow"],
+        lat=_LAT,
+        lon=_LON,
+        layout=_layout(),
+        production=buckets,
+        cloud_times=times,
+        cloud=w["cloud"],
+        shortwave=w["shortwave"],
+        direct=w["direct"],
+        diffuse=w["diffuse"],
+        temp=w["temp"],
+        wind=w["wind"],
+        snow=w["snow"],
         gti_store=None,
         now_ms=datetime(2026, 6, 23, tzinfo=timezone.utc).timestamp() * 1000.0,
     )
@@ -116,8 +141,9 @@ def _input(buckets: list[ProductionBucket], **over) -> SkyResidualInput:
 
 # --- build behaviour ------------------------------------------------------------
 
+
 def test_build_none_cases() -> None:
-    assert build_sky_residual_map(_input([])) is None                          # no production
+    assert build_sky_residual_map(_input([])) is None  # no production
     buckets = _midday_buckets()
     assert build_sky_residual_map(_input(buckets, layout=PvLayout([], [], [], 0.0))) is None  # no kWp
 
@@ -137,22 +163,31 @@ def test_ratio_clamped_high() -> None:
     over = [ProductionBucket(b.start_ms, b.end_ms, 5.0 * _model_kwh(b, inp0)) for b in buckets]
     sky_map = build_sky_residual_map(_input(over))
     assert sky_map is not None
-    assert sky_map.global_ratio == M_MAX   # 5x clamps to the ceiling
+    assert sky_map.global_ratio == M_MAX  # 5x clamps to the ceiling
 
 
 def test_forecast_applies_ratio() -> None:
     # A flat map returning 0.5 everywhere halves the corrected curve, raw untouched.
     n = 36 * 18
-    half = SkyResidualMap(n_az=36, n_alt=18, m=[0.5] * n, conf=[1.0] * n, global_ratio=0.5, total_weight=99, visited_cells=n)
+    half = SkyResidualMap(
+        n_az=36, n_alt=18, m=[0.5] * n, conf=[1.0] * n, global_ratio=0.5, total_weight=99, visited_cells=n
+    )
     base = datetime(2026, 6, 21, tzinfo=timezone.utc)
     weather = WeatherSeries(
         times=[base + timedelta(hours=h) for h in range(25)],
-        cloud=[20.0] * 25, shortwave=[500.0] * 25, direct=[350.0] * 25,
-        diffuse=[120.0] * 25, temp=[18.0] * 25, wind=[3.0] * 25, snow=[0.0] * 25,
+        cloud=[20.0] * 25,
+        shortwave=[500.0] * 25,
+        direct=[350.0] * 25,
+        diffuse=[120.0] * 25,
+        temp=[18.0] * 25,
+        wind=[3.0] * 25,
+        snow=[0.0] * 25,
     )
     start = datetime(2026, 6, 21, tzinfo=timezone.utc)
     end = datetime(2026, 6, 21, 23, 59, tzinfo=timezone.utc)
-    pts = build_forecast_series(weather, None, _layout(), _LAT, _LON, start=start, end=end, step_minutes=60, residual_map=half)
+    pts = build_forecast_series(
+        weather, None, _layout(), _LAT, _LON, start=start, end=end, step_minutes=60, residual_map=half
+    )
     for p in pts:
         assert abs(p.pv_w - 0.5 * p.pv_raw_w) < 1e-9
 

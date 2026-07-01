@@ -52,9 +52,9 @@ def test_parse_weather_fuses_models_to_median() -> None:
     }
     w = parse_weather(payload)
     assert w is not None
-    assert w.cloud == [20.0, 90.0]          # median of the two models per hour
+    assert w.cloud == [20.0, 90.0]  # median of the two models per hour
     assert w.shortwave == [0.0, 150.0]
-    assert w.cloud_spread[1] > 0            # models disagree -> non-zero spread
+    assert w.cloud_spread[1] > 0  # models disagree -> non-zero spread
 
 
 def test_gti_url_matches_card_with_azimuth_conversion() -> None:
@@ -68,11 +68,11 @@ def test_gti_url_matches_card_with_azimuth_conversion() -> None:
 
 
 def test_om_azimuth_conversion() -> None:
-    assert om_azimuth(180) == 0      # south
-    assert om_azimuth(90) == -90     # east
-    assert om_azimuth(270) == 90     # west
-    assert om_azimuth(0) == -180     # north
-    assert om_azimuth(225) == 45     # south-west
+    assert om_azimuth(180) == 0  # south
+    assert om_azimuth(90) == -90  # east
+    assert om_azimuth(270) == 90  # west
+    assert om_azimuth(0) == -180  # north
+    assert om_azimuth(225) == 45  # south-west
 
 
 def test_parse_times_are_utc() -> None:

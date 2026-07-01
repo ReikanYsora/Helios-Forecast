@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, replace
-from datetime import datetime, tzinfo
+from datetime import datetime
 from typing import List, Optional
 
 from .forecast import ForecastPoint
@@ -47,10 +47,10 @@ _K = 60
 
 @dataclass(frozen=True)
 class AnalogSample:
-    alt: float    # sun altitude, degrees (only daytime samples are kept)
-    az: float     # sun azimuth, degrees
+    alt: float  # sun altitude, degrees (only daytime samples are kept)
+    az: float  # sun azimuth, degrees
     cloud: float  # cloud cover, %
-    watt: float   # actual production at that hour, W
+    watt: float  # actual production at that hour, W
 
 
 @dataclass(frozen=True)
@@ -87,9 +87,9 @@ def _sample_cloud(weather: WeatherSeries, ms: float) -> Optional[float]:
             hi = mid
     a = cloud[lo] if lo < len(cloud) else None
     b = cloud[hi] if hi < len(cloud) else None
-    if not _finite(a):
-        return b if _finite(b) else None
-    if not _finite(b):
+    if a is None or not math.isfinite(a):
+        return b if (b is not None and math.isfinite(b)) else None
+    if b is None or not math.isfinite(b):
         return a
     f = (ms - epochs[lo]) / (epochs[hi] - epochs[lo])
     return a + (b - a) * f

@@ -3,7 +3,7 @@
 The 7 weather variables here are orientation-independent: they describe the sky
 over the home, not the panels, so this archive stays valid across any PV layout
 change. GTI is deliberately not archived, it depends on orientation and is
-recomputable from the direct / diffuse / global radiation kept here plus the sun
+recomputable from the direct / diffuse / global irradiance kept here plus the sun
 geometry (see solar/irradiance.py).
 
 Open-Meteo only serves a rolling 60-day past window. By copying each refresh's
@@ -66,10 +66,7 @@ def observed_value(times: List[datetime], values: List[float], now: datetime) ->
 
 def observed_snapshot(weather: WeatherSeries, now: datetime) -> Dict[str, Optional[float]]:
     """Current-hour value for every archived field, keyed by field key."""
-    return {
-        field.key: observed_value(weather.times, getattr(weather, field.attr), now)
-        for field in WEATHER_FIELDS
-    }
+    return {field.key: observed_value(weather.times, getattr(weather, field.attr), now) for field in WEATHER_FIELDS}
 
 
 # Archive entity keys for the predicted production. Their long-term statistics, backfilled by the
@@ -89,7 +86,7 @@ def forecast_statistics(points: list) -> Dict[str, List[dict]]:
     energy: List[dict] = []
     for p in points:
         w = getattr(p, "pv_w", None)
-        if not _finite(w):
+        if not isinstance(w, (int, float)) or not math.isfinite(w):
             continue
         w = float(max(0.0, w))
         kwh = w / 1000.0

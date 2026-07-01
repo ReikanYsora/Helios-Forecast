@@ -71,11 +71,11 @@ def test_bounds() -> None:
 
 
 def test_snow_cover_factor() -> None:
-    assert snow_cover_factor(None, 1.0) == 1.0          # no snow series
-    assert snow_cover_factor(0.005, -5.0) == 1.0        # below 1 cm: a dusting, no cover
-    assert snow_cover_factor(0.20, -5.0) == 0.1         # deep snow, freezing: fully covered (min factor)
-    assert snow_cover_factor(0.20, None) == 0.1         # unknown air treated as cold
-    assert snow_cover_factor(0.20, 4.0) == 1.0          # warm enough to have shed
+    assert snow_cover_factor(None, 1.0) == 1.0  # no snow series
+    assert snow_cover_factor(0.005, -5.0) == 1.0  # below 1 cm: a dusting, no cover
+    assert snow_cover_factor(0.20, -5.0) == 0.1  # deep snow, freezing: fully covered (min factor)
+    assert snow_cover_factor(0.20, None) == 0.1  # unknown air treated as cold
+    assert snow_cover_factor(0.20, 4.0) == 1.0  # warm enough to have shed
     assert abs(snow_cover_factor(0.20, 2.0) - (0.1 + 0.9 * 0.5)) < 1e-12  # mid-melt ramp
 
 
@@ -84,10 +84,17 @@ if __name__ == "__main__":
     test_bounds()
     test_snow_cover_factor()
     max_err = max(
-        abs(compute_pv_power(
-            datetime(fx["year"], fx["month"], fx["day"], fx["hour"], tzinfo=timezone.utc),
-            fx["lat"], fx["lon"], fx["cloud"], _panel(fx["panel"]), _ctx(fx["ctx"]),
-        ) - fx["expected"])
+        abs(
+            compute_pv_power(
+                datetime(fx["year"], fx["month"], fx["day"], fx["hour"], tzinfo=timezone.utc),
+                fx["lat"],
+                fx["lon"],
+                fx["cloud"],
+                _panel(fx["panel"]),
+                _ctx(fx["ctx"]),
+            )
+            - fx["expected"]
+        )
         for fx in _FIXTURES
     )
     print(f"OK  {len(_FIXTURES)} scenarios")

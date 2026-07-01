@@ -61,18 +61,17 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
             continue
         if end is not None and p.t >= end:
             continue
-        points.append({
-            "t": p.t.isoformat(),
-            "pv_w": p.pv_w,
-            "pv_raw_w": p.pv_raw_w,
-            "pv_p10": p.pv_p10,
-            "pv_p90": p.pv_p90,
-            "ghi": getattr(p, "ghi", None),
-            "cloud": getattr(p, "cloud", None),
-        })
+        points.append(
+            {
+                "t": p.t.isoformat(),
+                "pv_w": p.pv_w,
+                "pv_raw_w": p.pv_raw_w,
+                "pv_p10": p.pv_p10,
+                "pv_p90": p.pv_p90,
+                "ghi": getattr(p, "ghi", None),
+                "cloud": getattr(p, "cloud", None),
+            }
+        )
 
-    daily = [
-        {"date": d.date, "kwh": d.energy_kwh, "kwh_raw": d.energy_kwh}
-        for d in coordinator.data.summary.days
-    ]
+    daily = [{"date": d.date, "kwh": d.energy_kwh, "kwh_raw": d.energy_kwh} for d in coordinator.data.summary.days]
     connection.send_result(msg["id"], {"points": points, "daily": daily})

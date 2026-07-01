@@ -55,7 +55,9 @@ def test_weighted_equals_share_weighted_sum() -> None:
 
     expected = 0.0
     for orientation, share in zip(layout.orientations, layout.shares):
-        ctx = PvContext(air_temp_c=18, wind_ms=3, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150, poa_wm2=None, shading=False)
+        ctx = PvContext(
+            air_temp_c=18, wind_ms=3, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150, poa_wm2=None, shading=False
+        )
         expected += compute_pv_power(_NOON, _LAT, _LON, 30, orientation, ctx) * share
     assert abs(weighted - expected) < 1e-12
 
@@ -71,8 +73,12 @@ def test_weighted_uses_gti_per_orientation() -> None:
 
     weighted = compute_pv_power_weighted(_NOON, _LAT, _LON, sample, layout, gti_sampler=sampler)
 
-    east_ctx = PvContext(air_temp_c=18, wind_ms=3, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150, poa_wm2=710.0, shading=False)
-    west_ctx = PvContext(air_temp_c=18, wind_ms=3, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150, poa_wm2=None, shading=False)
+    east_ctx = PvContext(
+        air_temp_c=18, wind_ms=3, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150, poa_wm2=710.0, shading=False
+    )
+    west_ctx = PvContext(
+        air_temp_c=18, wind_ms=3, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150, poa_wm2=None, shading=False
+    )
     expected = (
         compute_pv_power(_NOON, _LAT, _LON, 30, PanelOrientation(30, 90), east_ctx) * 0.5
         + compute_pv_power(_NOON, _LAT, _LON, 30, PanelOrientation(30, 270), west_ctx) * 0.5
@@ -90,8 +96,8 @@ def test_sample_gti_interpolates_and_guards() -> None:
     half = datetime(2026, 6, 21, 12, 30, tzinfo=timezone.utc)
     assert sample_gti(store, 30, 180, half) == 700.0
     assert sample_gti(store, 30, 180, datetime(2026, 6, 21, 12, tzinfo=timezone.utc)) == 600.0
-    assert sample_gti(None, 30, 180, half) is None        # no store
-    assert sample_gti(store, 30, 90, half) is None        # orientation absent
+    assert sample_gti(None, 30, 180, half) is None  # no store
+    assert sample_gti(store, 30, 90, half) is None  # orientation absent
 
 
 def test_lerp_helpers() -> None:

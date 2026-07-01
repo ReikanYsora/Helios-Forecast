@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from datetime import datetime, timedelta, tzinfo
+from datetime import date, datetime, timedelta, tzinfo
 from typing import Dict, List, Optional
 
 # Days of history at which the learning is considered fully matured.
@@ -42,12 +42,12 @@ _W_PREDICT = 0.20
 class Reliability:
     """The reliability index and its components."""
 
-    overall: float                       # 0..100
-    data_maturity: float                 # 0..1
-    recent_skill: Optional[float]        # 0..1, None when too few comparable days
+    overall: float  # 0..100
+    data_maturity: float  # 0..1
+    recent_skill: Optional[float]  # 0..1, None when too few comparable days
     today_predictability: Optional[float]  # 0..1, None when today has no daytime data
     days_learned: int
-    per_day: List[float]                 # 0..100 per horizon day (today .. +6)
+    per_day: List[float]  # 0..100 per horizon day (today .. +6)
 
 
 def _clamp01(x: float) -> float:
@@ -62,9 +62,9 @@ def _local_date(ms: float, tz: tzinfo):
     return datetime.fromtimestamp(ms / 1000.0, tz).date()
 
 
-def daily_actual_kwh(production: list, tz: tzinfo) -> Dict[object, float]:
+def daily_actual_kwh(production: list, tz: tzinfo) -> Dict[date, float]:
     """Real production summed to kWh per local calendar day."""
-    out: Dict[object, float] = {}
+    out: Dict[date, float] = {}
     for b in production:
         if not _finite(getattr(b, "kwh", None)):
             continue
@@ -73,9 +73,9 @@ def daily_actual_kwh(production: list, tz: tzinfo) -> Dict[object, float]:
     return out
 
 
-def daily_predicted_kwh(points: list, tz: tzinfo) -> Dict[object, float]:
+def daily_predicted_kwh(points: list, tz: tzinfo) -> Dict[date, float]:
     """Hourly predicted points summed to kWh per local calendar day (pv_w over 1 h)."""
-    out: Dict[object, float] = {}
+    out: Dict[date, float] = {}
     for p in points:
         if not _finite(getattr(p, "pv_w", None)):
             continue
@@ -122,10 +122,10 @@ def _daytime_cloud_for_day(weather, day, tz: tzinfo) -> List[float]:
         if t.astimezone(tz).date() != day:
             continue
         g = ghi[i] if i < len(ghi) else None
-        if not (_finite(g) and g > DAYTIME_GHI_WM2):
+        if not isinstance(g, (int, float)) or not math.isfinite(g) or g <= DAYTIME_GHI_WM2:
             continue
         c = cloud[i] if i < len(cloud) else None
-        if _finite(c):
+        if isinstance(c, (int, float)) and math.isfinite(c):
             clouds.append(float(c))
     return clouds
 
@@ -151,10 +151,10 @@ def _daytime_spread_for_day(weather, day, tz: tzinfo) -> Optional[float]:
         if t.astimezone(tz).date() != day:
             continue
         g = ghi[i] if i < len(ghi) else None
-        if not (_finite(g) and g > DAYTIME_GHI_WM2):
+        if not isinstance(g, (int, float)) or not math.isfinite(g) or g <= DAYTIME_GHI_WM2:
             continue
         s = sp[i] if i < len(sp) else None
-        if _finite(s):
+        if isinstance(s, (int, float)) and math.isfinite(s):
             spreads.append(float(s))
     if not spreads:
         return None

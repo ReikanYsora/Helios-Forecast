@@ -30,8 +30,7 @@ if TYPE_CHECKING:
 _BASE_URL = "https://api.open-meteo.com/v1/forecast"
 
 WEATHER_HOURLY = (
-    "cloud_cover,shortwave_radiation,direct_radiation,diffuse_radiation,"
-    "temperature_2m,wind_speed_10m,snow_depth"
+    "cloud_cover,shortwave_radiation,direct_radiation,diffuse_radiation,temperature_2m,wind_speed_10m,snow_depth"
 )
 GTI_HOURLY = "global_tilted_irradiance_instant"
 
@@ -54,13 +53,13 @@ class WeatherSeries:
     per-hour median across the requested models."""
 
     times: list[datetime]
-    cloud: list[float]      # %
+    cloud: list[float | None]  # %, None where every model was missing that hour
     shortwave: list[float]  # GHI, W/m2
-    direct: list[float]     # W/m2 on the horizontal
-    diffuse: list[float]    # W/m2 on the horizontal
-    temp: list[float]       # degC
-    wind: list[float]       # Open-Meteo default (km/h), passed through as the card does
-    snow: list[float]       # snow depth, metres
+    direct: list[float]  # W/m2 on the horizontal
+    diffuse: list[float]  # W/m2 on the horizontal
+    temp: list[float]  # degC
+    wind: list[float]  # Open-Meteo default (km/h), passed through as the card does
+    snow: list[float]  # snow depth, metres
     # Per-hour standard deviation of cloud cover across the models (model disagreement). Empty for a
     # single-model response. Read as a forecast-uncertainty signal by the reliability index.
     cloud_spread: list[float] = field(default_factory=list)

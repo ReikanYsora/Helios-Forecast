@@ -30,8 +30,8 @@ def test_power_now_and_next_hour() -> None:
     pts = _triangular_points()
     now = datetime(2026, 6, 21, 10, tzinfo=_UTC)
     s = summarize(pts, now=now, tz=_UTC, step_minutes=60)
-    assert s.power_now_w == 1000.0 - 2 * 120.0          # 760 at 10:00
-    assert s.power_next_hour_w == 760.0                  # only the 10:00 bucket in [10,11)
+    assert s.power_now_w == 1000.0 - 2 * 120.0  # 760 at 10:00
+    assert s.power_next_hour_w == 760.0  # only the 10:00 bucket in [10,11)
 
 
 def test_seven_days_with_peak() -> None:

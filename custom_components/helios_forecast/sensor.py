@@ -136,9 +136,10 @@ def _build_descriptions() -> list[HeliosSensorDescription]:
     ]
     for n in range(1, _HORIZON_DAYS + 1):
         i = n - 1
-        descriptions.append(_energy(f"energy_day_{n}", f"Energy day {n}", lambda s, i=i: s.days[i].energy_kwh))
-        descriptions.append(_power(f"peak_power_day_{n}", f"Peak power day {n}", lambda s, i=i: s.days[i].peak_power_w))
-        descriptions.append(_timestamp(f"peak_time_day_{n}", f"Peak time day {n}", lambda s, i=i: s.days[i].peak_time))
+        # `i=i` binds the loop index into each lambda; mypy can't infer the default-arg lambda's type.
+        descriptions.append(_energy(f"energy_day_{n}", f"Energy day {n}", lambda s, i=i: s.days[i].energy_kwh))  # type: ignore[misc]
+        descriptions.append(_power(f"peak_power_day_{n}", f"Peak power day {n}", lambda s, i=i: s.days[i].peak_power_w))  # type: ignore[misc]
+        descriptions.append(_timestamp(f"peak_time_day_{n}", f"Peak time day {n}", lambda s, i=i: s.days[i].peak_time))  # type: ignore[misc]
     return descriptions
 
 
@@ -193,9 +194,7 @@ async def async_setup_entry(
     entities: list[SensorEntity] = [
         HeliosForecastSensor(coordinator, entry, description) for description in _build_descriptions()
     ]
-    entities += [
-        HeliosWeatherSensor(coordinator, entry, description) for description in _build_weather_descriptions()
-    ]
+    entities += [HeliosWeatherSensor(coordinator, entry, description) for description in _build_weather_descriptions()]
     entities.append(HeliosReliabilitySensor(coordinator, entry))
     entities.append(HeliosTodayTrendSensor(coordinator, entry))
     async_add_entities(entities)

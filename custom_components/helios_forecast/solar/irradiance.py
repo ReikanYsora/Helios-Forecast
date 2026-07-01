@@ -7,7 +7,7 @@ orientation, exactly as the card does, built from:
      supplied measured / forecast GHI when present.
   2. An optional tilt transposition (Liu-Jordan isotropic), or Open-Meteo's
      anisotropic plane-of-array (GTI) when supplied, with a direct / diffuse
-     split from real radiation when available else cloud-derived.
+     split from real irradiance when available else cloud-derived.
   3. A Sandia-style cell-temperature derate when air temperature is known.
 
 Kept identical to the TypeScript so the server-side forecast matches the card
@@ -19,9 +19,12 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from .geometry import sun_position
+
+if TYPE_CHECKING:
+    from typing import TypeGuard
 
 _D = math.pi / 180.0
 
@@ -89,7 +92,7 @@ def snow_cover_factor(snow_depth_m: Optional[float], air_temp_c: Optional[float]
     return SNOW_MIN_FACTOR + (1.0 - SNOW_MIN_FACTOR) * melt
 
 
-def _supplied(value: Optional[float]) -> bool:
+def _supplied(value: Optional[float]) -> TypeGuard[float]:
     """True when an optional irradiance field is present and non-negative."""
     return value is not None and value >= 0
 
@@ -112,9 +115,10 @@ def compute_pv_power(
     ghi_clear = 1098.0 * cos_z * math.exp(-0.059 / cos_z)
 
     cc = max(0.0, min(100.0, cloud_cover_pct)) / 100.0
-    k_cloud = 1.0 - 0.75 * (cc ** 3.4)
+    k_cloud = 1.0 - 0.75 * (cc**3.4)
 
-    ghi_eff = ctx.ghi_wm2 if (ctx is not None and _supplied(ctx.ghi_wm2)) else ghi_clear * k_cloud
+    ghi_wm2 = ctx.ghi_wm2 if ctx is not None else None
+    ghi_eff = ghi_wm2 if _supplied(ghi_wm2) else ghi_clear * k_cloud
 
     shading = bool(ctx and ctx.shading)
 
@@ -140,14 +144,10 @@ def compute_pv_power(
         cos_theta = math.sin(alt_r) * math.cos(beta) + math.cos(alt_r) * math.sin(beta) * math.cos(d_az)
         r_b = max(0.0, cos_theta) / max(0.087, cos_z) if cos_theta > 0 else 0.0
 
-        has_split = (
-            ctx is not None
-            and _supplied(ctx.direct_wm2)
-            and _supplied(ctx.diffuse_wm2)
-            and (ctx.direct_wm2 + ctx.diffuse_wm2) > 0
-        )
-        if has_split:
-            direct_fraction = ctx.direct_wm2 / (ctx.direct_wm2 + ctx.diffuse_wm2)
+        direct_wm2 = ctx.direct_wm2 if ctx is not None else None
+        diffuse_wm2 = ctx.diffuse_wm2 if ctx is not None else None
+        if _supplied(direct_wm2) and _supplied(diffuse_wm2) and (direct_wm2 + diffuse_wm2) > 0:
+            direct_fraction = direct_wm2 / (direct_wm2 + diffuse_wm2)
         else:
             direct_fraction = max(0.0, min(0.85, (k_cloud - 0.25) / 0.75 * 0.85))
         diffuse_fraction = 1.0 - direct_fraction
@@ -156,8 +156,9 @@ def compute_pv_power(
         diffuse_poa = ghi_eff * diffuse_fraction * (1.0 + math.cos(beta)) / 2.0
         ground_poa = ghi_eff * 0.2 * (1.0 - math.cos(beta)) / 2.0
 
-        if ctx is not None and _supplied(ctx.poa_wm2):
-            poa_eff = min(ctx.poa_wm2, diffuse_poa + ground_poa) if shading else ctx.poa_wm2
+        poa_wm2 = ctx.poa_wm2 if ctx is not None else None
+        if _supplied(poa_wm2):
+            poa_eff = min(poa_wm2, diffuse_poa + ground_poa) if shading else poa_wm2
         else:
             poa_eff = direct_poa + diffuse_poa + ground_poa
 

@@ -71,8 +71,14 @@ def _weather_today(clouds, *, ghi=500.0) -> WeatherSeries:
     times = [base + timedelta(hours=i) for i in range(len(clouds))]
     n = len(clouds)
     return WeatherSeries(
-        times=times, cloud=list(clouds), shortwave=[ghi] * n, direct=[0.0] * n,
-        diffuse=[0.0] * n, temp=[20.0] * n, wind=[5.0] * n, snow=[0.0] * n,
+        times=times,
+        cloud=list(clouds),
+        shortwave=[ghi] * n,
+        direct=[0.0] * n,
+        diffuse=[0.0] * n,
+        temp=[20.0] * n,
+        wind=[5.0] * n,
+        snow=[0.0] * n,
     )
 
 
