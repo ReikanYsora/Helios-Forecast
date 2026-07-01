@@ -166,6 +166,18 @@ def test_ratio_clamped_high() -> None:
     assert sky_map.global_ratio == M_MAX  # 5x clamps to the ceiling
 
 
+def test_build_survives_missing_cloud_hours() -> None:
+    # Regression for issue #14: Open-Meteo can leave a cloud hour as None, and _clamp_pct used to
+    # crash on it (math.isfinite(None) -> TypeError). The build must instead treat the gap as clear
+    # (0 %) and still produce a map.
+    buckets = _midday_buckets()
+    inp0 = _input(buckets)
+    matched = [ProductionBucket(b.start_ms, b.end_ms, _model_kwh(b, inp0)) for b in buckets]
+    cloud_with_gaps = [None if i % 3 == 0 else 10.0 for i in range(len(matched))]
+    sky_map = build_sky_residual_map(_input(matched, cloud=cloud_with_gaps))
+    assert sky_map is not None
+
+
 def test_forecast_applies_ratio() -> None:
     # A flat map returning 0.5 everywhere halves the corrected curve, raw untouched.
     n = 36 * 18

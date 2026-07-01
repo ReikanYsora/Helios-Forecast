@@ -76,7 +76,7 @@ class SkyResidualInput:
     layout: PvLayout
     production: Optional[List[ProductionBucket]]
     cloud_times: List[float]  # epoch ms, ascending
-    cloud: List[float]
+    cloud: List[Optional[float]]  # %, None where the model left an hour missing
     shortwave: List[float]
     direct: List[float]
     diffuse: List[float]
@@ -269,5 +269,7 @@ def _nearest_cloud_idx(times: List[float], t_ms: float) -> int:
     return best
 
 
-def _clamp_pct(v: float) -> float:
-    return max(0.0, min(100.0, v)) if math.isfinite(v) else 0.0
+def _clamp_pct(v: Optional[float]) -> float:
+    # Open-Meteo can leave a cloud hour missing (None); treat it, and any non-finite value, as 0 %
+    # (clear), matching the caller's fallback when no cloud sample is in range.
+    return max(0.0, min(100.0, v)) if (v is not None and math.isfinite(v)) else 0.0
