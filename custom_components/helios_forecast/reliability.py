@@ -179,8 +179,10 @@ def today_predictability(weather, now: datetime, tz: tzinfo) -> Optional[float]:
 
 
 def _horizon_decay(day_index: int) -> float:
-    """Cloud-forecast skill drops with lead time; reliability decays accordingly."""
-    return max(0.4, 1.0 - 0.12 * day_index)
+    """Cloud-forecast skill drops with lead time; reliability decays accordingly. Exponential toward a
+    0.5 floor (J0=1.00, J1=0.88, J3=0.71, J6=0.58), matching how NWP skill actually degrades instead
+    of the old steep 0.12/day linear ramp that bottomed out at 0.40 by J+5."""
+    return 0.5 + 0.5 * math.exp(-day_index / 3.5)
 
 
 def _blend(maturity: float, skill: Optional[float], predict: Optional[float]) -> float:

@@ -72,6 +72,22 @@ def test_predict_none_on_empty_or_night() -> None:
     assert predict([AnalogSample(40, 180, 50, 2000)], -5.0, 180.0, 50.0) is None
 
 
+def test_temperature_influences_match() -> None:
+    # Same sky + geometry, two temperature regimes producing differently (hot panels produce less).
+    # The match must lean toward the analogs whose temperature is closest to the query, so a cool
+    # query reads higher than a hot one; without the temperature feature both would return the mix.
+    cool = [AnalogSample(alt=40.0, az=180.0, cloud=30.0, watt=3000.0, temp=5.0) for _ in range(40)]
+    hot = [AnalogSample(alt=40.0, az=180.0, cloud=30.0, watt=2000.0, temp=35.0) for _ in range(40)]
+    lib = cool + hot
+    band_cool = predict(lib, 40.0, 180.0, 30.0, temp=5.0)
+    band_hot = predict(lib, 40.0, 180.0, 30.0, temp=35.0)
+    assert band_cool is not None and band_hot is not None
+    assert band_cool.p50 > band_hot.p50
+    # No query temperature (or samples without temp) falls back to the old geometry+cloud match.
+    band_none = predict(lib, 40.0, 180.0, 30.0)
+    assert band_none is not None
+
+
 def _june_noon(hour: int) -> datetime:
     return datetime(2026, 6, 15, hour, tzinfo=UTC)
 
