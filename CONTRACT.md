@@ -99,6 +99,12 @@ Energy, intraday:
 | `sensor.helios_forecast_energy_this_hour` | predicted production this hour, **kWh** | |
 | `sensor.helios_forecast_energy_next_hour` | predicted production next hour, **kWh** | |
 
+Forecast quality:
+
+| Entity | State | Notes |
+|---|---|---|
+| `sensor.helios_forecast_reliability` | forecast reliability, **0..100 %** | `state_class: measurement`. Blends learning maturity, recent predicted-vs-actual skill and today's cloud predictability. Attributes: `data_maturity`, `recent_skill`, `today_predictability`, `days_learned`, and a per-horizon-day `per_day` list (chart-style, kept off the recorder). |
+
 All values are residual-corrected. A raw (pre-correction) variant is not exposed
 as entities to keep the set clean; the raw curve stays available to the card via
 the detail series in §3.

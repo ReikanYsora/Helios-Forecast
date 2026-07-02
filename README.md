@@ -13,8 +13,8 @@ Home Assistant already knows how to show it. No browser-side math, no guessing.
   real production in Home Assistant's own Energy view.
 - **Gives you real entities.** A clean, recorder-friendly set of sensors (power
   now, next hour, per-day energy and peaks over a 7 day horizon, energy left
-  today) that you can drop straight into automations and history graphs. Useful
-  on its own, with or without the card.
+  today, plus a forecast-reliability score) that you can drop straight into
+  automations and history graphs. Useful on its own, with or without the card.
 - **Powers the [Helios card](https://github.com/ReikanYsora/Helios).** It serves
   a richer, sub-hourly detail series the card reads for full fidelity visuals,
   so the card no longer has to compute the forecast itself.
@@ -23,9 +23,13 @@ Home Assistant already knows how to show it. No browser-side math, no guessing.
 
 The forecast starts from Open-Meteo irradiance (global tilted irradiance per
 panel orientation, the direct and diffuse split, snow cover) combined with your
-installation geometry. Then it learns a correction from your home's own recorded
-production, so over time the prediction tracks your site's real behaviour:
+installation geometry, including a cell-temperature derate so hot days are not
+over-predicted. Then it learns a correction from your home's own recorded
+production, matching past hours on cloud cover, sun geometry and outdoor
+temperature, so over time the prediction tracks your site's real behaviour:
 shading, soiling, orientation error, inverter clipping, even battery curtailment.
+It also publishes a reliability score that reflects how much history backs the
+learning, its recent accuracy, and how predictable today's sky is.
 
 ## One forecast per panel line
 
@@ -50,5 +54,5 @@ This integration is installed through [HACS](https://hacs.xyz/).
 ## Status
 
 Early days, and moving fast. The data contract the card is built against is
-documented and frozen in [CONTRACT.md](./CONTRACT.md). Feedback and issues are
-very welcome.
+documented and frozen in [CONTRACT.md](./CONTRACT.md), and per-release changes are
+in [CHANGELOG.md](./CHANGELOG.md). Feedback and issues are very welcome.
