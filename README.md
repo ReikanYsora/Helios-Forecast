@@ -56,3 +56,12 @@ This integration is installed through [HACS](https://hacs.xyz/).
 Early days, and moving fast. The data contract the card is built against is
 documented and frozen in [CONTRACT.md](./CONTRACT.md), and per-release changes are
 in [CHANGELOG.md](./CHANGELOG.md). Feedback and issues are very welcome.
+
+---
+
+## License
+
+Helios Forecast, self-learning solar forecast integration for Home Assistant.
+Copyright (C) 2026 Jérôme Crémoux (ReikanYsora).
+
+This project is licensed under the GNU General Public License v3.0, see the [LICENSE](LICENSE) file for details.
