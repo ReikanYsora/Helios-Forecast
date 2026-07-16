@@ -8,6 +8,7 @@ so a drift from the card's request is caught. Runnable with
 
 from __future__ import annotations
 
+import asyncio
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -15,9 +16,11 @@ from pathlib import Path
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
+import custom_components.helios_forecast.openmeteo as om  # noqa: E402
 from custom_components.helios_forecast.openmeteo import (  # noqa: E402
     build_gti_url,
     build_weather_url,
+    fetch_weather,
     om_azimuth,
     parse_gti,
     parse_times,
@@ -124,6 +127,65 @@ def test_parse_gti() -> None:
     assert g.poa == [0, 620]
     assert g.times[1] == datetime(2026, 6, 11, 12, tzinfo=timezone.utc)
     assert parse_gti({"hourly": {"time": ["2026-06-11T00:00"], "global_tilted_irradiance_instant": []}}) is None
+
+
+_GOOD_WEATHER = {
+    "hourly": {
+        "time": ["2026-06-11T10:00", "2026-06-11T11:00"],
+        "cloud_cover": [50.0, 60.0],
+        "shortwave_radiation": [100.0, 200.0],
+        "direct_radiation": [10.0, 20.0],
+        "diffuse_radiation": [5.0, 6.0],
+        "temperature_2m": [15.0, 16.0],
+        "wind_speed_10m": [3.0, 4.0],
+        "snow_depth": [0.0, 0.0],
+    }
+}
+
+
+class _FakeResp:
+    def __init__(self, status, payload):
+        self.status = status
+        self._payload = payload
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *exc):
+        return False
+
+    async def json(self):
+        return self._payload
+
+
+class _FakeSession:
+    """Serves a scripted list of responses, one per get() call."""
+
+    def __init__(self, responses):
+        self._responses = list(responses)
+        self.calls = 0
+
+    def get(self, url):
+        self.calls += 1
+        return self._responses.pop(0)
+
+
+def test_fetch_weather_retries_empty_then_succeeds() -> None:
+    om._RETRY_DELAY_S = 0.0  # do not actually sleep between retries in tests
+    # A 200-but-empty payload, then a non-200, then a good payload: the third try wins (issue #19).
+    session = _FakeSession([_FakeResp(200, {"hourly": {}}), _FakeResp(429, None), _FakeResp(200, _GOOD_WEATHER)])
+    result = asyncio.run(fetch_weather(session, 1.0, 2.0))
+    assert result is not None
+    assert result.cloud == [50.0, 60.0]
+    assert session.calls == 3
+
+
+def test_fetch_weather_none_after_exhausting_retries() -> None:
+    om._RETRY_DELAY_S = 0.0
+    session = _FakeSession([_FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)])
+    result = asyncio.run(fetch_weather(session, 1.0, 2.0))
+    assert result is None
+    assert session.calls == 3  # capped at _RETRY_ATTEMPTS, no infinite loop
 
 
 if __name__ == "__main__":

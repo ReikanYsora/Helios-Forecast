@@ -5,6 +5,35 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.8.0
+
+### Added
+
+- **Several panel lines in one entry.** A single entry can now hold more than one panel
+  line, added through an "add another line" step. This is the setup for two strings on one
+  inverter that only exposes a single, combined production sensor: the lines share that
+  sensor and one inverter limit, and the model sums them by kWp share. One entry per line
+  is still fully supported for installs that do have a sensor per line. The Configure
+  button opens a menu to edit the shared settings or the lines (edit, add or remove).
+  (#18)
+- **`forecast` attribute on the weather sensors.** Every archived Open-Meteo sensor —
+  cloud cover, irradiance, temperature, wind, snow — now carries a forward-looking hourly
+  `forecast` list (today plus the 7-day horizon), the same shape the power sensor exposes,
+  so you can plot the upcoming sky next to the predicted power in ApexCharts. (#21)
+
+### Fixed
+
+- **Decimal peak power and inverter limits are entered reliably.** The peak power, tilt,
+  azimuth and inverter fields are now proper numeric inputs with a defined decimal step,
+  so a value like `2.61 kWp` is stored at full precision instead of being misread by the
+  browser's number locale. (#13)
+- **A transient Open-Meteo blank no longer errors.** An empty or rate-limited weather
+  response is now retried a few times, and if it still comes back empty the last good
+  fetch is reused for that cycle rather than failing the update with "Open-Meteo returned
+  no weather data". (#19)
+
+---
+
 ## 2026.7.2
 
 ### Fixed
