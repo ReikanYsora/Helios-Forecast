@@ -34,6 +34,40 @@ CONF_TRACKER = "tracker"
 TRACKER_NONE = "none"
 _VALID_TRACKERS = {"dual-axis", "single-axis-h", "single-axis-v"}
 
+# Per-line geometry keys, split out of the flat form into one entry in the
+# ``arrays`` list. An entry may hold several lines (e.g. two strings on one
+# inverter): the model sums them by kWp share and the entry-level inverter cap
+# applies to their combined output.
+LINE_KEYS: Tuple[str, ...] = (CONF_TILT, CONF_AZIMUTH, CONF_KWP, CONF_TRACKER)
+# Entry-level settings, shared by every line in the entry.
+SETTINGS_KEYS: Tuple[str, ...] = (
+    CONF_LATITUDE,
+    CONF_LONGITUDE,
+    CONF_INVERTER_MAX_KW,
+    CONF_PRODUCTION_ENTITY,
+    CONF_TREND_ANCHOR_HOUR,
+)
+
+
+def split_line(user_input: Dict[str, Any]) -> Dict[str, Any]:
+    """The per-line geometry fields of a submitted form (drops empty values)."""
+    return {k: user_input[k] for k in LINE_KEYS if user_input.get(k) is not None}
+
+
+def split_settings(user_input: Dict[str, Any]) -> Dict[str, Any]:
+    """The entry-level settings of a submitted form (drops empty values)."""
+    return {k: user_input[k] for k in SETTINGS_KEYS if user_input.get(k) is not None}
+
+
+def merge_entry_data(settings: Dict[str, Any], lines: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Assemble a config entry's data from entry-level settings + its panel lines."""
+    return {**settings, CONF_ARRAYS: list(lines)}
+
+
+def lines_from_config(data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """The panel lines stored in an entry, in order (empty when none)."""
+    return list(data.get(CONF_ARRAYS) or [])
+
 
 def _as_float(value: Any) -> Optional[float]:
     try:

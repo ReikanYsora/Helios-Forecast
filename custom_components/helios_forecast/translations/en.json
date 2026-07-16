@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast — panel line",
-        "description": "One forecast for one panel line (a group of co-oriented panels). Add the integration again for each additional line. Leave the location blank to use your Home Assistant home.",
+        "description": "One forecast for a photovoltaic installation. Add a panel line per orientation — several lines share this installation's single production sensor and inverter cap. Leave the location blank to use your Home Assistant home.",
         "data": {
           "name": "Name (e.g. South roof)",
           "tilt": "Tilt (degrees, 0 = flat, 90 = vertical)",
@@ -14,7 +14,19 @@
           "longitude": "Longitude (optional)",
           "inverter_max_kw": "Inverter max output (kW, optional)",
           "production_entity": "PV production sensor (for the learned correction)",
-          "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)"
+          "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)",
+          "add_another": "Add another panel line"
+        }
+      },
+      "line": {
+        "title": "Helios Forecast — additional panel line",
+        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "data": {
+          "tilt": "Tilt (degrees, 0 = flat, 90 = vertical)",
+          "azimuth": "Azimuth (degrees from north, 90 = east, 180 = south, 270 = west)",
+          "kwp": "Peak power (kWp)",
+          "tracker": "Sun tracker",
+          "add_another": "Add another panel line"
         }
       }
     }
@@ -22,26 +34,36 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast — panel line",
-        "description": "Edit this panel line's orientation and settings.",
+        "title": "Helios Forecast",
+        "description": "Choose what to edit.",
+        "menu_options": {
+          "settings": "Edit settings (location, inverter, production sensor)",
+          "lines": "Edit panel lines"
+        }
+      },
+      "settings": {
+        "title": "Helios Forecast — settings",
+        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
-          "tilt": "Tilt (degrees, 0 = flat, 90 = vertical)",
-          "azimuth": "Azimuth (degrees from north, 90 = east, 180 = south, 270 = west)",
-          "kwp": "Peak power (kWp)",
-          "tracker": "Sun tracker",
           "latitude": "Latitude (optional)",
           "longitude": "Longitude (optional)",
           "inverter_max_kw": "Inverter max output (kW, optional)",
           "production_entity": "PV production sensor (for the learned correction)",
           "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)"
         }
+      },
+      "lines": {
+        "title": "Helios Forecast — panel line {index}/{total}",
+        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "data": {
+          "tilt": "Tilt (degrees, 0 = flat, 90 = vertical)",
+          "azimuth": "Azimuth (degrees from north, 90 = east, 180 = south, 270 = west)",
+          "kwp": "Peak power (kWp)",
+          "tracker": "Sun tracker",
+          "remove_this_line": "Remove this panel line",
+          "add_another": "Add another panel line"
+        }
       }
-    }
-  },
-  "issues": {
-    "legacy_multi_array": {
-      "title": "{name}: multiple panel lines in one entry",
-      "description": "\"{name}\" was set up with several panel arrays in a single entry, which is no longer supported. Each panel line now needs its own entry so it gets its own forecast entities. Delete this entry and add Helios Forecast once per panel line."
     }
   },
   "selector": {

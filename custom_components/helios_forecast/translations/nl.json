@@ -14,7 +14,19 @@
           "longitude": "Lengtegraad (optioneel)",
           "inverter_max_kw": "Max. uitgangsvermogen omvormer (kW, optioneel)",
           "production_entity": "PV-productiesensor (voor de aangeleerde correctie)",
-          "trend_anchor_hour": "Referentie-uur voor dagtrend (0-23, standaard 6)"
+          "trend_anchor_hour": "Referentie-uur voor dagtrend (0-23, standaard 6)",
+          "add_another": "Add another panel line"
+        }
+      },
+      "line": {
+        "title": "Helios Forecast — additional panel line",
+        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "data": {
+          "tilt": "Hellingshoek (graden, 0 = plat, 90 = verticaal)",
+          "azimuth": "Azimut (graden vanaf noord, 90 = oost, 180 = zuid, 270 = west)",
+          "kwp": "Piekvermogen (kWp)",
+          "tracker": "Zonnevolger",
+          "add_another": "Add another panel line"
         }
       }
     }
@@ -22,26 +34,36 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast — paneellijn",
-        "description": "Bewerk de oriëntatie en instellingen van deze paneellijn.",
+        "title": "Helios Forecast",
+        "description": "Choose what to edit.",
+        "menu_options": {
+          "settings": "Edit settings (location, inverter, production sensor)",
+          "lines": "Edit panel lines"
+        }
+      },
+      "settings": {
+        "title": "Helios Forecast — settings",
+        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
-          "tilt": "Hellingshoek (graden, 0 = plat, 90 = verticaal)",
-          "azimuth": "Azimut (graden vanaf noord, 90 = oost, 180 = zuid, 270 = west)",
-          "kwp": "Piekvermogen (kWp)",
-          "tracker": "Zonnevolger",
           "latitude": "Breedtegraad (optioneel)",
           "longitude": "Lengtegraad (optioneel)",
           "inverter_max_kw": "Max. uitgangsvermogen omvormer (kW, optioneel)",
           "production_entity": "PV-productiesensor (voor de aangeleerde correctie)",
           "trend_anchor_hour": "Referentie-uur voor dagtrend (0-23, standaard 6)"
         }
+      },
+      "lines": {
+        "title": "Helios Forecast — panel line {index}/{total}",
+        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "data": {
+          "tilt": "Hellingshoek (graden, 0 = plat, 90 = verticaal)",
+          "azimuth": "Azimut (graden vanaf noord, 90 = oost, 180 = zuid, 270 = west)",
+          "kwp": "Piekvermogen (kWp)",
+          "tracker": "Zonnevolger",
+          "remove_this_line": "Remove this panel line",
+          "add_another": "Add another panel line"
+        }
       }
-    }
-  },
-  "issues": {
-    "legacy_multi_array": {
-      "title": "{name}: meerdere paneellijnen in één invoer",
-      "description": "\"{name}\" is ingesteld met meerdere paneelgroepen in één invoer, wat niet langer wordt ondersteund. Elke paneellijn heeft nu een eigen invoer nodig zodat deze zijn eigen prognose-entiteiten krijgt. Verwijder deze invoer en voeg Helios Forecast eenmaal per paneellijn toe."
     }
   },
   "selector": {

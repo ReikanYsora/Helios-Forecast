@@ -14,7 +14,19 @@
           "longitude": "Longitud (valfritt)",
           "inverter_max_kw": "Växelriktarens maxeffekt (kW, valfritt)",
           "production_entity": "Sensor för solelproduktion (för den inlärda korrigeringen)",
-          "trend_anchor_hour": "Referenstimme för dagens trend (0-23, standard 6)"
+          "trend_anchor_hour": "Referenstimme för dagens trend (0-23, standard 6)",
+          "add_another": "Add another panel line"
+        }
+      },
+      "line": {
+        "title": "Helios Forecast — additional panel line",
+        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "data": {
+          "tilt": "Lutning (grader, 0 = platt, 90 = lodrät)",
+          "azimuth": "Azimut (grader från norr, 90 = öster, 180 = söder, 270 = väster)",
+          "kwp": "Toppeffekt (kWp)",
+          "tracker": "Solföljare",
+          "add_another": "Add another panel line"
         }
       }
     }
@@ -22,26 +34,36 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast — panelrad",
-        "description": "Redigera denna panelrads orientering och inställningar.",
+        "title": "Helios Forecast",
+        "description": "Choose what to edit.",
+        "menu_options": {
+          "settings": "Edit settings (location, inverter, production sensor)",
+          "lines": "Edit panel lines"
+        }
+      },
+      "settings": {
+        "title": "Helios Forecast — settings",
+        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
-          "tilt": "Lutning (grader, 0 = platt, 90 = lodrät)",
-          "azimuth": "Azimut (grader från norr, 90 = öster, 180 = söder, 270 = väster)",
-          "kwp": "Toppeffekt (kWp)",
-          "tracker": "Solföljare",
           "latitude": "Latitud (valfritt)",
           "longitude": "Longitud (valfritt)",
           "inverter_max_kw": "Växelriktarens maxeffekt (kW, valfritt)",
           "production_entity": "Sensor för solelproduktion (för den inlärda korrigeringen)",
           "trend_anchor_hour": "Referenstimme för dagens trend (0-23, standard 6)"
         }
+      },
+      "lines": {
+        "title": "Helios Forecast — panel line {index}/{total}",
+        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "data": {
+          "tilt": "Lutning (grader, 0 = platt, 90 = lodrät)",
+          "azimuth": "Azimut (grader från norr, 90 = öster, 180 = söder, 270 = väster)",
+          "kwp": "Toppeffekt (kWp)",
+          "tracker": "Solföljare",
+          "remove_this_line": "Remove this panel line",
+          "add_another": "Add another panel line"
+        }
       }
-    }
-  },
-  "issues": {
-    "legacy_multi_array": {
-      "title": "{name}: flera panelrader i en post",
-      "description": "\"{name}\" konfigurerades med flera panelgrupper i en enda post, vilket inte längre stöds. Varje panelrad behöver nu sin egen post för att få sina egna prognosentiteter. Ta bort denna post och lägg till Helios Forecast en gång per panelrad."
     }
   },
   "selector": {

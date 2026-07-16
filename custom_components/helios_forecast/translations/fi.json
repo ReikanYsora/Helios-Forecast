@@ -14,7 +14,19 @@
           "longitude": "Pituusaste (valinnainen)",
           "inverter_max_kw": "Invertterin enimmäisteho (kW, valinnainen)",
           "production_entity": "Aurinkotuotannon anturi (opitulle korjaukselle)",
-          "trend_anchor_hour": "Tämän päivän trendin viitetunti (0-23, oletus 6)"
+          "trend_anchor_hour": "Tämän päivän trendin viitetunti (0-23, oletus 6)",
+          "add_another": "Add another panel line"
+        }
+      },
+      "line": {
+        "title": "Helios Forecast — additional panel line",
+        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "data": {
+          "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",
+          "azimuth": "Atsimuutti (astetta pohjoisesta, 90 = itä, 180 = etelä, 270 = länsi)",
+          "kwp": "Huipputeho (kWp)",
+          "tracker": "Aurinkoseuranta",
+          "add_another": "Add another panel line"
         }
       }
     }
@@ -22,26 +34,36 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast — paneelilinja",
-        "description": "Muokkaa tämän paneelilinjan suuntausta ja asetuksia.",
+        "title": "Helios Forecast",
+        "description": "Choose what to edit.",
+        "menu_options": {
+          "settings": "Edit settings (location, inverter, production sensor)",
+          "lines": "Edit panel lines"
+        }
+      },
+      "settings": {
+        "title": "Helios Forecast — settings",
+        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
-          "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",
-          "azimuth": "Atsimuutti (astetta pohjoisesta, 90 = itä, 180 = etelä, 270 = länsi)",
-          "kwp": "Huipputeho (kWp)",
-          "tracker": "Aurinkoseuranta",
           "latitude": "Leveysaste (valinnainen)",
           "longitude": "Pituusaste (valinnainen)",
           "inverter_max_kw": "Invertterin enimmäisteho (kW, valinnainen)",
           "production_entity": "Aurinkotuotannon anturi (opitulle korjaukselle)",
           "trend_anchor_hour": "Tämän päivän trendin viitetunti (0-23, oletus 6)"
         }
+      },
+      "lines": {
+        "title": "Helios Forecast — panel line {index}/{total}",
+        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "data": {
+          "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",
+          "azimuth": "Atsimuutti (astetta pohjoisesta, 90 = itä, 180 = etelä, 270 = länsi)",
+          "kwp": "Huipputeho (kWp)",
+          "tracker": "Aurinkoseuranta",
+          "remove_this_line": "Remove this panel line",
+          "add_another": "Add another panel line"
+        }
       }
-    }
-  },
-  "issues": {
-    "legacy_multi_array": {
-      "title": "{name}: useita paneelilinjoja yhdessä merkinnässä",
-      "description": "\"{name}\" määritettiin useilla paneeliryhmillä yhteen merkintään, mitä ei enää tueta. Jokainen paneelilinja tarvitsee nyt oman merkintänsä, jotta se saa omat ennusteentiteettinsä. Poista tämä merkintä ja lisää Helios Forecast kerran kutakin paneelilinjaa kohti."
     }
   },
   "selector": {
