@@ -13,9 +13,12 @@
           "latitude": "Latitude (optionnel)",
           "longitude": "Longitude (optionnel)",
           "inverter_max_kw": "Puissance max de l'onduleur (kW, optionnel)",
-          "production_entity": "Capteur de production PV (pour la correction apprise)",
+          "production_entity": "Capteur d'énergie de production PV (kWh, pour la correction apprise)",
           "trend_anchor_hour": "Heure de référence de la tendance du jour (0-23, défaut 6)",
           "add_another": "Ajouter une autre ligne de panneaux"
+        },
+        "data_description": {
+          "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs."
         }
       },
       "line": {
@@ -48,8 +51,11 @@
           "latitude": "Latitude (optionnel)",
           "longitude": "Longitude (optionnel)",
           "inverter_max_kw": "Puissance max de l'onduleur (kW, optionnel)",
-          "production_entity": "Capteur de production PV (pour la correction apprise)",
+          "production_entity": "Capteur d'énergie de production PV (kWh, pour la correction apprise)",
           "trend_anchor_hour": "Heure de référence de la tendance du jour (0-23, défaut 6)"
+        },
+        "data_description": {
+          "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs."
         }
       },
       "lines": {

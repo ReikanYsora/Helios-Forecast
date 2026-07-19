@@ -47,7 +47,10 @@ _ADD_ANOTHER = "add_another"
 _REMOVE = "remove_this_line"
 
 _BOX = selector.NumberSelectorMode.BOX
-_SENSOR = selector.EntitySelector(selector.EntitySelectorConfig(domain="sensor"))
+# Energy sensors only: the learning reads hourly "sum" statistics (change in kWh),
+# which a power (W) sensor does not have — picking one silently disabled the
+# learning and capped the reliability index (it only records a mean).
+_SENSOR = selector.EntitySelector(selector.EntitySelectorConfig(domain="sensor", device_class="energy"))
 _BOOL = selector.BooleanSelector()
 _HOUR = selector.NumberSelector(selector.NumberSelectorConfig(min=0, max=23, step=1, mode=_BOX))
 # Numeric geometry / power fields as explicit NumberSelectors: a proper numeric input

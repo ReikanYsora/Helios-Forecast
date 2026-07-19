@@ -406,6 +406,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         self._production_buckets = production
         if not production:
+            _LOGGER.warning(
+                "Production history for %s is empty: the entity has no long-term sum statistics "
+                "(pick a cumulative energy sensor in kWh, not a power sensor); learning is off and "
+                "the reliability index stays capped until then",
+                production_entity,
+            )
             return None
 
         return build_sky_residual_map(

@@ -31,6 +31,13 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
   response is now retried a few times, and if it still comes back empty the last good
   fetch is reused for that cycle rather than failing the update with "Open-Meteo returned
   no weather data". (#19)
+- **The production sensor picker only offers energy sensors now.** The learned correction
+  reads the sensor's long-term sum statistics (hourly kWh change); a power sensor (W) has
+  none, which silently disabled the learning and capped the reliability index at ~36 %.
+  The picker is filtered to energy sensors, the field explains what to pick (a cumulative
+  kWh sensor, e.g. the inverter's total production), and installs that already point at a
+  sensor without usable statistics now log an explicit warning instead of failing
+  silently.
 
 ---
 

@@ -57,8 +57,11 @@ This integration is installed through [HACS](https://hacs.xyz/).
    "Helios Forecast".
 4. Fill in the panel line: orientation, peak power, optional location and
    inverter limit, and the PV production sensor that drives the learned
-   correction. If several strings share one inverter and one production sensor,
-   tick "add another line" and add each orientation to the same entry.
+   correction. The production sensor must be a **cumulative energy sensor (kWh)**
+   — your inverter's or energy meter's total production — not an instantaneous
+   power sensor (W): only an energy sensor carries the long-term statistics the
+   learning reads. If several strings share one inverter and one production
+   sensor, tick "add another line" and add each orientation to the same entry.
 
 > Home Assistant logs "We found a custom integration helios_forecast which has
 > not been tested by Home Assistant" on startup. That notice is shown for every

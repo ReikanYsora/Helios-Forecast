@@ -13,9 +13,12 @@
           "latitude": "Latitude (optional)",
           "longitude": "Longitude (optional)",
           "inverter_max_kw": "Inverter max output (kW, optional)",
-          "production_entity": "PV production sensor (for the learned correction)",
+          "production_entity": "PV production energy sensor (kWh, for the learned correction)",
           "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)",
           "add_another": "Add another panel line"
+        },
+        "data_description": {
+          "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off."
         }
       },
       "line": {
@@ -48,8 +51,11 @@
           "latitude": "Latitude (optional)",
           "longitude": "Longitude (optional)",
           "inverter_max_kw": "Inverter max output (kW, optional)",
-          "production_entity": "PV production sensor (for the learned correction)",
+          "production_entity": "PV production energy sensor (kWh, for the learned correction)",
           "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)"
+        },
+        "data_description": {
+          "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off."
         }
       },
       "lines": {
