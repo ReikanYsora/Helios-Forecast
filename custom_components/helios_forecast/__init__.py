@@ -31,31 +31,14 @@ def _legacy_issue_id(entry: ConfigEntry) -> str:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Helios Solar Forecast from a config entry."""
     from homeassistant.const import Platform
-    from homeassistant.exceptions import ConfigEntryError
     from homeassistant.helpers import issue_registry as ir
 
     from . import websocket
     from .coordinator import HeliosForecastCoordinator
 
-    # One entry now describes a single panel line. Entries created by an older
-    # version may still carry several arrays; those are no longer supported, so we
-    # stop here and raise a repair issue asking the user to recreate one entry per
-    # line. Once the issue is cleared/recreated, len(arrays) <= 1 and setup runs.
-    merged = {**entry.data, **entry.options}
-    if len(merged.get("arrays") or []) > 1:
-        ir.async_create_issue(
-            hass,
-            DOMAIN,
-            _legacy_issue_id(entry),
-            is_fixable=False,
-            severity=ir.IssueSeverity.ERROR,
-            translation_key=_LEGACY_MULTI_ARRAY,
-            translation_placeholders={"name": entry.title},
-        )
-        raise ConfigEntryError(
-            f"'{entry.title}' has several panel arrays in one entry, which is no longer "
-            "supported. Delete it and add one entry per panel line."
-        )
+    # Several panel lines in one entry are supported again (they share one production
+    # sensor and one inverter cap; the model sums them by kWp share). Clear any repair
+    # issue an older version raised against a multi-line entry.
     ir.async_delete_issue(hass, DOMAIN, _legacy_issue_id(entry))
 
     coordinator = HeliosForecastCoordinator(hass, entry)

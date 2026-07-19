@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, tzinfo
 from typing import Dict, List, Optional
 
 from .openmeteo import WeatherSeries
@@ -67,6 +67,27 @@ def observed_value(times: List[datetime], values: List[float], now: datetime) ->
 def observed_snapshot(weather: WeatherSeries, now: datetime) -> Dict[str, Optional[float]]:
     """Current-hour value for every archived field, keyed by field key."""
     return {field.key: observed_value(weather.times, getattr(weather, field.attr), now) for field in WEATHER_FIELDS}
+
+
+def weather_forecast_series(weather: WeatherSeries, start: datetime, tz: tzinfo) -> Dict[str, List[dict]]:
+    """Forward-looking hourly series per weather field, for charting.
+
+    Mirrors the power sensor's ``forecast`` attribute (issue #21): one list per field key, each
+    entry ``{"datetime": <local ISO>, "<field key>": <value>}`` for hours at or after ``start``.
+    Timestamps are localised to ``tz`` so they line up with the power forecast on the same chart.
+    Non-finite samples are dropped. ``start`` is typically local midnight today, giving today +
+    the 7-day horizon.
+    """
+    out: Dict[str, List[dict]] = {}
+    for field in WEATHER_FIELDS:
+        values = getattr(weather, field.attr)
+        series: List[dict] = []
+        for t, v in zip(weather.times, values):
+            if t < start or not _finite(v):
+                continue
+            series.append({"datetime": t.astimezone(tz).isoformat(), field.key: round(float(v), 2)})
+        out[field.key] = series
+    return out
 
 
 # Archive entity keys for the predicted production. Their long-term statistics, backfilled by the

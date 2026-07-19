@@ -14,7 +14,19 @@
           "longitude": "Географска дължина (по избор)",
           "inverter_max_kw": "Максимална мощност на инвертора (kW, по избор)",
           "production_entity": "Сензор за производство на фотоволтаици (за наученото коригиране)",
-          "trend_anchor_hour": "Референтен час за дневната тенденция (0-23, по подразбиране 6)"
+          "trend_anchor_hour": "Референтен час за дневната тенденция (0-23, по подразбиране 6)",
+          "add_another": "Add another panel line"
+        }
+      },
+      "line": {
+        "title": "Helios Forecast — additional panel line",
+        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "data": {
+          "tilt": "Наклон (градуси, 0 = хоризонтално, 90 = вертикално)",
+          "azimuth": "Азимут (градуси от север, 90 = изток, 180 = юг, 270 = запад)",
+          "kwp": "Пикова мощност (kWp)",
+          "tracker": "Слънчев тракер",
+          "add_another": "Add another panel line"
         }
       }
     }
@@ -22,26 +34,36 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast — линия панели",
-        "description": "Редактирайте ориентацията и настройките на тази линия панели.",
+        "title": "Helios Forecast",
+        "description": "Choose what to edit.",
+        "menu_options": {
+          "settings": "Edit settings (location, inverter, production sensor)",
+          "lines": "Edit panel lines"
+        }
+      },
+      "settings": {
+        "title": "Helios Forecast — settings",
+        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
-          "tilt": "Наклон (градуси, 0 = хоризонтално, 90 = вертикално)",
-          "azimuth": "Азимут (градуси от север, 90 = изток, 180 = юг, 270 = запад)",
-          "kwp": "Пикова мощност (kWp)",
-          "tracker": "Слънчев тракер",
           "latitude": "Географска ширина (по избор)",
           "longitude": "Географска дължина (по избор)",
           "inverter_max_kw": "Максимална мощност на инвертора (kW, по избор)",
           "production_entity": "Сензор за производство на фотоволтаици (за наученото коригиране)",
           "trend_anchor_hour": "Референтен час за дневната тенденция (0-23, по подразбиране 6)"
         }
+      },
+      "lines": {
+        "title": "Helios Forecast — panel line {index}/{total}",
+        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "data": {
+          "tilt": "Наклон (градуси, 0 = хоризонтално, 90 = вертикално)",
+          "azimuth": "Азимут (градуси от север, 90 = изток, 180 = юг, 270 = запад)",
+          "kwp": "Пикова мощност (kWp)",
+          "tracker": "Слънчев тракер",
+          "remove_this_line": "Remove this panel line",
+          "add_another": "Add another panel line"
+        }
       }
-    }
-  },
-  "issues": {
-    "legacy_multi_array": {
-      "title": "{name}: няколко линии панели в един запис",
-      "description": "„{name}“ беше настроен с няколко групи панели в един запис, което вече не се поддържа. Всяка линия панели сега се нуждае от собствен запис, за да получи собствени обекти за прогноза. Изтрийте този запис и добавете Helios Forecast веднъж за всяка линия панели."
     }
   },
   "selector": {

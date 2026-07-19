@@ -169,11 +169,13 @@ a list.
 - Panel line geometry: `tilt`, `azimuth`, `kwp`, tracker type.
 - Location (defaults to the HA home), optional per entry.
 - Inverter max kW (optional clip).
-- The PV production sensor that drives the learned correction. It reads the
-  line's real production, curtailment included, so the forecast tracks what the
-  home actually harvests. No battery SoC input and no SoC cutoff: curtailment is
-  learned directly from production (see the 2026-06-12 revision that dropped the
-  SoC guard).
+- The PV production sensor that drives the learned correction. It must be a
+  cumulative energy sensor (kWh) carrying long-term sum statistics — the learning
+  reads hourly `change` rows from the recorder, which a power (W) sensor does not
+  have. It reads the line's real production, curtailment included, so the
+  forecast tracks what the home actually harvests. No battery SoC input and no
+  SoC cutoff: curtailment is learned directly from production (see the 2026-06-12
+  revision that dropped the SoC guard).
 - Today-trend reference hour: the local hour at which today's outlook reference
   is frozen.
 

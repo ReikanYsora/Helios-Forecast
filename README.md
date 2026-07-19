@@ -31,12 +31,20 @@ shading, soiling, orientation error, inverter clipping, even battery curtailment
 It also publishes a reliability score that reflects how much history backs the
 learning, its recent accuracy, and how predictable today's sky is.
 
-## One forecast per panel line
+## Panel lines
 
-Each Helios Forecast entry describes a single panel line (a group of
-co-oriented panels) and gets its own device, its own entities, and its own
-detail series. If your roof faces several directions, add the integration once
-per line. That way every line can be wired to its own card on the dashboard.
+A panel line is a group of co-oriented panels. You can organise your install two
+ways:
+
+- **One entry per line** (recommended when each line has its own production
+  sensor). Each entry gets its own device, entities and detail series, so every
+  line can be wired to its own card on the dashboard. Add the integration once
+  per line.
+- **Several lines in one entry** (for two strings on one inverter that only
+  reports a single, combined production value). Add the first line, then tick
+  "add another line" for each extra orientation. The lines share one production
+  sensor and one inverter limit; the forecast sums them by their kWp share. Use
+  the Configure button to edit the shared settings or the lines later.
 
 ## Installation
 
@@ -49,7 +57,16 @@ This integration is installed through [HACS](https://hacs.xyz/).
    "Helios Forecast".
 4. Fill in the panel line: orientation, peak power, optional location and
    inverter limit, and the PV production sensor that drives the learned
-   correction.
+   correction. The production sensor must be a **cumulative energy sensor (kWh)**
+   — your inverter's or energy meter's total production — not an instantaneous
+   power sensor (W): only an energy sensor carries the long-term statistics the
+   learning reads. If several strings share one inverter and one production
+   sensor, tick "add another line" and add each orientation to the same entry.
+
+> Home Assistant logs "We found a custom integration helios_forecast which has
+> not been tested by Home Assistant" on startup. That notice is shown for every
+> integration installed outside of core (all HACS integrations) and is
+> informational — it does not indicate a problem with Helios Forecast.
 
 ## Status
 

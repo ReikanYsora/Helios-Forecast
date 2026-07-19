@@ -14,7 +14,19 @@
           "longitude": "Longitudine (opzionale)",
           "inverter_max_kw": "Potenza massima dell'inverter (kW, opzionale)",
           "production_entity": "Sensore di produzione fotovoltaica (per la correzione appresa)",
-          "trend_anchor_hour": "Ora di riferimento per l'andamento odierno (0-23, predefinito 6)"
+          "trend_anchor_hour": "Ora di riferimento per l'andamento odierno (0-23, predefinito 6)",
+          "add_another": "Add another panel line"
+        }
+      },
+      "line": {
+        "title": "Helios Forecast — additional panel line",
+        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "data": {
+          "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
+          "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
+          "kwp": "Potenza di picco (kWp)",
+          "tracker": "Inseguitore solare",
+          "add_another": "Add another panel line"
         }
       }
     }
@@ -22,26 +34,36 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast — stringa di pannelli",
-        "description": "Modifica l'orientamento e le impostazioni di questa stringa di pannelli.",
+        "title": "Helios Forecast",
+        "description": "Choose what to edit.",
+        "menu_options": {
+          "settings": "Edit settings (location, inverter, production sensor)",
+          "lines": "Edit panel lines"
+        }
+      },
+      "settings": {
+        "title": "Helios Forecast — settings",
+        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
-          "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
-          "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
-          "kwp": "Potenza di picco (kWp)",
-          "tracker": "Inseguitore solare",
           "latitude": "Latitudine (opzionale)",
           "longitude": "Longitudine (opzionale)",
           "inverter_max_kw": "Potenza massima dell'inverter (kW, opzionale)",
           "production_entity": "Sensore di produzione fotovoltaica (per la correzione appresa)",
           "trend_anchor_hour": "Ora di riferimento per l'andamento odierno (0-23, predefinito 6)"
         }
+      },
+      "lines": {
+        "title": "Helios Forecast — panel line {index}/{total}",
+        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "data": {
+          "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
+          "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
+          "kwp": "Potenza di picco (kWp)",
+          "tracker": "Inseguitore solare",
+          "remove_this_line": "Remove this panel line",
+          "add_another": "Add another panel line"
+        }
       }
-    }
-  },
-  "issues": {
-    "legacy_multi_array": {
-      "title": "{name}: più stringhe di pannelli in una sola voce",
-      "description": "\"{name}\" è stato configurato con diverse stringhe di pannelli in un'unica voce, opzione non più supportata. Ora ogni stringa di pannelli necessita di una propria voce per avere le proprie entità di previsione. Elimina questa voce e aggiungi Helios Forecast una volta per ogni stringa di pannelli."
     }
   },
   "selector": {

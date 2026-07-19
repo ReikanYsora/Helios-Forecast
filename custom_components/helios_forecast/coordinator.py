@@ -49,6 +49,7 @@ from .statistics import (
     forecast_statistics,
     hourly_statistics,
     observed_snapshot,
+    weather_forecast_series,
 )
 from .solar.residual import (
     LEARN_DAYS,
@@ -119,6 +120,10 @@ class ForecastData:
     # Current-hour observed weather, keyed by WEATHER_FIELDS key, feeds the
     # weather sensor entities.
     observed: Dict[str, Optional[float]]
+    # Forward-looking hourly series per weather field (today + horizon), keyed by
+    # WEATHER_FIELDS key, exposed as each weather sensor's `forecast` attribute for
+    # charting (issue #21).
+    weather_forecast: Dict[str, List[dict]]
     # Forecast reliability index (0..100) and its components, feeds the
     # reliability sensor.
     reliability: Reliability
@@ -167,6 +172,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # One combined window: 60 past days feed the learning, 7 future the forecast.
         try:
             weather = await fetch_weather(session, lat, lon, past_days=LEARN_DAYS, forecast_days=FORECAST_DAYS)
+            # A transient empty response should not blank the forecast: reuse the last good
+            # fetch so the model still runs (issue #19). The data is only ~30 min old and the
+            # next refresh recovers; a first-ever empty response (no prior fetch) still fails.
+            if weather is None and self.weather_series is not None:
+                _LOGGER.warning("Open-Meteo returned no weather data; reusing the last successful fetch")
+                weather = self.weather_series
             store: Dict[str, GtiSeries] = {}
             seen: Set[str] = set()
             for orientation in layout.orientations:
@@ -222,6 +233,9 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         self.weather_series = weather
         self.write_weather_statistics(now_utc)
         observed = observed_snapshot(weather, now_utc)
+        # Forward-looking weather per field (from today's local midnight), for the sensors'
+        # `forecast` chart attribute (issue #21). Shares the `start` used by the power forecast.
+        weather_forecast = weather_forecast_series(weather, start, dt_util.DEFAULT_TIME_ZONE)
 
         # Archive the predicted production: run the model over the past weather window (the same
         # 60-day window already fetched for learning) at an hourly step, and store it in HA's
@@ -242,7 +256,14 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         trend = await self._today_trend(data, now, summary)
 
-        return ForecastData(points=points, summary=summary, observed=observed, reliability=reliability, trend=trend)
+        return ForecastData(
+            points=points,
+            summary=summary,
+            observed=observed,
+            weather_forecast=weather_forecast,
+            reliability=reliability,
+            trend=trend,
+        )
 
     async def _today_trend(self, data, now, summary) -> TodayTrend:
         """Today's predicted total versus its frozen daily reference (default 06:00).
@@ -385,6 +406,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         self._production_buckets = production
         if not production:
+            _LOGGER.warning(
+                "Production history for %s is empty: the entity has no long-term sum statistics "
+                "(pick a cumulative energy sensor in kWh, not a power sensor); learning is off and "
+                "the reliability index stays capped until then",
+                production_entity,
+            )
             return None
 
         return build_sky_residual_map(

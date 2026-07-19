@@ -14,7 +14,19 @@
           "longitude": "Lengdargráða (valfrjálst)",
           "inverter_max_kw": "Hámarksafl invertara (kW, valfrjálst)",
           "production_entity": "Skynjari sólarframleiðslu (fyrir lærða leiðréttingu)",
-          "trend_anchor_hour": "Viðmiðunarstund dagsleitni (0-23, sjálfgefið 6)"
+          "trend_anchor_hour": "Viðmiðunarstund dagsleitni (0-23, sjálfgefið 6)",
+          "add_another": "Add another panel line"
+        }
+      },
+      "line": {
+        "title": "Helios Forecast — additional panel line",
+        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "data": {
+          "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",
+          "azimuth": "Áttarhorn (gráður frá norðri, 90 = austur, 180 = suður, 270 = vestur)",
+          "kwp": "Hámarksafl (kWp)",
+          "tracker": "Sólarrakari",
+          "add_another": "Add another panel line"
         }
       }
     }
@@ -22,26 +34,36 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast — spjaldalína",
-        "description": "Breyttu stefnu og stillingum þessarar spjaldalínu.",
+        "title": "Helios Forecast",
+        "description": "Choose what to edit.",
+        "menu_options": {
+          "settings": "Edit settings (location, inverter, production sensor)",
+          "lines": "Edit panel lines"
+        }
+      },
+      "settings": {
+        "title": "Helios Forecast — settings",
+        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
-          "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",
-          "azimuth": "Áttarhorn (gráður frá norðri, 90 = austur, 180 = suður, 270 = vestur)",
-          "kwp": "Hámarksafl (kWp)",
-          "tracker": "Sólarrakari",
           "latitude": "Breiddargráða (valfrjálst)",
           "longitude": "Lengdargráða (valfrjálst)",
           "inverter_max_kw": "Hámarksafl invertara (kW, valfrjálst)",
           "production_entity": "Skynjari sólarframleiðslu (fyrir lærða leiðréttingu)",
           "trend_anchor_hour": "Viðmiðunarstund dagsleitni (0-23, sjálfgefið 6)"
         }
+      },
+      "lines": {
+        "title": "Helios Forecast — panel line {index}/{total}",
+        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "data": {
+          "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",
+          "azimuth": "Áttarhorn (gráður frá norðri, 90 = austur, 180 = suður, 270 = vestur)",
+          "kwp": "Hámarksafl (kWp)",
+          "tracker": "Sólarrakari",
+          "remove_this_line": "Remove this panel line",
+          "add_another": "Add another panel line"
+        }
       }
-    }
-  },
-  "issues": {
-    "legacy_multi_array": {
-      "title": "{name}: margar spjaldalínur í einni færslu",
-      "description": "„{name}“ var sett upp með nokkrum spjaldaröðum í einni færslu, sem er ekki lengur stutt. Hver spjaldalína þarf nú sína eigin færslu til að fá sínar eigin spáeiningar. Eyddu þessari færslu og bættu Helios Forecast við einu sinni fyrir hverja spjaldalínu."
     }
   },
   "selector": {

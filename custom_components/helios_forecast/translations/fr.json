@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast — ligne de panneaux",
-        "description": "Un forecast pour une ligne de panneaux (un groupe de panneaux de même orientation). Ajoutez de nouveau l'intégration pour chaque ligne supplémentaire. Laissez la position vide pour utiliser le domicile configuré dans Home Assistant.",
+        "description": "Un forecast pour une installation photovoltaïque. Ajoutez une ligne de panneaux par orientation — plusieurs lignes partagent l'unique capteur de production et l'onduleur de cette installation. Laissez la position vide pour utiliser le domicile Home Assistant.",
         "data": {
           "name": "Nom (ex. Toiture sud)",
           "tilt": "Inclinaison (degrés, 0 = à plat, 90 = vertical)",
@@ -13,8 +13,23 @@
           "latitude": "Latitude (optionnel)",
           "longitude": "Longitude (optionnel)",
           "inverter_max_kw": "Puissance max de l'onduleur (kW, optionnel)",
-          "production_entity": "Capteur de production PV (pour la correction apprise)",
-          "trend_anchor_hour": "Heure de référence de la tendance du jour (0-23, défaut 6)"
+          "production_entity": "Capteur d'énergie de production PV (kWh, pour la correction apprise)",
+          "trend_anchor_hour": "Heure de référence de la tendance du jour (0-23, défaut 6)",
+          "add_another": "Ajouter une autre ligne de panneaux"
+        },
+        "data_description": {
+          "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs."
+        }
+      },
+      "line": {
+        "title": "Helios Forecast — ligne de panneaux supplémentaire",
+        "description": "Ligne de panneaux {index} : un autre groupe de panneaux de même orientation sur la même installation (capteur de production et onduleur partagés).",
+        "data": {
+          "tilt": "Inclinaison (degrés, 0 = à plat, 90 = vertical)",
+          "azimuth": "Azimut (degrés depuis le nord, 90 = est, 180 = sud, 270 = ouest)",
+          "kwp": "Puissance crête (kWc)",
+          "tracker": "Suiveur solaire",
+          "add_another": "Ajouter une autre ligne de panneaux"
         }
       }
     }
@@ -22,26 +37,39 @@
   "options": {
     "step": {
       "init": {
-        "title": "Helios Forecast — ligne de panneaux",
-        "description": "Modifiez l'orientation et les réglages de cette ligne de panneaux.",
+        "title": "Helios Forecast",
+        "description": "Choisissez ce que vous voulez modifier.",
+        "menu_options": {
+          "settings": "Modifier les réglages (position, onduleur, capteur de production)",
+          "lines": "Modifier les lignes de panneaux"
+        }
+      },
+      "settings": {
+        "title": "Helios Forecast — réglages",
+        "description": "Position, puissance max de l'onduleur, capteur de production et heure de référence partagés par toutes les lignes de panneaux de cette entrée.",
+        "data": {
+          "latitude": "Latitude (optionnel)",
+          "longitude": "Longitude (optionnel)",
+          "inverter_max_kw": "Puissance max de l'onduleur (kW, optionnel)",
+          "production_entity": "Capteur d'énergie de production PV (kWh, pour la correction apprise)",
+          "trend_anchor_hour": "Heure de référence de la tendance du jour (0-23, défaut 6)"
+        },
+        "data_description": {
+          "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs."
+        }
+      },
+      "lines": {
+        "title": "Helios Forecast — ligne de panneaux {index}/{total}",
+        "description": "Modifiez la ligne de panneaux {index} sur {total}, ou cochez pour en ajouter une.",
         "data": {
           "tilt": "Inclinaison (degrés, 0 = à plat, 90 = vertical)",
           "azimuth": "Azimut (degrés depuis le nord, 90 = est, 180 = sud, 270 = ouest)",
           "kwp": "Puissance crête (kWc)",
           "tracker": "Suiveur solaire",
-          "latitude": "Latitude (optionnel)",
-          "longitude": "Longitude (optionnel)",
-          "inverter_max_kw": "Puissance max de l'onduleur (kW, optionnel)",
-          "production_entity": "Capteur de production PV (pour la correction apprise)",
-          "trend_anchor_hour": "Heure de référence de la tendance du jour (0-23, défaut 6)"
+          "remove_this_line": "Supprimer cette ligne de panneaux",
+          "add_another": "Ajouter une autre ligne de panneaux"
         }
       }
-    }
-  },
-  "issues": {
-    "legacy_multi_array": {
-      "title": "{name} : plusieurs lignes de panneaux dans une seule entrée",
-      "description": "« {name} » a été configuré avec plusieurs groupes de panneaux dans une seule entrée, ce qui n'est plus pris en charge. Chaque ligne de panneaux a désormais besoin de sa propre entrée pour avoir ses propres entités de forecast. Supprimez cette entrée et ajoutez Helios Forecast une fois par ligne de panneaux."
     }
   },
   "selector": {

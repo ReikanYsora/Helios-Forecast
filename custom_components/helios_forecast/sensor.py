@@ -236,10 +236,13 @@ class HeliosWeatherSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEn
 
     The long-term history of these entities is written to HA statistics by the
     coordinator (see write_weather_statistics), which is what keeps it available
-    beyond Open-Meteo's rolling 60-day window.
+    beyond Open-Meteo's rolling 60-day window. Each also carries a `forecast`
+    attribute (the forward-looking hourly series) for charting, mirroring the
+    power sensor (issue #21).
     """
 
     _attr_has_entity_name = True
+    _unrecorded_attributes = frozenset({"forecast"})
 
     def __init__(
         self,
@@ -257,6 +260,13 @@ class HeliosWeatherSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEn
         if self.coordinator.data is None:
             return None
         return self.coordinator.data.observed.get(self.entity_description.key)
+
+    @property
+    def extra_state_attributes(self) -> Optional[dict]:
+        if self.coordinator.data is None:
+            return None
+        series = self.coordinator.data.weather_forecast.get(self.entity_description.key)
+        return {"forecast": series} if series else None
 
 
 class HeliosReliabilitySensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEntity):

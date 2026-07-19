@@ -19,6 +19,7 @@ fetchers take a caller-provided session (HA's shared aiohttp client).
 
 from __future__ import annotations
 
+import asyncio
 import math
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -28,6 +29,12 @@ if TYPE_CHECKING:
     from aiohttp import ClientSession
 
 _BASE_URL = "https://api.open-meteo.com/v1/forecast"
+
+# Open-Meteo occasionally answers a valid request with a non-200 or an empty payload (a brief
+# rate-limit or hiccup). A couple of short retries turn that transient blank into a success instead
+# of a failed 30-minute refresh (issue #19). Transport errors are left to propagate.
+_RETRY_ATTEMPTS = 3
+_RETRY_DELAY_S = 2.0
 
 WEATHER_HOURLY = (
     "cloud_cover,shortwave_radiation,direct_radiation,diffuse_radiation,temperature_2m,wind_speed_10m,snow_depth"
@@ -202,6 +209,14 @@ def parse_gti(payload: dict[str, Any]) -> GtiSeries | None:
     return GtiSeries(times=parse_times(time_strs), poa=poa)
 
 
+async def _get_json(session: ClientSession, url: str) -> Optional[dict]:
+    """GET ``url`` as JSON once. None on a non-200; transport errors propagate."""
+    async with session.get(url) as resp:
+        if resp.status != 200:
+            return None
+        return await resp.json()
+
+
 async def fetch_weather(
     session: ClientSession,
     lat: float,
@@ -210,12 +225,16 @@ async def fetch_weather(
     past_days: int = 0,
     forecast_days: int = 7,
 ) -> WeatherSeries | None:
-    """GET the weather inputs. Returns None on any non-200 or empty payload."""
+    """GET the weather inputs, retrying an empty/non-200 response. None once exhausted."""
     url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days)
-    async with session.get(url) as resp:
-        if resp.status != 200:
-            return None
-        return parse_weather(await resp.json())
+    for attempt in range(_RETRY_ATTEMPTS):
+        payload = await _get_json(session, url)
+        series = parse_weather(payload) if payload is not None else None
+        if series is not None:
+            return series
+        if attempt + 1 < _RETRY_ATTEMPTS:
+            await asyncio.sleep(_RETRY_DELAY_S)
+    return None
 
 
 async def fetch_gti(
@@ -228,9 +247,13 @@ async def fetch_gti(
     past_days: int = 0,
     forecast_days: int = 7,
 ) -> GtiSeries | None:
-    """GET one orientation's GTI. Returns None on any non-200 or empty payload."""
+    """GET one orientation's GTI, retrying an empty/non-200 response. None once exhausted."""
     url = build_gti_url(lat, lon, tilt_deg, azimuth_deg, past_days=past_days, forecast_days=forecast_days)
-    async with session.get(url) as resp:
-        if resp.status != 200:
-            return None
-        return parse_gti(await resp.json())
+    for attempt in range(_RETRY_ATTEMPTS):
+        payload = await _get_json(session, url)
+        series = parse_gti(payload) if payload is not None else None
+        if series is not None:
+            return series
+        if attempt + 1 < _RETRY_ATTEMPTS:
+            await asyncio.sleep(_RETRY_DELAY_S)
+    return None

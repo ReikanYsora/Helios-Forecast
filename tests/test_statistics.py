@@ -8,7 +8,7 @@ statistic rows derived from an Open-Meteo weather window. Runnable with
 from __future__ import annotations
 
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -23,6 +23,7 @@ from custom_components.helios_forecast.statistics import (  # noqa: E402
     hourly_statistics,
     observed_snapshot,
     observed_value,
+    weather_forecast_series,
 )
 
 
@@ -103,6 +104,30 @@ def test_forecast_statistics_power_and_energy() -> None:
 def test_forecast_statistics_clamps_negative() -> None:
     rows = forecast_statistics([_Pt(_h(9), -50.0)])
     assert rows[FORECAST_POWER_KEY][0]["mean"] == 0.0
+
+
+def test_weather_forecast_series_forward_only_and_keyed_by_field() -> None:
+    times = [_h(10), _h(11), _h(12)]
+    values = [10.0, 20.0, 30.0]
+    out = weather_forecast_series(_series(times, values), _h(11), timezone.utc)
+    assert set(out) == {f.key for f in WEATHER_FIELDS}
+    cloud = out["cloud_cover"]
+    # Only hours at or after the start; each entry keyed by the field's own key.
+    assert [e["datetime"] for e in cloud] == [_h(11).isoformat(), _h(12).isoformat()]
+    assert cloud[0]["cloud_cover"] == 20.0
+    assert out["temperature"][1]["temperature"] == 30.0
+
+
+def test_weather_forecast_series_localises_timestamps() -> None:
+    tz = timezone(timedelta(hours=2))
+    out = weather_forecast_series(_series([_h(11)], [42.0]), _h(11), tz)
+    # UTC 11:00 rendered in +02:00 as 13:00+02:00.
+    assert out["cloud_cover"][0]["datetime"] == "2026-06-11T13:00:00+02:00"
+
+
+def test_weather_forecast_series_drops_non_finite() -> None:
+    out = weather_forecast_series(_series([_h(11), _h(12)], [float("nan"), 30.0]), _h(11), timezone.utc)
+    assert [e["datetime"] for e in out["ghi"]] == [_h(12).isoformat()]
 
 
 if __name__ == "__main__":
