@@ -9,6 +9,7 @@
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
           "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
           "kwp": "Maksimālā jauda (kWp)",
+          "line_inverter_max_kw": "Maks. invertora jauda šai līnijai (kW, neobligāti)",
           "tracker": "Saules sekotājs",
           "latitude": "Platums (neobligāti)",
           "longitude": "Garums (neobligāti)",
@@ -25,6 +26,7 @@
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
           "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
           "kwp": "Maksimālā jauda (kWp)",
+          "line_inverter_max_kw": "Maks. invertora jauda šai līnijai (kW, neobligāti)",
           "tracker": "Saules sekotājs",
           "add_another": "Add another panel line"
         }
@@ -59,6 +61,7 @@
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
           "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
           "kwp": "Maksimālā jauda (kWp)",
+          "line_inverter_max_kw": "Maks. invertora jauda šai līnijai (kW, neobligāti)",
           "tracker": "Saules sekotājs",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"

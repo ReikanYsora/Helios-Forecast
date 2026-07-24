@@ -9,6 +9,7 @@
           "tilt": "Inclinaison (degrés, 0 = à plat, 90 = vertical)",
           "azimuth": "Azimut (degrés depuis le nord, 90 = est, 180 = sud, 270 = ouest)",
           "kwp": "Puissance crête (kWc)",
+          "line_inverter_max_kw": "Puissance max de l'onduleur pour cette ligne (kW, optionnel)",
           "tracker": "Suiveur solaire",
           "latitude": "Latitude (optionnel)",
           "longitude": "Longitude (optionnel)",
@@ -28,6 +29,7 @@
           "tilt": "Inclinaison (degrés, 0 = à plat, 90 = vertical)",
           "azimuth": "Azimut (degrés depuis le nord, 90 = est, 180 = sud, 270 = ouest)",
           "kwp": "Puissance crête (kWc)",
+          "line_inverter_max_kw": "Puissance max de l'onduleur pour cette ligne (kW, optionnel)",
           "tracker": "Suiveur solaire",
           "add_another": "Ajouter une autre ligne de panneaux"
         }
@@ -65,6 +67,7 @@
           "tilt": "Inclinaison (degrés, 0 = à plat, 90 = vertical)",
           "azimuth": "Azimut (degrés depuis le nord, 90 = est, 180 = sud, 270 = ouest)",
           "kwp": "Puissance crête (kWc)",
+          "line_inverter_max_kw": "Puissance max de l'onduleur pour cette ligne (kW, optionnel)",
           "tracker": "Suiveur solaire",
           "remove_this_line": "Supprimer cette ligne de panneaux",
           "add_another": "Ajouter une autre ligne de panneaux"

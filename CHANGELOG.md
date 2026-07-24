@@ -5,6 +5,36 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.8.1
+
+### Added
+
+- **A per-line inverter limit.** Each panel line can now carry its own optional inverter
+  cap, on top of the entry-level one. When set, the line is clipped at its own ceiling
+  before the lines are summed, so a micro-inverter string that saturates on its own is
+  modelled correctly instead of being bounded only on the combined total. Left empty, a
+  line is uncapped and behaves exactly as before. (#26)
+
+### Fixed
+
+- **Cloud cover now matches the Open-Meteo app.** The weather inputs were blended across
+  several forecast models and reduced to their median, which could outvote the one model
+  that is actually right for a location and, for instance, show a fully overcast tomorrow
+  as clear. The values now come from best_match, the same single model the Open-Meteo app
+  displays and the one the tilted-irradiance request already used, so the cloud curve lines
+  up with what you see in the app. The cross-model spread is still read as an uncertainty
+  signal for the reliability index. (#22)
+- **The forecast no longer reads sunnier than the Helios card.** Because of that same model
+  blend, the forecast could sit a little above the card's own figure and over-estimate
+  production. With the inputs back on best_match, the integration and the card read the same
+  source and track much more closely. (#27)
+
+### Changed
+
+- Refreshed the integration branding (icon and logo).
+
+---
+
 ## 2026.8.0
 
 ### Added

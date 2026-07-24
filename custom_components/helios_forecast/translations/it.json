@@ -9,6 +9,7 @@
           "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
           "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
           "kwp": "Potenza di picco (kWp)",
+          "line_inverter_max_kw": "Potenza max inverter per questa linea (kW, opzionale)",
           "tracker": "Inseguitore solare",
           "latitude": "Latitudine (opzionale)",
           "longitude": "Longitudine (opzionale)",
@@ -25,6 +26,7 @@
           "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
           "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
           "kwp": "Potenza di picco (kWp)",
+          "line_inverter_max_kw": "Potenza max inverter per questa linea (kW, opzionale)",
           "tracker": "Inseguitore solare",
           "add_another": "Add another panel line"
         }
@@ -59,6 +61,7 @@
           "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
           "azimuth": "Azimut (gradi da nord, 90 = est, 180 = sud, 270 = ovest)",
           "kwp": "Potenza di picco (kWp)",
+          "line_inverter_max_kw": "Potenza max inverter per questa linea (kW, opzionale)",
           "tracker": "Inseguitore solare",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"

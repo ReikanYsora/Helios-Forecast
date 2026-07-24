@@ -19,7 +19,7 @@ from .openmeteo import WeatherSeries
 from .solar.geometry import sun_position
 from .solar.gti import GtiStore, sample_gti
 from .solar.irradiance import snow_cover_factor
-from .solar.power import PvLayout, WeatherSample, compute_pv_power_weighted
+from .solar.power import PvLayout, WeatherSample, compute_pv_power_per_array
 from .solar.residual import SkyResidualMap, sample_sky_residual
 
 INF = float("inf")
@@ -69,6 +69,26 @@ def _at(arr: List, i: int) -> Optional[float]:
     return arr[i] if 0 <= i < len(arr) else None
 
 
+def _sum_arrays(
+    pcts: List[float], layout: PvLayout, snow: float, ratio: float
+) -> tuple[float, float]:
+    """Per-array watts (``pct * kWp * 10 * snow``), each clipped at its OWN inverter cap, then summed. Returns
+    ``(raw, corrected)``; corrected also applies the learned sky ratio. With no per-array caps the clips are all INF,
+    so the sum is exactly the old single-total figure; a single-element ``pcts`` (fallback layout) reproduces it too."""
+    orientations = layout.orientations
+    if not orientations or len(pcts) != len(orientations):
+        base = pcts[0] * layout.total_kwp * 10.0 * snow
+        return max(0.0, base), max(0.0, base * ratio)
+    raw = 0.0
+    corrected = 0.0
+    for i, pct_i in enumerate(pcts):
+        watts = pct_i * layout.shares[i] * layout.total_kwp * 10.0 * snow
+        cap = layout.caps[i] if i < len(layout.caps) else INF
+        raw += min(cap, max(0.0, watts))
+        corrected += min(cap, max(0.0, watts * ratio))
+    return raw, corrected
+
+
 def build_forecast_series(
     weather: WeatherSeries,
     gti_store: Optional[GtiStore],
@@ -84,7 +104,6 @@ def build_forecast_series(
 ) -> List[ForecastPoint]:
     """Forecast watt curve over [start, end). pv_w applies the learned residual
     ratio when a map is given (else equals pv_raw_w), pv_raw_w is the pure model."""
-    k = layout.total_kwp * 10.0
     step = timedelta(minutes=step_minutes)
     times = weather.times
     epochs = [t.timestamp() for t in times]
@@ -118,16 +137,18 @@ def build_forecast_series(
             snow=lerp_finite(_at(weather.snow, i0), _at(weather.snow, i1), f),
         )
 
-        pct = compute_pv_power_weighted(t, home_lat, home_lon, sample, layout, sampler)
-        raw_w = pct * k * snow_cover_factor(sample.snow, sample.temp)
+        pcts = compute_pv_power_per_array(t, home_lat, home_lon, sample, layout, sampler)
+        snow = snow_cover_factor(sample.snow, sample.temp)
+        if residual_map is not None:
+            sun = sun_position(t, home_lat, home_lon)
+            ratio = sample_sky_residual(residual_map, sun.azimuth, sun.altitude)
+        else:
+            ratio = 1.0
+        # Each array is clipped at its own cap before summing (#26); the entry-level cap then bounds the combined total.
+        raw_w, corrected_w = _sum_arrays(pcts, layout, snow, ratio)
         if math.isfinite(raw_w):
             raw_clamped = min(inverter_max_w, max(0.0, raw_w))
-            if residual_map is not None:
-                sun = sun_position(t, home_lat, home_lon)
-                ratio = sample_sky_residual(residual_map, sun.azimuth, sun.altitude)
-            else:
-                ratio = 1.0
-            corrected = min(inverter_max_w, max(0.0, raw_w * ratio))
+            corrected = min(inverter_max_w, max(0.0, corrected_w))
             points.append(
                 ForecastPoint(
                     t=t,

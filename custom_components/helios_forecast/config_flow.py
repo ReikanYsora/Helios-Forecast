@@ -25,6 +25,7 @@ from .config import (
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
     CONF_LATITUDE,
+    CONF_LINE_INVERTER_MAX_KW,
     CONF_LONGITUDE,
     CONF_PRODUCTION_ENTITY,
     CONF_TILT,
@@ -94,6 +95,11 @@ def _line_fields(
     # current value so the field comes up filled.
     kwp_key = vol.Required(CONF_KWP, default=arr[CONF_KWP]) if CONF_KWP in arr else vol.Required(CONF_KWP)
     fields[kwp_key] = _KWP
+    # Optional per-line inverter cap (#26): a micro-inverter string that saturates on its own, distinct from the
+    # entry-level cap that bounds the combined total. Left empty, the line is uncapped and behaves exactly as before.
+    fields[
+        vol.Optional(CONF_LINE_INVERTER_MAX_KW, description={"suggested_value": arr.get(CONF_LINE_INVERTER_MAX_KW)})
+    ] = _INVERTER
     fields[vol.Required(CONF_TRACKER, default=arr.get(CONF_TRACKER, TRACKER_NONE))] = _TRACKER
     if allow_remove:
         fields[vol.Optional(_REMOVE, default=False)] = _BOOL
