@@ -4,8 +4,11 @@ Thin transport, faithful to the card's own requests so the forecast is fed the
 exact same data. Two endpoints on ``/v1/forecast``:
 
   - weather: hourly ``cloud_cover, shortwave_radiation, direct_radiation,
-    diffuse_radiation, temperature_2m, wind_speed_10m, snow_depth`` (ported from
-    the card's fetchCloudHistory).
+    diffuse_radiation, temperature_2m, wind_speed_10m, snow_depth``. The values
+    come from best_match (the model the Open-Meteo app shows, and the one the GTI
+    already uses), so what we display and what we compute agree with the app the
+    user checks against. A second, best-effort call over the model ensemble adds
+    only the cross-model cloud spread, kept as a forecast-uncertainty signal (#22).
   - GTI: hourly ``global_tilted_irradiance_instant`` for one tilt + azimuth
     (ported from gti.ts). Open-Meteo accepts a single orientation per request,
     so a multi-orientation install needs one GET per distinct orientation.
@@ -21,14 +24,16 @@ from __future__ import annotations
 
 import asyncio
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Any, Callable, List, Optional, TypeVar
 
 if TYPE_CHECKING:
     from aiohttp import ClientSession
 
 _BASE_URL = "https://api.open-meteo.com/v1/forecast"
+
+_T = TypeVar("_T")
 
 # Open-Meteo occasionally answers a valid request with a non-200 or an empty payload (a brief
 # rate-limit or hiccup). A couple of short retries turn that transient blank into a success instead
@@ -41,10 +46,11 @@ WEATHER_HOURLY = (
 )
 GTI_HOURLY = "global_tilted_irradiance_instant"
 
-# Multi-model ensemble. Open-Meteo returns each variable once per model (key suffixed with the model
-# name); we fuse them to the per-hour median, which absorbs single-model outliers, and read the
-# cross-model spread as a forecast-uncertainty signal. A broad, global-ish set: models that do not
-# cover the location return nulls and simply drop out of the median.
+# Multi-model ensemble, used only for the cross-model cloud spread (a forecast-uncertainty signal).
+# The weather VALUES come from best_match; this ensemble call runs alongside it and we read the
+# per-hour disagreement across these models. Open-Meteo returns each variable once per model (key
+# suffixed with the model name). A broad, global-ish set: models that do not cover the location
+# return nulls and simply drop out of the spread.
 WEATHER_MODELS = (
     "ecmwf_ifs025",
     "gfs_seamless",
@@ -56,19 +62,20 @@ WEATHER_MODELS = (
 
 @dataclass(frozen=True)
 class WeatherSeries:
-    """Parallel hourly arrays, times are UTC-aware datetimes. Values are the
-    per-hour median across the requested models."""
+    """Parallel hourly arrays, times are UTC-aware datetimes. Values come from the
+    best_match model (matching the Open-Meteo app and the GTI request)."""
 
     times: list[datetime]
-    cloud: list[float | None]  # %, None where every model was missing that hour
+    cloud: list[float | None]  # %, None where the model was missing that hour
     shortwave: list[float]  # GHI, W/m2
     direct: list[float]  # W/m2 on the horizontal
     diffuse: list[float]  # W/m2 on the horizontal
     temp: list[float]  # degC
     wind: list[float]  # Open-Meteo default (km/h), passed through as the card does
     snow: list[float]  # snow depth, metres
-    # Per-hour standard deviation of cloud cover across the models (model disagreement). Empty for a
-    # single-model response. Read as a forecast-uncertainty signal by the reliability index.
+    # Per-hour standard deviation of cloud cover across the ensemble models (model disagreement),
+    # overlaid from the best-effort ensemble call. Empty when that call yielded nothing. Read as a
+    # forecast-uncertainty signal by the reliability index.
     cloud_spread: list[float] = field(default_factory=list)
 
 
@@ -90,14 +97,22 @@ def om_azimuth(helios_azimuth_deg: float) -> int:
     return round(helios_azimuth_deg - 180)
 
 
-def build_weather_url(lat: float, lon: float, *, past_days: int = 0, forecast_days: int = 7) -> str:
-    """URL for the weather (forecast inputs) request, across the model ensemble."""
+def build_weather_url(
+    lat: float, lon: float, *, past_days: int = 0, forecast_days: int = 7, ensemble: bool = False
+) -> str:
+    """URL for the weather (forecast inputs) request.
+
+    Default (``ensemble=False``) is a best_match request: no ``models=``, so Open-Meteo returns its
+    per-location best model, matching the app and the GTI request. ``ensemble=True`` adds ``models=``
+    to fetch the whole set, used only to derive the cross-model cloud spread.
+    """
+    models = f"&models={','.join(WEATHER_MODELS)}" if ensemble else ""
     return (
         f"{_BASE_URL}"
         f"?latitude={lat:.4f}"
         f"&longitude={lon:.4f}"
         f"&hourly={WEATHER_HOURLY}"
-        f"&models={','.join(WEATHER_MODELS)}"
+        f"{models}"
         f"&past_days={past_days}&forecast_days={forecast_days}&timezone=UTC"
     )
 
@@ -199,6 +214,30 @@ def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
     )
 
 
+def parse_cloud_spread(payload: dict[str, Any]) -> tuple[list[datetime], list[float]] | None:
+    """(times, per-hour cloud spread) from an ENSEMBLE payload, or None when unusable.
+
+    The spread is the standard deviation of cloud cover across the models at each hour. Returned
+    with its own times so it can be overlaid onto the best_match series by timestamp, even if the
+    two responses ever cover slightly different hours.
+    """
+    hourly = payload.get("hourly") or {}
+    time_strs = hourly.get("time") or []
+    cloud_arrays = _model_arrays(hourly, "cloud_cover")
+    if not time_strs or not any(cloud_arrays):
+        return None
+    spread = [_stdev(_finite_at(cloud_arrays, i)) or 0.0 for i in range(len(time_strs))]
+    return parse_times(time_strs), spread
+
+
+def _overlay_cloud_spread(
+    series: WeatherSeries, spread_times: list[datetime], spread_vals: list[float]
+) -> WeatherSeries:
+    """Return ``series`` with the ensemble cloud spread aligned onto its own hours (0.0 where absent)."""
+    by_time = dict(zip(spread_times, spread_vals))
+    return replace(series, cloud_spread=[by_time.get(t, 0.0) for t in series.times])
+
+
 def parse_gti(payload: dict[str, Any]) -> GtiSeries | None:
     """Build a GtiSeries from an Open-Meteo payload, or None when unusable."""
     hourly = payload.get("hourly") or {}
@@ -217,6 +256,20 @@ async def _get_json(session: ClientSession, url: str) -> Optional[dict]:
         return await resp.json()
 
 
+async def _fetch_parsed(
+    session: ClientSession, url: str, parser: Callable[[dict[str, Any]], Optional[_T]]
+) -> Optional[_T]:
+    """GET ``url`` and run ``parser``, retrying an empty/non-200 response (issue #19). None once exhausted."""
+    for attempt in range(_RETRY_ATTEMPTS):
+        payload = await _get_json(session, url)
+        result = parser(payload) if payload is not None else None
+        if result is not None:
+            return result
+        if attempt + 1 < _RETRY_ATTEMPTS:
+            await asyncio.sleep(_RETRY_DELAY_S)
+    return None
+
+
 async def fetch_weather(
     session: ClientSession,
     lat: float,
@@ -225,16 +278,18 @@ async def fetch_weather(
     past_days: int = 0,
     forecast_days: int = 7,
 ) -> WeatherSeries | None:
-    """GET the weather inputs, retrying an empty/non-200 response. None once exhausted."""
-    url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days)
-    for attempt in range(_RETRY_ATTEMPTS):
-        payload = await _get_json(session, url)
-        series = parse_weather(payload) if payload is not None else None
-        if series is not None:
-            return series
-        if attempt + 1 < _RETRY_ATTEMPTS:
-            await asyncio.sleep(_RETRY_DELAY_S)
-    return None
+    """GET the weather inputs. best_match carries the values (required); a second, best-effort
+    ensemble call adds only the cross-model cloud spread (#22). If the ensemble call fails, the
+    best_match series is returned with a zero spread rather than failing the whole refresh."""
+    base_url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days)
+    series = await _fetch_parsed(session, base_url, parse_weather)
+    if series is None:
+        return None
+    ensemble_url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days, ensemble=True)
+    spread = await _fetch_parsed(session, ensemble_url, parse_cloud_spread)
+    if spread is not None:
+        series = _overlay_cloud_spread(series, spread[0], spread[1])
+    return series
 
 
 async def fetch_gti(
@@ -249,11 +304,4 @@ async def fetch_gti(
 ) -> GtiSeries | None:
     """GET one orientation's GTI, retrying an empty/non-200 response. None once exhausted."""
     url = build_gti_url(lat, lon, tilt_deg, azimuth_deg, past_days=past_days, forecast_days=forecast_days)
-    for attempt in range(_RETRY_ATTEMPTS):
-        payload = await _get_json(session, url)
-        series = parse_gti(payload) if payload is not None else None
-        if series is not None:
-            return series
-        if attempt + 1 < _RETRY_ATTEMPTS:
-            await asyncio.sleep(_RETRY_DELAY_S)
-    return None
+    return await _fetch_parsed(session, url, parse_gti)

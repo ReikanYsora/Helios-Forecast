@@ -22,6 +22,7 @@ from custom_components.helios_forecast.openmeteo import (  # noqa: E402
     build_weather_url,
     fetch_weather,
     om_azimuth,
+    parse_cloud_spread,
     parse_gti,
     parse_times,
     parse_weather,
@@ -30,15 +31,21 @@ from custom_components.helios_forecast.openmeteo import (  # noqa: E402
 _BASE = "https://api.open-meteo.com/v1/forecast"
 
 
-def test_weather_url_has_variables_and_models() -> None:
+def test_weather_url_best_match_by_default() -> None:
+    # No models= param: Open-Meteo returns its per-location best model, matching the app and the GTI request (#22).
     got = build_weather_url(48.8566, 2.3522, past_days=0, forecast_days=7)
     assert got == (
         f"{_BASE}?latitude=48.8566&longitude=2.3522"
         "&hourly=cloud_cover,shortwave_radiation,direct_radiation,diffuse_radiation,"
         "temperature_2m,wind_speed_10m,snow_depth"
-        "&models=ecmwf_ifs025,gfs_seamless,icon_seamless,gem_seamless,meteofrance_seamless"
         "&past_days=0&forecast_days=7&timezone=UTC"
     )
+    assert "&models=" not in got
+
+
+def test_weather_url_ensemble_adds_models() -> None:
+    got = build_weather_url(48.8566, 2.3522, past_days=0, forecast_days=7, ensemble=True)
+    assert "&models=ecmwf_ifs025,gfs_seamless,icon_seamless,gem_seamless,meteofrance_seamless" in got
 
 
 def test_parse_weather_fuses_models_to_median() -> None:
@@ -58,6 +65,24 @@ def test_parse_weather_fuses_models_to_median() -> None:
     assert w.cloud == [20.0, 90.0]  # median of the two models per hour
     assert w.shortwave == [0.0, 150.0]
     assert w.cloud_spread[1] > 0  # models disagree -> non-zero spread
+
+
+def test_parse_cloud_spread() -> None:
+    # From an ensemble payload: per-hour stdev of cloud across the models, with its own times.
+    payload = {
+        "hourly": {
+            "time": ["2026-06-11T00:00", "2026-06-11T01:00"],
+            "cloud_cover_ecmwf_ifs025": [10, 80],
+            "cloud_cover_gfs_seamless": [30, 80],
+        }
+    }
+    res = parse_cloud_spread(payload)
+    assert res is not None
+    times, spread = res
+    assert len(times) == 2
+    assert spread[0] > 0  # models disagree at hour 0
+    assert spread[1] == 0.0  # models agree at hour 1
+    assert parse_cloud_spread({"hourly": {"time": [], "cloud_cover": []}}) is None
 
 
 def test_gti_url_matches_card_with_azimuth_conversion() -> None:
@@ -170,14 +195,46 @@ class _FakeSession:
         return self._responses.pop(0)
 
 
-def test_fetch_weather_retries_empty_then_succeeds() -> None:
+_ENSEMBLE_SPREAD = {
+    "hourly": {
+        "time": ["2026-06-11T10:00", "2026-06-11T11:00"],
+        "cloud_cover_ecmwf_ifs025": [40.0, 60.0],
+        "cloud_cover_gfs_seamless": [60.0, 60.0],
+    }
+}
+
+
+def test_fetch_weather_best_match_values_with_ensemble_spread() -> None:
     om._RETRY_DELAY_S = 0.0  # do not actually sleep between retries in tests
-    # A 200-but-empty payload, then a non-200, then a good payload: the third try wins (issue #19).
-    session = _FakeSession([_FakeResp(200, {"hourly": {}}), _FakeResp(429, None), _FakeResp(200, _GOOD_WEATHER)])
+    # best_match: empty, non-200, then good (the third try wins, issue #19). Then the ensemble call overlays
+    # the cross-model cloud spread onto the best_match values.
+    session = _FakeSession(
+        [
+            _FakeResp(200, {"hourly": {}}),
+            _FakeResp(429, None),
+            _FakeResp(200, _GOOD_WEATHER),
+            _FakeResp(200, _ENSEMBLE_SPREAD),
+        ]
+    )
+    result = asyncio.run(fetch_weather(session, 1.0, 2.0))
+    assert result is not None
+    assert result.cloud == [50.0, 60.0]  # values are best_match, not an ensemble median
+    assert result.cloud_spread == [10.0, 0.0]  # stdev([40,60])=10 then stdev([60,60])=0, overlaid from the ensemble
+    assert session.calls == 4  # 3 best_match tries + 1 ensemble
+
+
+def test_fetch_weather_ensemble_failure_degrades_to_zero_spread() -> None:
+    om._RETRY_DELAY_S = 0.0
+    # best_match succeeds on the first try; the ensemble call fails every retry. The series still returns,
+    # with a zero spread rather than failing the refresh (best-effort).
+    session = _FakeSession(
+        [_FakeResp(200, _GOOD_WEATHER), _FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)]
+    )
     result = asyncio.run(fetch_weather(session, 1.0, 2.0))
     assert result is not None
     assert result.cloud == [50.0, 60.0]
-    assert session.calls == 3
+    assert result.cloud_spread == [0.0, 0.0]  # no ensemble spread available this refresh
+    assert session.calls == 4  # 1 best_match + 3 ensemble tries
 
 
 def test_fetch_weather_none_after_exhausting_retries() -> None:
@@ -185,7 +242,7 @@ def test_fetch_weather_none_after_exhausting_retries() -> None:
     session = _FakeSession([_FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)])
     result = asyncio.run(fetch_weather(session, 1.0, 2.0))
     assert result is None
-    assert session.calls == 3  # capped at _RETRY_ATTEMPTS, no infinite loop
+    assert session.calls == 3  # best_match capped at _RETRY_ATTEMPTS; the ensemble call is never reached
 
 
 if __name__ == "__main__":
