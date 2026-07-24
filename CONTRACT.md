@@ -7,6 +7,9 @@
 > Revision (2026-06-27): the config model moved from one entry holding several
 > panel arrays to **one entry per panel line**. Every output surface is unchanged;
 > only the configuration shape (section 5) and its scoping changed.
+>
+> Revision (2026-07-24): a panel line can carry an optional **per-line inverter cap**
+> in addition to the entry-level cap (section 5). Output surfaces are unchanged.
 
 The integration owns one **config entry per panel line** (a group of co-oriented
 panels). Add it once per line. Every surface below is scoped to that entry, so
@@ -166,9 +169,11 @@ The card no longer carries these; they become Helios-Forecast's config entry.
 One entry describes one panel line, so the geometry is a single orientation, not
 a list.
 
-- Panel line geometry: `tilt`, `azimuth`, `kwp`, tracker type.
+- Panel line geometry: `tilt`, `azimuth`, `kwp`, tracker type, and an optional per-line
+  inverter cap (kW) that clips that line before the lines are summed.
 - Location (defaults to the HA home), optional per entry.
-- Inverter max kW (optional clip).
+- Inverter max kW (optional clip) at the entry level, bounding the combined output of all
+  lines.
 - The PV production sensor that drives the learned correction. It must be a
   cumulative energy sensor (kWh) carrying long-term sum statistics — the learning
   reads hourly `change` rows from the recorder, which a power (W) sensor does not
