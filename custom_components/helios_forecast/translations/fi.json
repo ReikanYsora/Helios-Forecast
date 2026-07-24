@@ -9,6 +9,7 @@
           "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",
           "azimuth": "Atsimuutti (astetta pohjoisesta, 90 = itä, 180 = etelä, 270 = länsi)",
           "kwp": "Huipputeho (kWp)",
+          "line_inverter_max_kw": "Invertterin maksimiteho tälle linjalle (kW, valinnainen)",
           "tracker": "Aurinkoseuranta",
           "latitude": "Leveysaste (valinnainen)",
           "longitude": "Pituusaste (valinnainen)",
@@ -25,6 +26,7 @@
           "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",
           "azimuth": "Atsimuutti (astetta pohjoisesta, 90 = itä, 180 = etelä, 270 = länsi)",
           "kwp": "Huipputeho (kWp)",
+          "line_inverter_max_kw": "Invertterin maksimiteho tälle linjalle (kW, valinnainen)",
           "tracker": "Aurinkoseuranta",
           "add_another": "Add another panel line"
         }
@@ -59,6 +61,7 @@
           "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",
           "azimuth": "Atsimuutti (astetta pohjoisesta, 90 = itä, 180 = etelä, 270 = länsi)",
           "kwp": "Huipputeho (kWp)",
+          "line_inverter_max_kw": "Invertterin maksimiteho tälle linjalle (kW, valinnainen)",
           "tracker": "Aurinkoseuranta",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"

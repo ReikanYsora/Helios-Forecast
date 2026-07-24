@@ -9,6 +9,7 @@
           "tilt": "Sklon (stupně, 0 = vodorovně, 90 = svisle)",
           "azimuth": "Azimut (stupně od severu, 90 = východ, 180 = jih, 270 = západ)",
           "kwp": "Špičkový výkon (kWp)",
+          "line_inverter_max_kw": "Max. výkon střídače pro tuto linii (kW, volitelné)",
           "tracker": "Sledovač slunce",
           "latitude": "Zeměpisná šířka (volitelné)",
           "longitude": "Zeměpisná délka (volitelné)",
@@ -25,6 +26,7 @@
           "tilt": "Sklon (stupně, 0 = vodorovně, 90 = svisle)",
           "azimuth": "Azimut (stupně od severu, 90 = východ, 180 = jih, 270 = západ)",
           "kwp": "Špičkový výkon (kWp)",
+          "line_inverter_max_kw": "Max. výkon střídače pro tuto linii (kW, volitelné)",
           "tracker": "Sledovač slunce",
           "add_another": "Add another panel line"
         }
@@ -59,6 +61,7 @@
           "tilt": "Sklon (stupně, 0 = vodorovně, 90 = svisle)",
           "azimuth": "Azimut (stupně od severu, 90 = východ, 180 = jih, 270 = západ)",
           "kwp": "Špičkový výkon (kWp)",
+          "line_inverter_max_kw": "Max. výkon střídače pro tuto linii (kW, volitelné)",
           "tracker": "Sledovač slunce",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"

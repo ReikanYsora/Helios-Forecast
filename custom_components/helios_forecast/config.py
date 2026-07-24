@@ -30,6 +30,10 @@ CONF_TILT = "tilt"
 CONF_AZIMUTH = "azimuth"
 CONF_KWP = "kwp"
 CONF_TRACKER = "tracker"
+# Optional per-line inverter cap (kW). For micro-inverter strings that saturate on their own: two very different
+# orientations sharing one meter never peak together, so summing then clipping loses that per-string ceiling. When
+# set, the line is clipped at this cap before the arrays are summed; the entry-level cap still bounds the total.
+CONF_LINE_INVERTER_MAX_KW = "line_inverter_max_kw"
 
 TRACKER_NONE = "none"
 _VALID_TRACKERS = {"dual-axis", "single-axis-h", "single-axis-v"}
@@ -38,7 +42,7 @@ _VALID_TRACKERS = {"dual-axis", "single-axis-h", "single-axis-v"}
 # ``arrays`` list. An entry may hold several lines (e.g. two strings on one
 # inverter): the model sums them by kWp share and the entry-level inverter cap
 # applies to their combined output.
-LINE_KEYS: Tuple[str, ...] = (CONF_TILT, CONF_AZIMUTH, CONF_KWP, CONF_TRACKER)
+LINE_KEYS: Tuple[str, ...] = (CONF_TILT, CONF_AZIMUTH, CONF_KWP, CONF_TRACKER, CONF_LINE_INVERTER_MAX_KW)
 # Entry-level settings, shared by every line in the entry.
 SETTINGS_KEYS: Tuple[str, ...] = (
     CONF_LATITUDE,
@@ -83,6 +87,7 @@ def layout_from_config(data: Dict[str, Any]) -> PvLayout:
     orientations: List[PanelOrientation] = []
     coords: List[Optional[Tuple[float, float]]] = []
     kwps: List[float] = []
+    caps: List[float] = []
 
     for arr in arrays:
         tilt = _as_float(arr.get(CONF_TILT)) or 0.0
@@ -99,6 +104,9 @@ def layout_from_config(data: Dict[str, Any]) -> PvLayout:
         lon = _as_float(arr.get(CONF_LONGITUDE))
         coords.append((lat, lon) if (lat is not None and lon is not None) else None)
 
+        cap_kw = _as_float(arr.get(CONF_LINE_INVERTER_MAX_KW))
+        caps.append(cap_kw * 1000.0 if (cap_kw is not None and cap_kw > 0) else INF)
+
     total_kwp = sum(kwps)
     if total_kwp > 0:
         shares = [k / total_kwp for k in kwps]
@@ -107,7 +115,9 @@ def layout_from_config(data: Dict[str, Any]) -> PvLayout:
         # makes pvCalibK 0, so the forecast is flat until a peak power is set.
         shares = [1.0 / len(kwps) for _ in kwps] if kwps else []
 
-    return PvLayout(orientations=orientations, shares=shares, coords=coords, total_kwp=total_kwp)
+    # Empty caps list when no line carries one, so the model keeps clipping only the combined total (unchanged).
+    line_caps = caps if any(c != INF for c in caps) else []
+    return PvLayout(orientations=orientations, shares=shares, coords=coords, total_kwp=total_kwp, caps=line_caps)
 
 
 def location_from_config(

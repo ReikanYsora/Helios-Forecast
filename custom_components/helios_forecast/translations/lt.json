@@ -9,6 +9,7 @@
           "tilt": "Pasvirimas (laipsniais, 0 = horizontaliai, 90 = vertikaliai)",
           "azimuth": "Azimutas (laipsniais nuo šiaurės, 90 = rytai, 180 = pietūs, 270 = vakarai)",
           "kwp": "Didžiausia galia (kWp)",
+          "line_inverter_max_kw": "Maks. keitiklio galia šiai linijai (kW, neprivaloma)",
           "tracker": "Saulės sekiklis",
           "latitude": "Platuma (nebūtina)",
           "longitude": "Ilguma (nebūtina)",
@@ -25,6 +26,7 @@
           "tilt": "Pasvirimas (laipsniais, 0 = horizontaliai, 90 = vertikaliai)",
           "azimuth": "Azimutas (laipsniais nuo šiaurės, 90 = rytai, 180 = pietūs, 270 = vakarai)",
           "kwp": "Didžiausia galia (kWp)",
+          "line_inverter_max_kw": "Maks. keitiklio galia šiai linijai (kW, neprivaloma)",
           "tracker": "Saulės sekiklis",
           "add_another": "Add another panel line"
         }
@@ -59,6 +61,7 @@
           "tilt": "Pasvirimas (laipsniais, 0 = horizontaliai, 90 = vertikaliai)",
           "azimuth": "Azimutas (laipsniais nuo šiaurės, 90 = rytai, 180 = pietūs, 270 = vakarai)",
           "kwp": "Didžiausia galia (kWp)",
+          "line_inverter_max_kw": "Maks. keitiklio galia šiai linijai (kW, neprivaloma)",
           "tracker": "Saulės sekiklis",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"

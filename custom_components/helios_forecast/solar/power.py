@@ -9,7 +9,7 @@ covers. Pure, no Home Assistant imports.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Callable, List, Optional, Tuple
 
@@ -40,21 +40,27 @@ class PvLayout:
     shares: List[float]  # pre-normalised, sum to 1.0
     coords: List[Optional[Tuple[float, float]]]  # per-array (lat, lon) override or None
     total_kwp: float
+    # Per-array inverter cap in watts (INF when that array has none). Empty = no per-array caps at all, so the
+    # forecast clips only the combined total at the entry-level cap, exactly as before. When present, each array is
+    # clipped at its own cap BEFORE the arrays are summed, for micro-inverter strings that saturate independently.
+    caps: List[float] = field(default_factory=list)
 
 
 def _finite(value: Optional[float]) -> bool:
     return value is not None and math.isfinite(value)
 
 
-def compute_pv_power_weighted(
+def compute_pv_power_per_array(
     moment: datetime,
     home_lat: float,
     home_lon: float,
     sample: WeatherSample,
     layout: PvLayout,
     gti_sampler: Optional[GtiSampler] = None,
-) -> float:
-    """Forecast PV percentage (0..100) summed across arrays, weighted by kWp share."""
+) -> List[float]:
+    """PV percentage (0..100) for each configured array, in layout order. Returns a single-element list
+    ``[horizontal_pct]`` when the layout cannot be split per array (empty or out-of-lockstep), so callers can
+    still render one curve. This is the per-array primitive; the weighted total and the per-array cap both read it."""
     has_ghi = _supplied(sample.ghi)
     has_split = _supplied(sample.direct) and _supplied(sample.diffuse)
     base_present = _finite(sample.temp) or _finite(sample.wind) or has_ghi or has_split
@@ -71,17 +77,15 @@ def compute_pv_power_weighted(
     )
 
     orientations = layout.orientations
-    # Defensive: keep the per-array arrays in lockstep, else fall back to the
-    # horizontal path so the curve still renders (matches the card's guard).
-    if len(layout.shares) != len(orientations) or len(layout.coords) != len(orientations):
-        return compute_pv_power(moment, home_lat, home_lon, sample.cloud, None, base_ctx)
+    # Defensive: keep the per-array arrays in lockstep, else fall back to the horizontal path so the curve still
+    # renders (matches the card's guard). A single-element list signals "one array over the whole layout".
+    if not orientations or len(layout.shares) != len(orientations) or len(layout.coords) != len(orientations):
+        return [compute_pv_power(moment, home_lat, home_lon, sample.cloud, None, base_ctx)]
 
-    if not orientations:
-        return compute_pv_power(moment, home_lat, home_lon, sample.cloud, None, base_ctx)
-
-    acc = 0.0
-    for i, orientation in enumerate(orientations):
-        coord = layout.coords[i]
+    out: List[float] = []
+    for orientation in orientations:
+        idx = len(out)
+        coord = layout.coords[idx]
         array_lat = coord[0] if coord else home_lat
         array_lon = coord[1] if coord else home_lon
 
@@ -104,6 +108,23 @@ def compute_pv_power_weighted(
         else:
             array_ctx = None
 
-        acc += compute_pv_power(moment, array_lat, array_lon, sample.cloud, orientation, array_ctx) * layout.shares[i]
+        out.append(compute_pv_power(moment, array_lat, array_lon, sample.cloud, orientation, array_ctx))
 
-    return acc
+    return out
+
+
+def compute_pv_power_weighted(
+    moment: datetime,
+    home_lat: float,
+    home_lon: float,
+    sample: WeatherSample,
+    layout: PvLayout,
+    gti_sampler: Optional[GtiSampler] = None,
+) -> float:
+    """Forecast PV percentage (0..100) summed across arrays, weighted by kWp share. Thin wrapper over
+    ``compute_pv_power_per_array`` so the two never diverge."""
+    pcts = compute_pv_power_per_array(moment, home_lat, home_lon, sample, layout, gti_sampler)
+    orientations = layout.orientations
+    if not orientations or len(pcts) != len(orientations):
+        return pcts[0]
+    return sum(pcts[i] * layout.shares[i] for i in range(len(pcts)))

@@ -32,6 +32,7 @@ from custom_components.helios_forecast.solar.irradiance import (  # noqa: E402
 from custom_components.helios_forecast.solar.power import (  # noqa: E402
     PvLayout,
     WeatherSample,
+    compute_pv_power_per_array,
     compute_pv_power_weighted,
 )
 
@@ -151,6 +152,36 @@ def test_build_forecast_watts_mapping_and_cap() -> None:
         assert abs(p.pv_w - expected) < 1e-9
         assert p.pv_w == p.pv_raw_w  # ratio 1 in phase 1
         assert p.pv_w <= cap
+
+
+def test_per_line_inverter_cap_clips_each_array_before_summing() -> None:
+    # East string capped tight, west string uncapped (#26): the east micro-inverter saturates on its own, and the
+    # forecast must clip it BEFORE summing, not the combined total. Two 0.5-share arrays over 6 kWp -> 3 kWp each.
+    east_cap = 800.0
+    layout = PvLayout(
+        orientations=[PanelOrientation(30, 90), PanelOrientation(30, 270)],
+        shares=[0.5, 0.5],
+        coords=[None, None],
+        total_kwp=6.0,
+        caps=[east_cap, float("inf")],
+    )
+    weather = _constant_weather()
+    start = datetime(2026, 6, 21, 0, tzinfo=timezone.utc)
+    end = start + timedelta(days=1)
+    points = build_forecast_series(  # no entry-level cap, so only the per-line cap can bite
+        weather, None, layout, _LAT, _LON, start=start, end=end, step_minutes=60
+    )
+    assert len(points) == 24
+    saw_clip = False
+    for p in points:
+        sample = WeatherSample(cloud=20, ghi=500, direct=350, diffuse=120, temp=18, wind=3, snow=0)
+        pcts = compute_pv_power_per_array(p.t, _LAT, _LON, sample, layout, gti_sampler=None)
+        watts = [pcts[i] * layout.shares[i] * layout.total_kwp * 10.0 for i in range(len(pcts))]  # snow factor 1
+        expected = min(east_cap, max(0.0, watts[0])) + max(0.0, watts[1])
+        assert abs(p.pv_w - expected) < 1e-9
+        if watts[0] > east_cap:
+            saw_clip = True
+    assert saw_clip  # the per-line cap actually bit at some hour of the day
 
 
 def test_daily_integration() -> None:

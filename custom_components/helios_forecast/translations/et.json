@@ -9,6 +9,7 @@
           "tilt": "Kalle (kraadides, 0 = lapik, 90 = vertikaalne)",
           "azimuth": "Asimuut (kraadid põhjast, 90 = ida, 180 = lõuna, 270 = lääs)",
           "kwp": "Tippvõimsus (kWp)",
+          "line_inverter_max_kw": "Inverteri max väljundvõimsus sellele reale (kW, valikuline)",
           "tracker": "Päikese jälgija",
           "latitude": "Laiuskraad (valikuline)",
           "longitude": "Pikkuskraad (valikuline)",
@@ -25,6 +26,7 @@
           "tilt": "Kalle (kraadides, 0 = lapik, 90 = vertikaalne)",
           "azimuth": "Asimuut (kraadid põhjast, 90 = ida, 180 = lõuna, 270 = lääs)",
           "kwp": "Tippvõimsus (kWp)",
+          "line_inverter_max_kw": "Inverteri max väljundvõimsus sellele reale (kW, valikuline)",
           "tracker": "Päikese jälgija",
           "add_another": "Add another panel line"
         }
@@ -59,6 +61,7 @@
           "tilt": "Kalle (kraadides, 0 = lapik, 90 = vertikaalne)",
           "azimuth": "Asimuut (kraadid põhjast, 90 = ida, 180 = lõuna, 270 = lääs)",
           "kwp": "Tippvõimsus (kWp)",
+          "line_inverter_max_kw": "Inverteri max väljundvõimsus sellele reale (kW, valikuline)",
           "tracker": "Päikese jälgija",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"

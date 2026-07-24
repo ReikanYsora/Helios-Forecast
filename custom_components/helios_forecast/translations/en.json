@@ -9,6 +9,7 @@
           "tilt": "Tilt (degrees, 0 = flat, 90 = vertical)",
           "azimuth": "Azimuth (degrees from north, 90 = east, 180 = south, 270 = west)",
           "kwp": "Peak power (kWp)",
+          "line_inverter_max_kw": "Inverter max output for this line (kW, optional)",
           "tracker": "Sun tracker",
           "latitude": "Latitude (optional)",
           "longitude": "Longitude (optional)",
@@ -28,6 +29,7 @@
           "tilt": "Tilt (degrees, 0 = flat, 90 = vertical)",
           "azimuth": "Azimuth (degrees from north, 90 = east, 180 = south, 270 = west)",
           "kwp": "Peak power (kWp)",
+          "line_inverter_max_kw": "Inverter max output for this line (kW, optional)",
           "tracker": "Sun tracker",
           "add_another": "Add another panel line"
         }
@@ -65,6 +67,7 @@
           "tilt": "Tilt (degrees, 0 = flat, 90 = vertical)",
           "azimuth": "Azimuth (degrees from north, 90 = east, 180 = south, 270 = west)",
           "kwp": "Peak power (kWp)",
+          "line_inverter_max_kw": "Inverter max output for this line (kW, optional)",
           "tracker": "Sun tracker",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
