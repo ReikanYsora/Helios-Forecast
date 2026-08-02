@@ -8,6 +8,7 @@ map is built from the recorder's own production / SoC history.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -178,8 +179,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             if weather is None and self.weather_series is not None:
                 _LOGGER.warning("Open-Meteo returned no weather data; reusing the last successful fetch")
                 weather = self.weather_series
-            store: Dict[str, GtiSeries] = {}
             seen: Set[str] = set()
+            targets: List[tuple] = []
             for orientation in layout.orientations:
                 if orientation.tracker:
                     continue
@@ -187,17 +188,19 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 if key in seen:
                     continue
                 seen.add(key)
-                gti = await fetch_gti(
-                    session,
-                    lat,
-                    lon,
-                    orientation.tilt_deg,
-                    orientation.azimuth_deg,
-                    past_days=LEARN_DAYS,
-                    forecast_days=FORECAST_DAYS,
+                targets.append((key, orientation.tilt_deg, orientation.azimuth_deg))
+            # Fetch every distinct orientation's irradiance in parallel: one slow round-trip instead of
+            # N sequential ones. Sequential fetches were the main reason a multi-orientation install was
+            # slow to set up (#31).
+            gti_results = await asyncio.gather(
+                *(
+                    fetch_gti(session, lat, lon, tilt, az, past_days=LEARN_DAYS, forecast_days=FORECAST_DAYS)
+                    for (_key, tilt, az) in targets
                 )
-                if gti is not None:
-                    store[key] = gti
+            )
+            store: Dict[str, GtiSeries] = {
+                key: gti for (key, _tilt, _az), gti in zip(targets, gti_results) if gti is not None
+            }
         except Exception as err:  # noqa: BLE001 - any transport error becomes a retry
             raise UpdateFailed(f"Open-Meteo fetch failed: {err}") from err
 
