@@ -5,6 +5,41 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.8.2
+
+A corrective release on top of 2026.8.1.
+
+### Fixed
+
+- **Faster startup.** The integration fetched each panel orientation's irradiance from
+  Open-Meteo one after another and ran the full 60-day statistics backfill during setup, so a
+  multi-orientation install was slow to appear. It now fetches every orientation in parallel
+  and moves the archiving to a background task, so setup finishes promptly. (#31) Thanks to
+  @FoxP.
+
+- **Over-prediction curbed on shaded sites.** The physical model cannot see near-field shadows
+  (a tree in the morning, a roof in the evening), so at low learning confidence the forecast
+  could predict well above what a site actually produces. Once enough close analogs exist, the
+  forecast is now capped at the site's own observed production under similar sun and cloud (with
+  a margin), which reins in the over-prediction while still allowing an unusually clear day.
+  (#28) Thanks to @ManuMaxGit and @ferreto1978.
+
+### Changed
+
+- **A leaner default entity set.** A fresh install added a large entity set to the recorder.
+  Only the everyday values are now enabled by default (power now, energy today remaining, today
+  and tomorrow energy, and reliability); the rest are registered but disabled, so you switch on
+  only what you automate on, and enabling one later never loses its history. (#30) Thanks to
+  @rapahl.
+
+### Packaging
+
+- Installable from the **HACS default store**, with an integration icon shown on the HACS
+  repository line, and a refreshed README (absolute images so they render in HACS, restyled
+  badges).
+
+---
+
 ## 2026.8.1
 
 ### Added
