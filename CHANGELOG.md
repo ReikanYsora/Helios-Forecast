@@ -5,6 +5,22 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.8.3
+
+A performance fix on top of 2026.8.2.
+
+### Fixed: high CPU and network stalls every 30 minutes
+
+Since 2026.8.2, each 30-minute refresh ran its whole forecast computation on Home Assistant's event
+loop and rebuilt the full 60-day predicted-production archive every time, which briefly pinned a CPU
+core to 100% and could stall the network for a few seconds on small systems. The refresh now runs its
+heavy work off the event loop, rebuilds the 60-day archive at most once an hour, memoises the
+sun-position maths, caps the concurrent Open-Meteo requests, and writes the weather statistics
+incrementally instead of re-importing 60 days every time. Thanks to the users who reported it with
+detailed CPU traces.
+
+---
+
 ## 2026.8.2
 
 A corrective release on top of 2026.8.1.
