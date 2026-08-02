@@ -47,14 +47,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR])
 
-    # The sensor entities now exist, so the weather archive's first backfill can
-    # land immediately rather than waiting for the next 30-minute refresh.
+    # The sensor entities now exist, so the weather archive's first backfill can land. It walks a
+    # 60-day window and is not needed for the live forecast, so run it off the setup path as a
+    # background task: a fresh install finishes setting up promptly instead of waiting on the
+    # trailing statistics build (#31).
     from homeassistant.util import dt as dt_util
 
-    coordinator.write_weather_statistics(dt_util.utcnow())
-    coordinator.write_forecast_statistics()
+    async def _initial_statistics_archive() -> None:
+        coordinator.write_weather_statistics(dt_util.utcnow())
+        coordinator.write_forecast_statistics()
+        _purge_orphan_forecast_stats(hass, entry)
 
-    _purge_orphan_forecast_stats(hass, entry)
+    entry.async_create_background_task(hass, _initial_statistics_archive(), "helios_forecast_initial_statistics")
 
     entry.async_on_unload(entry.add_update_listener(_async_reload_entry))
     websocket.async_register(hass)

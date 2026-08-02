@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="images/helios-forecast-logo.svg" alt="" width="84">
+<img src="https://raw.githubusercontent.com/ReikanYsora/Helios-Forecast/main/images/helios-forecast-logo.svg" alt="" width="84">
 
 # HELIOS FORECAST
 
@@ -10,16 +10,19 @@ A Home Assistant integration that predicts your PV production, corrects itself
 against what your installation really produces, and publishes the result where
 Home Assistant already knows how to show it.
 
-<img src="images/forecast-vs-reality.png" alt="The Helios card at midday: the measured production curve and the forecast running together, the readout showing 2055 W produced against 2062 W predicted." width="880">
+<img src="https://raw.githubusercontent.com/ReikanYsora/Helios-Forecast/main/images/forecast-vs-reality.png" alt="The Helios card at midday: the measured production curve and the forecast running together, the readout showing 2055 W produced against 2062 W predicted." width="880">
 
 <sub>Measured **2 055 W**, predicted **2 062 W**. Seven watts apart, on a real installation.</sub>
 
 [**Learn more**](https://helios-ha.org/helios-forecast/) &nbsp;&nbsp; [**Data contract**](CONTRACT.md) &nbsp;&nbsp; [**Changelog**](CHANGELOG.md)
 
-[![HACS custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/)
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Stars](https://img.shields.io/github/stars/ReikanYsora/Helios-Forecast?style=flat&color=2f6fbf)](https://github.com/ReikanYsora/Helios-Forecast/stargazers)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?logo=buymeacoffee&logoColor=000000)](https://www.buymeacoffee.com/reikanysora)
+[![Release](https://img.shields.io/github/v/release/ReikanYsora/Helios-Forecast?display_name=tag&style=for-the-badge&color=e0a106)](https://github.com/ReikanYsora/Helios-Forecast/releases)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-e0a106.svg?style=for-the-badge)](https://github.com/hacs/default)
+[![Validate](https://img.shields.io/github/actions/workflow/status/ReikanYsora/Helios-Forecast/validate.yml?style=for-the-badge&label=validate&color=e0a106)](https://github.com/ReikanYsora/Helios-Forecast/actions/workflows/validate.yml)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2025.1%2B-e0a106.svg?style=for-the-badge&logo=home-assistant&logoColor=white)](https://www.home-assistant.io/)
+[![License](https://img.shields.io/github/license/ReikanYsora/Helios-Forecast?style=for-the-badge&color=blue)](https://www.gnu.org/licenses/gpl-3.0)
+[![Stars](https://img.shields.io/github/stars/ReikanYsora/Helios-Forecast?style=for-the-badge&color=e0a106)](https://github.com/ReikanYsora/Helios-Forecast/stargazers)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=000000)](https://www.buymeacoffee.com/reikanysora)
 
 </div>
 
@@ -27,14 +30,12 @@ Home Assistant already knows how to show it.
 
 ## Install
 
-Helios Forecast is not in the HACS default list yet, so it is added as a custom
-repository. It takes one extra step, once.
+Helios Forecast is in the **HACS default store**.
 
-1. In **HACS**, open the three-dot menu and choose **Custom repositories**.
-2. Paste `https://github.com/ReikanYsora/Helios-Forecast`, category **Integration**, and add it.
-3. Install **Helios Forecast**, then **restart Home Assistant**.
-4. Go to **Settings** > **Devices and services** > **Add integration**, and search for **Helios Forecast**.
-5. Fill in your first panel line: orientation, peak power, and your PV production sensor.
+1. In **HACS**, search for **Helios Forecast** and install it.
+2. **Restart Home Assistant.**
+3. Go to **Settings** > **Devices and services** > **Add integration**, and search for **Helios Forecast**.
+4. Fill in your first panel line: orientation, peak power, and your PV production sensor.
 
 > The production sensor must be a **cumulative energy sensor in kWh**, your
 > inverter's or meter's running total, not an instantaneous power sensor in W.

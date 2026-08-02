@@ -50,6 +50,13 @@ _CONFIDENCE_FULL = 25
 BAND_MIN_CONFIDENCE = 0.35
 # How many nearest analogs feed the weighted percentiles.
 _K = 60
+# Learned production ceiling. Once at least this many close analogs exist, the blended forecast is
+# capped at the 90th percentile of what the site ACTUALLY produced under similar sun+cloud, times a
+# margin. The physical model cannot see near-field shadows (a tree in the morning, a roof in the
+# evening), but the real production already reflects them, so this stops the model over-predicting on
+# shaded sites while the margin still allows an unusually clear day (#28).
+_CEILING_MIN_ANALOGS = 5
+_CEILING_MARGIN = 1.25
 
 
 @dataclass(frozen=True)
@@ -67,6 +74,7 @@ class AnalogBand:
     p50: float
     p90: float
     confidence: float  # 0..1
+    ceiling: Optional[float] = None  # learned production cap (W), or None when analog support is thin
 
 
 def _finite(v: object) -> bool:
@@ -177,7 +185,8 @@ def predict(
     p10, p50, p90 = _weighted_percentiles(weighted, (0.10, 0.50, 0.90))
     n_close = sum(1 for d2, _ in top if d2 <= _CLOSE_D2)
     confidence = min(1.0, n_close / _CONFIDENCE_FULL)
-    return AnalogBand(p10=p10, p50=p50, p90=p90, confidence=confidence)
+    ceiling = p90 * _CEILING_MARGIN if n_close >= _CEILING_MIN_ANALOGS else None
+    return AnalogBand(p10=p10, p50=p50, p90=p90, confidence=confidence, ceiling=ceiling)
 
 
 def enrich_points(
@@ -213,6 +222,11 @@ def enrich_points(
             continue
         c = band.confidence
         blended = c * band.p50 + (1.0 - c) * p.pv_w
+        # Never predict above what the site has actually produced under similar sun+cloud (with a
+        # margin). At low confidence the blend leans on the physical model, which is blind to
+        # near-field shadows; the learned ceiling reins that back in (#28).
+        if band.ceiling is not None:
+            blended = min(blended, band.ceiling)
         if c >= BAND_MIN_CONFIDENCE:
             out.append(replace(p, pv_w=blended, pv_p10=band.p10, pv_p90=band.p90))
         else:

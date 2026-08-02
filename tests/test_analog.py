@@ -146,6 +146,44 @@ def test_enrich_points_past_untouched_future_blended() -> None:
     assert out[1].pv_p10 <= out[1].pv_w <= out[1].pv_p90 + 1e-6
 
 
+def _flat_weather() -> WeatherSeries:
+    times = [_june_noon(h) for h in range(24)]
+    return WeatherSeries(
+        times=times,
+        cloud=[30.0] * 24,
+        shortwave=[0.0] * 24,
+        direct=[0.0] * 24,
+        diffuse=[0.0] * 24,
+        temp=[20.0] * 24,
+        wind=[5.0] * 24,
+        snow=[0.0] * 24,
+    )
+
+
+def test_ceiling_caps_overprediction() -> None:
+    # A shaded site: the physical model predicts far more than the site ever produces at this sun
+    # position. With enough close analogs, the learned ceiling caps the forecast to p90 * margin (#28).
+    lat, lon = 45.0, 0.0
+    now = _june_noon(12)
+    fut = ForecastPoint(t=_june_noon(13), pv_w=6500.0, pv_raw_w=6500.0)  # physical over-predicts
+    sun = sun_position(fut.t, lat, lon)
+    lib = [AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=30.0, watt=4500.0) for _ in range(10)]
+    out = enrich_points([fut], lib, _flat_weather(), lat, lon, now)
+    assert out[0].pv_w <= 4500.0 * 1.25 + 1e-6  # capped at p90 * margin, well below the physical 6500
+    assert out[0].pv_w < 6500.0
+
+
+def test_ceiling_skipped_when_analogs_thin() -> None:
+    # Too few close analogs to trust a ceiling (cold start): no cap, the forecast stays near physical.
+    lat, lon = 45.0, 0.0
+    now = _june_noon(12)
+    fut = ForecastPoint(t=_june_noon(13), pv_w=6500.0, pv_raw_w=6500.0)
+    sun = sun_position(fut.t, lat, lon)
+    lib = [AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=30.0, watt=4500.0) for _ in range(3)]
+    out = enrich_points([fut], lib, _flat_weather(), lat, lon, now)
+    assert out[0].pv_w > 4500.0 * 1.25  # no ceiling applied with thin support
+
+
 if __name__ == "__main__":
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):

@@ -62,6 +62,7 @@ def _power(
     name: str,
     value_fn: Callable[[ForecastSummary], _ValueType],
     attrs_fn: Optional[Callable[[ForecastData], dict]] = None,
+    enabled_default: bool = True,
 ) -> HeliosSensorDescription:
     return HeliosSensorDescription(
         key=key,
@@ -70,12 +71,18 @@ def _power(
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfPower.WATT,
         suggested_display_precision=0,
+        entity_registry_enabled_default=enabled_default,
         value_fn=value_fn,
         attrs_fn=attrs_fn,
     )
 
 
-def _energy(key: str, name: str, value_fn: Callable[[ForecastSummary], _ValueType]) -> HeliosSensorDescription:
+def _energy(
+    key: str,
+    name: str,
+    value_fn: Callable[[ForecastSummary], _ValueType],
+    enabled_default: bool = True,
+) -> HeliosSensorDescription:
     # No state_class: these are forecast values, not a metered total. The ENERGY device
     # class forbids `measurement` (HA rejects energy + measurement), and `total` /
     # `total_increasing` would wrongly imply an accumulating meter. The long-term
@@ -87,6 +94,7 @@ def _energy(key: str, name: str, value_fn: Callable[[ForecastSummary], _ValueTyp
         device_class=SensorDeviceClass.ENERGY,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         suggested_display_precision=2,
+        entity_registry_enabled_default=enabled_default,
         value_fn=value_fn,
     )
 
@@ -108,26 +116,36 @@ def _archive_energy(key: str, name: str, value_fn: Callable[[ForecastSummary], _
     )
 
 
-def _timestamp(key: str, name: str, value_fn: Callable[[ForecastSummary], _ValueType]) -> HeliosSensorDescription:
+def _timestamp(
+    key: str,
+    name: str,
+    value_fn: Callable[[ForecastSummary], _ValueType],
+    enabled_default: bool = True,
+) -> HeliosSensorDescription:
     return HeliosSensorDescription(
         key=key,
         name=name,
         device_class=SensorDeviceClass.TIMESTAMP,
+        entity_registry_enabled_default=enabled_default,
         value_fn=value_fn,
     )
 
 
 def _build_descriptions() -> list[HeliosSensorDescription]:
+    # Keep the recorder lean by default (#30): only the everyday headline values are enabled, the rest
+    # are registered but disabled so the user opts into the ones they actually automate on. The two
+    # `predicted_*` archive entities stay enabled because their long-term statistics are the card's
+    # past predicted-production curve. Enabling a disabled entity later never loses history.
     descriptions: list[HeliosSensorDescription] = [
         _power("power_now", "Power now", lambda s: s.power_now_w, attrs_fn=_forecast_attrs),
         # Analog uncertainty band on the current power: P10 (low) and P90 (high). None until the
-        # analog support is solid enough to surface a band.
-        _power("power_now_low", "Power now (low)", lambda s: s.power_now_low_w),
-        _power("power_now_high", "Power now (high)", lambda s: s.power_now_high_w),
-        _power("power_next_hour", "Power next hour", lambda s: s.power_next_hour_w),
+        # analog support is solid enough to surface a band. Off by default.
+        _power("power_now_low", "Power now (low)", lambda s: s.power_now_low_w, enabled_default=False),
+        _power("power_now_high", "Power now (high)", lambda s: s.power_now_high_w, enabled_default=False),
+        _power("power_next_hour", "Power next hour", lambda s: s.power_next_hour_w, enabled_default=False),
         _energy("energy_today_remaining", "Energy today remaining", lambda s: s.energy_today_remaining_kwh),
-        _energy("energy_this_hour", "Energy this hour", lambda s: s.energy_this_hour_kwh),
-        _energy("energy_next_hour", "Energy next hour", lambda s: s.energy_next_hour_kwh),
+        _energy("energy_this_hour", "Energy this hour", lambda s: s.energy_this_hour_kwh, enabled_default=False),
+        _energy("energy_next_hour", "Energy next hour", lambda s: s.energy_next_hour_kwh, enabled_default=False),
         # Archive entities: their live value mirrors the prediction for the current hour, but their
         # purpose is the long-term statistics the coordinator backfills (predicted production history,
         # kept by HA well beyond Open-Meteo's 60-day window so the card can draw the past forecast).
@@ -136,10 +154,33 @@ def _build_descriptions() -> list[HeliosSensorDescription]:
     ]
     for n in range(1, _HORIZON_DAYS + 1):
         i = n - 1
-        # `i=i` binds the loop index into each lambda; mypy can't infer the default-arg lambda's type.
-        descriptions.append(_energy(f"energy_day_{n}", f"Energy day {n}", lambda s, i=i: s.days[i].energy_kwh))  # type: ignore[misc]
-        descriptions.append(_power(f"peak_power_day_{n}", f"Peak power day {n}", lambda s, i=i: s.days[i].peak_power_w))  # type: ignore[misc]
-        descriptions.append(_timestamp(f"peak_time_day_{n}", f"Peak time day {n}", lambda s, i=i: s.days[i].peak_time))  # type: ignore[misc]
+        # Today (day 1) and tomorrow (day 2) energy stay on by default; the rest of the 7-day horizon
+        # and every peak power / peak time are opt-in. `i=i` binds the loop index into each lambda.
+        day_energy_on = n <= 2
+        descriptions.append(
+            _energy(
+                f"energy_day_{n}",
+                f"Energy day {n}",
+                lambda s, i=i: s.days[i].energy_kwh,  # type: ignore[misc]
+                enabled_default=day_energy_on,
+            )
+        )
+        descriptions.append(
+            _power(
+                f"peak_power_day_{n}",
+                f"Peak power day {n}",
+                lambda s, i=i: s.days[i].peak_power_w,  # type: ignore[misc]
+                enabled_default=False,
+            )
+        )
+        descriptions.append(
+            _timestamp(
+                f"peak_time_day_{n}",
+                f"Peak time day {n}",
+                lambda s, i=i: s.days[i].peak_time,  # type: ignore[misc]
+                enabled_default=False,
+            )
+        )
     return descriptions
 
 
@@ -319,6 +360,8 @@ class HeliosTodayTrendSensor(CoordinatorEntity[HeliosForecastCoordinator], Senso
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_suggested_display_precision = 2
     _attr_icon = "mdi:trending-up"
+    # A nuance most users don't automate on; registered but off by default to keep the recorder lean (#30).
+    _attr_entity_registry_enabled_default = False
 
     def __init__(self, coordinator: HeliosForecastCoordinator, entry: ConfigEntry) -> None:
         super().__init__(coordinator)

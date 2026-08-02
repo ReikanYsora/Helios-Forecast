@@ -72,6 +72,11 @@ users expect, so people switch over without relearning, and **every value is
 residual-corrected**, so it tracks the site's real behaviour better than a raw
 model. The card does not depend on these entity names for its baseline layer.
 
+Only the everyday values are **enabled by default** (`power_now`, `energy_today_remaining`,
+`energy_day_1` = today, `energy_day_2` = tomorrow, and `reliability`). The rest of the set
+below is registered but **disabled by default**, so the recorder stays lean and each user
+enables the entities they actually automate on; enabling one later never loses its history.
+
 Days are numbered uniformly, **`day_1` = today** through **`day_7` = J+6**.
 
 Power, now / next hour:
@@ -92,7 +97,7 @@ Energy, daily totals over the 7-day horizon:
 
 | Entity | State | Notes |
 |---|---|---|
-| `sensor.helios_forecast_energy_day_1` … `_day_7` | predicted daily total, **kWh** | `device_class: energy`, `state_class: total`, one per day |
+| `sensor.helios_forecast_energy_day_1` … `_day_7` | predicted daily total, **kWh** | `device_class: energy` (no `state_class`: a forecast, not a metered total), one per day |
 | `sensor.helios_forecast_energy_today_remaining` | predicted production left today, **kWh** | the one exception to day numbering, "remaining" only applies to today; drives "run the dishwasher if enough sun left" automations |
 
 Energy, intraday:
@@ -137,7 +142,9 @@ the card's "Graph detail" setting; the integration resamples server-side).
   "points": [
     { "t": "2026-06-11T12:00:00+00:00",
       "pv_w": 3120,        // residual-corrected predicted power (the curve drawn)
-      "pv_raw_w": 3340 }   // pre-correction (the card's forecast vs forecastRaw)
+      "pv_raw_w": 3340,    // pre-correction (the card's forecast vs forecastRaw)
+      "pv_p10": 2650,      // analog P10/P90 uncertainty band (null until learning is solid)
+      "pv_p90": 3450 }
   ],
   "daily": [
     { "date": "2026-06-11", "kwh": 21.4, "kwh_raw": 22.9 }
