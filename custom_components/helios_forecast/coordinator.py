@@ -155,6 +155,9 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # The UTC hour the archive was last recomputed. The 60-day past curve only changes at its
         # trailing hour, so it is rebuilt once an hour rather than on every 30-minute refresh.
         self._last_archive_hour: Optional[datetime] = None
+        # The UTC hour up to which the weather statistics have been written. A refresh then imports only
+        # the new hours; the full 60-day backfill (self-heal) runs once at startup.
+        self._last_weather_stat_hour: Optional[datetime] = None
         # Production history (recorder change buckets) from the most recent refresh, kept so the
         # reliability index can reuse it without a second recorder fetch.
         self._production_buckets: List[ProductionBucket] = []
@@ -320,14 +323,13 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         return compute_trend(self._trend_ref, current, today_date)
 
     @callback
-    def write_weather_statistics(self, now: datetime) -> None:
+    def write_weather_statistics(self, now: datetime, *, full: bool = False) -> None:
         """Copy the past weather hours into HA long-term statistics.
 
-        Idempotent: re-importing the trailing 60-day window every refresh both
-        backfills history on install and self-heals any gap left by downtime.
-        Only completed hours are written, the in-progress current hour is left
-        to the recorder. Skips a field until its sensor entity is registered
-        (the statistic_id is the entity_id), so the first call lands once setup
+        A refresh imports only the hours added since the last write; the full 60-day backfill (install
+        and self-heal after downtime) runs once at startup with ``full=True``. Only completed hours are
+        written, the in-progress current hour is left to the recorder. Skips a field until its sensor
+        entity is registered (the statistic_id is the entity_id), so the first backfill lands once setup
         has added the entities.
         """
         weather = self.weather_series
@@ -335,12 +337,14 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             return
 
         cutoff = now.replace(minute=0, second=0, microsecond=0)
+        since = None if (full or self._last_weather_stat_hour is None) else self._last_weather_stat_hour
         registry = er.async_get(self.hass)
+        wrote_any = False
         for field in WEATHER_FIELDS:
             entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"{self.entry.entry_id}_{field.key}")
             if entity_id is None:
                 continue
-            rows = hourly_statistics(weather.times, getattr(weather, field.attr), cutoff)
+            rows = hourly_statistics(weather.times, getattr(weather, field.attr), cutoff, since=since)
             if not rows:
                 continue
             metadata: StatisticMetaData = {
@@ -356,6 +360,11 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             if _SUPPORTS_UNIT_CLASS:
                 metadata["unit_class"] = _UNIT_CLASSES.get(field.unit)
             async_import_statistics(self.hass, metadata, rows)
+            wrote_any = True
+        # Advance the marker only once the entities exist and a write happened, so a pre-registration
+        # call does not skip the backlog the first real backfill still has to cover.
+        if wrote_any:
+            self._last_weather_stat_hour = cutoff
 
     def _compute_archive_points(self, now, weather, store, layout, lat, lon, cap, residual_map):
         """Hourly predicted points over the past window [now - LEARN_DAYS, current hour).
