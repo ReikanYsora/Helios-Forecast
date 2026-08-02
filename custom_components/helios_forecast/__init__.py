@@ -58,9 +58,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         coordinator.write_forecast_statistics()
         _purge_orphan_forecast_stats(hass, entry)
 
-    entry.async_create_background_task(
-        hass, _initial_statistics_archive(), "helios_forecast_initial_statistics"
-    )
+    entry.async_create_background_task(hass, _initial_statistics_archive(), "helios_forecast_initial_statistics")
 
     entry.async_on_unload(entry.add_update_listener(_async_reload_entry))
     websocket.async_register(hass)

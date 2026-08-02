@@ -69,9 +69,7 @@ def _at(arr: List, i: int) -> Optional[float]:
     return arr[i] if 0 <= i < len(arr) else None
 
 
-def _sum_arrays(
-    pcts: List[float], layout: PvLayout, snow: float, ratio: float
-) -> tuple[float, float]:
+def _sum_arrays(pcts: List[float], layout: PvLayout, snow: float, ratio: float) -> tuple[float, float]:
     """Per-array watts (``pct * kWp * 10 * snow``), each clipped at its OWN inverter cap, then summed. Returns
     ``(raw, corrected)``; corrected also applies the learned sky ratio. With no per-array caps the clips are all INF,
     so the sum is exactly the old single-total figure; a single-element ``pcts`` (fallback layout) reproduces it too."""

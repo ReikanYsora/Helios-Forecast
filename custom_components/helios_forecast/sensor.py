@@ -157,9 +157,30 @@ def _build_descriptions() -> list[HeliosSensorDescription]:
         # Today (day 1) and tomorrow (day 2) energy stay on by default; the rest of the 7-day horizon
         # and every peak power / peak time are opt-in. `i=i` binds the loop index into each lambda.
         day_energy_on = n <= 2
-        descriptions.append(_energy(f"energy_day_{n}", f"Energy day {n}", lambda s, i=i: s.days[i].energy_kwh, enabled_default=day_energy_on))  # type: ignore[misc]
-        descriptions.append(_power(f"peak_power_day_{n}", f"Peak power day {n}", lambda s, i=i: s.days[i].peak_power_w, enabled_default=False))  # type: ignore[misc]
-        descriptions.append(_timestamp(f"peak_time_day_{n}", f"Peak time day {n}", lambda s, i=i: s.days[i].peak_time, enabled_default=False))  # type: ignore[misc]
+        descriptions.append(
+            _energy(
+                f"energy_day_{n}",
+                f"Energy day {n}",
+                lambda s, i=i: s.days[i].energy_kwh,  # type: ignore[misc]
+                enabled_default=day_energy_on,
+            )
+        )
+        descriptions.append(
+            _power(
+                f"peak_power_day_{n}",
+                f"Peak power day {n}",
+                lambda s, i=i: s.days[i].peak_power_w,  # type: ignore[misc]
+                enabled_default=False,
+            )
+        )
+        descriptions.append(
+            _timestamp(
+                f"peak_time_day_{n}",
+                f"Peak time day {n}",
+                lambda s, i=i: s.days[i].peak_time,  # type: ignore[misc]
+                enabled_default=False,
+            )
+        )
     return descriptions
 
 
