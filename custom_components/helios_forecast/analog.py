@@ -81,12 +81,25 @@ def _finite(v: object) -> bool:
     return isinstance(v, (int, float)) and math.isfinite(v)
 
 
-def _sample_series(times: Sequence[datetime], values: Sequence[Optional[float]], ms: float) -> Optional[float]:
+def series_epochs(times: Sequence[datetime]) -> List[float]:
+    """The epoch-ms axis for an hourly series, computed once so callers can reuse it across many
+    ``_sample_series`` lookups instead of rebuilding it (thousands of ``.timestamp()`` calls) each time."""
+    return [t.timestamp() * 1000.0 for t in times]
+
+
+def _sample_series(
+    times: Sequence[datetime],
+    values: Sequence[Optional[float]],
+    ms: float,
+    epochs: Optional[List[float]] = None,
+) -> Optional[float]:
     """Linearly interpolate an hourly field (cloud, temperature, ...) at epoch-ms ``ms``,
-    guarding gaps at either end and missing samples in the bracket."""
+    guarding gaps at either end and missing samples in the bracket. ``epochs`` may be supplied
+    (``series_epochs(times)``) to avoid rebuilding the axis on every call."""
     if not times:
         return None
-    epochs = [t.timestamp() * 1000.0 for t in times]
+    if epochs is None:
+        epochs = series_epochs(times)
     if ms <= epochs[0]:
         return values[0] if (len(values) > 0 and _finite(values[0])) else None
     if ms >= epochs[-1]:
@@ -114,6 +127,7 @@ def build_library(production: list, weather: WeatherSeries, lat: float, lon: flo
     """Turn the production history into analog samples: actual watts tagged with
     the sun geometry and cloud cover at that hour. Night hours are dropped."""
     out: List[AnalogSample] = []
+    w_epochs = series_epochs(weather.times) if weather.times else None
     for b in production:
         if not _finite(getattr(b, "kwh", None)):
             continue
@@ -124,10 +138,10 @@ def build_library(production: list, weather: WeatherSeries, lat: float, lon: flo
         sun = sun_position(moment, lat, lon)
         if sun.altitude <= 0:
             continue
-        cloud = _sample_series(weather.times, weather.cloud, mid_ms)
+        cloud = _sample_series(weather.times, weather.cloud, mid_ms, w_epochs)
         if cloud is None:
             continue
-        temp = _sample_series(weather.times, weather.temp, mid_ms)
+        temp = _sample_series(weather.times, weather.temp, mid_ms, w_epochs)
         out.append(
             AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=cloud, watt=max(0.0, b.kwh * 1000.0), temp=temp)
         )
@@ -205,6 +219,7 @@ def enrich_points(
     if not library:
         return points
     out: List[ForecastPoint] = []
+    w_epochs = series_epochs(weather.times) if weather.times else None
     for p in points:
         if p.t < now:
             out.append(p)
@@ -214,8 +229,8 @@ def enrich_points(
             out.append(p)
             continue
         ms = p.t.timestamp() * 1000.0
-        cloud = _sample_series(weather.times, weather.cloud, ms)
-        temp = _sample_series(weather.times, weather.temp, ms)
+        cloud = _sample_series(weather.times, weather.cloud, ms, w_epochs)
+        temp = _sample_series(weather.times, weather.temp, ms, w_epochs)
         band = predict(library, sun.altitude, sun.azimuth, cloud if cloud is not None else 50.0, temp)
         if band is None:
             out.append(p)

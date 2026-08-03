@@ -17,7 +17,7 @@ from typing import Dict, List, Optional
 
 from .openmeteo import WeatherSeries
 from .solar.geometry import sun_position
-from .solar.gti import GtiStore, sample_gti
+from .solar.gti import GtiStore, make_gti_sampler
 from .solar.irradiance import snow_cover_factor
 from .solar.power import PvLayout, WeatherSample, compute_pv_power_per_array
 from .solar.residual import SkyResidualMap, sample_sky_residual
@@ -105,7 +105,7 @@ def build_forecast_series(
     step = timedelta(minutes=step_minutes)
     times = weather.times
     epochs = [t.timestamp() for t in times]
-    sampler = (lambda tilt, az, m: sample_gti(gti_store, tilt, az, m)) if gti_store else None
+    sampler = make_gti_sampler(gti_store)
 
     points: List[ForecastPoint] = []
     if not times:
