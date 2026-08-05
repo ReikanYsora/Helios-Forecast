@@ -54,7 +54,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     from homeassistant.util import dt as dt_util
 
     async def _initial_statistics_archive() -> None:
-        coordinator.write_weather_statistics(dt_util.utcnow())
+        # full=True: the one-time 60-day backfill (install + self-heal after downtime); refreshes then
+        # import only the new hours.
+        coordinator.write_weather_statistics(dt_util.utcnow(), full=True)
         coordinator.write_forecast_statistics()
         _purge_orphan_forecast_stats(hass, entry)
 

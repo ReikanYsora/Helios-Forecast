@@ -116,16 +116,22 @@ def forecast_statistics(points: list) -> Dict[str, List[dict]]:
     return {FORECAST_POWER_KEY: power, FORECAST_ENERGY_KEY: energy}
 
 
-def hourly_statistics(times: List[datetime], values: List[float], cutoff: datetime) -> List[dict]:
+def hourly_statistics(
+    times: List[datetime], values: List[float], cutoff: datetime, since: Optional[datetime] = None
+) -> List[dict]:
     """Per-hour statistic rows for completed hours strictly before ``cutoff``.
 
     Each Open-Meteo hourly sample is one row with mean = min = max = the sample
     (a single value per hour). Non-finite samples and the in-progress current
     hour (``start >= cutoff``) are dropped. ``times`` are already top-of-hour UTC.
+    When ``since`` is given, only hours strictly after it are emitted, so a refresh
+    can import just the new hours instead of the whole 60-day window every time.
     """
     rows: List[dict] = []
     for t, v in zip(times, values):
         if t >= cutoff or not _finite(v):
+            continue
+        if since is not None and t <= since:
             continue
         rows.append({"start": t, "mean": float(v), "min": float(v), "max": float(v)})
     return rows

@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from .gti import GtiStore, sample_gti
+from .gti import GtiStore, make_gti_sampler
 from .irradiance import snow_cover_factor
 from .geometry import sun_position
 from .power import PvLayout, WeatherSample, compute_pv_power_weighted
@@ -137,7 +137,7 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
     global_sum_w = 0.0
     global_sum_wr = 0.0
 
-    sampler = (lambda tilt, az, m: sample_gti(inp.gti_store, tilt, az, m)) if inp.gti_store else None
+    sampler = make_gti_sampler(inp.gti_store)
 
     for bucket in inp.production:
         kwh = bucket.kwh

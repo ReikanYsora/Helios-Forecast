@@ -90,6 +90,14 @@ def test_hourly_statistics_skips_non_finite() -> None:
     assert [r["start"] for r in rows] == [_h(10)]
 
 
+def test_hourly_statistics_since_emits_only_new_hours() -> None:
+    times = [_h(9), _h(10), _h(11), _h(12)]
+    values = [90.0, 100.0, 110.0, 120.0]
+    # Completed hours before cutoff 12:00 are 09/10/11; since 10:00 leaves only the new 11:00.
+    rows = hourly_statistics(times, values, _h(12), since=_h(10))
+    assert [r["start"] for r in rows] == [_h(11)]
+
+
 def test_forecast_statistics_power_and_energy() -> None:
     pts = [_Pt(_h(10), 2000.0), _Pt(_h(11), 0.0), _Pt(_h(12), float("nan"))]
     rows = forecast_statistics(pts)

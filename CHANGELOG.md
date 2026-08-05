@@ -5,6 +5,31 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.8.3
+
+A performance and reliability release on top of 2026.8.2.
+
+### Fixed: high CPU and network stalls every 30 minutes
+
+Since 2026.8.2, each 30-minute refresh ran its whole forecast computation on Home Assistant's event
+loop and rebuilt the full 60-day predicted-production archive every time, which briefly pinned a CPU
+core to 100% and could stall the network for a few seconds on small systems. The refresh now runs its
+heavy work off the event loop, rebuilds the 60-day archive at most once an hour, memoises the
+sun-position maths, caps the concurrent Open-Meteo requests, writes the weather statistics
+incrementally instead of re-importing 60 days every time, and precomputes each refresh's time axes
+once instead of rebuilding them on every sample. Thanks to the users who reported it with detailed
+CPU traces.
+
+### Fixed: forecast sensors could stay unavailable until a manual update
+
+A stalled network request had no timeout, so if a fetch hung, that config entry's refresh could
+freeze and leave its sensors unavailable for a long time until `homeassistant.update_entity` was
+called by hand (#32). Requests now time out and fall back to the retry and last-good-value path, so a
+temporary network problem recovers on its own at the next cycle. Thanks to @CaneTLOTW for the
+detailed report.
+
+---
+
 ## 2026.8.2
 
 A corrective release on top of 2026.8.1.

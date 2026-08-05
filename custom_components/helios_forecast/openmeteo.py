@@ -37,9 +37,13 @@ _T = TypeVar("_T")
 
 # Open-Meteo occasionally answers a valid request with a non-200 or an empty payload (a brief
 # rate-limit or hiccup). A couple of short retries turn that transient blank into a success instead
-# of a failed 30-minute refresh (issue #19). Transport errors are left to propagate.
+# of a failed 30-minute refresh (issue #19).
 _RETRY_ATTEMPTS = 3
 _RETRY_DELAY_S = 2.0
+# Per-request timeout. Without it a stalled connection could hang a refresh indefinitely and leave a
+# config entry's sensors unavailable until a manual update_entity; a timeout instead becomes a None
+# result that the retry + last-good-reuse path recovers from.
+_REQUEST_TIMEOUT_S = 30
 
 WEATHER_HOURLY = (
     "cloud_cover,shortwave_radiation,direct_radiation,diffuse_radiation,temperature_2m,wind_speed_10m,snow_depth"
@@ -249,11 +253,17 @@ def parse_gti(payload: dict[str, Any]) -> GtiSeries | None:
 
 
 async def _get_json(session: ClientSession, url: str) -> Optional[dict]:
-    """GET ``url`` as JSON once. None on a non-200; transport errors propagate."""
-    async with session.get(url) as resp:
-        if resp.status != 200:
-            return None
-        return await resp.json()
+    """GET ``url`` as JSON once. None on a non-200 or a timeout, so the caller's retry +
+    last-good-reuse path recovers instead of a stalled request hanging the whole refresh. Other
+    transport errors propagate and become an UpdateFailed, retried on the next cycle."""
+    try:
+        async with asyncio.timeout(_REQUEST_TIMEOUT_S):
+            async with session.get(url) as resp:
+                if resp.status != 200:
+                    return None
+                return await resp.json()
+    except TimeoutError:
+        return None
 
 
 async def _fetch_parsed(

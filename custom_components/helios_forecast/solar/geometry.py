@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import math
 from datetime import datetime, timedelta, timezone
+from functools import lru_cache
 from typing import NamedTuple
 
 _D = math.pi / 180.0
@@ -25,6 +26,11 @@ class SunPosition(NamedTuple):
     azimuth: float
 
 
+# Memoised: the position is fully determined by (moment, lat, lon), and the past hours are recomputed
+# on every 30-minute refresh (the archive, the analog library, the enrich pass) with identical
+# arguments, so caching turns thousands of repeat trig computations per refresh into dict lookups. The
+# cache is thread-safe (lru_cache locks), which matters once the compute runs in an executor.
+@lru_cache(maxsize=8192)
 def sun_position(moment: datetime, lat: float, lon: float) -> SunPosition:
     """Sun altitude / azimuth at a UTC instant for a lat/lon point.
 

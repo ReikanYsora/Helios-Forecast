@@ -12,6 +12,7 @@ import asyncio
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from functools import partial
 from typing import Any, Dict, List, Optional, Set
 
 from homeassistant.components.recorder import get_instance
@@ -151,6 +152,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # the detail websocket can serve the past forecast curve the live `points` (today onward) do
         # not cover.
         self.archive_points: List[ForecastPoint] = []
+        # The UTC hour the archive was last recomputed. The 60-day past curve only changes at its
+        # trailing hour, so it is rebuilt once an hour rather than on every 30-minute refresh.
+        self._last_archive_hour: Optional[datetime] = None
+        # The UTC hour up to which the weather statistics have been written. A refresh then imports only
+        # the new hours; the full 60-day backfill (self-heal) runs once at startup.
+        self._last_weather_stat_hour: Optional[datetime] = None
         # Production history (recorder change buckets) from the most recent refresh, kept so the
         # reliability index can reuse it without a second recorder fetch.
         self._production_buckets: List[ProductionBucket] = []
@@ -189,15 +196,19 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                     continue
                 seen.add(key)
                 targets.append((key, orientation.tilt_deg, orientation.azimuth_deg))
-            # Fetch every distinct orientation's irradiance in parallel: one slow round-trip instead of
-            # N sequential ones. Sequential fetches were the main reason a multi-orientation install was
-            # slow to set up (#31).
-            gti_results = await asyncio.gather(
-                *(
-                    fetch_gti(session, lat, lon, tilt, az, past_days=LEARN_DAYS, forecast_days=FORECAST_DAYS)
-                    for (_key, tilt, az) in targets
-                )
-            )
+            # Fetch the distinct orientations concurrently but capped: a couple of requests at a time
+            # instead of one burst of simultaneous connections, which on a small box briefly saturated
+            # the link and stalled other traffic every refresh. Still far faster than the old fully
+            # sequential fetch (#31), without the spike.
+            gti_sem = asyncio.Semaphore(2)
+
+            async def _fetch_gti_bounded(tilt: float, az: float) -> Optional[GtiSeries]:
+                async with gti_sem:
+                    return await fetch_gti(
+                        session, lat, lon, tilt, az, past_days=LEARN_DAYS, forecast_days=FORECAST_DAYS
+                    )
+
+            gti_results = await asyncio.gather(*(_fetch_gti_bounded(tilt, az) for (_key, tilt, az) in targets))
             store: Dict[str, GtiSeries] = {
                 key: gti for (key, _tilt, _az), gti in zip(targets, gti_results) if gti is not None
             }
@@ -212,25 +223,35 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + timedelta(days=FORECAST_DAYS)
-        points = build_forecast_series(
-            weather,
-            store or None,
-            layout,
-            lat,
-            lon,
-            inverter_max_w=cap,
-            start=start,
-            end=end,
-            step_minutes=STEP_MINUTES,
-            residual_map=residual_map,
+        # The forecast pipeline is CPU-bound pure Python (the sub-hourly walk, the analog scan, the
+        # 60-day archive). Each heavy stage runs in the executor so it never blocks the event loop: on a
+        # small box a 30-minute refresh used to spike a core to 100% and starve the network for seconds.
+        points = await self.hass.async_add_executor_job(
+            partial(
+                build_forecast_series,
+                weather,
+                store or None,
+                layout,
+                lat,
+                lon,
+                inverter_max_w=cap,
+                start=start,
+                end=end,
+                step_minutes=STEP_MINUTES,
+                residual_map=residual_map,
+            )
         )
         # Analog-ensemble refinement: blend the median of past actual production under similar
         # conditions into the future points and attach the P10/P90 uncertainty band. Reuses the same
         # production history fetched for the residual map.
-        analog_library = build_library(self._production_buckets, weather, lat, lon)
-        points = enrich_points(points, analog_library, weather, lat, lon, now)
+        analog_library = await self.hass.async_add_executor_job(
+            build_library, self._production_buckets, weather, lat, lon
+        )
+        points = await self.hass.async_add_executor_job(enrich_points, points, analog_library, weather, lat, lon, now)
 
-        summary = summarize(points, now=now, tz=dt_util.DEFAULT_TIME_ZONE, step_minutes=STEP_MINUTES)
+        summary = await self.hass.async_add_executor_job(
+            partial(summarize, points, now=now, tz=dt_util.DEFAULT_TIME_ZONE, step_minutes=STEP_MINUTES)
+        )
 
         now_utc = dt_util.utcnow()
         self.weather_series = weather
@@ -240,21 +261,23 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # `forecast` chart attribute (issue #21). Shares the `start` used by the power forecast.
         weather_forecast = weather_forecast_series(weather, start, dt_util.DEFAULT_TIME_ZONE)
 
-        # Archive the predicted production: run the model over the past weather window (the same
-        # 60-day window already fetched for learning) at an hourly step, and store it in HA's
-        # long-term statistics. Open-Meteo caps the past at LEARN_DAYS, but the statistics are never
-        # purged, so the history grows without bound from install onward.
-        self.archive_points = self._compute_archive_points(
-            now_utc, weather, store or None, layout, lat, lon, cap, residual_map
-        )
-        self._forecast_stat_rows = forecast_statistics(self.archive_points)
-        self.write_forecast_statistics()
+        # Archive the predicted production over the past 60-day window at an hourly step, for HA's
+        # long-term statistics and the card's past curve. The past only changes at its trailing hour, so
+        # rebuild it at most once an hour rather than on every 30-minute refresh (a big CPU saving).
+        archive_hour = now_utc.replace(minute=0, second=0, microsecond=0)
+        if self._last_archive_hour != archive_hour:
+            self.archive_points = await self.hass.async_add_executor_job(
+                self._compute_archive_points, now_utc, weather, store or None, layout, lat, lon, cap, residual_map
+            )
+            self._forecast_stat_rows = await self.hass.async_add_executor_job(forecast_statistics, self.archive_points)
+            self.write_forecast_statistics()
+            self._last_archive_hour = archive_hour
 
         # Reliability index: blends learning maturity, recent predicted-vs-actual skill and today's
         # cloud predictability. Reuses the production history already fetched for the residual map and
-        # the hourly archive points just computed, so no extra recorder or model work.
-        reliability = compute_reliability(
-            self._production_buckets, self.archive_points, weather, now, dt_util.DEFAULT_TIME_ZONE
+        # the hourly archive points, so no extra recorder or model work.
+        reliability = await self.hass.async_add_executor_job(
+            compute_reliability, self._production_buckets, self.archive_points, weather, now, dt_util.DEFAULT_TIME_ZONE
         )
 
         trend = await self._today_trend(data, now, summary)
@@ -300,14 +323,13 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         return compute_trend(self._trend_ref, current, today_date)
 
     @callback
-    def write_weather_statistics(self, now: datetime) -> None:
+    def write_weather_statistics(self, now: datetime, *, full: bool = False) -> None:
         """Copy the past weather hours into HA long-term statistics.
 
-        Idempotent: re-importing the trailing 60-day window every refresh both
-        backfills history on install and self-heals any gap left by downtime.
-        Only completed hours are written, the in-progress current hour is left
-        to the recorder. Skips a field until its sensor entity is registered
-        (the statistic_id is the entity_id), so the first call lands once setup
+        A refresh imports only the hours added since the last write; the full 60-day backfill (install
+        and self-heal after downtime) runs once at startup with ``full=True``. Only completed hours are
+        written, the in-progress current hour is left to the recorder. Skips a field until its sensor
+        entity is registered (the statistic_id is the entity_id), so the first backfill lands once setup
         has added the entities.
         """
         weather = self.weather_series
@@ -315,12 +337,14 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             return
 
         cutoff = now.replace(minute=0, second=0, microsecond=0)
+        since = None if (full or self._last_weather_stat_hour is None) else self._last_weather_stat_hour
         registry = er.async_get(self.hass)
+        wrote_any = False
         for field in WEATHER_FIELDS:
             entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"{self.entry.entry_id}_{field.key}")
             if entity_id is None:
                 continue
-            rows = hourly_statistics(weather.times, getattr(weather, field.attr), cutoff)
+            rows = hourly_statistics(weather.times, getattr(weather, field.attr), cutoff, since=since)
             if not rows:
                 continue
             metadata: StatisticMetaData = {
@@ -336,6 +360,11 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             if _SUPPORTS_UNIT_CLASS:
                 metadata["unit_class"] = _UNIT_CLASSES.get(field.unit)
             async_import_statistics(self.hass, metadata, rows)
+            wrote_any = True
+        # Advance the marker only once the entities exist and a write happened, so a pre-registration
+        # call does not skip the backlog the first real backfill still has to cover.
+        if wrote_any:
+            self._last_weather_stat_hour = cutoff
 
     def _compute_archive_points(self, now, weather, store, layout, lat, lon, cap, residual_map):
         """Hourly predicted points over the past window [now - LEARN_DAYS, current hour).
@@ -417,7 +446,10 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             )
             return None
 
-        return build_sky_residual_map(
+        # The map build is pure CPU (walking the production buckets against the sky grid); run it in the
+        # executor so it never blocks the event loop.
+        return await self.hass.async_add_executor_job(
+            build_sky_residual_map,
             SkyResidualInput(
                 lat=lat,
                 lon=lon,
@@ -433,7 +465,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 snow=weather.snow,
                 gti_store=store,
                 now_ms=now.timestamp() * 1000.0,
-            )
+            ),
         )
 
     async def _statistics(self, stat_id, start, end, types, units):
