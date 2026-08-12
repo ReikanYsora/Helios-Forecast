@@ -71,16 +71,11 @@ try:
 except ImportError:  # pragma: no cover - older HA cores
     _MEAN_TYPE_ARITHMETIC = None
 
+
 # `unit_class` names the unit-conversion class HA uses to migrate a statistic's history if its unit
 # later changes. We derive the unit -> class map from the core's own converters so the value always
-# matches the installed core, and only set the key on cores that declare it. Units with no converter
-# (e.g. W/m2 irradiance) map to None, the correct "not convertible" answer.
-try:
-    _SUPPORTS_UNIT_CLASS = "unit_class" in StatisticMetaData.__annotations__
-except (AttributeError, TypeError):  # pragma: no cover - older HA cores
-    _SUPPORTS_UNIT_CLASS = False
-
-
+# matches the installed core. Units with no converter (e.g. W/m2 irradiance) map to None, the correct
+# "not convertible" answer. The key is always declared in the metadata; cores predating it ignore it.
 def _build_unit_classes() -> Dict[str, Optional[str]]:
     mapping: Dict[str, Optional[str]] = {}
     try:
@@ -347,18 +342,19 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             rows = hourly_statistics(weather.times, getattr(weather, field.attr), cutoff, since=since)
             if not rows:
                 continue
+            # mean_type + unit_class are declared statically (not added after the literal) so both the
+            # runtime and static API scanners see them. has_mean stays for cores older than mean_type
+            # (HA 2025.1), where the extra mean_type key is simply ignored and has_mean is read instead.
             metadata: StatisticMetaData = {
                 "has_mean": True,
+                "mean_type": _MEAN_TYPE_ARITHMETIC,
                 "has_sum": False,
                 "name": None,
                 "source": "recorder",
                 "statistic_id": entity_id,
                 "unit_of_measurement": field.unit,
+                "unit_class": _UNIT_CLASSES.get(field.unit),
             }
-            if _MEAN_TYPE_ARITHMETIC is not None:
-                metadata["mean_type"] = _MEAN_TYPE_ARITHMETIC
-            if _SUPPORTS_UNIT_CLASS:
-                metadata["unit_class"] = _UNIT_CLASSES.get(field.unit)
             async_import_statistics(self.hass, metadata, rows)
             wrote_any = True
         # Advance the marker only once the entities exist and a write happened, so a pre-registration
@@ -408,18 +404,17 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"{self.entry.entry_id}_{key}")
             if entity_id is None:
                 continue
+            # Same static mean_type + unit_class declaration as the weather archive above.
             metadata: StatisticMetaData = {
                 "has_mean": True,
+                "mean_type": _MEAN_TYPE_ARITHMETIC,
                 "has_sum": False,
                 "name": None,
                 "source": "recorder",
                 "statistic_id": entity_id,
                 "unit_of_measurement": unit,
+                "unit_class": _UNIT_CLASSES.get(unit),
             }
-            if _MEAN_TYPE_ARITHMETIC is not None:
-                metadata["mean_type"] = _MEAN_TYPE_ARITHMETIC
-            if _SUPPORTS_UNIT_CLASS:
-                metadata["unit_class"] = _UNIT_CLASSES.get(unit)
             async_import_statistics(self.hass, metadata, rows)
 
     async def _build_residual_map(self, data, lat, lon, layout, weather, store, now):
