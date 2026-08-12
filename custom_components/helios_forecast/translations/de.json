@@ -78,5 +78,17 @@
         "single-axis-v": "Einachsig vertikal (Azimut folgt)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Prognose abrufen",
+      "description": "Gibt die vollständige Produktionsprognose (ab heute, ein Punkt alle 15 Minuten, jeder mit den prognostizierten Watt und dem P10/P90-Konfidenzband) als Antwortdaten zur Verwendung in Automatisierungen zurück.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installation",
+          "description": "Welche Helios-Forecast-Installation gelesen werden soll. Optional, wenn nur eine konfiguriert ist."
+        }
+      }
+    }
   }
 }

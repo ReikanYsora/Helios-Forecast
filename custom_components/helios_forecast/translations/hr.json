@@ -78,5 +78,17 @@
         "single-axis-v": "Jednoosno okomito (azimut se prilagođava)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Dohvati prognozu",
+      "description": "Vraća potpunu prognozu proizvodnje (od danas nadalje, jedna točka svakih 15 minuta, svaka s predviđenim vatima i pojasom pouzdanosti P10/P90) kao podatke odgovora za upotrebu u automatizacijama.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Instalacija",
+          "description": "Koju Helios Forecast instalaciju čitati. Neobavezno kada je konfigurirana samo jedna."
+        }
+      }
+    }
   }
 }

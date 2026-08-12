@@ -78,5 +78,17 @@
         "single-axis-v": "Enaxlig vertikal (azimut följer)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Hämta prognos",
+      "description": "Returnerar hela produktionsprognosen (från idag och framåt, en punkt var 15:e minut, var och en med de förutsagda watten och P10/P90-konfidensbandet) som svarsdata för användning i automationer.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installation",
+          "description": "Vilken Helios Forecast-installation som ska läsas. Valfritt när endast en är konfigurerad."
+        }
+      }
+    }
   }
 }

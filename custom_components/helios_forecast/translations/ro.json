@@ -78,5 +78,17 @@
         "single-axis-v": "Pe o axă verticală (urmărește azimutul)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Obține prognoza",
+      "description": "Returnează prognoza completă de producție (de astăzi înainte, câte un punct la fiecare 15 minute, fiecare cu wații estimați și banda de încredere P10/P90) ca date de răspuns, pentru utilizare în automatizări.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Instalație",
+          "description": "Ce instalație Helios Forecast să fie citită. Opțional când este configurată una singură."
+        }
+      }
+    }
   }
 }

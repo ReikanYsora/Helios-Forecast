@@ -78,5 +78,17 @@
         "single-axis-v": "Enakset lodret (azimut følger)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Hent prognose",
+      "description": "Returnerer hele produktionsprognosen (fra i dag og frem, ét punkt hvert 15. minut, hver med de forudsagte watt og P10/P90-konfidensbåndet) som svardata til brug i automatiseringer.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installation",
+          "description": "Hvilken Helios Forecast-installation der skal læses. Valgfrit, når kun én er konfigureret."
+        }
+      }
+    }
   }
 }

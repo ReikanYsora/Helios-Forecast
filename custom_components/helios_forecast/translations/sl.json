@@ -78,5 +78,17 @@
         "single-axis-v": "Enoosni navpični (sledi azimut)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Pridobi napoved",
+      "description": "Vrne celotno napoved proizvodnje (od danes naprej, ena točka vsakih 15 minut, vsaka z napovedanimi vati in intervalom zaupanja P10/P90) kot podatke odgovora za uporabo v avtomatizacijah.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Namestitev",
+          "description": "Katero namestitev Helios Forecast prebrati. Neobvezno, kadar je konfigurirana samo ena."
+        }
+      }
+    }
   }
 }

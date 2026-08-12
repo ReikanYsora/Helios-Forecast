@@ -78,5 +78,17 @@
         "single-axis-v": "Egytengelyes függőleges (azimut követ)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Előrejelzés lekérése",
+      "description": "Visszaadja a teljes termelési előrejelzést (a mai naptól kezdve, 15 percenként egy pont, mindegyik az előre jelzett wattokkal és a P10/P90 megbízhatósági sávval) válaszadatként, automatizálásokban való használatra.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Telepítés",
+          "description": "Melyik Helios Forecast telepítést olvassa be. Nem kötelező, ha csak egy van beállítva."
+        }
+      }
+    }
   }
 }

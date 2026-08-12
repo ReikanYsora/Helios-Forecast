@@ -78,5 +78,17 @@
         "single-axis-v": "Üheteljeline vertikaalne (asimuut jälgib)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Hangi prognoos",
+      "description": "Tagastab täieliku tootmisprognoosi (tänasest alates, üks punkt iga 15 minuti järel, igaüks prognoositud vattide ja P10/P90 usaldusvahemikuga) vastuseandmetena automatiseeringutes kasutamiseks.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Paigaldis",
+          "description": "Millist Helios Forecasti paigaldist lugeda. Valikuline, kui seadistatud on ainult üks."
+        }
+      }
+    }
   }
 }

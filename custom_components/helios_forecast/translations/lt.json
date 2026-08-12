@@ -78,5 +78,17 @@
         "single-axis-v": "Vienašis vertikalus (seka azimutas)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Gauti prognozę",
+      "description": "Grąžina visą gamybos prognozę (nuo šiandien, po vieną tašką kas 15 minučių, kiekvienas su prognozuojamais vatais ir P10/P90 pasikliovimo intervalu) kaip atsako duomenis, naudoti automatizacijose.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Įdiegimas",
+          "description": "Kurią Helios Forecast įdiegtį nuskaityti. Nebūtina, kai sukonfigūruota tik viena."
+        }
+      }
+    }
   }
 }

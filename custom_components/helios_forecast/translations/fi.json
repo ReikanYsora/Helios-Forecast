@@ -78,5 +78,17 @@
         "single-axis-v": "Yksiakselinen pysty (atsimuutti seuraa)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Hae ennuste",
+      "description": "Palauttaa koko tuotantoennusteen (tästä päivästä eteenpäin, yksi piste 15 minuutin välein, kukin ennustetuilla wateilla ja P10/P90-luottamusvälillä) vastaustietona automaatioita varten.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Asennus",
+          "description": "Mikä Helios Forecast -asennus luetaan. Valinnainen, kun määritettynä on vain yksi."
+        }
+      }
+    }
   }
 }

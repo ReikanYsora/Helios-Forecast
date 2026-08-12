@@ -78,5 +78,17 @@
         "single-axis-v": "Jednoosiowy pionowy (zmienia azymut)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Pobierz prognozę",
+      "description": "Zwraca pełną prognozę produkcji (od dziś, jeden punkt co 15 minut, każdy z przewidywanymi watami i przedziałem ufności P10/P90) jako dane odpowiedzi do użycia w automatyzacjach.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Instalacja",
+          "description": "Którą instalację Helios Forecast odczytać. Opcjonalne, gdy skonfigurowana jest tylko jedna."
+        }
+      }
+    }
   }
 }

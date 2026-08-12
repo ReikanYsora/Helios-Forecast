@@ -78,5 +78,17 @@
         "single-axis-v": "Enkele as verticaal (azimut volgt)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Prognose ophalen",
+      "description": "Geeft de volledige productieprognose terug (vanaf vandaag, één punt per 15 minuten, elk met de voorspelde watts en de P10/P90-betrouwbaarheidsband) als reactiegegevens, voor gebruik in automatiseringen.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installatie",
+          "description": "Welke Helios Forecast-installatie moet worden gelezen. Optioneel wanneer er slechts één is geconfigureerd."
+        }
+      }
+    }
   }
 }

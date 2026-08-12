@@ -78,5 +78,17 @@
         "single-axis-v": "Jednoosový zvislý (sleduje azimut)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Získať predpoveď",
+      "description": "Vráti úplnú predpoveď výroby (od dnešného dňa, jeden bod každých 15 minút, každý s predpokladanými wattmi a intervalom spoľahlivosti P10/P90) ako údaje odpovede na použitie v automatizáciách.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Inštalácia",
+          "description": "Ktorú inštaláciu Helios Forecast načítať. Voliteľné, keď je nakonfigurovaná len jedna."
+        }
+      }
+    }
   }
 }

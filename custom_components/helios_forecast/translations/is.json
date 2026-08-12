@@ -78,5 +78,17 @@
         "single-axis-v": "Einása lóðréttur (áttarhorn fylgir)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Sækja spá",
+      "description": "Skilar allri framleiðsluspánni (frá og með deginum í dag, einn punktur á 15 mínútna fresti, hver með spáðum vöttum og P10/P90 öryggisbili) sem svargögnum til notkunar í sjálfvirkni.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Uppsetning",
+          "description": "Hvaða Helios Forecast uppsetningu á að lesa. Valfrjálst þegar aðeins ein er stillt."
+        }
+      }
+    }
   }
 }
