@@ -16,7 +16,16 @@
           "inverter_max_kw": "Invertora maksimālā jauda (kW, neobligāti)",
           "production_entity": "PV ražošanas sensors (apgūtajai korekcijai)",
           "trend_anchor_hour": "Šodienas tendences atskaites stunda (0-23, noklusējums 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Izmantojamā akumulatora ietilpība (kWh)",
+          "battery_soc_entity": "Akumulatora uzlādes līmeņa sensors (%)",
+          "battery_max_charge_kw": "Maks. akumulatora uzlādes jauda (kW, neobligāti)",
+          "battery_max_discharge_kw": "Maks. akumulatora izlādes jauda (kW, neobligāti)",
+          "battery_min_soc": "Akumulatora rezerve — minimālais uzlādes līmenis (%, noklusējums 10)",
+          "battery_efficiency": "Akumulatora cikla lietderības koeficients (%, noklusējums 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Aizpildiet ietilpību un šo sensoru, lai ieslēgtu uzlādes līmeņa prognozi. Mājas patēriņš tiek ņemts no Enerģijas paneļa, sensors šeit nav vajadzīgs."
         }
       },
       "line": {
@@ -51,7 +60,16 @@
           "longitude": "Garums (neobligāti)",
           "inverter_max_kw": "Invertora maksimālā jauda (kW, neobligāti)",
           "production_entity": "PV ražošanas sensors (apgūtajai korekcijai)",
-          "trend_anchor_hour": "Šodienas tendences atskaites stunda (0-23, noklusējums 6)"
+          "trend_anchor_hour": "Šodienas tendences atskaites stunda (0-23, noklusējums 6)",
+          "battery_capacity_kwh": "Izmantojamā akumulatora ietilpība (kWh)",
+          "battery_soc_entity": "Akumulatora uzlādes līmeņa sensors (%)",
+          "battery_max_charge_kw": "Maks. akumulatora uzlādes jauda (kW, neobligāti)",
+          "battery_max_discharge_kw": "Maks. akumulatora izlādes jauda (kW, neobligāti)",
+          "battery_min_soc": "Akumulatora rezerve — minimālais uzlādes līmenis (%, noklusējums 10)",
+          "battery_efficiency": "Akumulatora cikla lietderības koeficients (%, noklusējums 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Aizpildiet ietilpību un šo sensoru, lai ieslēgtu uzlādes līmeņa prognozi. Mājas patēriņš tiek ņemts no Enerģijas paneļa, sensors šeit nav vajadzīgs."
         }
       },
       "lines": {
@@ -83,6 +101,16 @@
     "get_forecast": {
       "name": "Iegūt prognozi",
       "description": "Atgriež pilnu ražošanas prognozi (no šodienas, viens punkts ik pēc 15 minūtēm, katrs ar prognozētajiem vatiem un P10/P90 ticamības joslu) kā atbildes datus izmantošanai automatizācijās.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Instalācija",
+          "description": "Kuru Helios Forecast instalāciju nolasīt. Nav obligāti, ja konfigurēta tikai viena."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Iegūt uzlādes līmeņa prognozi",
+      "description": "Atgriež prognozēto akumulatora uzlādes līmeni nākamajām 24 stundām (viens punkts ik pēc 15 minūtēm) kā atbildes datus izmantošanai automatizācijās.",
       "fields": {
         "config_entry_id": {
           "name": "Instalācija",

@@ -33,6 +33,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from .config import battery_from_config
 from .const import DOMAIN
 from .coordinator import ForecastData, HeliosForecastCoordinator
 from .statistics import WEATHER_FIELDS
@@ -249,6 +250,10 @@ async def async_setup_entry(
     entities += [HeliosWeatherSensor(coordinator, entry, description) for description in _build_weather_descriptions()]
     entities.append(HeliosReliabilitySensor(coordinator, entry))
     entities.append(HeliosTodayTrendSensor(coordinator, entry))
+    # The predicted-SoC sensor only exists when the battery feature is configured, so installs without a
+    # battery don't carry a perpetually-unknown entity. An options change reloads the entry and rebuilds this.
+    if battery_from_config({**entry.data, **entry.options}) is not None:
+        entities.append(HeliosBatterySocSensor(coordinator, entry))
     async_add_entities(entities)
 
 
@@ -357,6 +362,47 @@ class HeliosReliabilitySensor(CoordinatorEntity[HeliosForecastCoordinator], Sens
             "today_predictability": r.today_predictability,
             "days_learned": r.days_learned,
             "per_day": r.per_day,
+        }
+
+
+class HeliosBatterySocSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEntity):
+    """Predicted battery state of charge. The state is the near-term projection; the full 24-hour SoC
+    curve rides along as the `forecast` attribute, with the projected daily low/high and the forecast
+    reliability so an automation can weigh how much to trust it. Charge decisions stay with the user."""
+
+    _attr_has_entity_name = True
+    _attr_name = "Predicted battery state of charge"
+    _attr_device_class = SensorDeviceClass.BATTERY
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_suggested_display_precision = 0
+    _unrecorded_attributes = frozenset({"forecast"})
+
+    def __init__(self, coordinator: HeliosForecastCoordinator, entry: ConfigEntry) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{entry.entry_id}_predicted_battery_soc"
+        self._attr_device_info = _device_info(entry)
+
+    @property
+    def native_value(self) -> Optional[float]:
+        if self.coordinator.data is None or not self.coordinator.data.battery_soc:
+            return None
+        return self.coordinator.data.battery_soc[0].soc
+
+    @property
+    def extra_state_attributes(self) -> Optional[dict]:
+        if self.coordinator.data is None or not self.coordinator.data.battery_soc:
+            return None
+        soc = self.coordinator.data.battery_soc
+        low = min(soc, key=lambda p: p.soc)
+        high = max(soc, key=lambda p: p.soc)
+        return {
+            "forecast": [{"datetime": p.t.isoformat(), "soc": p.soc} for p in soc],
+            "min_soc": low.soc,
+            "min_soc_time": low.t.isoformat(),
+            "max_soc": high.soc,
+            "max_soc_time": high.t.isoformat(),
+            "reliability": self.coordinator.data.reliability.overall,
         }
 
 

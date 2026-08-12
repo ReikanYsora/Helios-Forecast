@@ -8,6 +8,7 @@ mapping is testable on its own.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 from .solar.irradiance import PanelOrientation
@@ -25,6 +26,17 @@ CONF_PRODUCTION_ENTITY = "production_entity"
 # Today-trend reference anchor (local hour at which the day's reference is frozen).
 CONF_TREND_ANCHOR_HOUR = "trend_anchor_hour"
 DEFAULT_TREND_ANCHOR_HOUR = 6
+# Battery state-of-charge projection (optional). The whole feature is off until both the capacity and the
+# live SoC entity are set; the rest carry sensible defaults. Consumption is not configured here: it is derived
+# from the Home Assistant Energy dashboard.
+CONF_BATTERY_CAPACITY_KWH = "battery_capacity_kwh"
+CONF_BATTERY_SOC_ENTITY = "battery_soc_entity"
+CONF_BATTERY_MAX_CHARGE_KW = "battery_max_charge_kw"
+CONF_BATTERY_MAX_DISCHARGE_KW = "battery_max_discharge_kw"
+CONF_BATTERY_MIN_SOC = "battery_min_soc"
+CONF_BATTERY_EFFICIENCY = "battery_efficiency"
+DEFAULT_BATTERY_MIN_SOC = 10.0
+DEFAULT_BATTERY_EFFICIENCY = 90.0
 # Per-array keys.
 CONF_TILT = "tilt"
 CONF_AZIMUTH = "azimuth"
@@ -50,6 +62,12 @@ SETTINGS_KEYS: Tuple[str, ...] = (
     CONF_INVERTER_MAX_KW,
     CONF_PRODUCTION_ENTITY,
     CONF_TREND_ANCHOR_HOUR,
+    CONF_BATTERY_CAPACITY_KWH,
+    CONF_BATTERY_SOC_ENTITY,
+    CONF_BATTERY_MAX_CHARGE_KW,
+    CONF_BATTERY_MAX_DISCHARGE_KW,
+    CONF_BATTERY_MIN_SOC,
+    CONF_BATTERY_EFFICIENCY,
 )
 
 
@@ -155,3 +173,47 @@ def trend_anchor_hour_from_config(data: Dict[str, Any]) -> int:
     if h is None:
         return DEFAULT_TREND_ANCHOR_HOUR
     return int(max(0, min(23, h)))
+
+
+@dataclass(frozen=True)
+class BatteryConfig:
+    """Resolved battery inputs for the SoC projection. Powers are in watts (INF when uncapped), the SoC
+    bounds are fractions 0..1, and efficiency is the round-trip fraction applied on the charging side."""
+
+    capacity_kwh: float
+    soc_entity: str
+    max_charge_w: float
+    max_discharge_w: float
+    min_soc_frac: float
+    efficiency: float
+
+
+def battery_from_config(data: Dict[str, Any]) -> Optional[BatteryConfig]:
+    """Resolve the battery config, or None when the feature is off.
+
+    The projection needs a usable capacity and a live SoC entity to start from; without either the whole
+    feature stays off. The remaining fields fall back to sensible defaults (10% reserve, 90% round-trip).
+    """
+    capacity = _as_float(data.get(CONF_BATTERY_CAPACITY_KWH))
+    soc_entity = data.get(CONF_BATTERY_SOC_ENTITY) or None
+    if capacity is None or capacity <= 0 or not soc_entity:
+        return None
+
+    max_charge_kw = _as_float(data.get(CONF_BATTERY_MAX_CHARGE_KW))
+    max_discharge_kw = _as_float(data.get(CONF_BATTERY_MAX_DISCHARGE_KW))
+    min_soc = _as_float(data.get(CONF_BATTERY_MIN_SOC))
+    efficiency = _as_float(data.get(CONF_BATTERY_EFFICIENCY))
+
+    if min_soc is None:
+        min_soc = DEFAULT_BATTERY_MIN_SOC
+    if efficiency is None:
+        efficiency = DEFAULT_BATTERY_EFFICIENCY
+
+    return BatteryConfig(
+        capacity_kwh=capacity,
+        soc_entity=soc_entity,
+        max_charge_w=max_charge_kw * 1000.0 if (max_charge_kw is not None and max_charge_kw > 0) else INF,
+        max_discharge_w=max_discharge_kw * 1000.0 if (max_discharge_kw is not None and max_discharge_kw > 0) else INF,
+        min_soc_frac=max(0.0, min(1.0, min_soc / 100.0)),
+        efficiency=max(0.1, min(1.0, efficiency / 100.0)),
+    )

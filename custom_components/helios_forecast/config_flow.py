@@ -22,6 +22,12 @@ from homeassistant.helpers import selector
 
 from .config import (
     CONF_AZIMUTH,
+    CONF_BATTERY_CAPACITY_KWH,
+    CONF_BATTERY_EFFICIENCY,
+    CONF_BATTERY_MAX_CHARGE_KW,
+    CONF_BATTERY_MAX_DISCHARGE_KW,
+    CONF_BATTERY_MIN_SOC,
+    CONF_BATTERY_SOC_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
     CONF_LATITUDE,
@@ -31,6 +37,8 @@ from .config import (
     CONF_TILT,
     CONF_TRACKER,
     CONF_TREND_ANCHOR_HOUR,
+    DEFAULT_BATTERY_EFFICIENCY,
+    DEFAULT_BATTERY_MIN_SOC,
     DEFAULT_TREND_ANCHOR_HOUR,
     TRACKER_NONE,
     lines_from_config,
@@ -71,6 +79,13 @@ _TRACKER = selector.SelectSelector(
         translation_key="tracker",
         mode=selector.SelectSelectorMode.DROPDOWN,
     )
+)
+# Battery SoC projection fields. Capacity in kWh, the live SoC entity (a % battery sensor), and the optional
+# limits / efficiency as percentages. Charge / discharge power reuse the kW input.
+_KWH = selector.NumberSelector(selector.NumberSelectorConfig(min=0, step=0.1, mode=_BOX, unit_of_measurement="kWh"))
+_SOC_ENTITY = selector.EntitySelector(selector.EntitySelectorConfig(domain="sensor", device_class="battery"))
+_PERCENT = selector.NumberSelector(
+    selector.NumberSelectorConfig(min=0, max=100, step=1, mode=_BOX, unit_of_measurement="%")
 )
 
 
@@ -135,6 +150,26 @@ def _settings_fields(
     fields[vol.Optional(CONF_TREND_ANCHOR_HOUR, default=s.get(CONF_TREND_ANCHOR_HOUR, DEFAULT_TREND_ANCHOR_HOUR))] = (
         _HOUR
     )
+    # Battery SoC projection (all optional): capacity + the live SoC entity switch the feature on; the rest
+    # keep their defaults when left empty. Consumption is not asked for, it comes from the Energy dashboard.
+    fields[
+        vol.Optional(CONF_BATTERY_CAPACITY_KWH, description={"suggested_value": s.get(CONF_BATTERY_CAPACITY_KWH)})
+    ] = _KWH
+    fields[vol.Optional(CONF_BATTERY_SOC_ENTITY, description={"suggested_value": s.get(CONF_BATTERY_SOC_ENTITY)})] = (
+        _SOC_ENTITY
+    )
+    fields[
+        vol.Optional(CONF_BATTERY_MAX_CHARGE_KW, description={"suggested_value": s.get(CONF_BATTERY_MAX_CHARGE_KW)})
+    ] = _INVERTER
+    fields[
+        vol.Optional(
+            CONF_BATTERY_MAX_DISCHARGE_KW, description={"suggested_value": s.get(CONF_BATTERY_MAX_DISCHARGE_KW)}
+        )
+    ] = _INVERTER
+    fields[vol.Optional(CONF_BATTERY_MIN_SOC, default=s.get(CONF_BATTERY_MIN_SOC, DEFAULT_BATTERY_MIN_SOC))] = _PERCENT
+    fields[
+        vol.Optional(CONF_BATTERY_EFFICIENCY, default=s.get(CONF_BATTERY_EFFICIENCY, DEFAULT_BATTERY_EFFICIENCY))
+    ] = _PERCENT
     return fields
 
 

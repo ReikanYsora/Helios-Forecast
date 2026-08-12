@@ -31,6 +31,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from homeassistant.util import dt as dt_util
 
 from .config import (
+    battery_from_config,
     inverter_max_w_from_config,
     layout_from_config,
     learning_from_config,
@@ -38,6 +39,8 @@ from .config import (
     trend_anchor_hour_from_config,
 )
 from .analog import build_library, enrich_points
+from .battery import BatterySocPoint, project_battery_soc
+from .consumption import build_consumption_profile, consumption_sources
 from .trend import TodayTrend, TrendReference, compute_trend, should_capture
 from .const import DOMAIN
 from .forecast import ForecastPoint, build_forecast_series
@@ -127,6 +130,10 @@ class ForecastData:
     # Today's outlook versus its frozen daily reference (default 06:00), feeds
     # the today-trend sensor.
     trend: TodayTrend
+    # Projected battery state of charge over the next 24 h (15-min points), from the PV forecast
+    # against the learned consumption profile. Empty when the battery feature is off or has no
+    # usable input (no capacity / SoC entity / consumption history). Feeds the SoC sensor + service.
+    battery_soc: List[BatterySocPoint]
 
 
 class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
@@ -276,6 +283,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         )
 
         trend = await self._today_trend(data, now, summary)
+        battery_soc = await self._project_battery_soc(data, points, now)
 
         return ForecastData(
             points=points,
@@ -284,6 +292,72 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             weather_forecast=weather_forecast,
             reliability=reliability,
             trend=trend,
+            battery_soc=battery_soc,
+        )
+
+    async def _project_battery_soc(self, data, points, now) -> List[BatterySocPoint]:
+        """Project the battery SoC over the next 24 h, or [] when the feature can't run.
+
+        Needs three things: the battery config (capacity + live SoC entity), a current SoC reading to
+        start from, and a consumption profile derived from the Energy dashboard's own statistics. Any
+        missing piece leaves the projection off rather than guessing.
+        """
+        battery = battery_from_config(data)
+        if battery is None:
+            return []
+
+        soc_state = self.hass.states.get(battery.soc_entity)
+        if soc_state is None or soc_state.state in ("unknown", "unavailable"):
+            return []
+        try:
+            start_soc_frac = float(soc_state.state) / 100.0
+        except (TypeError, ValueError):
+            return []
+
+        # Home consumption comes from the Energy dashboard: read its configured statistic ids, signed so
+        # they sum to consumption (solar + import - export + discharge - charge).
+        try:
+            from homeassistant.components.energy import async_get_manager
+
+            manager = await async_get_manager(self.hass)
+            prefs = manager.data
+        except Exception as err:  # noqa: BLE001 - the SoC projection is best-effort, the forecast still renders
+            _LOGGER.warning("Helios battery projection: Energy dashboard unavailable, SoC skipped: %s", err)
+            return []
+
+        sources = consumption_sources(prefs)
+        if not sources.signed:
+            _LOGGER.warning(
+                "Helios battery projection: the Energy dashboard has no configured sources, so home "
+                "consumption cannot be derived and the SoC projection stays off"
+            )
+            return []
+
+        learn_start = now - timedelta(days=LEARN_DAYS)
+        ids = list(sources.signed)
+        fetched = await asyncio.gather(
+            *(self._fetch_change_buckets(stat_id, learn_start, now) for stat_id in ids),
+            return_exceptions=True,
+        )
+        buckets_by_id = {
+            stat_id: result for stat_id, result in zip(ids, fetched) if not isinstance(result, BaseException)
+        }
+
+        profile = build_consumption_profile(sources, buckets_by_id, dt_util.DEFAULT_TIME_ZONE)
+        if profile is None:
+            return []
+
+        return await self.hass.async_add_executor_job(
+            partial(
+                project_battery_soc,
+                battery,
+                start_soc_frac,
+                points,
+                profile,
+                now=now,
+                tz=dt_util.DEFAULT_TIME_ZONE,
+                step_minutes=STEP_MINUTES,
+            )
         )
 
     async def _today_trend(self, data, now, summary) -> TodayTrend:

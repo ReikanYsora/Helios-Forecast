@@ -16,7 +16,16 @@
           "inverter_max_kw": "Växelriktarens maxeffekt (kW, valfritt)",
           "production_entity": "Sensor för solelproduktion (för den inlärda korrigeringen)",
           "trend_anchor_hour": "Referenstimme för dagens trend (0-23, standard 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Användbar batterikapacitet (kWh)",
+          "battery_soc_entity": "Sensor för batteriets laddningsnivå (%)",
+          "battery_max_charge_kw": "Max. laddningseffekt för batteri (kW, valfritt)",
+          "battery_max_discharge_kw": "Max. urladdningseffekt för batteri (kW, valfritt)",
+          "battery_min_soc": "Batterireserv — minimal laddningsnivå (%, standard 10)",
+          "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här."
         }
       },
       "line": {
@@ -51,7 +60,16 @@
           "longitude": "Longitud (valfritt)",
           "inverter_max_kw": "Växelriktarens maxeffekt (kW, valfritt)",
           "production_entity": "Sensor för solelproduktion (för den inlärda korrigeringen)",
-          "trend_anchor_hour": "Referenstimme för dagens trend (0-23, standard 6)"
+          "trend_anchor_hour": "Referenstimme för dagens trend (0-23, standard 6)",
+          "battery_capacity_kwh": "Användbar batterikapacitet (kWh)",
+          "battery_soc_entity": "Sensor för batteriets laddningsnivå (%)",
+          "battery_max_charge_kw": "Max. laddningseffekt för batteri (kW, valfritt)",
+          "battery_max_discharge_kw": "Max. urladdningseffekt för batteri (kW, valfritt)",
+          "battery_min_soc": "Batterireserv — minimal laddningsnivå (%, standard 10)",
+          "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här."
         }
       },
       "lines": {
@@ -83,6 +101,16 @@
     "get_forecast": {
       "name": "Hämta prognos",
       "description": "Returnerar hela produktionsprognosen (från idag och framåt, en punkt var 15:e minut, var och en med de förutsagda watten och P10/P90-konfidensbandet) som svarsdata för användning i automationer.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installation",
+          "description": "Vilken Helios Forecast-installation som ska läsas. Valfritt när endast en är konfigurerad."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Hämta laddningsnivåprognos",
+      "description": "Returnerar batteriets förväntade laddningsnivå för de kommande 24 timmarna (en punkt var 15:e minut) som svarsdata för användning i automationer.",
       "fields": {
         "config_entry_id": {
           "name": "Installation",

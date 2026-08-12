@@ -5,6 +5,9 @@
     "@ReikanYsora"
   ],
   "config_flow": true,
+  "after_dependencies": [
+    "energy"
+  ],
   "dependencies": [
     "recorder",
     "websocket_api"

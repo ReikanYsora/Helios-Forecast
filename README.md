@@ -134,6 +134,52 @@ With more than one installation, pass `config_entry_id` (from **Settings** >
 
 ---
 
+## Predicted battery state of charge
+
+If you have a battery, Helios Forecast can project its **state of charge over the
+next 24 hours**. It runs the production forecast against your home's own
+consumption, which it derives from your **Home Assistant Energy dashboard** (no
+extra sensor to wire), and integrates the battery's charge from your current SoC.
+
+Turn it on in the integration settings by filling in your **battery capacity** and
+your **state-of-charge sensor**; the reserve, efficiency and charge/discharge
+limits are optional. A **Predicted battery state of charge** sensor then appears,
+carrying the full curve as its `forecast` attribute (plus the day's projected low
+and high, and the forecast reliability so you know how far to trust it).
+
+It predicts, it never commands. Sending the charge order stays with your own
+automation, which knows your inverter — Helios just tells it what's coming:
+
+```yaml
+# Top the battery up from the grid tonight only if it's predicted to run low
+- action: helios_forecast.get_battery_soc_forecast
+  response_variable: soc
+- variables:
+    lowest: "{{ soc.forecast | map(attribute='soc') | map('float') | min }}"
+- condition: template
+  value_template: "{{ lowest < 20 }}"
+- action: switch.turn_on
+  target:
+    entity_id: switch.force_battery_charge
+```
+
+The response:
+
+```yaml
+forecast:
+  - datetime: "2026-09-12T14:00:00+02:00"
+    soc: 78.4
+  - datetime: "2026-09-12T14:15:00+02:00"
+    soc: 80.1
+  # ... one point every 15 minutes, 24 hours ahead
+```
+
+One honest note: home consumption is a **learned average**, so the projection is a
+good steer, not a guarantee — read it alongside the reliability figure, and it gets
+better as it sees more of your history.
+
+---
+
 ## How it learns
 
 It starts from physics: Open-Meteo irradiance, global tilted irradiance per panel

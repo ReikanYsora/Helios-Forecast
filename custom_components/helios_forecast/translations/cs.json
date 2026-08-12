@@ -16,7 +16,16 @@
           "inverter_max_kw": "Maximální výkon střídače (kW, volitelné)",
           "production_entity": "Senzor výroby FV (pro naučenou korekci)",
           "trend_anchor_hour": "Referenční hodina denního trendu (0-23, výchozí 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Využitelná kapacita baterie (kWh)",
+          "battery_soc_entity": "Senzor stavu nabití baterie (%)",
+          "battery_max_charge_kw": "Max. nabíjecí výkon baterie (kW, volitelné)",
+          "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
+          "battery_min_soc": "Rezerva baterie — minimální stav nabití (%, výchozí 10)",
+          "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor."
         }
       },
       "line": {
@@ -51,7 +60,16 @@
           "longitude": "Zeměpisná délka (volitelné)",
           "inverter_max_kw": "Maximální výkon střídače (kW, volitelné)",
           "production_entity": "Senzor výroby FV (pro naučenou korekci)",
-          "trend_anchor_hour": "Referenční hodina denního trendu (0-23, výchozí 6)"
+          "trend_anchor_hour": "Referenční hodina denního trendu (0-23, výchozí 6)",
+          "battery_capacity_kwh": "Využitelná kapacita baterie (kWh)",
+          "battery_soc_entity": "Senzor stavu nabití baterie (%)",
+          "battery_max_charge_kw": "Max. nabíjecí výkon baterie (kW, volitelné)",
+          "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
+          "battery_min_soc": "Rezerva baterie — minimální stav nabití (%, výchozí 10)",
+          "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor."
         }
       },
       "lines": {
@@ -83,6 +101,16 @@
     "get_forecast": {
       "name": "Získat předpověď",
       "description": "Vrátí úplnou předpověď výroby (ode dneška dál, jeden bod každých 15 minut, každý s předpokládanými watty a intervalem spolehlivosti P10/P90) jako data odpovědi pro použití v automatizacích.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Instalace",
+          "description": "Kterou instalaci Helios Forecast načíst. Nepovinné, když je nakonfigurována jen jedna."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Získat předpověď stavu nabití",
+      "description": "Vrátí předpokládaný stav nabití baterie na příštích 24 hodin (jeden bod každých 15 minut) jako data odpovědi pro použití v automatizacích.",
       "fields": {
         "config_entry_id": {
           "name": "Instalace",

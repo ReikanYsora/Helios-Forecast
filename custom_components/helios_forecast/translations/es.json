@@ -16,7 +16,16 @@
           "inverter_max_kw": "Potencia máxima del inversor (kW, opcional)",
           "production_entity": "Sensor de producción fotovoltaica (para la corrección aprendida)",
           "trend_anchor_hour": "Hora de referencia para la tendencia de hoy (0-23, predeterminado 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Capacidad útil de la batería (kWh)",
+          "battery_soc_entity": "Sensor de estado de carga de la batería (%)",
+          "battery_max_charge_kw": "Potencia máx. de carga de la batería (kW, opcional)",
+          "battery_max_discharge_kw": "Potencia máx. de descarga de la batería (kW, opcional)",
+          "battery_min_soc": "Reserva de la batería — estado de carga mínimo (%, predeterminado 10)",
+          "battery_efficiency": "Eficiencia de ciclo completo de la batería (%, predeterminado 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Rellena la capacidad y este sensor para activar la proyección del estado de carga. El consumo del hogar se toma de tu panel de Energía, aquí no hace falta ningún sensor."
         }
       },
       "line": {
@@ -51,7 +60,16 @@
           "longitude": "Longitud (opcional)",
           "inverter_max_kw": "Potencia máxima del inversor (kW, opcional)",
           "production_entity": "Sensor de producción fotovoltaica (para la corrección aprendida)",
-          "trend_anchor_hour": "Hora de referencia para la tendencia de hoy (0-23, predeterminado 6)"
+          "trend_anchor_hour": "Hora de referencia para la tendencia de hoy (0-23, predeterminado 6)",
+          "battery_capacity_kwh": "Capacidad útil de la batería (kWh)",
+          "battery_soc_entity": "Sensor de estado de carga de la batería (%)",
+          "battery_max_charge_kw": "Potencia máx. de carga de la batería (kW, opcional)",
+          "battery_max_discharge_kw": "Potencia máx. de descarga de la batería (kW, opcional)",
+          "battery_min_soc": "Reserva de la batería — estado de carga mínimo (%, predeterminado 10)",
+          "battery_efficiency": "Eficiencia de ciclo completo de la batería (%, predeterminado 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Rellena la capacidad y este sensor para activar la proyección del estado de carga. El consumo del hogar se toma de tu panel de Energía, aquí no hace falta ningún sensor."
         }
       },
       "lines": {
@@ -83,6 +101,16 @@
     "get_forecast": {
       "name": "Obtener previsión",
       "description": "Devuelve la previsión de producción completa (desde hoy en adelante, un punto cada 15 minutos, cada uno con los vatios previstos y la banda de confianza P10/P90) como datos de respuesta, para usar en automatizaciones.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Instalación",
+          "description": "Qué instalación de Helios Forecast leer. Opcional cuando solo hay una configurada."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Obtener previsión de estado de carga",
+      "description": "Devuelve el estado de carga proyectado de la batería para las próximas 24 horas (un punto cada 15 minutos) como datos de respuesta, para usar en automatizaciones.",
       "fields": {
         "config_entry_id": {
           "name": "Instalación",

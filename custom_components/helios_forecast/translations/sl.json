@@ -16,7 +16,16 @@
           "inverter_max_kw": "Najv. izhodna moč razsmernika (kW, neobvezno)",
           "production_entity": "Senzor proizvodnje PV (za naučeni popravek)",
           "trend_anchor_hour": "Referenčna ura za današnji trend (0-23, privzeto 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Uporabna zmogljivost baterije (kWh)",
+          "battery_soc_entity": "Senzor stanja napolnjenosti baterije (%)",
+          "battery_max_charge_kw": "Najv. moč polnjenja baterije (kW, izbirno)",
+          "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
+          "battery_min_soc": "Rezerva baterije — najmanjše stanje napolnjenosti (%, privzeto 10)",
+          "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben."
         }
       },
       "line": {
@@ -51,7 +60,16 @@
           "longitude": "Zemljepisna dolžina (neobvezno)",
           "inverter_max_kw": "Najv. izhodna moč razsmernika (kW, neobvezno)",
           "production_entity": "Senzor proizvodnje PV (za naučeni popravek)",
-          "trend_anchor_hour": "Referenčna ura za današnji trend (0-23, privzeto 6)"
+          "trend_anchor_hour": "Referenčna ura za današnji trend (0-23, privzeto 6)",
+          "battery_capacity_kwh": "Uporabna zmogljivost baterije (kWh)",
+          "battery_soc_entity": "Senzor stanja napolnjenosti baterije (%)",
+          "battery_max_charge_kw": "Najv. moč polnjenja baterije (kW, izbirno)",
+          "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
+          "battery_min_soc": "Rezerva baterije — najmanjše stanje napolnjenosti (%, privzeto 10)",
+          "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben."
         }
       },
       "lines": {
@@ -83,6 +101,16 @@
     "get_forecast": {
       "name": "Pridobi napoved",
       "description": "Vrne celotno napoved proizvodnje (od danes naprej, ena točka vsakih 15 minut, vsaka z napovedanimi vati in intervalom zaupanja P10/P90) kot podatke odgovora za uporabo v avtomatizacijah.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Namestitev",
+          "description": "Katero namestitev Helios Forecast prebrati. Neobvezno, kadar je konfigurirana samo ena."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Pridobi napoved stanja napolnjenosti",
+      "description": "Vrne predvideno stanje napolnjenosti baterije za naslednjih 24 ur (ena točka vsakih 15 minut) kot podatke odgovora za uporabo v avtomatizacijah.",
       "fields": {
         "config_entry_id": {
           "name": "Namestitev",

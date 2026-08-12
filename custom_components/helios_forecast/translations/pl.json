@@ -16,7 +16,16 @@
           "inverter_max_kw": "Maksymalna moc falownika (kW, opcjonalnie)",
           "production_entity": "Czujnik produkcji PV (do uczonej korekcji)",
           "trend_anchor_hour": "Godzina odniesienia trendu dziennego (0-23, domyślnie 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Pojemność użytkowa akumulatora (kWh)",
+          "battery_soc_entity": "Czujnik stanu naładowania akumulatora (%)",
+          "battery_max_charge_kw": "Maks. moc ładowania akumulatora (kW, opcjonalnie)",
+          "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
+          "battery_min_soc": "Rezerwa akumulatora — minimalny stan naładowania (%, domyślnie 10)",
+          "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik."
         }
       },
       "line": {
@@ -51,7 +60,16 @@
           "longitude": "Długość geograficzna (opcjonalnie)",
           "inverter_max_kw": "Maksymalna moc falownika (kW, opcjonalnie)",
           "production_entity": "Czujnik produkcji PV (do uczonej korekcji)",
-          "trend_anchor_hour": "Godzina odniesienia trendu dziennego (0-23, domyślnie 6)"
+          "trend_anchor_hour": "Godzina odniesienia trendu dziennego (0-23, domyślnie 6)",
+          "battery_capacity_kwh": "Pojemność użytkowa akumulatora (kWh)",
+          "battery_soc_entity": "Czujnik stanu naładowania akumulatora (%)",
+          "battery_max_charge_kw": "Maks. moc ładowania akumulatora (kW, opcjonalnie)",
+          "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
+          "battery_min_soc": "Rezerwa akumulatora — minimalny stan naładowania (%, domyślnie 10)",
+          "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik."
         }
       },
       "lines": {
@@ -83,6 +101,16 @@
     "get_forecast": {
       "name": "Pobierz prognozę",
       "description": "Zwraca pełną prognozę produkcji (od dziś, jeden punkt co 15 minut, każdy z przewidywanymi watami i przedziałem ufności P10/P90) jako dane odpowiedzi do użycia w automatyzacjach.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Instalacja",
+          "description": "Którą instalację Helios Forecast odczytać. Opcjonalne, gdy skonfigurowana jest tylko jedna."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Pobierz prognozę stanu naładowania",
+      "description": "Zwraca prognozowany stan naładowania akumulatora na następne 24 godziny (jeden punkt co 15 minut) jako dane odpowiedzi do użycia w automatyzacjach.",
       "fields": {
         "config_entry_id": {
           "name": "Instalacja",

@@ -16,7 +16,16 @@
           "inverter_max_kw": "Maximale Wechselrichter-Leistung (kW, optional)",
           "production_entity": "PV-Erzeugungssensor (für die gelernte Korrektur)",
           "trend_anchor_hour": "Referenzstunde für den Tagestrend (0-23, Standard 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Nutzbare Batteriekapazität (kWh)",
+          "battery_soc_entity": "Batterieladezustand-Sensor (%)",
+          "battery_max_charge_kw": "Max. Ladeleistung der Batterie (kW, optional)",
+          "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
+          "battery_min_soc": "Batteriereserve — minimaler Ladezustand (%, Standard 10)",
+          "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig."
         }
       },
       "line": {
@@ -51,7 +60,16 @@
           "longitude": "Längengrad (optional)",
           "inverter_max_kw": "Maximale Wechselrichter-Leistung (kW, optional)",
           "production_entity": "PV-Erzeugungssensor (für die gelernte Korrektur)",
-          "trend_anchor_hour": "Referenzstunde für den Tagestrend (0-23, Standard 6)"
+          "trend_anchor_hour": "Referenzstunde für den Tagestrend (0-23, Standard 6)",
+          "battery_capacity_kwh": "Nutzbare Batteriekapazität (kWh)",
+          "battery_soc_entity": "Batterieladezustand-Sensor (%)",
+          "battery_max_charge_kw": "Max. Ladeleistung der Batterie (kW, optional)",
+          "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
+          "battery_min_soc": "Batteriereserve — minimaler Ladezustand (%, Standard 10)",
+          "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig."
         }
       },
       "lines": {
@@ -83,6 +101,16 @@
     "get_forecast": {
       "name": "Prognose abrufen",
       "description": "Gibt die vollständige Produktionsprognose (ab heute, ein Punkt alle 15 Minuten, jeder mit den prognostizierten Watt und dem P10/P90-Konfidenzband) als Antwortdaten zur Verwendung in Automatisierungen zurück.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installation",
+          "description": "Welche Helios-Forecast-Installation gelesen werden soll. Optional, wenn nur eine konfiguriert ist."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Ladezustandsprognose abrufen",
+      "description": "Gibt den prognostizierten Batterieladezustand für die nächsten 24 Stunden (ein Punkt alle 15 Minuten) als Antwortdaten zur Verwendung in Automatisierungen zurück.",
       "fields": {
         "config_entry_id": {
           "name": "Installation",
