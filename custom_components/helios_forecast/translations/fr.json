@@ -84,5 +84,17 @@
         "single-axis-v": "Un axe vertical (l'azimut suit)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Obtenir la prévision",
+      "description": "Renvoie la prévision de production complète (à partir d'aujourd'hui, un point toutes les 15 minutes, chacun avec les watts prédits et la bande de confiance P10/P90) sous forme de données de réponse, pour les automatisations.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installation",
+          "description": "Quelle installation Helios Forecast lire. Facultatif s'il n'y en a qu'une de configurée."
+        }
+      }
+    }
   }
 }

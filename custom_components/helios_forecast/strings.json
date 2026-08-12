@@ -84,5 +84,17 @@
         "single-axis-v": "Single-axis vertical (azimuth follows)"
       }
     }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Get forecast",
+      "description": "Returns the full production forecast (today onward, one point per 15 minutes, each with the predicted watts and the P10/P90 confidence band) as response data, for use in automations.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installation",
+          "description": "Which Helios Forecast installation to read. Optional when only one is configured."
+        }
+      }
+    }
   }
 }

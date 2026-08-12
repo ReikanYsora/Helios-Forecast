@@ -74,6 +74,66 @@ Every entity is listed on the [website](https://helios-ha.org/helios-forecast/).
 
 ---
 
+## The full forecast, in your automations
+
+Helios Forecast computes the **whole production curve**, not just the current
+value: one point every 15 minutes, from midnight today through the seven-day
+horizon, each with the predicted watts and its **P10/P90 confidence band**. An
+Energy Management System can read it to shift battery charging into the expected
+peak, work out how much sun is still to come, or find the latest safe charging
+start.
+
+**As a service (recommended).** `helios_forecast.get_forecast` returns the curve
+as response data, on demand:
+
+```yaml
+# How much PV energy is still forecast for the rest of today
+script:
+  sun_left_today:
+    sequence:
+      - action: helios_forecast.get_forecast
+        response_variable: helios
+      - variables:
+          remaining_kwh: >
+            {{ (helios.forecast
+                 | selectattr('datetime', 'match', now().strftime('%Y-%m-%d'))
+                 | selectattr('datetime', 'ge', now().isoformat())
+                 | map(attribute='watts') | map('float') | sum
+                 * 0.25 / 1000) | round(1) }}
+      - action: persistent_notification.create
+        data:
+          title: Solar forecast
+          message: "About {{ remaining_kwh }} kWh of sun still to come today."
+```
+
+The response is a list of buckets (`p10` / `p90` are `null` until the forecast has
+learned enough of your history to publish a band):
+
+```yaml
+forecast:
+  - datetime: "2026-09-12T14:00:00+02:00"
+    watts: 3120.4
+    p10: 2610.0
+    p90: 3450.8
+  - datetime: "2026-09-12T14:15:00+02:00"
+    watts: 3038.1
+    p10: 2550.2
+    p90: 3380.5
+  # ... one point every 15 minutes
+```
+
+With more than one installation, pass `config_entry_id` (from **Settings** >
+**Devices and services**) to choose which one to read.
+
+**As an attribute.** The same curve rides on the `power_now` sensor as its
+`forecast` attribute, handy in a template sensor:
+
+```jinja
+{{ state_attr('sensor.helios_forecast_power_now', 'forecast') }}
+```
+
+---
+
 ## How it learns
 
 It starts from physics: Open-Meteo irradiance, global tilted irradiance per panel

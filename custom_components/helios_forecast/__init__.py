@@ -33,7 +33,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     from homeassistant.const import Platform
     from homeassistant.helpers import issue_registry as ir
 
-    from . import websocket
+    from . import services, websocket
     from .coordinator import HeliosForecastCoordinator
 
     # Several panel lines in one entry are supported again (they share one production
@@ -64,6 +64,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     entry.async_on_unload(entry.add_update_listener(_async_reload_entry))
     websocket.async_register(hass)
+    services.async_register_services(hass)
     return True
 
 
