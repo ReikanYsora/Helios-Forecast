@@ -1,13 +1,13 @@
 {
   "domain": "helios_forecast",
   "name": "Helios Forecast",
+  "after_dependencies": [
+    "energy"
+  ],
   "codeowners": [
     "@ReikanYsora"
   ],
   "config_flow": true,
-  "after_dependencies": [
-    "energy"
-  ],
   "dependencies": [
     "recorder",
     "websocket_api"
@@ -17,5 +17,5 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/ReikanYsora/Helios-Forecast/issues",
   "requirements": [],
-  "version": "2026.9.0-b0"
+  "version": "2026.9.0-a0"
 }

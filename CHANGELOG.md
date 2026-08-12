@@ -5,6 +5,49 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.9.0
+
+A release about putting the forecast to work: the full curve now reaches your
+automations, and a battery can be projected forward. Currently in beta
+(`2026.9.0-a0`).
+
+### Added: the full forecast, in your automations
+
+The integration already computes the whole production curve, not just the current
+value. It's now available to automations two ways: a **`helios_forecast.get_forecast`
+service** that returns the remaining curve on demand (15-minute points, each with
+the predicted watts and the P10/P90 confidence band), and the same curve as a
+`forecast` attribute on the `power_now` sensor. An energy management system can
+read it to shift battery charging into the expected peak, work out how much sun is
+still to come, or find the latest safe charging start. Thanks to the detailed
+write-up on #35.
+
+### Added: a predicted battery state of charge
+
+If you have a battery, Helios Forecast can now project its **state of charge over
+the next 24 hours**. It runs the production forecast against your home's own
+consumption — derived straight from your **Home Assistant Energy dashboard**, so
+there's no extra sensor to wire — and integrates the battery's charge from your
+current level, within your capacity, reserve and charge/discharge limits. Turn it
+on by filling in your battery capacity and state-of-charge sensor in the
+integration settings; a **Predicted battery state of charge** sensor then appears,
+carrying the full curve, the day's projected low and high, and the forecast
+reliability. There's also a `helios_forecast.get_battery_soc_forecast` service.
+
+It predicts, it never commands: sending the charge order stays with your own
+automation, which knows your inverter. And because home consumption is a learned
+average, it's an honest steer read alongside the reliability figure, not a
+guarantee. Thanks to @brunnwart and @jasonyates for the design brief (#25).
+
+### Fixed: ready for a future Home Assistant statistics change
+
+A coming Home Assistant version tightens what the long-term statistics import
+expects; the integration now declares the new fields up front, so the archived
+weather and predicted-production history keep importing cleanly across the change.
+No user action needed. Thanks to @FoxP for pointing out the breakage radar (#38).
+
+---
+
 ## 2026.8.3
 
 A performance and reliability release on top of 2026.8.2.

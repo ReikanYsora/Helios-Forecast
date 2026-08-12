@@ -54,7 +54,7 @@ jobs:
       - run: |
           python - <<'PY'
           import importlib
-          mods = ["__init__", "coordinator", "sensor", "energy", "websocket", "config_flow", "config", "summary"]
+          mods = ["__init__", "coordinator", "sensor", "energy", "websocket", "config_flow", "config", "summary", "services", "battery", "consumption"]
           for m in mods:
               importlib.import_module(f"custom_components.helios_forecast.{m}")
           print("imports ok:", ", ".join(mods))

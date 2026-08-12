@@ -10,6 +10,16 @@
 >
 > Revision (2026-07-24): a panel line can carry an optional **per-line inverter cap**
 > in addition to the entry-level cap (section 5). Output surfaces are unchanged.
+>
+> Revision (2026-08-12): automation-facing additions that do **not** change the
+> card interface (§1-§4 unchanged). (a) The full forecast series is now also
+> available to automations — a `helios_forecast.get_forecast` service and a
+> `forecast` attribute on `power_now` (§2) — in addition to the card's WebSocket
+> series (§3). (b) An optional **battery state-of-charge projection** adds a
+> `predicted_battery_soc` sensor and a `helios_forecast.get_battery_soc_forecast`
+> service (§2), driven by a new battery config block (§5). The projection reads a
+> live SoC sensor as its starting point; this is a **projection-only input** and
+> does NOT feed the learning, which still takes no SoC input (§5).
 
 The integration owns one **config entry per panel line** (a group of co-oriented
 panels). Add it once per line. Every surface below is scoped to that entry, so
@@ -113,7 +123,25 @@ Forecast quality:
 |---|---|---|
 | `sensor.helios_forecast_reliability` | forecast reliability, **0..100 %** | `state_class: measurement`. Blends learning maturity, recent predicted-vs-actual skill and today's cloud predictability. Attributes: `data_maturity`, `recent_skill`, `today_predictability`, `days_learned`, and a per-horizon-day `per_day` list (chart-style, kept off the recorder). |
 
-All values are residual-corrected. A raw (pre-correction) variant is not exposed
+Battery state of charge (2026.9.0, only when the battery block in §5 is configured):
+
+| Entity | State | Notes |
+|---|---|---|
+| `sensor.helios_forecast_predicted_battery_soc` | near-term projected SoC, **0..100 %** | `device_class: battery`, `state_class: measurement`. The whole 24 h curve rides as a `forecast` attribute (`[{datetime, soc}]`, kept off the recorder), with the day's `min_soc` / `max_soc` (+ times) and the forecast `reliability`. Created only when the battery feature is on. |
+
+The forecast curve and the SoC curve are also exposed as **response services** for
+automations (the recommended path over scraping an attribute):
+
+| Service | Returns |
+|---|---|
+| `helios_forecast.get_forecast` | `{ forecast: [{datetime, watts, p10, p90}] }` — the production curve, today onward |
+| `helios_forecast.get_battery_soc_forecast` | `{ forecast: [{datetime, soc}] }` — the projected SoC, next 24 h |
+
+Both take an optional `config_entry_id` (needed only with several installations).
+The SoC projection **predicts, it never commands**: it exposes the curve and leaves
+the charge decision to the user's own automation.
+
+All PV values are residual-corrected. A raw (pre-correction) variant is not exposed
 as entities to keep the set clean; the raw curve stays available to the card via
 the detail series in §3.
 
@@ -190,6 +218,15 @@ a list.
   revision that dropped the SoC guard).
 - Today-trend reference hour: the local hour at which today's outlook reference
   is frozen.
+- **Battery SoC projection (2026.9.0, optional).** A separate block, off unless
+  both the usable **capacity (kWh)** and a live **state-of-charge sensor (%)** are
+  set; the reserve (min SoC %), round-trip efficiency (%) and charge / discharge
+  power caps (kW) are optional. This SoC sensor is the projection's starting point
+  only — it is **not** a learning input and does not reintroduce the SoC guard the
+  2026-06-12 revision removed. Home consumption for the projection is **not**
+  configured here: it is derived from the Home Assistant Energy dashboard
+  (solar + grid import − export + battery discharge − charge), averaged into a
+  per-weekday-hour profile from recorder history.
 
 ---
 

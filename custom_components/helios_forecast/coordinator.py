@@ -40,7 +40,7 @@ from .config import (
 )
 from .analog import build_library, enrich_points
 from .battery import BatterySocPoint, project_battery_soc
-from .consumption import build_consumption_profile, consumption_sources
+from .consumption import ConsumptionProfile, build_consumption_profile, consumption_sources
 from .trend import TodayTrend, TrendReference, compute_trend, should_capture
 from .const import DOMAIN
 from .forecast import ForecastPoint, build_forecast_series
@@ -160,6 +160,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # The UTC hour up to which the weather statistics have been written. A refresh then imports only
         # the new hours; the full 60-day backfill (self-heal) runs once at startup.
         self._last_weather_stat_hour: Optional[datetime] = None
+        # Home consumption profile for the battery SoC projection, rebuilt at most once an hour. Its
+        # multi-sensor 60-day recorder fetch is the expensive part, so it runs on the same hourly cadence
+        # as the prediction archive rather than on every 30-minute refresh (the 2026.8.3 CPU/network
+        # lesson); a 60-day average barely moves within an hour. Reused in between.
+        self._consumption_profile: Optional[ConsumptionProfile] = None
+        self._last_consumption_hour: Optional[datetime] = None
         # Production history (recorder change buckets) from the most recent refresh, kept so the
         # reliability index can reuse it without a second recorder fetch.
         self._production_buckets: List[ProductionBucket] = []
@@ -299,8 +305,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         """Project the battery SoC over the next 24 h, or [] when the feature can't run.
 
         Needs three things: the battery config (capacity + live SoC entity), a current SoC reading to
-        start from, and a consumption profile derived from the Energy dashboard's own statistics. Any
-        missing piece leaves the projection off rather than guessing.
+        start from, and a consumption profile derived from the Energy dashboard. Any missing piece
+        leaves the projection off rather than guessing.
         """
         battery = battery_from_config(data)
         if battery is None:
@@ -314,36 +320,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         except (TypeError, ValueError):
             return []
 
-        # Home consumption comes from the Energy dashboard: read its configured statistic ids, signed so
-        # they sum to consumption (solar + import - export + discharge - charge).
-        try:
-            from homeassistant.components.energy import async_get_manager
-
-            manager = await async_get_manager(self.hass)
-            prefs = manager.data
-        except Exception as err:  # noqa: BLE001 - the SoC projection is best-effort, the forecast still renders
-            _LOGGER.warning("Helios battery projection: Energy dashboard unavailable, SoC skipped: %s", err)
-            return []
-
-        sources = consumption_sources(prefs)
-        if not sources.signed:
-            _LOGGER.warning(
-                "Helios battery projection: the Energy dashboard has no configured sources, so home "
-                "consumption cannot be derived and the SoC projection stays off"
-            )
-            return []
-
-        learn_start = now - timedelta(days=LEARN_DAYS)
-        ids = list(sources.signed)
-        fetched = await asyncio.gather(
-            *(self._fetch_change_buckets(stat_id, learn_start, now) for stat_id in ids),
-            return_exceptions=True,
-        )
-        buckets_by_id = {
-            stat_id: result for stat_id, result in zip(ids, fetched) if not isinstance(result, BaseException)
-        }
-
-        profile = build_consumption_profile(sources, buckets_by_id, dt_util.DEFAULT_TIME_ZONE)
+        profile = await self._consumption_profile_for(now)
         if profile is None:
             return []
 
@@ -359,6 +336,52 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 step_minutes=STEP_MINUTES,
             )
         )
+
+    async def _consumption_profile_for(self, now) -> Optional[ConsumptionProfile]:
+        """Home consumption profile from the Energy dashboard, rebuilt at most once an hour.
+
+        The multi-sensor 60-day recorder fetch is the expensive part, so it runs on the archive's hourly
+        cadence rather than on every 30-minute refresh; a 60-day average is stable within the hour, and
+        the cached profile is reused in between. A transient Energy-dashboard problem keeps the last-good
+        profile instead of dropping the projection. Consumption is signed so the ids sum to it: solar +
+        grid import - export + battery discharge - charge.
+        """
+        this_hour = now.replace(minute=0, second=0, microsecond=0)
+        if self._consumption_profile is not None and self._last_consumption_hour == this_hour:
+            return self._consumption_profile
+
+        try:
+            from homeassistant.components.energy import async_get_manager
+
+            manager = await async_get_manager(self.hass)
+            prefs = manager.data
+        except Exception as err:  # noqa: BLE001 - the SoC projection is best-effort, the forecast still renders
+            _LOGGER.warning("Helios battery projection: Energy dashboard unavailable, SoC skipped: %s", err)
+            return self._consumption_profile
+
+        sources = consumption_sources(prefs)
+        if not sources.signed:
+            _LOGGER.warning(
+                "Helios battery projection: the Energy dashboard has no configured sources, so home "
+                "consumption cannot be derived and the SoC projection stays off"
+            )
+            return self._consumption_profile
+
+        learn_start = now - timedelta(days=LEARN_DAYS)
+        ids = list(sources.signed)
+        fetched = await asyncio.gather(
+            *(self._fetch_change_buckets(stat_id, learn_start, now) for stat_id in ids),
+            return_exceptions=True,
+        )
+        buckets_by_id = {
+            stat_id: result for stat_id, result in zip(ids, fetched) if not isinstance(result, BaseException)
+        }
+
+        profile = build_consumption_profile(sources, buckets_by_id, dt_util.DEFAULT_TIME_ZONE)
+        if profile is not None:
+            self._consumption_profile = profile
+            self._last_consumption_hour = this_hour
+        return self._consumption_profile
 
     async def _today_trend(self, data, now, summary) -> TodayTrend:
         """Today's predicted total versus its frozen daily reference (default 06:00).
