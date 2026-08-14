@@ -1,23 +1,24 @@
 """Open-Meteo client.
 
-Thin transport, faithful to the card's own requests so the forecast is fed the
-exact same data. Two endpoints on ``/v1/forecast``:
+Thin transport, matching the card's own weather request so the forecast is fed
+the same data. Two endpoints on ``/v1/forecast``:
 
-  - weather: hourly ``cloud_cover, shortwave_radiation, direct_radiation,
-    diffuse_radiation, temperature_2m, wind_speed_10m, snow_depth``. The values
-    come from best_match (the model the Open-Meteo app shows, and the one the GTI
-    already uses), so what we display and what we compute agree with the app the
-    user checks against. A second, best-effort call over the model ensemble adds
-    only the cross-model cloud spread, kept as a forecast-uncertainty signal (#22).
-  - GTI: hourly ``global_tilted_irradiance_instant`` for one tilt + azimuth
-    (ported from gti.ts). Open-Meteo accepts a single orientation per request,
-    so a multi-orientation install needs one GET per distinct orientation.
+  - weather: hourly cloud layers (``cloud_cover_low/mid/high``, fused into one
+    weighted cover), ``shortwave_radiation_instant``, ``direct_radiation_instant``,
+    ``diffuse_radiation_instant``, ``temperature_2m``, ``wind_speed_10m``,
+    ``snow_depth``. Values are the per-hour median across
+    ``pick_models_for_location`` (a regional high-resolution model paired with a
+    global one), the same selection the card uses. A second, best-effort call
+    over a wider model ensemble adds only the cross-model cloud spread, a
+    forecast-uncertainty signal.
+  - GTI: hourly ``global_tilted_irradiance_instant`` for one tilt + azimuth.
+    Open-Meteo accepts a single orientation per request, so a multi-orientation
+    install needs one GET per distinct orientation.
 
-No unit parameters are sent, exactly like the card, so Open-Meteo returns its
-defaults (W/m2 for irradiance, degC, snow depth in metres) and the model
-interprets the arrays the same way the card does. URL construction and parsing
-are pure functions so they can be tested without a network or aiohttp; the async
-fetchers take a caller-provided session (HA's shared aiohttp client).
+No unit parameters are sent, so Open-Meteo returns its defaults (W/m2 for
+irradiance, degC, snow depth in metres). URL construction and parsing are pure
+functions, testable without a network or aiohttp; the async fetchers take a
+caller-provided session (HA's shared aiohttp client).
 """
 
 from __future__ import annotations
@@ -46,15 +47,18 @@ _RETRY_DELAY_S = 2.0
 _REQUEST_TIMEOUT_S = 30
 
 WEATHER_HOURLY = (
-    "cloud_cover,shortwave_radiation,direct_radiation,diffuse_radiation,temperature_2m,wind_speed_10m,snow_depth"
+    "cloud_cover_low,cloud_cover_mid,cloud_cover_high,"
+    "shortwave_radiation_instant,direct_radiation_instant,diffuse_radiation_instant,"
+    "temperature_2m,wind_speed_10m,snow_depth"
 )
+# The ensemble spread call needs only the aggregate cover to measure model disagreement.
+WEATHER_SPREAD_HOURLY = "cloud_cover"
 GTI_HOURLY = "global_tilted_irradiance_instant"
 
-# Multi-model ensemble, used only for the cross-model cloud spread (a forecast-uncertainty signal).
-# The weather VALUES come from best_match; this ensemble call runs alongside it and we read the
-# per-hour disagreement across these models. Open-Meteo returns each variable once per model (key
-# suffixed with the model name). A broad, global-ish set: models that do not cover the location
-# return nulls and simply drop out of the spread.
+# Wider ensemble, used only for the cross-model cloud spread (a forecast-uncertainty signal). The
+# weather VALUES come from pick_models_for_location; this call runs alongside and we read the per-hour
+# disagreement across these models. Open-Meteo suffixes each variable key with the model name. A broad,
+# global-ish set: models that do not cover the location return nulls and drop out of the spread.
 WEATHER_MODELS = (
     "ecmwf_ifs025",
     "gfs_seamless",
@@ -64,14 +68,41 @@ WEATHER_MODELS = (
 )
 
 
+# Regional high-resolution model (paired with a global one for the median) per area, mirroring the
+# card's pick_models_for_location at 'high' precision (the card's only mode). Anywhere uncovered
+# falls back to two independent global models, whose median beats either alone.
+def pick_models_for_location(lat: float, lon: float) -> list[str]:
+    """Model set for the weather request, matching the card's picker."""
+    GLOBAL = "ecmwf_ifs025"
+    if 41.3 <= lat <= 51.2 and -5.5 <= lon <= 8.5:       # France + Corsica (AROME 1.3 km)
+        return ["meteofrance_seamless", GLOBAL]
+    if 49.5 <= lat <= 61.0 and -10.5 <= lon <= 2.0:      # UK & Ireland (UKMO 2 km)
+        return ["ukmo_seamless", GLOBAL]
+    if 46.0 <= lat <= 56.0 and 5.0 <= lon <= 22.0:       # Central Europe (ICON-D2 2 km)
+        return ["dwd_icon_seamless", GLOBAL]
+    if 36.5 <= lat <= 47.0 and 10.0 <= lon <= 18.5:      # Italy
+        return ["italia_meteo_arpae_icon_2i", GLOBAL]
+    if 54.5 <= lat <= 71.5 and 4.0 <= lon <= 32.0:       # Nordics (MET Nordic 1 km)
+        return ["metno_seamless", GLOBAL]
+    if 24.5 <= lat <= 49.5 and -125.0 <= lon <= -66.5:   # CONUS (HRRR via gfs_seamless)
+        return ["gfs_seamless", GLOBAL]
+    if 33.0 <= lat <= 39.0 and 124.5 <= lon <= 132.0:    # Korea (before Japan: the JMA box encloses it)
+        return ["kma_seamless", GLOBAL]
+    if 24.0 <= lat <= 46.0 and 122.0 <= lon <= 146.0:    # Japan (JMA MSM 5 km)
+        return ["jma_seamless", GLOBAL]
+    if -47.5 <= lat <= -10.0 and 112.0 <= lon <= 179.0:  # Australia & NZ (BOM ACCESS-G)
+        return ["bom_access_global", GLOBAL]
+    return [GLOBAL, "gfs_seamless"]                       # elsewhere: two globals
+
+
 @dataclass(frozen=True)
 class WeatherSeries:
-    """Parallel hourly arrays, times are UTC-aware datetimes. Values come from the
-    best_match model (matching the Open-Meteo app and the GTI request)."""
+    """Parallel hourly arrays, times are UTC-aware datetimes. Values are the
+    per-hour median across pick_models_for_location, matching the card."""
 
     times: list[datetime]
-    cloud: list[float | None]  # %, None where the model was missing that hour
-    shortwave: list[float]  # GHI, W/m2
+    cloud: list[float | None]  # weighted cover % (low + 0.6*mid + 0.2*high), 0 where a layer was missing
+    shortwave: list[float]  # GHI, W/m2 (instant)
     direct: list[float]  # W/m2 on the horizontal
     diffuse: list[float]  # W/m2 on the horizontal
     temp: list[float]  # degC
@@ -106,17 +137,22 @@ def build_weather_url(
 ) -> str:
     """URL for the weather (forecast inputs) request.
 
-    Default (``ensemble=False``) is a best_match request: no ``models=``, so Open-Meteo returns its
-    per-location best model, matching the app and the GTI request. ``ensemble=True`` adds ``models=``
-    to fetch the whole set, used only to derive the cross-model cloud spread.
+    Default (``ensemble=False``) fetches the full variable set over ``pick_models_for_location``
+    (median-fused), matching the card. ``ensemble=True`` fetches only the aggregate cover over the
+    wider model set, used to derive the cross-model cloud spread.
     """
-    models = f"&models={','.join(WEATHER_MODELS)}" if ensemble else ""
+    if ensemble:
+        models = ",".join(WEATHER_MODELS)
+        hourly = WEATHER_SPREAD_HOURLY
+    else:
+        models = ",".join(pick_models_for_location(lat, lon))
+        hourly = WEATHER_HOURLY
     return (
         f"{_BASE_URL}"
         f"?latitude={lat:.4f}"
         f"&longitude={lon:.4f}"
-        f"&hourly={WEATHER_HOURLY}"
-        f"{models}"
+        f"&hourly={hourly}"
+        f"&models={models}"
         f"&past_days={past_days}&forecast_days={forecast_days}&timezone=UTC"
     )
 
@@ -187,14 +223,29 @@ def _stdev(vals: List[float]) -> Optional[float]:
     return (sum((v - mean) ** 2 for v in vals) / len(vals)) ** 0.5
 
 
+def _clamp_pct(v: Optional[float]) -> float:
+    """A cloud-layer percentage clamped to [0, 100]; missing / non-finite reads as 0 (clear)."""
+    if v is None or not math.isfinite(v):
+        return 0.0
+    return max(0.0, min(100.0, v))
+
+
+def cloud_effective(low: Optional[float], mid: Optional[float], high: Optional[float]) -> float:
+    """One weighted cover from the three layers, matching the card: low cloud attenuates far more than
+    high cirrus. Each layer is clamped to [0, 100] first; missing layers count as clear."""
+    return min(100.0, _clamp_pct(low) + 0.6 * _clamp_pct(mid) + 0.2 * _clamp_pct(high))
+
+
 def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
-    """Build a WeatherSeries from an Open-Meteo payload, fusing the model ensemble
-    to the per-hour median. Returns None when there are no timestamps or no cloud
-    series. Works for a single-model response too (median of one = the value)."""
+    """Build a WeatherSeries from an Open-Meteo payload, fusing the picker models to the per-hour
+    median and the three cloud layers into one weighted cover. Returns None when there are no
+    timestamps or no cloud layers. Works for a single-model response too (median of one = the value)."""
     hourly = payload.get("hourly") or {}
     time_strs = hourly.get("time") or []
-    cloud_arrays = _model_arrays(hourly, "cloud_cover")
-    if not time_strs or not any(cloud_arrays):
+    low_arrays = _model_arrays(hourly, "cloud_cover_low")
+    mid_arrays = _model_arrays(hourly, "cloud_cover_mid")
+    high_arrays = _model_arrays(hourly, "cloud_cover_high")
+    if not time_strs or not any(low_arrays):
         return None
     n = len(time_strs)
 
@@ -202,19 +253,27 @@ def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
         arrays = _model_arrays(hourly, base)
         return [_median(_finite_at(arrays, i)) for i in range(n)]
 
-    cloud = [_median(_finite_at(cloud_arrays, i)) for i in range(n)]
-    cloud_spread = [_stdev(_finite_at(cloud_arrays, i)) or 0.0 for i in range(n)]
+    # Median each layer across models first, then combine into the weighted cover the card uses.
+    cloud = [
+        cloud_effective(
+            _median(_finite_at(low_arrays, i)),
+            _median(_finite_at(mid_arrays, i)),
+            _median(_finite_at(high_arrays, i)),
+        )
+        for i in range(n)
+    ]
 
     return WeatherSeries(
         times=parse_times(time_strs),
         cloud=cloud,
-        shortwave=fuse("shortwave_radiation"),
-        direct=fuse("direct_radiation"),
-        diffuse=fuse("diffuse_radiation"),
+        shortwave=fuse("shortwave_radiation_instant"),
+        direct=fuse("direct_radiation_instant"),
+        diffuse=fuse("diffuse_radiation_instant"),
         temp=fuse("temperature_2m"),
         wind=fuse("wind_speed_10m"),
         snow=fuse("snow_depth"),
-        cloud_spread=cloud_spread,
+        # Baseline zero spread aligned to times; the ensemble call overlays the real cross-model spread.
+        cloud_spread=[0.0] * n,
     )
 
 
@@ -222,7 +281,7 @@ def parse_cloud_spread(payload: dict[str, Any]) -> tuple[list[datetime], list[fl
     """(times, per-hour cloud spread) from an ENSEMBLE payload, or None when unusable.
 
     The spread is the standard deviation of cloud cover across the models at each hour. Returned
-    with its own times so it can be overlaid onto the best_match series by timestamp, even if the
+    with its own times so it can be overlaid onto the values series by timestamp, even if the
     two responses ever cover slightly different hours.
     """
     hourly = payload.get("hourly") or {}
@@ -288,9 +347,9 @@ async def fetch_weather(
     past_days: int = 0,
     forecast_days: int = 7,
 ) -> WeatherSeries | None:
-    """GET the weather inputs. best_match carries the values (required); a second, best-effort
-    ensemble call adds only the cross-model cloud spread (#22). If the ensemble call fails, the
-    best_match series is returned with a zero spread rather than failing the whole refresh."""
+    """GET the weather inputs. The picker-median call carries the values (required); a second,
+    best-effort ensemble call adds only the cross-model cloud spread. If the ensemble call fails, the
+    values series is returned with a zero spread rather than failing the whole refresh."""
     base_url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days)
     series = await _fetch_parsed(session, base_url, parse_weather)
     if series is None:
