@@ -8,6 +8,7 @@ map is built from the recorder's own production / SoC history.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -172,6 +173,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         self._trend_store: Store = Store(hass, 1, f"{DOMAIN}.{entry.entry_id}.trend")
         self._trend_ref: Optional[TrendReference] = None
         self._trend_loaded = False
+        # Last-logged reason the battery SoC projection was skipped, so _battery_off() warns once per reason.
+        self._battery_off_logged: Optional[str] = None
 
     def _config(self) -> Dict[str, Any]:
         return {**self.entry.data, **self.entry.options}
@@ -281,20 +284,29 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         """
         battery = battery_from_config(data)
         if battery is None:
-            return []
+            return self._battery_off(
+                "no battery is configured in the integration options (set the battery capacity and the "
+                "live SoC entity to enable it)"
+            )
 
         soc_state = self.hass.states.get(battery.soc_entity)
         if soc_state is None or soc_state.state in ("unknown", "unavailable"):
-            return []
+            return self._battery_off(f"the SoC entity {battery.soc_entity} is unavailable")
         try:
             start_soc_frac = float(soc_state.state) / 100.0
         except (TypeError, ValueError):
-            return []
+            return self._battery_off(
+                f"the SoC entity {battery.soc_entity} reads '{soc_state.state}', which is not a 0-100 number"
+            )
 
         profile = await self._consumption_profile_for(now)
         if profile is None:
-            return []
+            return self._battery_off(
+                "home consumption is not available yet from the Energy dashboard, so there is nothing to "
+                "discharge against"
+            )
 
+        self._battery_off_logged = None
         return await self.hass.async_add_executor_job(
             partial(
                 project_battery_soc,
@@ -307,6 +319,18 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 step_minutes=STEP_MINUTES,
             )
         )
+
+    def _battery_off(self, reason: str) -> List[BatterySocPoint]:
+        """Return an empty SoC projection, logging why the first time a given reason occurs.
+
+        The projection is deliberately skipped when an input is missing rather than guessed; without
+        this the sensor just read ``unknown`` with no hint, which made it impossible to tell a
+        misconfiguration from a transient gap. Logged once per distinct reason (re-armed when the
+        projection recovers) so a steady-state 'off' does not spam the log every refresh."""
+        if self._battery_off_logged != reason:
+            _LOGGER.warning("Helios battery SoC projection is off: %s", reason)
+            self._battery_off_logged = reason
+        return []
 
     async def _consumption_profile_for(self, now) -> Optional[ConsumptionProfile]:
         """Home consumption profile from the Energy dashboard, rebuilt at most once an hour.
