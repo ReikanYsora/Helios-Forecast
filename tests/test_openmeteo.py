@@ -18,12 +18,9 @@ sys.path.insert(0, str(_REPO_ROOT))
 
 import custom_components.helios_forecast.openmeteo as om  # noqa: E402
 from custom_components.helios_forecast.openmeteo import (  # noqa: E402
-    build_gti_url,
     build_weather_url,
     fetch_weather,
-    om_azimuth,
     parse_cloud_spread,
-    parse_gti,
     parse_times,
     parse_weather,
     pick_models_for_location,
@@ -101,24 +98,6 @@ def test_parse_cloud_spread() -> None:
     assert parse_cloud_spread({"hourly": {"time": [], "cloud_cover": []}}) is None
 
 
-def test_gti_url_matches_card_with_azimuth_conversion() -> None:
-    # Helios south (180) -> Open-Meteo south (0); tilt rounded.
-    got = build_gti_url(48.8566, 2.3522, 30.0, 180.0, past_days=0, forecast_days=7)
-    assert got == (
-        f"{_BASE}?latitude=48.8566&longitude=2.3522"
-        "&hourly=global_tilted_irradiance_instant"
-        "&tilt=30&azimuth=0&past_days=0&forecast_days=7&timezone=UTC"
-    )
-
-
-def test_om_azimuth_conversion() -> None:
-    assert om_azimuth(180) == 0  # south
-    assert om_azimuth(90) == -90  # east
-    assert om_azimuth(270) == 90  # west
-    assert om_azimuth(0) == -180  # north
-    assert om_azimuth(225) == 45  # south-west
-
-
 def test_parse_times_are_utc() -> None:
     times = parse_times(["2026-06-11T00:00", "2026-06-11T12:00"])
     assert times[0] == datetime(2026, 6, 11, 0, tzinfo=timezone.utc)
@@ -157,20 +136,6 @@ def test_parse_weather_none_when_empty() -> None:
     assert parse_weather({}) is None
     assert parse_weather({"hourly": {"time": [], "cloud_cover_low": []}}) is None
     assert parse_weather({"hourly": {"time": ["2026-06-11T00:00"], "cloud_cover_low": []}}) is None
-
-
-def test_parse_gti() -> None:
-    payload = {
-        "hourly": {
-            "time": ["2026-06-11T00:00", "2026-06-11T12:00"],
-            "global_tilted_irradiance_instant": [0, 620],
-        }
-    }
-    g = parse_gti(payload)
-    assert g is not None
-    assert g.poa == [0, 620]
-    assert g.times[1] == datetime(2026, 6, 11, 12, tzinfo=timezone.utc)
-    assert parse_gti({"hourly": {"time": ["2026-06-11T00:00"], "global_tilted_irradiance_instant": []}}) is None
 
 
 _GOOD_WEATHER = {

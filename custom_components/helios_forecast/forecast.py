@@ -17,7 +17,6 @@ from typing import Dict, List, Optional
 
 from .openmeteo import WeatherSeries
 from .solar.geometry import sun_position
-from .solar.gti import GtiStore, make_gti_sampler
 from .solar.irradiance import snow_cover_factor
 from .solar.power import PvLayout, WeatherSample, compute_pv_power_per_array
 from .solar.residual import SkyResidualMap, sample_sky_residual
@@ -89,7 +88,6 @@ def _sum_arrays(pcts: List[float], layout: PvLayout, snow: float, ratio: float) 
 
 def build_forecast_series(
     weather: WeatherSeries,
-    gti_store: Optional[GtiStore],
     layout: PvLayout,
     home_lat: float,
     home_lon: float,
@@ -105,7 +103,6 @@ def build_forecast_series(
     step = timedelta(minutes=step_minutes)
     times = weather.times
     epochs = [t.timestamp() for t in times]
-    sampler = make_gti_sampler(gti_store)
 
     points: List[ForecastPoint] = []
     if not times:
@@ -135,7 +132,7 @@ def build_forecast_series(
             snow=lerp_finite(_at(weather.snow, i0), _at(weather.snow, i1), f),
         )
 
-        pcts = compute_pv_power_per_array(t, home_lat, home_lon, sample, layout, sampler)
+        pcts = compute_pv_power_per_array(t, home_lat, home_lon, sample, layout)
         snow = snow_cover_factor(sample.snow, sample.temp)
         if residual_map is not None:
             sun = sun_position(t, home_lat, home_lon)

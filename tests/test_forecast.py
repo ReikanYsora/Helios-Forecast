@@ -1,9 +1,9 @@
 """Tests for the weighted PV orchestration and the forecast assembly.
 
 compute_pv_power is parity-proven elsewhere, so here we pin the orchestration:
-the kWp-weighted sum, per-orientation GTI selection, weather interpolation, the
-watts mapping (pct x pvCalibK x snow), the inverter clip and the daily kWh
-integration. Runnable with ``python3 tests/test_forecast.py`` or under pytest.
+the kWp-weighted sum, weather interpolation, the watts mapping (pct x pvCalibK x
+snow), the inverter clip and the daily kWh integration. Runnable with
+``python3 tests/test_forecast.py`` or under pytest.
 """
 
 from __future__ import annotations
@@ -22,8 +22,7 @@ from custom_components.helios_forecast.forecast import (  # noqa: E402
     lerp_plain,
     lerp_rad,
 )
-from custom_components.helios_forecast.openmeteo import GtiSeries, WeatherSeries  # noqa: E402
-from custom_components.helios_forecast.solar.gti import sample_gti  # noqa: E402
+from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: E402
 from custom_components.helios_forecast.solar.irradiance import (  # noqa: E402
     PanelOrientation,
     PvContext,
@@ -50,55 +49,16 @@ def _east_west_layout() -> PvLayout:
 
 
 def test_weighted_equals_share_weighted_sum() -> None:
+    # Every array self-transposes the same GHI to its own plane; the weighted total is the kWp-share sum.
     sample = WeatherSample(cloud=30, ghi=600, direct=400, diffuse=150, temp=18, wind=3)
     layout = _east_west_layout()
-    weighted = compute_pv_power_weighted(_NOON, _LAT, _LON, sample, layout, gti_sampler=None)
+    weighted = compute_pv_power_weighted(_NOON, _LAT, _LON, sample, layout)
 
     expected = 0.0
     for orientation, share in zip(layout.orientations, layout.shares):
-        ctx = PvContext(
-            air_temp_c=18, wind_ms=3, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150, poa_wm2=None, shading=False
-        )
+        ctx = PvContext(air_temp_c=18, wind_ms=3, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150)
         expected += compute_pv_power(_NOON, _LAT, _LON, 30, orientation, ctx) * share
     assert abs(weighted - expected) < 1e-12
-
-
-def test_weighted_uses_gti_per_orientation() -> None:
-    sample = WeatherSample(cloud=30, ghi=600, direct=400, diffuse=150, temp=18, wind=3)
-    layout = _east_west_layout()
-    # GTI only for the east array; west stays on transposition.
-    store = {"30|90": GtiSeries(times=[datetime(2026, 6, 21, 12, tzinfo=timezone.utc)], poa=[710.0])}
-
-    def sampler(tilt: float, az: float, m: datetime):
-        return sample_gti(store, tilt, az, m)
-
-    weighted = compute_pv_power_weighted(_NOON, _LAT, _LON, sample, layout, gti_sampler=sampler)
-
-    east_ctx = PvContext(
-        air_temp_c=18, wind_ms=3, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150, poa_wm2=710.0, shading=False
-    )
-    west_ctx = PvContext(
-        air_temp_c=18, wind_ms=3, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150, poa_wm2=None, shading=False
-    )
-    expected = (
-        compute_pv_power(_NOON, _LAT, _LON, 30, PanelOrientation(30, 90), east_ctx) * 0.5
-        + compute_pv_power(_NOON, _LAT, _LON, 30, PanelOrientation(30, 270), west_ctx) * 0.5
-    )
-    assert abs(weighted - expected) < 1e-12
-
-
-def test_sample_gti_interpolates_and_guards() -> None:
-    store = {
-        "30|180": GtiSeries(
-            times=[datetime(2026, 6, 21, 12, tzinfo=timezone.utc), datetime(2026, 6, 21, 13, tzinfo=timezone.utc)],
-            poa=[600.0, 800.0],
-        )
-    }
-    half = datetime(2026, 6, 21, 12, 30, tzinfo=timezone.utc)
-    assert sample_gti(store, 30, 180, half) == 700.0
-    assert sample_gti(store, 30, 180, datetime(2026, 6, 21, 12, tzinfo=timezone.utc)) == 600.0
-    assert sample_gti(None, 30, 180, half) is None  # no store
-    assert sample_gti(store, 30, 90, half) is None  # orientation absent
 
 
 def test_lerp_helpers() -> None:
@@ -142,12 +102,12 @@ def test_build_forecast_watts_mapping_and_cap() -> None:
     k = layout.total_kwp * 10.0
 
     points = build_forecast_series(
-        weather, None, layout, _LAT, _LON, inverter_max_w=cap, start=start, end=end, step_minutes=60
+        weather, layout, _LAT, _LON, inverter_max_w=cap, start=start, end=end, step_minutes=60
     )
     assert len(points) == 24
     for p in points:
         sample = WeatherSample(cloud=20, ghi=500, direct=350, diffuse=120, temp=18, wind=3, snow=0)
-        pct = compute_pv_power_weighted(p.t, _LAT, _LON, sample, layout, gti_sampler=None)
+        pct = compute_pv_power_weighted(p.t, _LAT, _LON, sample, layout)
         expected = min(cap, max(0.0, pct * k))  # snow factor is 1 here
         assert abs(p.pv_w - expected) < 1e-9
         assert p.pv_w == p.pv_raw_w  # ratio 1 in phase 1
@@ -155,7 +115,7 @@ def test_build_forecast_watts_mapping_and_cap() -> None:
 
 
 def test_per_line_inverter_cap_clips_each_array_before_summing() -> None:
-    # East string capped tight, west string uncapped (#26): the east micro-inverter saturates on its own, and the
+    # East string capped tight, west string uncapped: the east micro-inverter saturates on its own, and the
     # forecast must clip it BEFORE summing, not the combined total. Two 0.5-share arrays over 6 kWp -> 3 kWp each.
     east_cap = 800.0
     layout = PvLayout(
@@ -169,13 +129,13 @@ def test_per_line_inverter_cap_clips_each_array_before_summing() -> None:
     start = datetime(2026, 6, 21, 0, tzinfo=timezone.utc)
     end = start + timedelta(days=1)
     points = build_forecast_series(  # no entry-level cap, so only the per-line cap can bite
-        weather, None, layout, _LAT, _LON, start=start, end=end, step_minutes=60
+        weather, layout, _LAT, _LON, start=start, end=end, step_minutes=60
     )
     assert len(points) == 24
     saw_clip = False
     for p in points:
         sample = WeatherSample(cloud=20, ghi=500, direct=350, diffuse=120, temp=18, wind=3, snow=0)
-        pcts = compute_pv_power_per_array(p.t, _LAT, _LON, sample, layout, gti_sampler=None)
+        pcts = compute_pv_power_per_array(p.t, _LAT, _LON, sample, layout)
         watts = [pcts[i] * layout.shares[i] * layout.total_kwp * 10.0 for i in range(len(pcts))]  # snow factor 1
         expected = min(east_cap, max(0.0, watts[0])) + max(0.0, watts[1])
         assert abs(p.pv_w - expected) < 1e-9
@@ -189,7 +149,7 @@ def test_daily_integration() -> None:
     layout = _single_south_layout()
     start = datetime(2026, 6, 21, 0, tzinfo=timezone.utc)
     end = start + timedelta(days=1)
-    points = build_forecast_series(weather, None, layout, _LAT, _LON, start=start, end=end, step_minutes=60)
+    points = build_forecast_series(weather, layout, _LAT, _LON, start=start, end=end, step_minutes=60)
 
     totals = integrate_daily_kwh(points, step_minutes=60)
     expected_kwh = sum(p.pv_w for p in points) * (60 / 60.0) / 1000.0

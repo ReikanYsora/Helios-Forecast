@@ -8,12 +8,11 @@ map is built from the recorder's own production / SoC history.
 
 from __future__ import annotations
 
-import asyncio
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import partial
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 from homeassistant.components.recorder import get_instance
 from homeassistant.components.recorder.models import StatisticMetaData
@@ -44,9 +43,8 @@ from .consumption import ConsumptionProfile, build_consumption_profile, consumpt
 from .trend import TodayTrend, TrendReference, compute_trend, should_capture
 from .const import DOMAIN
 from .forecast import ForecastPoint, build_forecast_series
-from .openmeteo import GtiSeries, WeatherSeries, fetch_gti, fetch_weather
+from .openmeteo import WeatherSeries, fetch_weather
 from .reliability import Reliability, compute_reliability
-from .solar.gti import orientation_key
 from .statistics import (
     FORECAST_ENERGY_KEY,
     FORECAST_POWER_KEY,
@@ -194,32 +192,6 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             if weather is None and self.weather_series is not None:
                 _LOGGER.warning("Open-Meteo returned no weather data; reusing the last successful fetch")
                 weather = self.weather_series
-            seen: Set[str] = set()
-            targets: List[tuple] = []
-            for orientation in layout.orientations:
-                if orientation.tracker:
-                    continue
-                key = orientation_key(orientation.tilt_deg, orientation.azimuth_deg)
-                if key in seen:
-                    continue
-                seen.add(key)
-                targets.append((key, orientation.tilt_deg, orientation.azimuth_deg))
-            # Fetch the distinct orientations concurrently but capped: a couple of requests at a time
-            # instead of one burst of simultaneous connections, which on a small box briefly saturated
-            # the link and stalled other traffic every refresh. Still far faster than the old fully
-            # sequential fetch (#31), without the spike.
-            gti_sem = asyncio.Semaphore(2)
-
-            async def _fetch_gti_bounded(tilt: float, az: float) -> Optional[GtiSeries]:
-                async with gti_sem:
-                    return await fetch_gti(
-                        session, lat, lon, tilt, az, past_days=LEARN_DAYS, forecast_days=FORECAST_DAYS
-                    )
-
-            gti_results = await asyncio.gather(*(_fetch_gti_bounded(tilt, az) for (_key, tilt, az) in targets))
-            store: Dict[str, GtiSeries] = {
-                key: gti for (key, _tilt, _az), gti in zip(targets, gti_results) if gti is not None
-            }
         except Exception as err:  # noqa: BLE001 - any transport error becomes a retry
             raise UpdateFailed(f"Open-Meteo fetch failed: {err}") from err
 
@@ -227,7 +199,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             raise UpdateFailed("Open-Meteo returned no weather data")
 
         now = dt_util.now()  # local-aware, drives the local-day boundaries
-        residual_map = await self._build_residual_map(data, lat, lon, layout, weather, store or None, now)
+        residual_map = await self._build_residual_map(data, lat, lon, layout, weather, now)
 
         start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + timedelta(days=FORECAST_DAYS)
@@ -238,7 +210,6 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             partial(
                 build_forecast_series,
                 weather,
-                store or None,
                 layout,
                 lat,
                 lon,
@@ -275,7 +246,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         archive_hour = now_utc.replace(minute=0, second=0, microsecond=0)
         if self._last_archive_hour != archive_hour:
             self.archive_points = await self.hass.async_add_executor_job(
-                self._compute_archive_points, now_utc, weather, store or None, layout, lat, lon, cap, residual_map
+                self._compute_archive_points, now_utc, weather, layout, lat, lon, cap, residual_map
             )
             self._forecast_stat_rows = await self.hass.async_add_executor_job(forecast_statistics, self.archive_points)
             self.write_forecast_statistics()
@@ -459,7 +430,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         if wrote_any:
             self._last_weather_stat_hour = cutoff
 
-    def _compute_archive_points(self, now, weather, store, layout, lat, lon, cap, residual_map):
+    def _compute_archive_points(self, now, weather, layout, lat, lon, cap, residual_map):
         """Hourly predicted points over the past window [now - LEARN_DAYS, current hour).
 
         Runs the same model used for the live forecast across the past at an hourly step (the cadence
@@ -470,7 +441,6 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         arch_start = cutoff - timedelta(days=LEARN_DAYS)
         return build_forecast_series(
             weather,
-            store,
             layout,
             lat,
             lon,
@@ -514,7 +484,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             }
             async_import_statistics(self.hass, metadata, rows)
 
-    async def _build_residual_map(self, data, lat, lon, layout, weather, store, now):
+    async def _build_residual_map(self, data, lat, lon, layout, weather, now):
         """Learn the actual/model residual from the recorder's production history."""
         self._production_buckets = []
         production_entity = learning_from_config(data)
@@ -555,7 +525,6 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 temp=weather.temp,
                 wind=weather.wind,
                 snow=weather.snow,
-                gti_store=store,
                 now_ms=now.timestamp() * 1000.0,
             ),
         )

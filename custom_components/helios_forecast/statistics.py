@@ -2,9 +2,9 @@
 
 The 7 weather variables here are orientation-independent: they describe the sky
 over the home, not the panels, so this archive stays valid across any PV layout
-change. GTI is deliberately not archived, it depends on orientation and is
-recomputable from the direct / diffuse / global irradiance kept here plus the sun
-geometry (see solar/irradiance.py).
+change. Plane-of-array irradiance is deliberately not archived: it depends on
+orientation and is recomputed from the direct / diffuse / global irradiance kept
+here plus the sun geometry (see solar/irradiance.py).
 
 Open-Meteo only serves a rolling 60-day past window. By copying each refresh's
 past hours into Home Assistant's long-term statistics (which are never purged),

@@ -111,7 +111,7 @@ def _model_kwh(bucket: ProductionBucket, inp: SkyResidualInput) -> float:
     for s in range(LEARN_SUBSAMPLES):
         sub_t = bucket.start_ms + (s + 0.5) * (bucket.end_ms - bucket.start_ms) / LEARN_SUBSAMPLES
         moment = _dt(sub_t)
-        w_sum += compute_pv_power_weighted(moment, inp.lat, inp.lon, sample, inp.layout, None)
+        w_sum += compute_pv_power_weighted(moment, inp.lat, inp.lon, sample, inp.layout)
         w_n += 1
     return (w_sum / w_n) * k * snow_cover_factor(inp.snow[ci], inp.temp[ci]) / 1000.0
 
@@ -132,7 +132,6 @@ def _input(buckets: list[ProductionBucket], **over) -> SkyResidualInput:
         temp=w["temp"],
         wind=w["wind"],
         snow=w["snow"],
-        gti_store=None,
         now_ms=datetime(2026, 6, 23, tzinfo=timezone.utc).timestamp() * 1000.0,
     )
     base.update(over)
@@ -198,7 +197,7 @@ def test_forecast_applies_ratio() -> None:
     start = datetime(2026, 6, 21, tzinfo=timezone.utc)
     end = datetime(2026, 6, 21, 23, 59, tzinfo=timezone.utc)
     pts = build_forecast_series(
-        weather, None, _layout(), _LAT, _LON, start=start, end=end, step_minutes=60, residual_map=half
+        weather, _layout(), _LAT, _LON, start=start, end=end, step_minutes=60, residual_map=half
     )
     for p in pts:
         assert abs(p.pv_w - 0.5 * p.pv_raw_w) < 1e-9

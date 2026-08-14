@@ -22,7 +22,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from .gti import GtiStore, make_gti_sampler
 from .irradiance import snow_cover_factor
 from .geometry import sun_position
 from .power import PvLayout, WeatherSample, compute_pv_power_weighted
@@ -83,7 +82,6 @@ class SkyResidualInput:
     temp: List[float]
     wind: List[float]
     snow: List[float]
-    gti_store: Optional[GtiStore]
     now_ms: float
 
 
@@ -137,8 +135,6 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
     global_sum_w = 0.0
     global_sum_wr = 0.0
 
-    sampler = make_gti_sampler(inp.gti_store)
-
     for bucket in inp.production:
         kwh = bucket.kwh
         if not math.isfinite(kwh) or kwh < 0:
@@ -166,7 +162,7 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
             moment = _dt(sub_t)
             if sun_position(moment, inp.lat, inp.lon).altitude <= 0:
                 continue
-            w_sum += compute_pv_power_weighted(moment, inp.lat, inp.lon, sample, inp.layout, sampler)
+            w_sum += compute_pv_power_weighted(moment, inp.lat, inp.lon, sample, inp.layout)
             w_n += 1
         if w_n == 0:
             continue

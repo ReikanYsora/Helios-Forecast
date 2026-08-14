@@ -1,19 +1,15 @@
 """Open-Meteo client.
 
 Thin transport, matching the card's own weather request so the forecast is fed
-the same data. Two endpoints on ``/v1/forecast``:
-
-  - weather: hourly cloud layers (``cloud_cover_low/mid/high``, fused into one
-    weighted cover), ``shortwave_radiation_instant``, ``direct_radiation_instant``,
-    ``diffuse_radiation_instant``, ``temperature_2m``, ``wind_speed_10m``,
-    ``snow_depth``. Values are the per-hour median across
-    ``pick_models_for_location`` (a regional high-resolution model paired with a
-    global one), the same selection the card uses. A second, best-effort call
-    over a wider model ensemble adds only the cross-model cloud spread, a
-    forecast-uncertainty signal.
-  - GTI: hourly ``global_tilted_irradiance_instant`` for one tilt + azimuth.
-    Open-Meteo accepts a single orientation per request, so a multi-orientation
-    install needs one GET per distinct orientation.
+the same data on ``/v1/forecast``. Hourly cloud layers
+(``cloud_cover_low/mid/high``, fused into one weighted cover),
+``shortwave_radiation_instant``, ``direct_radiation_instant``,
+``diffuse_radiation_instant``, ``temperature_2m``, ``wind_speed_10m``,
+``snow_depth``. Values are the per-hour median across
+``pick_models_for_location`` (a regional high-resolution model paired with a
+global one), the same selection the card uses. A second, best-effort call over a
+wider model ensemble adds only the cross-model cloud spread, a
+forecast-uncertainty signal.
 
 No unit parameters are sent, so Open-Meteo returns its defaults (W/m2 for
 irradiance, degC, snow depth in metres). URL construction and parsing are pure
@@ -53,7 +49,6 @@ WEATHER_HOURLY = (
 )
 # The ensemble spread call needs only the aggregate cover to measure model disagreement.
 WEATHER_SPREAD_HOURLY = "cloud_cover"
-GTI_HOURLY = "global_tilted_irradiance_instant"
 
 # Wider ensemble, used only for the cross-model cloud spread (a forecast-uncertainty signal). The
 # weather VALUES come from pick_models_for_location; this call runs alongside and we read the per-hour
@@ -114,24 +109,6 @@ class WeatherSeries:
     cloud_spread: list[float] = field(default_factory=list)
 
 
-@dataclass(frozen=True)
-class GtiSeries:
-    """Plane-of-array irradiance (W/m2) per hour for one orientation."""
-
-    times: list[datetime]
-    poa: list[float]
-
-
-def om_azimuth(helios_azimuth_deg: float) -> int:
-    """Helios azimuth (0 = north) to Open-Meteo azimuth (0 = south), rounded.
-
-    Open-Meteo uses 0 = south, -90 = east, +90 = west, +/-180 = north, so the
-    conversion is ``omAz = ourAz - 180``. Not normalised to a range, matching the
-    card (Open-Meteo accepts the raw value).
-    """
-    return round(helios_azimuth_deg - 180)
-
-
 def build_weather_url(
     lat: float, lon: float, *, past_days: int = 0, forecast_days: int = 7, ensemble: bool = False
 ) -> str:
@@ -153,27 +130,6 @@ def build_weather_url(
         f"&longitude={lon:.4f}"
         f"&hourly={hourly}"
         f"&models={models}"
-        f"&past_days={past_days}&forecast_days={forecast_days}&timezone=UTC"
-    )
-
-
-def build_gti_url(
-    lat: float,
-    lon: float,
-    tilt_deg: float,
-    azimuth_deg: float,
-    *,
-    past_days: int = 0,
-    forecast_days: int = 7,
-) -> str:
-    """URL for one orientation's GTI request. ``azimuth_deg`` is Helios convention."""
-    return (
-        f"{_BASE_URL}"
-        f"?latitude={lat:.4f}"
-        f"&longitude={lon:.4f}"
-        f"&hourly={GTI_HOURLY}"
-        f"&tilt={round(tilt_deg)}"
-        f"&azimuth={om_azimuth(azimuth_deg)}"
         f"&past_days={past_days}&forecast_days={forecast_days}&timezone=UTC"
     )
 
@@ -301,16 +257,6 @@ def _overlay_cloud_spread(
     return replace(series, cloud_spread=[by_time.get(t, 0.0) for t in series.times])
 
 
-def parse_gti(payload: dict[str, Any]) -> GtiSeries | None:
-    """Build a GtiSeries from an Open-Meteo payload, or None when unusable."""
-    hourly = payload.get("hourly") or {}
-    time_strs = hourly.get("time") or []
-    poa = hourly.get("global_tilted_irradiance_instant") or []
-    if not time_strs or not poa:
-        return None
-    return GtiSeries(times=parse_times(time_strs), poa=poa)
-
-
 async def _get_json(session: ClientSession, url: str) -> Optional[dict]:
     """GET ``url`` as JSON once. None on a non-200 or a timeout, so the caller's retry +
     last-good-reuse path recovers instead of a stalled request hanging the whole refresh. Other
@@ -359,18 +305,3 @@ async def fetch_weather(
     if spread is not None:
         series = _overlay_cloud_spread(series, spread[0], spread[1])
     return series
-
-
-async def fetch_gti(
-    session: ClientSession,
-    lat: float,
-    lon: float,
-    tilt_deg: float,
-    azimuth_deg: float,
-    *,
-    past_days: int = 0,
-    forecast_days: int = 7,
-) -> GtiSeries | None:
-    """GET one orientation's GTI, retrying an empty/non-200 response. None once exhausted."""
-    url = build_gti_url(lat, lon, tilt_deg, azimuth_deg, past_days=past_days, forecast_days=forecast_days)
-    return await _fetch_parsed(session, url, parse_gti)
