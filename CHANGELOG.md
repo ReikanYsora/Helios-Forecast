@@ -67,6 +67,15 @@ to run because an input was missing it did so silently, so an empty
 `get_battery_soc_forecast` gave no clue why. It no longer crashes, and it logs a
 clear reason whenever the projection is off, so you can tell at a glance what to
 fill in. Thanks to @FoxP (#40).
+
+### Fixed: the SoC projection recovers the moment the battery sensor is back
+
+On startup a battery integration can leave its state-of-charge sensor unavailable
+for a few seconds while it connects (a modbus link, for instance). The projection
+read the sensor at that instant, found it unavailable and stayed off until the
+next 30-minute refresh. It now re-projects as soon as the sensor becomes available
+again, and a brief startup gap is logged gently rather than as a warning. Thanks
+to @FoxP (#42).
 No user action needed. Thanks to @FoxP for pointing out the breakage radar (#38).
 
 ---

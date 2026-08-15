@@ -291,7 +291,10 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         soc_state = self.hass.states.get(battery.soc_entity)
         if soc_state is None or soc_state.state in ("unknown", "unavailable"):
-            return self._battery_off(f"the SoC entity {battery.soc_entity} is unavailable")
+            # Transient at startup or while the battery integration warms up (a modbus link can take a
+            # few seconds to open). A state listener re-projects the moment the entity comes back (see
+            # async_setup_entry), so this is logged gently rather than as a misconfiguration.
+            return self._battery_off(f"the SoC entity {battery.soc_entity} is unavailable", transient=True)
         try:
             start_soc_frac = float(soc_state.state) / 100.0
         except (TypeError, ValueError):
@@ -320,15 +323,20 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             )
         )
 
-    def _battery_off(self, reason: str) -> List[BatterySocPoint]:
+    def _battery_off(self, reason: str, *, transient: bool = False) -> List[BatterySocPoint]:
         """Return an empty SoC projection, logging why the first time a given reason occurs.
 
         The projection is deliberately skipped when an input is missing rather than guessed; without
         this the sensor just read ``unknown`` with no hint, which made it impossible to tell a
         misconfiguration from a transient gap. Logged once per distinct reason (re-armed when the
-        projection recovers) so a steady-state 'off' does not spam the log every refresh."""
+        projection recovers) so a steady-state 'off' does not spam the log every refresh. A
+        ``transient`` reason (the SoC entity briefly unavailable at startup, which the state listener
+        recovers from within seconds) logs at INFO; an actionable misconfiguration logs at WARNING."""
         if self._battery_off_logged != reason:
-            _LOGGER.warning("Helios battery SoC projection is off: %s", reason)
+            if transient:
+                _LOGGER.info("Helios battery SoC projection is off (transient, will retry): %s", reason)
+            else:
+                _LOGGER.warning("Helios battery SoC projection is off: %s", reason)
             self._battery_off_logged = reason
         return []
 

@@ -34,6 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     from homeassistant.helpers import issue_registry as ir
 
     from . import services, websocket
+    from .config import CONF_BATTERY_SOC_ENTITY
     from .coordinator import HeliosForecastCoordinator
 
     # Several panel lines in one entry are supported again (they share one production
@@ -63,6 +64,31 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_create_background_task(hass, _initial_statistics_archive(), "helios_forecast_initial_statistics")
 
     entry.async_on_unload(entry.add_update_listener(_async_reload_entry))
+
+    # Re-project the battery SoC the moment its source entity comes back from unavailable/unknown,
+    # instead of waiting up to the 30-minute refresh. A battery integration is often briefly
+    # unavailable at startup (a modbus link opening can take ~10 s), which would otherwise leave the
+    # projection off until the next cycle (#42).
+    soc_entity = {**entry.data, **entry.options}.get(CONF_BATTERY_SOC_ENTITY)
+    if soc_entity:
+        from homeassistant.core import callback
+        from homeassistant.helpers.event import async_track_state_change_event
+
+        _UNAVAILABLE = ("unavailable", "unknown")
+
+        @callback
+        def _soc_recovered(event) -> None:
+            new_state = event.data.get("new_state")
+            if new_state is None or new_state.state in _UNAVAILABLE:
+                return
+            # Only on the transition TO available (first appearance or recovery), so ordinary SoC %
+            # changes don't force off-cycle refreshes; the 30-minute cadence handles those.
+            old_state = event.data.get("old_state")
+            if old_state is None or old_state.state in _UNAVAILABLE:
+                hass.async_create_task(coordinator.async_request_refresh())
+
+        entry.async_on_unload(async_track_state_change_event(hass, [soc_entity], _soc_recovered))
+
     websocket.async_register(hass)
     services.async_register_services(hass)
     return True
