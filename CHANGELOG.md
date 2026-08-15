@@ -78,6 +78,16 @@ again, and a brief startup gap is logged gently rather than as a warning. Thanks
 to @FoxP (#42).
 No user action needed. Thanks to @FoxP for pointing out the breakage radar (#38).
 
+### Fixed: border locations pick the right regional weather model
+
+The forecast pairs a global weather model with the best regional high-resolution
+one for your location, using the same picker as the Helios card. The regional
+coverage areas overlap at national borders, and the first area listed used to
+win, so a site near a border, or inside a smaller area enclosed by a larger one,
+could be read with a neighbour's model. It now picks the area your location sits
+most centrally within, so the regional model matches where you actually are.
+Thanks to @MatCos.
+
 ---
 
 ## 2026.8.3

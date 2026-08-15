@@ -36,6 +36,15 @@ def test_pick_models_for_location() -> None:
     assert pick_models_for_location(0.0, -30.0) == ["ecmwf_ifs025", "gfs_seamless"]  # open ocean fallback
 
 
+def test_pick_models_resolves_overlapping_boxes() -> None:
+    # Korea's box sits entirely inside Japan's; the enclosed box still wins.
+    assert pick_models_for_location(37.5665, 126.9780) == ["kma_seamless", "ecmwf_ifs025"]  # Seoul
+    # Border overlaps resolve to whichever box the point sits most centrally inside.
+    assert pick_models_for_location(50.9, -1.4) == ["ukmo_seamless", "ecmwf_ifs025"]  # Southampton
+    assert pick_models_for_location(50.94, 6.96) == ["dwd_icon_seamless", "ecmwf_ifs025"]  # Cologne
+    assert pick_models_for_location(47.24, 6.02) == ["meteofrance_seamless", "ecmwf_ifs025"]  # Besançon
+
+
 def test_weather_url_uses_picker_and_layers() -> None:
     # Values request: pick_models_for_location median, cloud layers, instant irradiance (matches the card).
     got = build_weather_url(48.8566, 2.3522, past_days=0, forecast_days=7)

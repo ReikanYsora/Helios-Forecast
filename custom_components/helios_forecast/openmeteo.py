@@ -63,30 +63,48 @@ WEATHER_MODELS = (
 )
 
 
-# Regional high-resolution model (paired with a global one for the median) per area, mirroring the
-# card's pick_models_for_location at 'high' precision (the card's only mode). Anywhere uncovered
-# falls back to two independent global models, whose median beats either alone.
+# Regional high-resolution model (paired with a global one for the median) and its coverage box, per
+# area, mirroring the card's picker at 'high' precision (the card's only mode). (model, lat_min,
+# lat_max, lon_min, lon_max).
+_REGIONAL_MODELS: tuple[tuple[str, float, float, float, float], ...] = (
+    ("meteofrance_seamless", 41.3, 51.2, -5.5, 8.5),  # France + Corsica (AROME 1.3 km)
+    ("ukmo_seamless", 49.5, 61.0, -10.5, 2.0),  # UK & Ireland (UKMO 2 km)
+    ("dwd_icon_seamless", 46.0, 56.0, 5.0, 22.0),  # Central Europe (ICON-D2 2 km)
+    ("italia_meteo_arpae_icon_2i", 36.5, 47.0, 10.0, 18.5),  # Italy
+    ("metno_seamless", 54.5, 71.5, 4.0, 32.0),  # Nordics (MET Nordic 1 km)
+    ("gfs_seamless", 24.5, 49.5, -125.0, -66.5),  # CONUS (HRRR via gfs_seamless)
+    ("kma_seamless", 33.0, 39.0, 124.5, 132.0),  # Korea (box enclosed by Japan)
+    ("jma_seamless", 24.0, 46.0, 122.0, 146.0),  # Japan (JMA MSM 5 km)
+    ("bom_access_global", -47.5, -10.0, 112.0, 179.0),  # Australia & NZ (BOM ACCESS-G)
+)
+
+
+# The coverage boxes overlap (national borders are fuzzy: eastern France also falls in the Central-Europe
+# box, southern England in the France box, Korea entirely inside Japan). Of every box the point falls in,
+# keep the one it sits most centrally inside, measured as a fraction of each box's own size. That single
+# rule resolves both a partial border overlap and a fully enclosed box (Korea's small box outscores the
+# vast Japan box at the same point), with no reliance on declaration order. Anywhere uncovered falls back
+# to two independent global models, whose median beats either alone.
 def pick_models_for_location(lat: float, lon: float) -> list[str]:
     """Model set for the weather request, matching the card's picker."""
     GLOBAL = "ecmwf_ifs025"
-    if 41.3 <= lat <= 51.2 and -5.5 <= lon <= 8.5:  # France + Corsica (AROME 1.3 km)
-        return ["meteofrance_seamless", GLOBAL]
-    if 49.5 <= lat <= 61.0 and -10.5 <= lon <= 2.0:  # UK & Ireland (UKMO 2 km)
-        return ["ukmo_seamless", GLOBAL]
-    if 46.0 <= lat <= 56.0 and 5.0 <= lon <= 22.0:  # Central Europe (ICON-D2 2 km)
-        return ["dwd_icon_seamless", GLOBAL]
-    if 36.5 <= lat <= 47.0 and 10.0 <= lon <= 18.5:  # Italy
-        return ["italia_meteo_arpae_icon_2i", GLOBAL]
-    if 54.5 <= lat <= 71.5 and 4.0 <= lon <= 32.0:  # Nordics (MET Nordic 1 km)
-        return ["metno_seamless", GLOBAL]
-    if 24.5 <= lat <= 49.5 and -125.0 <= lon <= -66.5:  # CONUS (HRRR via gfs_seamless)
-        return ["gfs_seamless", GLOBAL]
-    if 33.0 <= lat <= 39.0 and 124.5 <= lon <= 132.0:  # Korea (before Japan: the JMA box encloses it)
-        return ["kma_seamless", GLOBAL]
-    if 24.0 <= lat <= 46.0 and 122.0 <= lon <= 146.0:  # Japan (JMA MSM 5 km)
-        return ["jma_seamless", GLOBAL]
-    if -47.5 <= lat <= -10.0 and 112.0 <= lon <= 179.0:  # Australia & NZ (BOM ACCESS-G)
-        return ["bom_access_global", GLOBAL]
+    best: str | None = None
+    best_score = float("-inf")
+    for model, lat_min, lat_max, lon_min, lon_max in _REGIONAL_MODELS:
+        if not (lat_min <= lat <= lat_max and lon_min <= lon <= lon_max):
+            continue
+        # Distance to the nearest edge as a fraction of the box's extent (0 on an edge, 0.5 dead centre).
+        score = min(
+            (lat - lat_min) / (lat_max - lat_min),
+            (lat_max - lat) / (lat_max - lat_min),
+            (lon - lon_min) / (lon_max - lon_min),
+            (lon_max - lon) / (lon_max - lon_min),
+        )
+        if score > best_score:
+            best_score = score
+            best = model
+    if best is not None:
+        return [best, GLOBAL]
     return [GLOBAL, "gfs_seamless"]  # elsewhere: two globals
 
 
