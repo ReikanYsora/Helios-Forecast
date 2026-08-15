@@ -52,8 +52,7 @@ def test_weather_url_uses_picker_and_layers() -> None:
 def test_weather_url_ensemble_is_cloud_only_over_the_wide_set() -> None:
     got = build_weather_url(48.8566, 2.3522, past_days=0, forecast_days=7, ensemble=True)
     assert (
-        "&hourly=cloud_cover"
-        "&models=ecmwf_ifs025,gfs_seamless,icon_seamless,gem_seamless,meteofrance_seamless"
+        "&hourly=cloud_cover&models=ecmwf_ifs025,gfs_seamless,icon_seamless,gem_seamless,meteofrance_seamless"
     ) in got
 
 

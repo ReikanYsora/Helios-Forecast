@@ -69,25 +69,25 @@ WEATHER_MODELS = (
 def pick_models_for_location(lat: float, lon: float) -> list[str]:
     """Model set for the weather request, matching the card's picker."""
     GLOBAL = "ecmwf_ifs025"
-    if 41.3 <= lat <= 51.2 and -5.5 <= lon <= 8.5:       # France + Corsica (AROME 1.3 km)
+    if 41.3 <= lat <= 51.2 and -5.5 <= lon <= 8.5:  # France + Corsica (AROME 1.3 km)
         return ["meteofrance_seamless", GLOBAL]
-    if 49.5 <= lat <= 61.0 and -10.5 <= lon <= 2.0:      # UK & Ireland (UKMO 2 km)
+    if 49.5 <= lat <= 61.0 and -10.5 <= lon <= 2.0:  # UK & Ireland (UKMO 2 km)
         return ["ukmo_seamless", GLOBAL]
-    if 46.0 <= lat <= 56.0 and 5.0 <= lon <= 22.0:       # Central Europe (ICON-D2 2 km)
+    if 46.0 <= lat <= 56.0 and 5.0 <= lon <= 22.0:  # Central Europe (ICON-D2 2 km)
         return ["dwd_icon_seamless", GLOBAL]
-    if 36.5 <= lat <= 47.0 and 10.0 <= lon <= 18.5:      # Italy
+    if 36.5 <= lat <= 47.0 and 10.0 <= lon <= 18.5:  # Italy
         return ["italia_meteo_arpae_icon_2i", GLOBAL]
-    if 54.5 <= lat <= 71.5 and 4.0 <= lon <= 32.0:       # Nordics (MET Nordic 1 km)
+    if 54.5 <= lat <= 71.5 and 4.0 <= lon <= 32.0:  # Nordics (MET Nordic 1 km)
         return ["metno_seamless", GLOBAL]
-    if 24.5 <= lat <= 49.5 and -125.0 <= lon <= -66.5:   # CONUS (HRRR via gfs_seamless)
+    if 24.5 <= lat <= 49.5 and -125.0 <= lon <= -66.5:  # CONUS (HRRR via gfs_seamless)
         return ["gfs_seamless", GLOBAL]
-    if 33.0 <= lat <= 39.0 and 124.5 <= lon <= 132.0:    # Korea (before Japan: the JMA box encloses it)
+    if 33.0 <= lat <= 39.0 and 124.5 <= lon <= 132.0:  # Korea (before Japan: the JMA box encloses it)
         return ["kma_seamless", GLOBAL]
-    if 24.0 <= lat <= 46.0 and 122.0 <= lon <= 146.0:    # Japan (JMA MSM 5 km)
+    if 24.0 <= lat <= 46.0 and 122.0 <= lon <= 146.0:  # Japan (JMA MSM 5 km)
         return ["jma_seamless", GLOBAL]
     if -47.5 <= lat <= -10.0 and 112.0 <= lon <= 179.0:  # Australia & NZ (BOM ACCESS-G)
         return ["bom_access_global", GLOBAL]
-    return [GLOBAL, "gfs_seamless"]                       # elsewhere: two globals
+    return [GLOBAL, "gfs_seamless"]  # elsewhere: two globals
 
 
 @dataclass(frozen=True)
@@ -210,7 +210,8 @@ def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
         return [_median(_finite_at(arrays, i)) for i in range(n)]
 
     # Median each layer across models first, then combine into the weighted cover the card uses.
-    cloud = [
+    # cloud_effective always returns a float, but the field is list[float | None] like the fused layers.
+    cloud: list[float | None] = [
         cloud_effective(
             _median(_finite_at(low_arrays, i)),
             _median(_finite_at(mid_arrays, i)),
