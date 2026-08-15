@@ -8,8 +8,8 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 ## 2026.9.0
 
 A release about putting the forecast to work: the full curve now reaches your
-automations, and a battery can be projected forward. Currently in beta
-(`2026.9.0-a0`).
+automations, a battery can be projected forward, and the forecast now reads the
+sky exactly like the Helios card.
 
 ### Added: the full forecast, in your automations
 
@@ -39,11 +39,34 @@ automation, which knows your inverter. And because home consumption is a learned
 average, it's an honest steer read alongside the reliability figure, not a
 guarantee. Thanks to @brunnwart and @jasonyates for the design brief (#25).
 
+### Changed: the forecast transposes the sun itself, no GTI dependency
+
+Helios Forecast no longer pulls a global tilted-irradiance (plane-of-array)
+supply; it transposes the horizontal irradiance onto each panel plane itself,
+exactly like the Helios card does. One fewer external dependency, and the two
+stay in lockstep. It also removes a flip-flop where some refreshes used
+Open-Meteo's own tilted value and others a fallback, giving different
+magnitudes from one update to the next.
+
+### Changed: the weather request now matches the Helios card
+
+The Open-Meteo request mirrors the card's: the same model picker (a regional
+high-resolution model paired with a global one, median-fused), the same weighted
+cloud-cover layers, and instant irradiance. Card and forecast read the same sky.
+
 ### Fixed: ready for a future Home Assistant statistics change
 
 A coming Home Assistant version tightens what the long-term statistics import
 expects; the integration now declares the new fields up front, so the archived
 weather and predicted-production history keep importing cleanly across the change.
+
+### Fixed: the battery SoC projection could crash, and now says why it skips
+
+The state-of-charge projection could error out, and when it correctly declined
+to run because an input was missing it did so silently, so an empty
+`get_battery_soc_forecast` gave no clue why. It no longer crashes, and it logs a
+clear reason whenever the projection is off, so you can tell at a glance what to
+fill in. Thanks to @FoxP (#40).
 No user action needed. Thanks to @FoxP for pointing out the breakage radar (#38).
 
 ---
