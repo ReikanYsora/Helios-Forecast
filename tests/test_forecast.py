@@ -56,9 +56,28 @@ def test_weighted_equals_share_weighted_sum() -> None:
 
     expected = 0.0
     for orientation, share in zip(layout.orientations, layout.shares):
-        ctx = PvContext(air_temp_c=18, wind_ms=3, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150)
+        ctx = PvContext(air_temp_c=18, wind_ms=3 / 3.6, ghi_wm2=600, direct_wm2=400, diffuse_wm2=150)
         expected += compute_pv_power(_NOON, _LAT, _LON, 30, orientation, ctx) * share
     assert abs(weighted - expected) < 1e-12
+
+
+def test_wind_is_converted_from_kmh_to_ms() -> None:
+    layout = _single_south_layout()
+    panel = layout.orientations[0]
+    sample = WeatherSample(cloud=0, ghi=900, direct=750, diffuse=150, temp=25, wind=18.0)
+    got = compute_pv_power_weighted(_NOON, _LAT, _LON, sample, layout)
+
+    def with_wind(wind_ms: float) -> float:
+        ctx = PvContext(air_temp_c=25, wind_ms=wind_ms, ghi_wm2=900, direct_wm2=750, diffuse_wm2=150)
+        return compute_pv_power(_NOON, _LAT, _LON, 0, panel, ctx)
+
+    assert abs(got - with_wind(18.0 / 3.6)) < 1e-12
+    assert abs(got - with_wind(18.0)) > 1e-6
+
+
+def test_wind_conversion_tolerates_missing_wind() -> None:
+    sample = WeatherSample(cloud=0, ghi=900, direct=750, diffuse=150, temp=25, wind=None)
+    assert compute_pv_power_weighted(_NOON, _LAT, _LON, sample, _single_south_layout()) > 0
 
 
 def test_lerp_helpers() -> None:

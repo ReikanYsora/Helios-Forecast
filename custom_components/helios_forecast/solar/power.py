@@ -63,7 +63,7 @@ def compute_pv_power_per_array(
     base_ctx = (
         PvContext(
             air_temp_c=sample.temp,
-            wind_ms=sample.wind,
+            wind_ms=(sample.wind / 3.6) if sample.wind is not None else None,
             ghi_wm2=sample.ghi if has_ghi else None,
             direct_wm2=sample.direct if has_split else None,
             diffuse_wm2=sample.diffuse if has_split else None,
