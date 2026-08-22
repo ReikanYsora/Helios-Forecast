@@ -20,6 +20,14 @@
 > service (§2), driven by a new battery config block (§5). The projection reads a
 > live SoC sensor as its starting point; this is a **projection-only input** and
 > does NOT feed the learning, which still takes no SoC input (§5).
+>
+> Revision (2026-08-22): documentation correction, no interface change. §3
+> described `helios_forecast/series` as future-only; the implementation has
+> always also served an hourly past archive (since the integration's first
+> commit) and the card has always requested it with `start` reaching into the
+> past when its active period does. The doc simply never matched, which fed a
+> false "past forecast is a hard platform limit for Helios-Forecast too"
+> assumption while auditing card issue #406. Corrected below.
 
 The integration owns one **config entry per panel line** (a group of co-oriented
 panels). Add it once per line. Every surface below is scoped to that entry, so
@@ -180,11 +188,17 @@ the card's "Graph detail" setting; the integration resamples server-side).
 }
 ```
 
-- Future only. **Past actuals are unchanged**: the card keeps reading them from
-  the recorder `change` series exactly as it does today.
-- Sub-hourly, so the short shadow dips the residual map carves (a tree clipping
-  production for half an hour) survive resampling. This is the fidelity the
-  hourly baseline `wh_hours` cannot carry.
+- Not future only: `points` also carries an **hourly past archive** (back to
+  `now - LEARN_DAYS`), the same model re-run against the real historical weather
+  and residual-corrected against recorded production. `start`/`end` bound the
+  full range, past and future, in one call. **Past actuals are unchanged
+  regardless**: the card's own production curve keeps reading them straight
+  from the recorder `change` series, this archive only backs the *predicted*
+  curve on a day already gone.
+- Sub-hourly for the live (future) half, hourly for the archived (past) half,
+  so the short shadow dips the residual map carves (a tree clipping
+  production for half an hour) survive resampling on what matters most. This
+  is the fidelity the hourly baseline `wh_hours` cannot carry either way.
 
 ## 4. What the card STOPS doing in v1.9.0
 
