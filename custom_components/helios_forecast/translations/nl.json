@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Laadtoestandsprognose ophalen",
-      "description": "Geeft de voorspelde batterijladingstoestand voor de komende 24 uur (één punt per 15 minuten) terug als reactiegegevens, voor gebruik in automatiseringen.",
+      "description": "Geeft de voorspelde batterijladingstoestand voor de komende 48 uur (één punt per 15 minuten) terug als reactiegegevens, voor gebruik in automatiseringen.",
       "fields": {
         "config_entry_id": {
           "name": "Installatie",

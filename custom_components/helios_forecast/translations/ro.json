@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Obține prognoza stării de încărcare",
-      "description": "Returnează starea de încărcare estimată a bateriei pentru următoarele 24 de ore (câte un punct la fiecare 15 minute) ca date de răspuns, pentru utilizare în automatizări.",
+      "description": "Returnează starea de încărcare estimată a bateriei pentru următoarele 48 de ore (câte un punct la fiecare 15 minute) ca date de răspuns, pentru utilizare în automatizări.",
       "fields": {
         "config_entry_id": {
           "name": "Instalație",

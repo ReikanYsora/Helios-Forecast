@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Dohvati prognozu stanja napunjenosti",
-      "description": "Vraća predviđeno stanje napunjenosti baterije za sljedeća 24 sata (jedna točka svakih 15 minuta) kao podatke odgovora za upotrebu u automatizacijama.",
+      "description": "Vraća predviđeno stanje napunjenosti baterije za sljedeća 48 sata (jedna točka svakih 15 minuta) kao podatke odgovora za upotrebu u automatizacijama.",
       "fields": {
         "config_entry_id": {
           "name": "Instalacija",

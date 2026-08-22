@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Získať predpoveď stavu nabitia",
-      "description": "Vráti predpokladaný stav nabitia batérie na nasledujúcich 24 hodín (jeden bod každých 15 minút) ako údaje odpovede na použitie v automatizáciách.",
+      "description": "Vráti predpokladaný stav nabitia batérie na nasledujúcich 48 hodín (jeden bod každých 15 minút) ako údaje odpovede na použitie v automatizáciách.",
       "fields": {
         "config_entry_id": {
           "name": "Inštalácia",

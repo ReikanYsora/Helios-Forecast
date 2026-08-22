@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Töltöttségi szint előrejelzés lekérése",
-      "description": "Visszaadja az akkumulátor előre jelzett töltöttségi szintjét a következő 24 órára (15 percenként egy pont) válaszadatként, automatizálásokban való használatra.",
+      "description": "Visszaadja az akkumulátor előre jelzett töltöttségi szintjét a következő 48 órára (15 percenként egy pont) válaszadatként, automatizálásokban való használatra.",
       "fields": {
         "config_entry_id": {
           "name": "Telepítés",

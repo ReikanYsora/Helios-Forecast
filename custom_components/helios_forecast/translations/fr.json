@@ -112,7 +112,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Obtenir la prévision d'état de charge",
-      "description": "Renvoie l'état de charge projeté de la batterie pour les 24 prochaines heures (un point toutes les 15 minutes) sous forme de données de réponse, pour les automatisations.",
+      "description": "Renvoie l'état de charge projeté de la batterie pour les 48 prochaines heures (un point toutes les 15 minutes) sous forme de données de réponse, pour les automatisations.",
       "fields": {
         "config_entry_id": {
           "name": "Installation",

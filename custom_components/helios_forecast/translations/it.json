@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Ottieni previsione dello stato di carica",
-      "description": "Restituisce lo stato di carica previsto della batteria per le prossime 24 ore (un punto ogni 15 minuti) come dati di risposta, da usare nelle automazioni.",
+      "description": "Restituisce lo stato di carica previsto della batteria per le prossime 48 ore (un punto ogni 15 minuti) come dati di risposta, da usare nelle automazioni.",
       "fields": {
         "config_entry_id": {
           "name": "Installazione",

@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Hent ladetilstandsprognose",
-      "description": "Returnerer den forventede ladetilstand for batteriet for de næste 24 timer (ét punkt hvert 15. minut) som svardata til brug i automatiseringer.",
+      "description": "Returnerer den forventede ladetilstand for batteriet for de næste 48 timer (ét punkt hvert 15. minut) som svardata til brug i automatiseringer.",
       "fields": {
         "config_entry_id": {
           "name": "Installation",

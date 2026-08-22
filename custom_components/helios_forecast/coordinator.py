@@ -108,6 +108,11 @@ _LOGGER = logging.getLogger(__name__)
 UPDATE_INTERVAL = timedelta(minutes=30)
 STEP_MINUTES = 15
 FORECAST_DAYS = 7
+# How far ahead the battery SoC projection runs. Was 24h, too short to show the projection recover
+# through the FOLLOWING day's solar peak (a chart reading it past that point just sees the reserve
+# floor, looking "stuck"). The PV forecast itself already reaches FORECAST_DAYS ahead, so widening
+# this only uses points already being fetched, nothing new to source.
+BATTERY_SOC_HORIZON_HOURS = 48.0
 
 
 @dataclass
@@ -129,7 +134,7 @@ class ForecastData:
     # Today's outlook versus its frozen daily reference (default 06:00), feeds
     # the today-trend sensor.
     trend: TodayTrend
-    # Projected battery state of charge over the next 24 h (15-min points), from the PV forecast
+    # Projected battery state of charge over the next BATTERY_SOC_HORIZON_HOURS (15-min points), from the PV forecast
     # against the learned consumption profile. Empty when the battery feature is off or has no
     # usable input (no capacity / SoC entity / consumption history). Feeds the SoC sensor + service.
     battery_soc: List[BatterySocPoint]
@@ -276,7 +281,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         )
 
     async def _project_battery_soc(self, data, points, now) -> List[BatterySocPoint]:
-        """Project the battery SoC over the next 24 h, or [] when the feature can't run.
+        """Project the battery SoC over the next BATTERY_SOC_HORIZON_HOURS, or [] when the feature can't run.
 
         Needs three things: the battery config (capacity + live SoC entity), a current SoC reading to
         start from, and a consumption profile derived from the Energy dashboard. Any missing piece
@@ -319,6 +324,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 profile,
                 now=now,
                 tz=dt_util.DEFAULT_TIME_ZONE,
+                horizon_hours=BATTERY_SOC_HORIZON_HOURS,
                 step_minutes=STEP_MINUTES,
             )
         )

@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Sækja spá um hleðslustöðu",
-      "description": "Skilar áætlaðri hleðslustöðu rafhlöðu fyrir næstu 24 klukkustundir (einn punktur á 15 mínútna fresti) sem svargögnum til notkunar í sjálfvirkni.",
+      "description": "Skilar áætlaðri hleðslustöðu rafhlöðu fyrir næstu 48 klukkustundir (einn punktur á 15 mínútna fresti) sem svargögnum til notkunar í sjálfvirkni.",
       "fields": {
         "config_entry_id": {
           "name": "Uppsetning",

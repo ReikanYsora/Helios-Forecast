@@ -366,7 +366,7 @@ class HeliosReliabilitySensor(CoordinatorEntity[HeliosForecastCoordinator], Sens
 
 
 class HeliosBatterySocSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEntity):
-    """Predicted battery state of charge. The state is the near-term projection; the full 24-hour SoC
+    """Predicted battery state of charge. The state is the near-term projection; the full 48-hour SoC
     curve rides along as the `forecast` attribute, with the projected daily low/high and the forecast
     reliability so an automation can weigh how much to trust it. Charge decisions stay with the user."""
 

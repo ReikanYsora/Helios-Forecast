@@ -112,7 +112,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Get battery SoC forecast",
-      "description": "Returns the projected battery state of charge for the next 24 hours (one point per 15 minutes) as response data, for use in automations.",
+      "description": "Returns the projected battery state of charge for the next 48 hours (one point per 15 minutes) as response data, for use in automations.",
       "fields": {
         "config_entry_id": {
           "name": "Installation",

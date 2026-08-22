@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Gauti įkrovos prognozę",
-      "description": "Grąžina prognozuojamą akumuliatoriaus įkrovą kitoms 24 valandoms (po vieną tašką kas 15 minučių) kaip atsako duomenis, naudoti automatizacijose.",
+      "description": "Grąžina prognozuojamą akumuliatoriaus įkrovą kitoms 48 valandoms (po vieną tašką kas 15 minučių) kaip atsako duomenis, naudoti automatizacijose.",
       "fields": {
         "config_entry_id": {
           "name": "Įdiegimas",

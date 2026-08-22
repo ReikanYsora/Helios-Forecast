@@ -137,7 +137,7 @@ With more than one installation, pass `config_entry_id` (from **Settings** >
 ## Predicted battery state of charge
 
 If you have a battery, Helios Forecast can project its **state of charge over the
-next 24 hours**. It runs the production forecast against your home's own
+next 48 hours**. It runs the production forecast against your home's own
 consumption, which it derives from your **Home Assistant Energy dashboard** (no
 extra sensor to wire), and integrates the battery's charge from your current SoC.
 
@@ -171,7 +171,7 @@ forecast:
     soc: 78.4
   - datetime: "2026-09-12T14:15:00+02:00"
     soc: 80.1
-  # ... one point every 15 minutes, 24 hours ahead
+  # ... one point every 15 minutes, 48 hours ahead
 ```
 
 One honest note: home consumption is a **learned average**, so the projection is a

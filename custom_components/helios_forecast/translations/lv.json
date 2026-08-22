@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Iegūt uzlādes līmeņa prognozi",
-      "description": "Atgriež prognozēto akumulatora uzlādes līmeni nākamajām 24 stundām (viens punkts ik pēc 15 minūtēm) kā atbildes datus izmantošanai automatizācijās.",
+      "description": "Atgriež prognozēto akumulatora uzlādes līmeni nākamajām 48 stundām (viens punkts ik pēc 15 minūtēm) kā atbildes datus izmantošanai automatizācijās.",
       "fields": {
         "config_entry_id": {
           "name": "Instalācija",

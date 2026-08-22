@@ -28,6 +28,13 @@
 > past when its active period does. The doc simply never matched, which fed a
 > false "past forecast is a hard platform limit for Helios-Forecast too"
 > assumption while auditing card issue #406. Corrected below.
+>
+> Revision (2026-08-22): the battery SoC projection's horizon widened from **24 h to
+> 48 h** (§2). A 24 h window cut the curve off partway through the FOLLOWING day, before
+> its solar recovery showed, which read as the projection stuck at the reserve floor
+> (#40) and left no data to chart 48 h out (#41). The PV forecast itself already reaches
+> a week ahead, so this only uses points already being fetched. Shape unchanged
+> (`[{datetime, soc}]`), only the count of points grows.
 
 The integration owns one **config entry per panel line** (a group of co-oriented
 panels). Add it once per line. Every surface below is scoped to that entry, so
@@ -135,7 +142,7 @@ Battery state of charge (2026.9.0, only when the battery block in §5 is configu
 
 | Entity | State | Notes |
 |---|---|---|
-| `sensor.helios_forecast_predicted_battery_soc` | near-term projected SoC, **0..100 %** | `device_class: battery`, `state_class: measurement`. The whole 24 h curve rides as a `forecast` attribute (`[{datetime, soc}]`, kept off the recorder), with the day's `min_soc` / `max_soc` (+ times) and the forecast `reliability`. Created only when the battery feature is on. |
+| `sensor.helios_forecast_predicted_battery_soc` | near-term projected SoC, **0..100 %** | `device_class: battery`, `state_class: measurement`. The whole 48 h curve rides as a `forecast` attribute (`[{datetime, soc}]`, kept off the recorder), with the day's `min_soc` / `max_soc` (+ times) and the forecast `reliability`. Created only when the battery feature is on. |
 
 The forecast curve and the SoC curve are also exposed as **response services** for
 automations (the recommended path over scraping an attribute):
@@ -143,7 +150,7 @@ automations (the recommended path over scraping an attribute):
 | Service | Returns |
 |---|---|
 | `helios_forecast.get_forecast` | `{ forecast: [{datetime, watts, p10, p90}] }` — the production curve, today onward |
-| `helios_forecast.get_battery_soc_forecast` | `{ forecast: [{datetime, soc}] }` — the projected SoC, next 24 h |
+| `helios_forecast.get_battery_soc_forecast` | `{ forecast: [{datetime, soc}] }` — the projected SoC, next 48 h |
 
 Both take an optional `config_entry_id` (needed only with several installations).
 The SoC projection **predicts, it never commands**: it exposes the curve and leaves

@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Hämta laddningsnivåprognos",
-      "description": "Returnerar batteriets förväntade laddningsnivå för de kommande 24 timmarna (en punkt var 15:e minut) som svarsdata för användning i automationer.",
+      "description": "Returnerar batteriets förväntade laddningsnivå för de kommande 48 timmarna (en punkt var 15:e minut) som svarsdata för användning i automationer.",
       "fields": {
         "config_entry_id": {
           "name": "Installation",

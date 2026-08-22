@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Pobierz prognozę stanu naładowania",
-      "description": "Zwraca prognozowany stan naładowania akumulatora na następne 24 godziny (jeden punkt co 15 minut) jako dane odpowiedzi do użycia w automatyzacjach.",
+      "description": "Zwraca prognozowany stan naładowania akumulatora na następne 48 godzin (jeden punkt co 15 minut) jako dane odpowiedzi do użycia w automatyzacjach.",
       "fields": {
         "config_entry_id": {
           "name": "Instalacja",

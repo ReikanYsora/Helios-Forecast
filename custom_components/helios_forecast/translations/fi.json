@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Hae varaustilan ennuste",
-      "description": "Palauttaa akun ennustetun varaustilan seuraaville 24 tunnille (yksi piste 15 minuutin välein) vastaustietona automaatioita varten.",
+      "description": "Palauttaa akun ennustetun varaustilan seuraaville 48 tunnille (yksi piste 15 minuutin välein) vastaustietona automaatioita varten.",
       "fields": {
         "config_entry_id": {
           "name": "Asennus",

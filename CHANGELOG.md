@@ -88,6 +88,15 @@ could be read with a neighbour's model. It now picks the area your location sits
 most centrally within, so the regional model matches where you actually are.
 Thanks to @MatCos.
 
+### Changed: the battery SoC projection now looks 48 hours ahead
+
+The projection used to stop 24 hours out, which cut it off partway through the
+following day, before that day's solar had a chance to recharge the battery. A
+chart reading past that point just saw the reserve floor, looking stuck there
+even though the battery would genuinely recover once the sun came back. It now
+runs 48 hours ahead, using PV forecast points already being fetched. Thanks to
+@FoxP (#40, #41).
+
 ---
 
 ## 2026.8.3

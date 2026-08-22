@@ -110,7 +110,7 @@
     },
     "get_battery_soc_forecast": {
       "name": "Hangi laetuse prognoos",
-      "description": "Tagastab aku prognoositud laetuse järgmiseks 24 tunniks (üks punkt iga 15 minuti järel) vastuseandmetena automatiseeringutes kasutamiseks.",
+      "description": "Tagastab aku prognoositud laetuse järgmiseks 48 tunniks (üks punkt iga 15 minuti järel) vastuseandmetena automatiseeringutes kasutamiseks.",
       "fields": {
         "config_entry_id": {
           "name": "Paigaldis",
