@@ -88,6 +88,15 @@ could be read with a neighbour's model. It now picks the area your location sits
 most centrally within, so the regional model matches where you actually are.
 Thanks to @MatCos.
 
+### Fixed: wind speed was read in the wrong unit, running the forecast hot
+
+Open-Meteo returns wind at 10 m in km/h, but the cell-temperature model that
+derates the forecast for a hot panel expects m/s. Reading the km/h figure as
+if it were m/s made the modelled cell run too cool, which overstated the
+forecast: about 7% high at a moderate 5 m/s wind, and 14% at 10 m/s. Converted
+at the single point wind enters the model; your wind sensor and its history
+are untouched, still in km/h. Thanks to @Happyfield7 (#44, #45).
+
 ### Changed: the battery SoC projection now looks 48 hours ahead
 
 The projection used to stop 24 hours out, which cut it off partway through the
