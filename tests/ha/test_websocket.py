@@ -31,7 +31,7 @@ def _register(hass):
 async def test_ws_series_returns_points_with_full_shape(hass, hass_ws_client) -> None:
     now = datetime(2026, 6, 21, 10, tzinfo=_UTC)
     points = [ForecastPoint(t=now, pv_w=100.0, pv_raw_w=90.0, pv_p10=80.0, pv_p90=120.0, ghi=300.0, cloud=50.0)]
-    days = [DayForecast(date="2026-06-21", energy_kwh=12.3, peak_power_w=1000.0, peak_time=now)]
+    days = [DayForecast(date="2026-06-21", energy_kwh=12.3, peak_power_w=1000.0, peak_time=now, energy_raw_kwh=13.5)]
     hass.data[DOMAIN] = {"entry1": _coordinator_with(points=points, days=days)}
     client = await hass_ws_client(hass)
 
@@ -49,7 +49,7 @@ async def test_ws_series_returns_points_with_full_shape(hass, hass_ws_client) ->
             "cloud": 50.0,
         }
     ]
-    assert response["result"]["daily"] == [{"date": "2026-06-21", "kwh": 12.3, "kwh_raw": 12.3}]
+    assert response["result"]["daily"] == [{"date": "2026-06-21", "kwh": 12.3, "kwh_raw": 13.5}]
 
 
 async def test_ws_series_missing_ghi_cloud_default_to_none(hass, hass_ws_client) -> None:
@@ -124,20 +124,20 @@ async def test_ws_series_not_found_when_coordinator_never_refreshed(hass, hass_w
     assert response["error"]["code"] == "not_found"
 
 
-async def test_ws_series_daily_kwh_raw_currently_mirrors_kwh(hass, hass_ws_client) -> None:
-    # Characterizes the CURRENT behavior: `kwh_raw` is set from the same (residual-corrected)
-    # `energy_kwh` as `kwh`, not from a true pre-correction sum (CONTRACT.md documents them as
-    # distinct, e.g. kwh: 21.4 / kwh_raw: 22.9). Flagged separately as a contract mismatch; this
-    # test only pins today's actual output so a fix is a deliberate, visible change here.
+async def test_ws_series_daily_kwh_raw_is_the_pre_correction_total(hass, hass_ws_client) -> None:
+    # kwh and kwh_raw must read from their own independently-summed daily totals (energy_kwh
+    # from pv_w, energy_raw_kwh from pv_raw_w), not collapse onto the same figure.
     now = datetime(2026, 6, 21, tzinfo=_UTC)
-    days = [DayForecast(date="2026-06-21", energy_kwh=21.4, peak_power_w=1000.0, peak_time=now)]
+    days = [DayForecast(date="2026-06-21", energy_kwh=21.4, peak_power_w=1000.0, peak_time=now, energy_raw_kwh=22.9)]
     hass.data[DOMAIN] = {"entry1": _coordinator_with(days=days)}
     client = await hass_ws_client(hass)
 
     await client.send_json({"id": 1, "type": "helios_forecast/series", "entry_id": "entry1"})
     response = await client.receive_json()
     daily = response["result"]["daily"][0]
-    assert daily["kwh"] == daily["kwh_raw"] == 21.4
+    assert daily["kwh"] == 21.4
+    assert daily["kwh_raw"] == 22.9
+    assert daily["kwh"] != daily["kwh_raw"]
 
 
 async def test_ws_series_resolution_min_resamples_into_averaged_buckets(hass, hass_ws_client) -> None:

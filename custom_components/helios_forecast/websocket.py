@@ -123,5 +123,5 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
     else:
         points = [_point_dict(p) for p in in_range]
 
-    daily = [{"date": d.date, "kwh": d.energy_kwh, "kwh_raw": d.energy_kwh} for d in coordinator.data.summary.days]
+    daily = [{"date": d.date, "kwh": d.energy_kwh, "kwh_raw": d.energy_raw_kwh} for d in coordinator.data.summary.days]
     connection.send_result(msg["id"], {"points": points, "daily": daily})
