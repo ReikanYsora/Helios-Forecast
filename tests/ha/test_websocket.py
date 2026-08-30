@@ -216,3 +216,22 @@ async def test_ws_series_omitting_resolution_min_keeps_native_output_unchanged(h
         }
         for p in points
     ]
+
+
+async def test_ws_series_naive_start_returns_clean_error_not_a_crash(hass, hass_ws_client) -> None:
+    now = datetime(2026, 6, 21, 10, tzinfo=_UTC)
+    points = [ForecastPoint(t=now, pv_w=1.0, pv_raw_w=1.0)]
+    hass.data[DOMAIN] = {"entry1": _coordinator_with(points=points)}
+    client = await hass_ws_client(hass)
+
+    await client.send_json(
+        {
+            "id": 1,
+            "type": "helios_forecast/series",
+            "entry_id": "entry1",
+            "start": "2026-06-21T10:00:00",  # no UTC offset
+        }
+    )
+    response = await client.receive_json()
+    assert response["success"] is False
+    assert response["error"]["code"] == "invalid_format"

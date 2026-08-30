@@ -99,6 +99,10 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
 
     start = dt_util.parse_datetime(msg["start"]) if msg.get("start") else None
     end = dt_util.parse_datetime(msg["end"]) if msg.get("end") else None
+    for label, value in (("start", start), ("end", end)):
+        if value is not None and value.tzinfo is None:
+            connection.send_error(msg["id"], "invalid_format", f"'{label}' must include a UTC offset")
+            return
 
     # Full curve = the hourly past archive (before the live series starts) followed by the live
     # sub-hourly points (today onward). The live points are higher resolution, so the past archive is
