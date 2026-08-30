@@ -13,6 +13,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pytest
+
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
@@ -123,6 +125,21 @@ def test_get_json_returns_none_on_timeout() -> None:
     finally:
         om._REQUEST_TIMEOUT_S = original_timeout
     assert result is None
+
+
+def test_parse_cloud_spread_asserts_on_layer_key_collision() -> None:
+    # If a payload ever carried both the per-layer keys and the aggregate 'cloud_cover' key together,
+    # the prefix match in _model_arrays would silently fold the per-layer arrays into the spread
+    # lookup. This must fail loudly instead of returning a corrupted result.
+    payload = {
+        "hourly": {
+            "time": ["2026-06-11T00:00"],
+            "cloud_cover": [50.0],
+            "cloud_cover_low": [10.0],
+        }
+    }
+    with pytest.raises(AssertionError):
+        parse_cloud_spread(payload)
 
 
 def test_parse_cloud_spread() -> None:

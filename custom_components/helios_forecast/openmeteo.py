@@ -253,6 +253,13 @@ def parse_cloud_spread(payload: dict[str, Any]) -> tuple[list[datetime], list[fl
     """
     hourly = payload.get("hourly") or {}
     time_strs = hourly.get("time") or []
+    # "cloud_cover" is a string-prefix of the per-layer keys ("cloud_cover_low" and friends), so
+    # _model_arrays' prefix match would silently fold them into this aggregate lookup if a payload
+    # ever carried both key families at once. Today the values and ensemble calls are always two
+    # separate HTTP responses, so this never happens; fail loudly instead of drifting quietly if it ever does.
+    assert not any(k.startswith(("cloud_cover_low", "cloud_cover_mid", "cloud_cover_high")) for k in hourly), (
+        "ensemble payload unexpectedly also carries per-layer cloud keys, would corrupt the spread lookup"
+    )
     cloud_arrays = _model_arrays(hourly, "cloud_cover")
     if not time_strs or not any(cloud_arrays):
         return None
