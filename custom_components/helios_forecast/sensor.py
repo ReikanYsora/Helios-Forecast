@@ -7,6 +7,7 @@ and this/next hour. All values are produced in summary.py.
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -38,6 +39,8 @@ from .const import DOMAIN
 from .coordinator import ForecastData, HeliosForecastCoordinator
 from .statistics import WEATHER_FIELDS
 from .summary import ForecastSummary
+
+_LOGGER = logging.getLogger(__name__)
 
 _HORIZON_DAYS = 7
 _ValueType = Optional[Union[float, datetime]]
@@ -214,7 +217,13 @@ def _build_weather_descriptions() -> list[SensorEntityDescription]:
     """One MEASUREMENT sensor per archived Open-Meteo weather variable."""
     descriptions: list[SensorEntityDescription] = []
     for field in WEATHER_FIELDS:
-        device_class, unit, name, precision = _WEATHER_META[field.key]
+        meta = _WEATHER_META.get(field.key)
+        if meta is None:
+            # A WEATHER_FIELDS entry with no display metadata: skip just this sensor rather than
+            # aborting the whole platform (every other entity, weather or not, still sets up).
+            _LOGGER.error("No display metadata for weather field '%s', skipping its sensor", field.key)
+            continue
+        device_class, unit, name, precision = meta
         descriptions.append(
             SensorEntityDescription(
                 key=field.key,
