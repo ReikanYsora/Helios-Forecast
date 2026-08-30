@@ -11,13 +11,16 @@ sys.path.insert(0, str(_REPO_ROOT))
 from custom_components.helios_forecast.config import (  # noqa: E402
     CONF_ARRAYS,
     INF,
+    battery_from_config,
     inverter_max_w_from_config,
     layout_from_config,
+    learning_from_config,
     lines_from_config,
     location_from_config,
     merge_entry_data,
     split_line,
     split_settings,
+    trend_anchor_hour_from_config,
 )
 
 
@@ -105,6 +108,80 @@ def test_decimal_peak_power_preserved() -> None:
     # Regression for issue #13: a decimal kWp must survive into the layout at full precision.
     layout = layout_from_config(merge_entry_data({}, [{"tilt": 30, "azimuth": 180, "kwp": 2.61}]))
     assert layout.total_kwp == 2.61
+
+
+def test_layout_no_line_caps_when_none_set() -> None:
+    layout = layout_from_config(
+        {"arrays": [{"tilt": 30, "azimuth": 90, "kwp": 4}, {"tilt": 30, "azimuth": 270, "kwp": 2}]}
+    )
+    assert layout.caps == []
+
+
+def test_layout_line_caps_mixed_capped_and_uncapped() -> None:
+    layout = layout_from_config(
+        {
+            "arrays": [
+                {"tilt": 30, "azimuth": 90, "kwp": 4, "line_inverter_max_kw": 3.0},
+                {"tilt": 30, "azimuth": 270, "kwp": 2},
+            ]
+        }
+    )
+    assert layout.caps == [3000.0, INF]
+
+
+def test_layout_line_cap_zero_or_negative_is_uncapped() -> None:
+    layout = layout_from_config({"arrays": [{"tilt": 30, "azimuth": 90, "kwp": 4, "line_inverter_max_kw": 0}]})
+    assert layout.caps == []
+
+
+def test_learning_entity_or_none() -> None:
+    assert learning_from_config({"production_entity": "sensor.pv"}) == "sensor.pv"
+    assert learning_from_config({}) is None
+    assert learning_from_config({"production_entity": ""}) is None
+
+
+def test_trend_anchor_hour_default_and_clamped() -> None:
+    assert trend_anchor_hour_from_config({}) == 6
+    assert trend_anchor_hour_from_config({"trend_anchor_hour": 14}) == 14
+    # Out-of-range inputs are clamped rather than rejected.
+    assert trend_anchor_hour_from_config({"trend_anchor_hour": -5}) == 0
+    assert trend_anchor_hour_from_config({"trend_anchor_hour": 99}) == 23
+
+
+def test_battery_off_without_capacity_or_soc_entity() -> None:
+    assert battery_from_config({}) is None
+    assert battery_from_config({"battery_capacity_kwh": 10.0}) is None  # no SoC entity
+    assert battery_from_config({"battery_soc_entity": "sensor.soc"}) is None  # no capacity
+    assert battery_from_config({"battery_capacity_kwh": 0, "battery_soc_entity": "sensor.soc"}) is None
+
+
+def test_battery_on_with_defaults() -> None:
+    config = battery_from_config({"battery_capacity_kwh": 10.0, "battery_soc_entity": "sensor.soc"})
+    assert config is not None
+    assert config.capacity_kwh == 10.0
+    assert config.soc_entity == "sensor.soc"
+    assert config.max_charge_w == INF
+    assert config.max_discharge_w == INF
+    assert config.min_soc_frac == 0.1  # default 10%
+    assert config.efficiency == 0.9  # default 90%
+
+
+def test_battery_on_with_explicit_fields() -> None:
+    config = battery_from_config(
+        {
+            "battery_capacity_kwh": 5.0,
+            "battery_soc_entity": "sensor.soc",
+            "battery_max_charge_kw": 2.0,
+            "battery_max_discharge_kw": 3.0,
+            "battery_min_soc": 20,
+            "battery_efficiency": 95,
+        }
+    )
+    assert config is not None
+    assert config.max_charge_w == 2000.0
+    assert config.max_discharge_w == 3000.0
+    assert config.min_soc_frac == 0.2
+    assert config.efficiency == 0.95
 
 
 if __name__ == "__main__":
