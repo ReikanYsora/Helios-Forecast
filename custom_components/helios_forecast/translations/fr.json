@@ -38,6 +38,8 @@
           "kwp": "Puissance crête (kWc)",
           "line_inverter_max_kw": "Puissance max de l'onduleur pour cette ligne (kW, optionnel)",
           "tracker": "Suiveur solaire",
+          "latitude": "Latitude pour cette ligne (optionnel)",
+          "longitude": "Longitude pour cette ligne (optionnel)",
           "add_another": "Ajouter une autre ligne de panneaux"
         }
       }
@@ -83,6 +85,8 @@
           "kwp": "Puissance crête (kWc)",
           "line_inverter_max_kw": "Puissance max de l'onduleur pour cette ligne (kW, optionnel)",
           "tracker": "Suiveur solaire",
+          "latitude": "Latitude pour cette ligne (optionnel)",
+          "longitude": "Longitude pour cette ligne (optionnel)",
           "remove_this_line": "Supprimer cette ligne de panneaux",
           "add_another": "Ajouter une autre ligne de panneaux"
         }

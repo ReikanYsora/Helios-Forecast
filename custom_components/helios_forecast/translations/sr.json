@@ -37,6 +37,8 @@
           "kwp": "Вршна снага (kWp)",
           "line_inverter_max_kw": "Макс. снага инвертора за ову линију (kW, опционо)",
           "tracker": "Пратилац сунца",
+          "latitude": "Географска ширина за ову линију (опционо)",
+          "longitude": "Географска дужина за ову линију (опционо)",
           "add_another": "Add another panel line"
         }
       }
@@ -81,6 +83,8 @@
           "kwp": "Вршна снага (kWp)",
           "line_inverter_max_kw": "Макс. снага инвертора за ову линију (kW, опционо)",
           "tracker": "Пратилац сунца",
+          "latitude": "Географска ширина за ову линију (опционо)",
+          "longitude": "Географска дужина за ову линију (опционо)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }

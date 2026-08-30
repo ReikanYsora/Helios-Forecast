@@ -37,6 +37,8 @@
           "kwp": "Пикова мощност (kWp)",
           "line_inverter_max_kw": "Макс. мощност на инвертора за тази линия (kW, по избор)",
           "tracker": "Слънчев тракер",
+          "latitude": "Географска ширина за тази линия (по избор)",
+          "longitude": "Географска дължина за тази линия (по избор)",
           "add_another": "Add another panel line"
         }
       }
@@ -81,6 +83,8 @@
           "kwp": "Пикова мощност (kWp)",
           "line_inverter_max_kw": "Макс. мощност на инвертора за тази линия (kW, по избор)",
           "tracker": "Слънчев тракер",
+          "latitude": "Географска ширина за тази линия (по избор)",
+          "longitude": "Географска дължина за тази линия (по избор)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }

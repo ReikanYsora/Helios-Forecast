@@ -68,10 +68,11 @@ def test_split_line_keeps_only_geometry_and_drops_empty() -> None:
         "azimuth": 180,
         "kwp": 2.61,
         "tracker": "none",
-        "latitude": 1.0,  # entry-level, not a line field
+        "latitude": 1.0,  # per-line coordinate override, kept
+        "inverter_max_kw": 5.0,  # entry-level, not a line field
         "add_another": True,  # control key, never stored
     }
-    assert split_line(form) == {"tilt": 30, "azimuth": 180, "kwp": 2.61, "tracker": "none"}
+    assert split_line(form) == {"tilt": 30, "azimuth": 180, "kwp": 2.61, "tracker": "none", "latitude": 1.0}
     # Missing / None geometry values are dropped rather than stored as null.
     assert split_line({"tilt": 30, "azimuth": None}) == {"tilt": 30}
 

@@ -37,6 +37,8 @@
           "kwp": "Didžiausia galia (kWp)",
           "line_inverter_max_kw": "Maks. keitiklio galia šiai linijai (kW, neprivaloma)",
           "tracker": "Saulės sekiklis",
+          "latitude": "Platuma šiai linijai (neprivaloma)",
+          "longitude": "Ilguma šiai linijai (neprivaloma)",
           "add_another": "Add another panel line"
         }
       }
@@ -81,6 +83,8 @@
           "kwp": "Didžiausia galia (kWp)",
           "line_inverter_max_kw": "Maks. keitiklio galia šiai linijai (kW, neprivaloma)",
           "tracker": "Saulės sekiklis",
+          "latitude": "Platuma šiai linijai (neprivaloma)",
+          "longitude": "Ilguma šiai linijai (neprivaloma)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }

@@ -18,6 +18,7 @@ from custom_components.helios_forecast.config import (
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_TRACKER,
+    layout_from_config,
 )
 from custom_components.helios_forecast.const import DOMAIN
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -183,3 +184,35 @@ async def test_options_settings_step_decimal_latitude_longitude_roundtrip(
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_LATITUDE] == 45.7597
     assert result["data"][CONF_LONGITUDE] == 4.8422
+
+
+async def test_options_lines_step_per_line_coordinate_override(
+    recorder_mock, hass: HomeAssistant, enable_custom_integrations
+) -> None:
+    """Two-line entry: line 2 sets an explicit lat/lon override, line 1 leaves it blank.
+
+    layout_from_config must carry line 2's override through to PvLayout.coords while line 1
+    stays None, so it falls back to the entry-level home coordinates downstream.
+    """
+    entry = MockConfigEntry(domain=DOMAIN, data={CONF_ARRAYS: [_LINE_A, _LINE_B]})
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "lines"})
+    assert result["type"] == FlowResultType.FORM
+
+    # Line 1: no coordinate override.
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {**_LINE_A, "remove_this_line": False}
+    )
+    assert result["type"] == FlowResultType.FORM
+
+    # Line 2: an explicit override, far enough from the entry's home to matter.
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {**_LINE_B, CONF_LATITUDE: 43.2965, CONF_LONGITUDE: 5.3698, "remove_this_line": False, "add_another": False},
+    )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+
+    layout = layout_from_config(result["data"])
+    assert layout.coords == [None, (43.2965, 5.3698)]

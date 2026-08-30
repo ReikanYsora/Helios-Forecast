@@ -42,6 +42,7 @@ from .config import (
     DEFAULT_TREND_ANCHOR_HOUR,
     TRACKER_NONE,
     lines_from_config,
+    location_from_config,
     merge_entry_data,
     split_line,
     split_settings,
@@ -95,6 +96,8 @@ _PERCENT = selector.NumberSelector(
 
 def _line_fields(
     arr: dict[str, Any] | None,
+    home_lat: float,
+    home_lon: float,
     *,
     with_add_another: bool,
     add_another_default: bool = False,
@@ -120,6 +123,13 @@ def _line_fields(
         vol.Optional(CONF_LINE_INVERTER_MAX_KW, description={"suggested_value": arr.get(CONF_LINE_INVERTER_MAX_KW)})
     ] = _INVERTER
     fields[vol.Required(CONF_TRACKER, default=arr.get(CONF_TRACKER, TRACKER_NONE))] = _TRACKER
+    # Optional per-line location override, for a line far enough from the entry's home coordinates
+    # (e.g. a detached outbuilding) that it needs its own sun geometry. Suggested with the entry's
+    # home coordinates so the field never comes up blank, but it is only stored once actually set.
+    fields[vol.Optional(CONF_LATITUDE, description={"suggested_value": arr.get(CONF_LATITUDE, home_lat)})] = _LATITUDE
+    fields[vol.Optional(CONF_LONGITUDE, description={"suggested_value": arr.get(CONF_LONGITUDE, home_lon)})] = (
+        _LONGITUDE
+    )
     if allow_remove:
         fields[vol.Optional(_REMOVE, default=False)] = _BOOL
     if with_add_another:
@@ -192,9 +202,10 @@ class HeliosForecastConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-
             if user_input.get(_ADD_ANOTHER):
                 return await self.async_step_line()
             return self._finish()
+        home_lat, home_lon = self.hass.config.latitude, self.hass.config.longitude
         fields = {vol.Optional(_NAME, default=_DEFAULT_NAME): str}
-        fields.update(_line_fields(None, with_add_another=False))
-        fields.update(_settings_fields(self.hass.config.latitude, self.hass.config.longitude))
+        fields.update(_line_fields(None, home_lat, home_lon, with_add_another=False))
+        fields.update(_settings_fields(home_lat, home_lon))
         fields[vol.Optional(_ADD_ANOTHER, default=False)] = _BOOL
         return self.async_show_form(step_id="user", data_schema=vol.Schema(fields))
 
@@ -205,9 +216,12 @@ class HeliosForecastConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-
             if user_input.get(_ADD_ANOTHER):
                 return await self.async_step_line()
             return self._finish()
+        # The entry-level location was already collected on the first step: suggest it (falling
+        # back to the Home Assistant home) rather than the raw HA home for this additional line.
+        home_lat, home_lon = location_from_config(self._settings, self.hass.config.latitude, self.hass.config.longitude)
         return self.async_show_form(
             step_id="line",
-            data_schema=vol.Schema(_line_fields(None, with_add_another=True)),
+            data_schema=vol.Schema(_line_fields(None, home_lat, home_lon, with_add_another=True)),
             description_placeholders={"index": str(len(self._lines) + 1)},
         )
 
@@ -263,11 +277,14 @@ class HeliosForecastOptionsFlow(OptionsFlow):
         arr = existing[self._index] if editing_existing else None
         # Auto-advance through the remaining existing lines without forcing a manual tick.
         more_existing = self._index + 1 < len(existing)
+        home_lat, home_lon = location_from_config(current, self.hass.config.latitude, self.hass.config.longitude)
         return self.async_show_form(
             step_id="lines",
             data_schema=vol.Schema(
                 _line_fields(
                     arr,
+                    home_lat,
+                    home_lon,
                     with_add_another=True,
                     add_another_default=more_existing,
                     allow_remove=editing_existing and len(existing) > 1,

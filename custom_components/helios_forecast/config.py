@@ -53,8 +53,18 @@ _VALID_TRACKERS = {"dual-axis", "single-axis-h", "single-axis-v"}
 # Per-line geometry keys, split out of the flat form into one entry in the
 # ``arrays`` list. An entry may hold several lines (e.g. two strings on one
 # inverter): the model sums them by kWp share and the entry-level inverter cap
-# applies to their combined output.
-LINE_KEYS: Tuple[str, ...] = (CONF_TILT, CONF_AZIMUTH, CONF_KWP, CONF_TRACKER, CONF_LINE_INVERTER_MAX_KW)
+# applies to their combined output. Latitude/longitude here are an optional
+# per-line override of the entry-level location (e.g. two roofs far enough
+# apart to matter); unset, a line falls back to the entry's location.
+LINE_KEYS: Tuple[str, ...] = (
+    CONF_TILT,
+    CONF_AZIMUTH,
+    CONF_KWP,
+    CONF_TRACKER,
+    CONF_LINE_INVERTER_MAX_KW,
+    CONF_LATITUDE,
+    CONF_LONGITUDE,
+)
 # Entry-level settings, shared by every line in the entry.
 SETTINGS_KEYS: Tuple[str, ...] = (
     CONF_LATITUDE,

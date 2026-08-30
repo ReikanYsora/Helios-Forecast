@@ -37,6 +37,8 @@
           "kwp": "Moc szczytowa (kWp)",
           "line_inverter_max_kw": "Maks. moc falownika dla tej linii (kW, opcjonalnie)",
           "tracker": "Tracker słoneczny",
+          "latitude": "Szerokość geograficzna dla tej linii (opcjonalnie)",
+          "longitude": "Długość geograficzna dla tej linii (opcjonalnie)",
           "add_another": "Add another panel line"
         }
       }
@@ -81,6 +83,8 @@
           "kwp": "Moc szczytowa (kWp)",
           "line_inverter_max_kw": "Maks. moc falownika dla tej linii (kW, opcjonalnie)",
           "tracker": "Tracker słoneczny",
+          "latitude": "Szerokość geograficzna dla tej linii (opcjonalnie)",
+          "longitude": "Długość geograficzna dla tej linii (opcjonalnie)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }
