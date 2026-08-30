@@ -28,6 +28,14 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional, TypeVar
 if TYPE_CHECKING:
     from aiohttp import ClientSession
 
+try:
+    from aiohttp import ContentTypeError
+except ImportError:  # aiohttp is not installed in the pure-python test env; only used for isinstance checks
+
+    class ContentTypeError(Exception):  # type: ignore[no-redef]
+        pass
+
+
 _BASE_URL = "https://api.open-meteo.com/v1/forecast"
 
 _T = TypeVar("_T")
@@ -276,15 +284,19 @@ def _overlay_cloud_spread(
 
 
 async def _get_json(session: ClientSession, url: str) -> Optional[dict]:
-    """GET ``url`` as JSON once. None on a non-200 or a timeout, so the caller's retry +
-    last-good-reuse path recovers instead of a stalled request hanging the whole refresh. Other
-    transport errors propagate and become an UpdateFailed, retried on the next cycle."""
+    """GET ``url`` as JSON once. None on a non-200, a timeout, or a malformed/non-JSON 200 body, so
+    the caller's retry + last-good-reuse path recovers instead of a stalled or garbled response
+    hanging or failing the whole refresh. Other transport errors propagate and become an
+    UpdateFailed, retried on the next cycle."""
     try:
         async with asyncio.timeout(_REQUEST_TIMEOUT_S):
             async with session.get(url) as resp:
                 if resp.status != 200:
                     return None
-                return await resp.json()
+                try:
+                    return await resp.json()
+                except (ContentTypeError, ValueError):
+                    return None
     except TimeoutError:
         return None
 

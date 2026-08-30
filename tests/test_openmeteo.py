@@ -127,6 +127,87 @@ def test_get_json_returns_none_on_timeout() -> None:
     assert result is None
 
 
+def test_get_json_returns_none_on_malformed_body() -> None:
+    # A 200 response with a non-JSON content-type (aiohttp raises ContentTypeError) must not raise
+    # out of _get_json: it degrades to None like a non-200 or a timeout, so the retry loop recovers.
+    class _BadContentTypeResp:
+        status = 200
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def json(self):
+            raise om.ContentTypeError(None, ())
+
+    class _BadContentTypeSession:
+        def get(self, url):
+            return _BadContentTypeResp()
+
+    result = asyncio.run(om._get_json(_BadContentTypeSession(), "https://example.invalid"))
+    assert result is None
+
+
+def test_get_json_returns_none_on_invalid_json() -> None:
+    # A 200 response with a truncated/malformed JSON body (json.JSONDecodeError, a ValueError) must
+    # also degrade to None rather than raise.
+    class _BadJsonResp:
+        status = 200
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def json(self):
+            raise ValueError("Expecting value: line 1 column 1 (char 0)")
+
+    class _BadJsonSession:
+        def get(self, url):
+            return _BadJsonResp()
+
+    result = asyncio.run(om._get_json(_BadJsonSession(), "https://example.invalid"))
+    assert result is None
+
+
+def test_fetch_parsed_retries_after_malformed_body() -> None:
+    # A malformed-but-200 first attempt must not escape _get_json as an uncaught exception: the
+    # retry loop in _fetch_parsed keeps running and recovers on the next, good attempt.
+    om._RETRY_DELAY_S = 0.0
+
+    class _BadThenGoodResp:
+        def __init__(self, raise_bad):
+            self._raise_bad = raise_bad
+            self.status = 200
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def json(self):
+            if self._raise_bad:
+                raise ValueError("bad json")
+            return _GOOD_WEATHER
+
+    class _Session:
+        def __init__(self):
+            self.calls = 0
+
+        def get(self, url):
+            self.calls += 1
+            return _BadThenGoodResp(raise_bad=self.calls == 1)
+
+    session = _Session()
+    result = asyncio.run(om._fetch_parsed(session, "https://example.invalid", parse_weather))
+    assert result is not None
+    assert session.calls == 2  # first attempt malformed and swallowed, second attempt succeeds
+
+
 def test_parse_cloud_spread_asserts_on_layer_key_collision() -> None:
     # If a payload ever carried both the per-layer keys and the aggregate 'cloud_cover' key together,
     # the prefix match in _model_arrays would silently fold the per-layer arrays into the spread
