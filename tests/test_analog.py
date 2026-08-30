@@ -17,10 +17,12 @@ sys.path.insert(0, str(_REPO_ROOT))
 from custom_components.helios_forecast.analog import (  # noqa: E402
     AnalogSample,
     _az_diff,
+    _sample_series,
     _weighted_percentiles,
     build_library,
     enrich_points,
     predict,
+    series_epochs,
 )
 from custom_components.helios_forecast.forecast import ForecastPoint  # noqa: E402
 from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: E402
@@ -86,6 +88,40 @@ def test_temperature_influences_match() -> None:
     # No query temperature (or samples without temp) falls back to the old geometry+cloud match.
     band_none = predict(lib, 40.0, 180.0, 30.0)
     assert band_none is not None
+
+
+def test_sample_series_clamps_outside_range() -> None:
+    times = [datetime(2026, 1, 1, h, tzinfo=UTC) for h in range(3)]
+    values = [10.0, 20.0, 30.0]
+    epochs = series_epochs(times)
+    assert _sample_series(times, values, epochs[0] - 1000.0, epochs) == 10.0
+    assert _sample_series(times, values, epochs[-1] + 1000.0, epochs) == 30.0
+
+
+def test_sample_series_interpolates_between_brackets() -> None:
+    times = [datetime(2026, 1, 1, h, tzinfo=UTC) for h in range(3)]
+    values = [10.0, 20.0, 30.0]
+    epochs = series_epochs(times)
+    mid = (epochs[0] + epochs[1]) / 2.0
+    assert _sample_series(times, values, mid, epochs) == 15.0
+    # epochs argument is optional: recomputing internally must agree.
+    assert _sample_series(times, values, mid) == 15.0
+
+
+def test_sample_series_skips_missing_bracket_side() -> None:
+    times = [datetime(2026, 1, 1, h, tzinfo=UTC) for h in range(3)]
+    values = [10.0, None, 30.0]
+    epochs = series_epochs(times)
+    # Querying inside [hour0, hour1] where hour1 is missing falls back to hour0's value.
+    just_after_0 = epochs[0] + 1.0
+    assert _sample_series(times, values, just_after_0, epochs) == 10.0
+    # Querying inside [hour1, hour2] where hour1 is missing falls back to hour2's value.
+    just_before_2 = epochs[2] - 1.0
+    assert _sample_series(times, values, just_before_2, epochs) == 30.0
+
+
+def test_sample_series_empty_series_returns_none() -> None:
+    assert _sample_series([], [], 0.0) is None
 
 
 def _june_noon(hour: int) -> datetime:
