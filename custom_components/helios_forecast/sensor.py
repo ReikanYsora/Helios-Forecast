@@ -37,6 +37,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .config import battery_from_config
 from .const import DOMAIN
 from .coordinator import ForecastData, HeliosForecastCoordinator
+from .forecast import forecast_point_dict
 from .statistics import WEATHER_FIELDS
 from .summary import ForecastSummary
 
@@ -59,17 +60,7 @@ class HeliosSensorDescription(SensorEntityDescription):
 def _forecast_attrs(data: ForecastData) -> dict:
     """The dense forecast curve as a chart-friendly attribute: watts per bucket, plus the
     P10/P90 analog band (null on a bucket until the analog support is solid enough for one)."""
-    return {
-        "forecast": [
-            {
-                "datetime": p.t.isoformat(),
-                "watts": round(p.pv_w, 2),
-                "p10": round(p.pv_p10, 2) if p.pv_p10 is not None else None,
-                "p90": round(p.pv_p90, 2) if p.pv_p90 is not None else None,
-            }
-            for p in data.points
-        ]
-    }
+    return {"forecast": [forecast_point_dict(p) for p in data.points]}
 
 
 def _power(

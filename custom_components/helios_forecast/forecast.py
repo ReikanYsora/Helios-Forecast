@@ -42,6 +42,18 @@ class ForecastPoint:
     cloud: Optional[float] = None
 
 
+def forecast_point_dict(p: ForecastPoint) -> Dict[str, object]:
+    """One forecast bucket in the response/attribute shape shared by the get_forecast service
+    and the power_now sensor's `forecast` attribute: watts and the P10/P90 band rounded to 2 dp
+    (null when the analog support is too thin to surface a band)."""
+    return {
+        "datetime": p.t.isoformat(),
+        "watts": round(p.pv_w, 2),
+        "p10": round(p.pv_p10, 2) if p.pv_p10 is not None else None,
+        "p90": round(p.pv_p90, 2) if p.pv_p90 is not None else None,
+    }
+
+
 def lerp_plain(a: float, b: float, f: float) -> float:
     return a + (b - a) * f
 
