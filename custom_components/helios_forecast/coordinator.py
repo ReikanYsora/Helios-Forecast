@@ -1,9 +1,10 @@
 """DataUpdateCoordinator: fetch Open-Meteo + recorder history and build the forecast.
 
 Runs the model on a timer, holding the assembled points and the derived summary.
-One combined Open-Meteo fetch (60 past days for the learning, 7 future days for
-the forecast) per weather + per distinct fixed orientation; the learned residual
-map is built from the recorder's own production / SoC history.
+One combined Open-Meteo fetch per refresh (60 past days for the learning, 7 future
+days for the forecast), regardless of how many panel orientations are configured;
+the model splits that single weather series across orientations itself. The learned
+residual map is built from the recorder's own production / SoC history.
 """
 
 from __future__ import annotations
