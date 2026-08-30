@@ -34,6 +34,7 @@ from custom_components.helios_forecast.solar.power import (  # noqa: E402
     compute_pv_power_per_array,
     compute_pv_power_weighted,
 )
+from custom_components.helios_forecast.solar.residual import SkyResidualMap  # noqa: E402
 
 _LAT, _LON = 48.8566, 2.3522
 _NOON = datetime(2026, 6, 21, 12, tzinfo=timezone.utc)
@@ -82,14 +83,17 @@ def test_wind_conversion_tolerates_missing_wind() -> None:
 
 def test_lerp_helpers() -> None:
     assert lerp_plain(0.0, 10.0, 0.5) == 5.0
-    # rad guards the missing / negative sentinel
+    # rad guards the missing / negative sentinel, on either side of the pair
     assert lerp_rad(100.0, 200.0, 0.5) == 150.0
     assert lerp_rad(None, 200.0, 0.5) == 200.0
     assert lerp_rad(-1.0, 200.0, 0.5) == 200.0
+    assert lerp_rad(100.0, None, 0.5) == 100.0
+    assert lerp_rad(100.0, -1.0, 0.5) == 100.0
     assert lerp_rad(None, None, 0.5) is None
-    # finite guards the missing case
+    # finite guards the missing case, on either side of the pair
     assert lerp_finite(10.0, 20.0, 0.25) == 12.5
     assert lerp_finite(None, 20.0, 0.5) == 20.0
+    assert lerp_finite(10.0, None, 0.5) == 10.0
     assert lerp_finite(None, None, 0.5) is None
 
 
@@ -174,6 +178,79 @@ def test_daily_integration() -> None:
     expected_kwh = sum(p.pv_w for p in points) * (60 / 60.0) / 1000.0
     assert abs(totals["2026-06-21"] - expected_kwh) < 1e-9
     assert expected_kwh > 0
+
+
+def test_daily_integration_buckets_by_the_given_day_tz() -> None:
+    # A bucket at 22:00 UTC falls on the next local day at UTC+3: the day split must follow
+    # day_tz, not the UTC calendar date, or a coordinator in that zone would misfile production.
+    from datetime import timezone as _tz
+
+    plus3 = _tz(timedelta(hours=3))
+    weather = _constant_weather()
+    layout = _single_south_layout()
+    start = datetime(2026, 6, 21, 20, tzinfo=timezone.utc)
+    end = start + timedelta(hours=4)
+    points = build_forecast_series(weather, layout, _LAT, _LON, start=start, end=end, step_minutes=60)
+
+    totals_utc = integrate_daily_kwh(points, step_minutes=60)
+    totals_local = integrate_daily_kwh(points, step_minutes=60, day_tz=plus3)
+
+    assert set(totals_utc.keys()) == {"2026-06-21"}
+    # 20:00-22:00 UTC is still 2026-06-21 at +3, 23:00 UTC is already 2026-06-22 at +3.
+    assert set(totals_local.keys()) == {"2026-06-21", "2026-06-22"}
+    assert abs(sum(totals_local.values()) - sum(totals_utc.values())) < 1e-9
+
+
+def test_build_forecast_series_empty_when_no_weather_or_no_span() -> None:
+    layout = _single_south_layout()
+    start = datetime(2026, 6, 21, 0, tzinfo=timezone.utc)
+    empty_weather = WeatherSeries(
+        times=[], cloud=[], shortwave=[], direct=[], diffuse=[], temp=[], wind=[], snow=[]
+    )
+    assert build_forecast_series(empty_weather, layout, _LAT, _LON, start=start, end=start + timedelta(hours=1)) == []
+
+    weather = _constant_weather()
+    # end <= start: no bucket should be produced regardless of available weather.
+    assert build_forecast_series(weather, layout, _LAT, _LON, start=start, end=start) == []
+
+
+def test_orientation_less_layout_uses_single_element_fallback() -> None:
+    # No per-array orientations configured: compute_pv_power_per_array falls back to a single
+    # horizontal percentage, and _sum_arrays must take its own matching fallback branch
+    # (pcts[0] * total_kwp), not try to zip it against a per-array shares/caps list.
+    layout = PvLayout(orientations=[], shares=[], coords=[], total_kwp=5.0)
+    weather = _constant_weather()
+    start = datetime(2026, 6, 21, 0, tzinfo=timezone.utc)
+    end = start + timedelta(hours=1)
+
+    points = build_forecast_series(weather, layout, _LAT, _LON, start=start, end=end, step_minutes=60)
+    assert len(points) == 1
+    p = points[0]
+    sample = WeatherSample(cloud=20, ghi=500, direct=350, diffuse=120, temp=18, wind=3, snow=0)
+    pcts = compute_pv_power_per_array(p.t, _LAT, _LON, sample, layout)
+    assert len(pcts) == 1
+    expected = max(0.0, pcts[0] * layout.total_kwp * 10.0)
+    assert abs(p.pv_w - expected) < 1e-9
+
+
+def test_residual_map_scales_pv_w_but_not_pv_raw_w() -> None:
+    # Flat ratio-2 sky map (single cell): during daytime the learned correction should
+    # double pv_w relative to the untouched physical model, pv_raw_w must stay the pure model.
+    residual_map = SkyResidualMap(
+        n_az=1, n_alt=1, m=[2.0], conf=[1.0], global_ratio=2.0, total_weight=10.0, visited_cells=1
+    )
+    layout = _single_south_layout()
+    weather = _constant_weather()
+    start = datetime(2026, 6, 21, 10, tzinfo=timezone.utc)
+    end = start + timedelta(hours=1)
+
+    points = build_forecast_series(
+        weather, layout, _LAT, _LON, start=start, end=end, step_minutes=60, residual_map=residual_map
+    )
+    assert len(points) == 1
+    p = points[0]
+    assert p.pv_raw_w > 0.0  # daytime bucket, physical model produces power
+    assert abs(p.pv_w - 2.0 * p.pv_raw_w) < 1e-6
 
 
 if __name__ == "__main__":

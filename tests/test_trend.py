@@ -10,6 +10,7 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
 from custom_components.helios_forecast.trend import (  # noqa: E402
+    FLAT_KWH,
     TrendReference,
     compute_trend,
     should_capture,
@@ -50,6 +51,10 @@ def test_compute_trend_directions() -> None:
 
     flat = compute_trend(ref, 20.05, "2026-06-12")
     assert flat.direction == "flat"
+
+    # A swing comfortably inside the flat band, on both sides, must still read as flat.
+    assert compute_trend(ref, ref.kwh + FLAT_KWH / 2.0, "2026-06-12").direction == "flat"
+    assert compute_trend(ref, ref.kwh - FLAT_KWH / 2.0, "2026-06-12").direction == "flat"
 
 
 def test_compute_trend_unknown_without_reference() -> None:
