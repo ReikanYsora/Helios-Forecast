@@ -209,7 +209,8 @@ def compute_reliability(production: list, points: list, weather, now: datetime, 
     per_day: List[float] = []
     for n in range(7):
         day = today + timedelta(days=n)
-        day_predict = _day_predictability(weather, day, tz)
+        # n=0 is today: reuse `predict`, already computed above, instead of recomputing it.
+        day_predict = predict if n == 0 else _day_predictability(weather, day, tz)
         base = _blend(maturity, skill, day_predict)
         per_day.append(round(base * _horizon_decay(n), 1))
 

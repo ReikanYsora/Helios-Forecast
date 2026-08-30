@@ -17,6 +17,7 @@ from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: E
 from custom_components.helios_forecast.reliability import (  # noqa: E402
     MATURITY_TARGET_DAYS,
     SKILL_MIN_DAY_KWH,
+    _blend,
     _day_predictability,
     _horizon_decay,
     compute_reliability,
@@ -145,6 +146,22 @@ def test_compute_reliability_shape_and_range() -> None:
     assert len(r.per_day) == 7
     # Per-day reliability decays with the horizon.
     assert r.per_day[0] >= r.per_day[6]
+
+
+def test_compute_reliability_today_entry_matches_predict() -> None:
+    # The n=0 per-day entry reuses the already-computed `predict` value rather than
+    # recomputing today's predictability a second time; horizon decay at n=0 is 1.0,
+    # so the entry must equal the blend built with `predict` exactly.
+    now = datetime(2026, 6, 10, 12, tzinfo=UTC)
+    prod = [_Bucket(datetime(2026, 6, d, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0) for d in range(1, 9)]
+    pts = [_Pt(datetime(2026, 6, d, 12, tzinfo=UTC), 10_000.0) for d in range(1, 9)]
+    weather = _weather_today([10, 12, 11, 10, 13])
+    r = compute_reliability(prod, pts, weather, now, UTC)
+    maturity, _ = data_maturity(prod, UTC)
+    skill = recent_skill(pts, prod, now, UTC)
+    predict = today_predictability(weather, now, UTC)
+    expected_today = round(_blend(maturity, skill, predict), 1)
+    assert r.per_day[0] == expected_today
 
 
 def test_horizon_decay_is_gentle() -> None:
