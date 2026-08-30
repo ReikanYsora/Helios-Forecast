@@ -19,6 +19,7 @@ sys.path.insert(0, str(_REPO_ROOT))
 import custom_components.helios_forecast.openmeteo as om  # noqa: E402
 from custom_components.helios_forecast.openmeteo import (  # noqa: E402
     build_weather_url,
+    cloud_effective,
     fetch_weather,
     parse_cloud_spread,
     parse_times,
@@ -86,6 +87,42 @@ def test_parse_weather_fuses_models_and_weights_layers() -> None:
     assert w.cloud == [54.0, 90.0]  # 20 + 0.6*40 + 0.2*50 = 54 ; 90 + 0 + 0 = 90
     assert w.shortwave == [0.0, 150.0]
     assert w.cloud_spread == [0.0, 0.0]  # baseline; the ensemble call overlays the real spread
+
+
+def test_cloud_effective_weights_and_clamps() -> None:
+    # Plain weighted blend, well inside [0, 100].
+    assert cloud_effective(20.0, 40.0, 50.0) == 54.0  # 20 + 0.6*40 + 0.2*50
+    # Missing layers (None) count as clear, matching the docstring.
+    assert cloud_effective(None, None, None) == 0.0
+    assert cloud_effective(50.0, None, None) == 50.0
+    # Out-of-range inputs are clamped to [0, 100] before weighting.
+    assert cloud_effective(-10.0, 40.0, 50.0) == 34.0  # low clamped to 0
+    assert cloud_effective(150.0, 0.0, 0.0) == 100.0  # low clamped to 100
+    # The weighted sum itself is capped at 100 even if every layer is saturated.
+    assert cloud_effective(100.0, 100.0, 100.0) == 100.0
+
+
+def test_get_json_returns_none_on_timeout() -> None:
+    # A stalled connection must not hang the refresh: _get_json degrades to None instead of raising.
+    class _HangingResp:
+        async def __aenter__(self):
+            await asyncio.sleep(1.0)
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+    class _HangingSession:
+        def get(self, url):
+            return _HangingResp()
+
+    original_timeout = om._REQUEST_TIMEOUT_S
+    om._REQUEST_TIMEOUT_S = 0.01
+    try:
+        result = asyncio.run(om._get_json(_HangingSession(), "https://example.invalid"))
+    finally:
+        om._REQUEST_TIMEOUT_S = original_timeout
+    assert result is None
 
 
 def test_parse_cloud_spread() -> None:

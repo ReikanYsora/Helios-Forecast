@@ -114,6 +114,14 @@ def test_forecast_statistics_clamps_negative() -> None:
     assert rows[FORECAST_POWER_KEY][0]["mean"] == 0.0
 
 
+def test_forecast_statistics_skips_missing_or_non_numeric_pv_w() -> None:
+    class _NoPower:
+        t = _h(9)
+
+    rows = forecast_statistics([_NoPower(), _Pt(_h(10), "not-a-number"), _Pt(_h(11), 500.0)])
+    assert [r["start"] for r in rows[FORECAST_POWER_KEY]] == [_h(11)]
+
+
 def test_weather_forecast_series_forward_only_and_keyed_by_field() -> None:
     times = [_h(10), _h(11), _h(12)]
     values = [10.0, 20.0, 30.0]
@@ -136,6 +144,11 @@ def test_weather_forecast_series_localises_timestamps() -> None:
 def test_weather_forecast_series_drops_non_finite() -> None:
     out = weather_forecast_series(_series([_h(11), _h(12)], [float("nan"), 30.0]), _h(11), timezone.utc)
     assert [e["datetime"] for e in out["ghi"]] == [_h(12).isoformat()]
+
+
+def test_weather_forecast_series_rounds_to_two_decimals() -> None:
+    out = weather_forecast_series(_series([_h(11)], [20.5678]), _h(11), timezone.utc)
+    assert out["cloud_cover"][0]["cloud_cover"] == 20.57
 
 
 if __name__ == "__main__":
