@@ -98,12 +98,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 def _purge_orphan_forecast_stats(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Clear long-term statistics left on the live forecast energy sensors.
 
-    Earlier versions gave these sensors a state_class, so HA recorded statistics for them. They
-    are point-in-time forecast values, not meters, and now carry no state_class, which makes HA
-    flag "entity no longer has a state class" on every statistics cycle. We clear those orphan
-    stats so testers do not have to do it by hand. predicted_energy is excluded: it is the archive
-    entity whose statistics are kept on purpose (it carries a valid state_class again). Idempotent:
-    the live sensors never regain a state_class, so this is a no-op once their stats are gone.
+    These sensors are point-in-time forecast values, not meters, and carry no state_class, which
+    makes HA flag "entity no longer has a state class" on every statistics cycle if any statistics
+    exist for them. We clear those to keep that warning from firing. predicted_energy is excluded:
+    it is the archive entity whose statistics are kept on purpose (it carries a valid state_class).
+    Idempotent: the live sensors never regain a state_class, so this is a no-op once their stats
+    are gone.
     """
     from homeassistant.components.recorder import get_instance
     from homeassistant.helpers import entity_registry as er

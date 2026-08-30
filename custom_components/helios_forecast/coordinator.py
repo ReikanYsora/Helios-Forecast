@@ -109,10 +109,10 @@ _LOGGER = logging.getLogger(__name__)
 UPDATE_INTERVAL = timedelta(minutes=30)
 STEP_MINUTES = 15
 FORECAST_DAYS = 7
-# How far ahead the battery SoC projection runs. Was 24h, too short to show the projection recover
-# through the FOLLOWING day's solar peak (a chart reading it past that point just sees the reserve
-# floor, looking "stuck"). The PV forecast itself already reaches FORECAST_DAYS ahead, so widening
-# this only uses points already being fetched, nothing new to source.
+# How far ahead the battery SoC projection runs. Reaches past the FOLLOWING day's solar peak, so a
+# chart reading the projection past that point sees it recover rather than reading as stuck at the
+# reserve floor. The PV forecast itself already reaches FORECAST_DAYS ahead, so this only uses
+# points already being fetched, nothing new to source.
 BATTERY_SOC_HORIZON_HOURS = 48.0
 
 
@@ -167,8 +167,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         self._last_weather_stat_hour: Optional[datetime] = None
         # Home consumption profile for the battery SoC projection, rebuilt at most once an hour. Its
         # multi-sensor 60-day recorder fetch is the expensive part, so it runs on the same hourly cadence
-        # as the prediction archive rather than on every 30-minute refresh (the 2026.8.3 CPU/network
-        # lesson); a 60-day average barely moves within an hour. Reused in between.
+        # as the prediction archive rather than on every 30-minute refresh; a 60-day average barely moves
+        # within an hour. Reused in between.
         self._consumption_profile: Optional[ConsumptionProfile] = None
         self._last_consumption_hour: Optional[datetime] = None
         # Production history (recorder change buckets) from the most recent refresh, kept so the
