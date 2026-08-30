@@ -24,7 +24,7 @@ from typing import List, Optional
 
 from .irradiance import snow_cover_factor
 from .geometry import sun_position
-from .power import PvLayout, WeatherSample, compute_pv_power_weighted
+from .power import PvLayout, WeatherSample, compute_pv_power_per_array
 
 # Learning window and cell grid.
 LEARN_DAYS = 60
@@ -120,6 +120,22 @@ def sample_sky_residual(sky_map: SkyResidualMap, az_deg: float, alt_deg: float) 
     return num / den if den > 0 else g
 
 
+def _capped_model_kwh(pcts: List[float], layout: PvLayout, k: float, snow: float) -> float:
+    """Per-array watts (share of ``k``), each clipped at its own inverter cap before summing, then
+    converted to kWh. Mirrors forecast.py's per-array-cap-then-sum shape so the learned ratio sees the
+    same hardware-clipped production the forecast-generation path applies, instead of conflating
+    inverter clipping with weather bias near solar noon."""
+    orientations = layout.orientations
+    if not orientations or len(pcts) != len(orientations):
+        return max(0.0, pcts[0] * k * snow) / 1000.0
+    total_w = 0.0
+    for i, pct_i in enumerate(pcts):
+        watts = pct_i * layout.shares[i] * k * snow
+        cap = layout.caps[i] if i < len(layout.caps) else math.inf
+        total_w += min(cap, max(0.0, watts))
+    return total_w / 1000.0
+
+
 def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
     """Build the residual map from the production + weather history, or None."""
     k = inp.layout.total_kwp * 10.0
@@ -154,19 +170,21 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
         snow = inp.snow[ci] if ci >= 0 else None
 
         sample = WeatherSample(cloud=cloud, ghi=ghi, direct=direct, diffuse=diffuse, temp=temp, wind=wind)
+        snow_factor = snow_cover_factor(snow, temp)
 
-        w_sum = 0.0
+        w_sum_kwh = 0.0
         w_n = 0
         for s in range(LEARN_SUBSAMPLES):
             sub_t = bucket.start_ms + (s + 0.5) * (bucket.end_ms - bucket.start_ms) / LEARN_SUBSAMPLES
             moment = _dt(sub_t)
             if sun_position(moment, inp.lat, inp.lon).altitude <= 0:
                 continue
-            w_sum += compute_pv_power_weighted(moment, inp.lat, inp.lon, sample, inp.layout)
+            pcts = compute_pv_power_per_array(moment, inp.lat, inp.lon, sample, inp.layout)
+            w_sum_kwh += _capped_model_kwh(pcts, inp.layout, k, snow_factor)
             w_n += 1
         if w_n == 0:
             continue
-        model_kwh = (w_sum / w_n) * k * snow_cover_factor(snow, temp) / 1000.0
+        model_kwh = w_sum_kwh / w_n
         if model_kwh < MODEL_KWH_FLOOR:
             continue
 
