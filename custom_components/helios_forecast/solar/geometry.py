@@ -60,8 +60,13 @@ def sun_position(moment: datetime, lat: float, lon: float) -> SunPosition:
     sin_a = math.sin(_D * lat) * math.sin(_D * decl) + math.cos(_D * lat) * math.cos(_D * decl) * math.cos(_D * ha)
     alt = math.asin(max(-1.0, min(1.0, sin_a))) / _D
     cos_alt = math.cos(alt * _D)
+    cos_lat = math.cos(_D * lat)
+    # At the poles (lat exactly +/-90) cos_lat is also ~0, so the guard on cos_alt alone is not enough to
+    # keep the denominator off zero; fall back to the same "azimuth undefined" 0.0 the cos_alt guard uses.
     cos_az = (
-        (math.sin(_D * decl) - math.sin(_D * lat) * sin_a) / (math.cos(_D * lat) * cos_alt) if cos_alt > 1e-4 else 0.0
+        (math.sin(_D * decl) - math.sin(_D * lat) * sin_a) / (cos_lat * cos_alt)
+        if cos_alt > 1e-4 and abs(cos_lat) > 1e-4
+        else 0.0
     )
     az = math.acos(max(-1.0, min(1.0, cos_az))) / _D
     if ha > 0:
