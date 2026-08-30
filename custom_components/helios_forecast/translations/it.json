@@ -37,6 +37,8 @@
           "kwp": "Potenza di picco (kWp)",
           "line_inverter_max_kw": "Potenza max inverter per questa linea (kW, opzionale)",
           "tracker": "Inseguitore solare",
+          "latitude": "Latitudine per questa linea (opzionale)",
+          "longitude": "Longitudine per questa linea (opzionale)",
           "add_another": "Add another panel line"
         }
       }
@@ -81,6 +83,8 @@
           "kwp": "Potenza di picco (kWp)",
           "line_inverter_max_kw": "Potenza max inverter per questa linea (kW, opzionale)",
           "tracker": "Inseguitore solare",
+          "latitude": "Latitudine per questa linea (opzionale)",
+          "longitude": "Longitudine per questa linea (opzionale)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }

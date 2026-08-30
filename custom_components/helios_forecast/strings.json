@@ -38,6 +38,8 @@
           "kwp": "Peak power (kWp)",
           "line_inverter_max_kw": "Inverter max output for this line (kW, optional)",
           "tracker": "Sun tracker",
+          "latitude": "Latitude override (optional)",
+          "longitude": "Longitude override (optional)",
           "add_another": "Add another panel line"
         }
       }
@@ -83,6 +85,8 @@
           "kwp": "Peak power (kWp)",
           "line_inverter_max_kw": "Inverter max output for this line (kW, optional)",
           "tracker": "Sun tracker",
+          "latitude": "Latitude override (optional)",
+          "longitude": "Longitude override (optional)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }

@@ -37,6 +37,8 @@
           "kwp": "Hámarksafl (kWp)",
           "line_inverter_max_kw": "Hámarksafköst invertera fyrir þessa línu (kW, valfrjálst)",
           "tracker": "Sólarrakari",
+          "latitude": "Breiddargráða fyrir þessa línu (valfrjálst)",
+          "longitude": "Lengdargráða fyrir þessa línu (valfrjálst)",
           "add_another": "Add another panel line"
         }
       }
@@ -81,6 +83,8 @@
           "kwp": "Hámarksafl (kWp)",
           "line_inverter_max_kw": "Hámarksafköst invertera fyrir þessa línu (kW, valfrjálst)",
           "tracker": "Sólarrakari",
+          "latitude": "Breiddargráða fyrir þessa línu (valfrjálst)",
+          "longitude": "Lengdargráða fyrir þessa línu (valfrjálst)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }

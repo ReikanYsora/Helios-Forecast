@@ -37,6 +37,8 @@
           "kwp": "Spidseffekt (kWp)",
           "line_inverter_max_kw": "Maks. inverterydelse for denne linje (kW, valgfrit)",
           "tracker": "Solfølger",
+          "latitude": "Breddegrad for denne linje (valgfrit)",
+          "longitude": "Længdegrad for denne linje (valgfrit)",
           "add_another": "Add another panel line"
         }
       }
@@ -81,6 +83,8 @@
           "kwp": "Spidseffekt (kWp)",
           "line_inverter_max_kw": "Maks. inverterydelse for denne linje (kW, valgfrit)",
           "tracker": "Solfølger",
+          "latitude": "Breddegrad for denne linje (valgfrit)",
+          "longitude": "Længdegrad for denne linje (valgfrit)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }
