@@ -21,6 +21,7 @@ from custom_components.helios_forecast.reliability import (  # noqa: E402
     _day_predictability,
     _horizon_decay,
     compute_reliability,
+    daily_predicted_kwh,
     data_maturity,
     recent_skill,
     today_predictability,
@@ -61,6 +62,17 @@ def test_recent_skill_perfect_and_off() -> None:
     # Predict double -> 100% relative error -> skill 0.
     pts_off = [_Pt(datetime(2026, 6, d, 12, tzinfo=UTC), 20_000.0) for d in range(5, 9)]
     assert recent_skill(pts_off, prod, now, UTC) == 0.0
+
+
+def test_daily_predicted_kwh_scales_with_step_minutes() -> None:
+    # A bucket duration other than the hourly default must scale the kWh conversion,
+    # not silently assume 1 h per point.
+    day = datetime(2026, 6, 5, tzinfo=UTC).date()
+    pts = [_Pt(datetime(2026, 6, 5, 12, tzinfo=UTC), 4_000.0)]
+    hourly = daily_predicted_kwh(pts, UTC)
+    quarter_hourly = daily_predicted_kwh(pts, UTC, step_minutes=15.0)
+    assert hourly[day] == 4.0
+    assert quarter_hourly[day] == 1.0
 
 
 def test_recent_skill_none_when_too_few_days() -> None:
@@ -158,7 +170,7 @@ def test_compute_reliability_today_entry_matches_predict() -> None:
     weather = _weather_today([10, 12, 11, 10, 13])
     r = compute_reliability(prod, pts, weather, now, UTC)
     maturity, _ = data_maturity(prod, UTC)
-    skill = recent_skill(pts, prod, now, UTC)
+    skill = recent_skill(pts, prod, now, UTC, step_minutes=60.0)
     predict = today_predictability(weather, now, UTC)
     expected_today = round(_blend(maturity, skill, predict), 1)
     assert r.per_day[0] == expected_today

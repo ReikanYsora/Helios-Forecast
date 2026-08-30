@@ -73,14 +73,16 @@ def daily_actual_kwh(production: list, tz: tzinfo) -> Dict[date, float]:
     return out
 
 
-def daily_predicted_kwh(points: list, tz: tzinfo) -> Dict[date, float]:
-    """Hourly predicted points summed to kWh per local calendar day (pv_w over 1 h)."""
+def daily_predicted_kwh(points: list, tz: tzinfo, step_minutes: float = 60.0) -> Dict[date, float]:
+    """Predicted points summed to kWh per local calendar day (pv_w over one bucket of
+    ``step_minutes``, default hourly to match the archive series)."""
+    step_h = step_minutes / 60.0
     out: Dict[date, float] = {}
     for p in points:
         if not _finite(getattr(p, "pv_w", None)):
             continue
         day = p.t.astimezone(tz).date()
-        out[day] = out.get(day, 0.0) + max(0.0, p.pv_w) / 1000.0
+        out[day] = out.get(day, 0.0) + max(0.0, p.pv_w) * step_h / 1000.0
     return out
 
 
@@ -90,11 +92,14 @@ def data_maturity(production: list, tz: tzinfo) -> tuple[float, int]:
     return _clamp01(days / MATURITY_TARGET_DAYS), days
 
 
-def recent_skill(points: list, production: list, now: datetime, tz: tzinfo) -> Optional[float]:
+def recent_skill(
+    points: list, production: list, now: datetime, tz: tzinfo, step_minutes: float = 60.0
+) -> Optional[float]:
     """1 - mean relative daily error over the trailing window, or None when too few
-    comparable days. Today is excluded (still in progress)."""
+    comparable days. Today is excluded (still in progress). ``step_minutes`` is the
+    bucket duration of ``points`` (the archive series is hourly)."""
     actual = daily_actual_kwh(production, tz)
-    predicted = daily_predicted_kwh(points, tz)
+    predicted = daily_predicted_kwh(points, tz, step_minutes)
     today = now.astimezone(tz).date()
     errs: List[float] = []
     for day, act in actual.items():
@@ -200,7 +205,8 @@ def _blend(maturity: float, skill: Optional[float], predict: Optional[float]) ->
 def compute_reliability(production: list, points: list, weather, now: datetime, tz: tzinfo) -> Reliability:
     """Blend the three signals into the overall index plus a per-horizon-day list."""
     maturity, days = data_maturity(production, tz)
-    skill = recent_skill(points, production, now, tz)
+    # `points` here is the archive series, always built at an hourly step.
+    skill = recent_skill(points, production, now, tz, step_minutes=60.0)
     predict = today_predictability(weather, now, tz)
 
     overall = _blend(maturity, skill, predict)
