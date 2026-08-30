@@ -4,8 +4,9 @@ Ports the deterministic core of the card's buildForecast. Walks the horizon at a
 sub-hourly step, interpolates the hourly Open-Meteo weather between samples with
 a moving cursor (so the magnitude stays smooth at any cadence), computes the
 weighted PV percentage, maps it to watts (x pvCalibK x snow), and clips at the
-inverter cap. The learned correction is the next phase; here ``pv_w`` equals
-``pv_raw_w`` (ratio 1).
+inverter cap. ``pv_w`` applies the learned per-sky-cell residual ratio when a
+map is given (else it equals ``pv_raw_w``, the pure physical model); the
+analog blend on top of that lives in the sibling ``analog`` module.
 """
 
 from __future__ import annotations
