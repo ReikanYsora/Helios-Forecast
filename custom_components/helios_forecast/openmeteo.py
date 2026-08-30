@@ -315,6 +315,15 @@ async def _fetch_parsed(
     return None
 
 
+async def _ensemble_spread(session: ClientSession, url: str) -> Optional[tuple[list[datetime], list[float]]]:
+    """Best-effort ensemble fetch: any failure, whether a bad response exhausting its retries or a
+    raised transport error, reads as 'no spread this refresh' instead of failing the whole call."""
+    try:
+        return await _fetch_parsed(session, url, parse_cloud_spread)
+    except Exception:
+        return None
+
+
 async def fetch_weather(
     session: ClientSession,
     lat: float,
@@ -324,14 +333,18 @@ async def fetch_weather(
     forecast_days: int = 7,
 ) -> WeatherSeries | None:
     """GET the weather inputs. The picker-median call carries the values (required); a second,
-    best-effort ensemble call adds only the cross-model cloud spread. If the ensemble call fails, the
-    values series is returned with a zero spread rather than failing the whole refresh."""
+    best-effort ensemble call adds only the cross-model cloud spread. The two hit independent
+    Open-Meteo endpoints and are fetched concurrently, so a slow or retried values call does not also
+    serialize the ensemble call's own latency on top of it. If the ensemble call fails, the values
+    series is returned with a zero spread rather than failing the whole refresh."""
     base_url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days)
-    series = await _fetch_parsed(session, base_url, parse_weather)
+    ensemble_url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days, ensemble=True)
+    series, spread = await asyncio.gather(
+        _fetch_parsed(session, base_url, parse_weather),
+        _ensemble_spread(session, ensemble_url),
+    )
     if series is None:
         return None
-    ensemble_url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days, ensemble=True)
-    spread = await _fetch_parsed(session, ensemble_url, parse_cloud_spread)
     if spread is not None:
         series = _overlay_cloud_spread(series, spread[0], spread[1])
     return series

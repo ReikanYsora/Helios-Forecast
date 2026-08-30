@@ -310,16 +310,31 @@ class _FakeResp:
         return self._payload
 
 
-class _FakeSession:
-    """Serves a scripted list of responses, one per get() call."""
+def _is_ensemble_url(url: str) -> bool:
+    return "&hourly=cloud_cover&" in url
 
-    def __init__(self, responses):
-        self._responses = list(responses)
-        self.calls = 0
+
+class _FakeSession:
+    """Serves two independent scripted response queues, one per request family (values vs.
+    ensemble), routed by URL rather than by call order - fetch_weather now fires both concurrently,
+    so the two families' calls can interleave in either order."""
+
+    def __init__(self, values_responses, ensemble_responses=()):
+        self._values = list(values_responses)
+        self._ensemble = list(ensemble_responses)
+        self.values_calls = 0
+        self.ensemble_calls = 0
+
+    @property
+    def calls(self):
+        return self.values_calls + self.ensemble_calls
 
     def get(self, url):
-        self.calls += 1
-        return self._responses.pop(0)
+        if _is_ensemble_url(url):
+            self.ensemble_calls += 1
+            return self._ensemble.pop(0)
+        self.values_calls += 1
+        return self._values.pop(0)
 
 
 _ENSEMBLE_SPREAD = {
@@ -336,12 +351,12 @@ def test_fetch_weather_values_with_ensemble_spread() -> None:
     # Values call: empty, non-200, then good (the third try wins). Then the ensemble call overlays
     # the cross-model cloud spread onto the values.
     session = _FakeSession(
-        [
+        values_responses=[
             _FakeResp(200, {"hourly": {}}),
             _FakeResp(429, None),
             _FakeResp(200, _GOOD_WEATHER),
-            _FakeResp(200, _ENSEMBLE_SPREAD),
-        ]
+        ],
+        ensemble_responses=[_FakeResp(200, _ENSEMBLE_SPREAD)],
     )
     result = asyncio.run(fetch_weather(session, 1.0, 2.0))
     assert result is not None
@@ -355,7 +370,8 @@ def test_fetch_weather_ensemble_failure_degrades_to_zero_spread() -> None:
     # Values succeed on the first try; the ensemble call fails every retry. The series still returns,
     # with the baseline zero spread rather than failing the refresh (best-effort).
     session = _FakeSession(
-        [_FakeResp(200, _GOOD_WEATHER), _FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)]
+        values_responses=[_FakeResp(200, _GOOD_WEATHER)],
+        ensemble_responses=[_FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)],
     )
     result = asyncio.run(fetch_weather(session, 1.0, 2.0))
     assert result is not None
@@ -366,10 +382,61 @@ def test_fetch_weather_ensemble_failure_degrades_to_zero_spread() -> None:
 
 def test_fetch_weather_none_after_exhausting_retries() -> None:
     om._RETRY_DELAY_S = 0.0
-    session = _FakeSession([_FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)])
+    # Values fail every retry. The two calls now run concurrently (see the dedicated concurrency
+    # test below), so the ensemble call is also attempted here even though its result is discarded.
+    session = _FakeSession(
+        values_responses=[_FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)],
+        ensemble_responses=[_FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)],
+    )
     result = asyncio.run(fetch_weather(session, 1.0, 2.0))
     assert result is None
-    assert session.calls == 3  # values call capped at _RETRY_ATTEMPTS; the ensemble call is never reached
+    assert session.values_calls == 3  # values call capped at _RETRY_ATTEMPTS
+    assert session.ensemble_calls == 3
+
+
+def test_fetch_weather_runs_values_and_ensemble_concurrently() -> None:
+    # Both requests hit independent endpoints. Each response only unblocks once both requests have
+    # started, so this deadlocks (and the wait_for below times out) if fetch_weather awaited them
+    # one after another instead of concurrently.
+    class _Gate:
+        def __init__(self):
+            self._arrivals = 0
+            self._both_arrived = asyncio.Event()
+
+        async def arrive(self):
+            self._arrivals += 1
+            if self._arrivals >= 2:
+                self._both_arrived.set()
+            await asyncio.wait_for(self._both_arrived.wait(), timeout=0.3)
+
+    class _GatedResp:
+        def __init__(self, gate, payload):
+            self._gate = gate
+            self._payload = payload
+            self.status = 200
+
+        async def __aenter__(self):
+            await self._gate.arrive()
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def json(self):
+            return self._payload
+
+    class _GatedSession:
+        def __init__(self, gate):
+            self._gate = gate
+
+        def get(self, url):
+            payload = _ENSEMBLE_SPREAD if _is_ensemble_url(url) else _GOOD_WEATHER
+            return _GatedResp(self._gate, payload)
+
+    result = asyncio.run(fetch_weather(_GatedSession(_Gate()), 1.0, 2.0))
+    assert result is not None
+    assert result.cloud == [50.0, 60.0]
+    assert result.cloud_spread == [10.0, 0.0]
 
 
 if __name__ == "__main__":
