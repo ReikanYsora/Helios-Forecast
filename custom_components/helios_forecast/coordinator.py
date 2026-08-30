@@ -385,9 +385,16 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             *(self._fetch_change_buckets(stat_id, learn_start, now) for stat_id in ids),
             return_exceptions=True,
         )
-        buckets_by_id = {
-            stat_id: result for stat_id, result in zip(ids, fetched) if not isinstance(result, BaseException)
-        }
+        buckets_by_id: Dict[str, List[ProductionBucket]] = {}
+        for stat_id, result in zip(ids, fetched):
+            if isinstance(result, BaseException):
+                _LOGGER.warning(
+                    "Helios battery projection: recorder fetch failed for %s, that source is skipped: %s",
+                    stat_id,
+                    result,
+                )
+                continue
+            buckets_by_id[stat_id] = result
 
         profile = build_consumption_profile(sources, buckets_by_id, dt_util.DEFAULT_TIME_ZONE)
         if profile is not None:
