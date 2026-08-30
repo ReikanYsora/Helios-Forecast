@@ -351,13 +351,16 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         The multi-sensor 60-day recorder fetch is the expensive part, so it runs on the archive's hourly
         cadence rather than on every 30-minute refresh; a 60-day average is stable within the hour, and
-        the cached profile is reused in between. A transient Energy-dashboard problem keeps the last-good
+        the cached profile is reused in between. The hour marker is set as soon as a build is attempted,
+        whether or not it yields a profile, so an unconfigured or history-less Energy dashboard is not
+        re-queried every 30 minutes either. A transient Energy-dashboard problem keeps the last-good
         profile instead of dropping the projection. Consumption is signed so the ids sum to it: solar +
         grid import - export + battery discharge - charge.
         """
         this_hour = now.replace(minute=0, second=0, microsecond=0)
-        if self._consumption_profile is not None and self._last_consumption_hour == this_hour:
+        if self._last_consumption_hour == this_hour:
             return self._consumption_profile
+        self._last_consumption_hour = this_hour
 
         try:
             from homeassistant.components.energy import async_get_manager
@@ -389,7 +392,6 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         profile = build_consumption_profile(sources, buckets_by_id, dt_util.DEFAULT_TIME_ZONE)
         if profile is not None:
             self._consumption_profile = profile
-            self._last_consumption_hour = this_hour
         return self._consumption_profile
 
     async def _today_trend(self, data, now, summary) -> TodayTrend:
