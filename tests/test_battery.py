@@ -10,7 +10,9 @@ from pathlib import Path
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
-from custom_components.helios_forecast.battery import project_battery_soc  # noqa: E402
+import pytest  # noqa: E402
+
+from custom_components.helios_forecast.battery import StepCadenceError, project_battery_soc  # noqa: E402
 from custom_components.helios_forecast.config import INF, BatteryConfig  # noqa: E402
 from custom_components.helios_forecast.consumption import ConsumptionProfile  # noqa: E402
 from custom_components.helios_forecast.forecast import ForecastPoint  # noqa: E402
@@ -97,6 +99,17 @@ def test_multistep_stays_capped_once_full() -> None:
     # not overflow the running soc_wh past the capacity clamp.
     soc = _project([50_000.0] * 3, load_w=0.0, efficiency=1.0, capacity_kwh=1.0)
     assert [p.soc for p in soc] == [100.0, 100.0, 100.0]
+
+
+def test_cadence_mismatch_is_caught_not_silently_mis_integrated() -> None:
+    # Points spaced 30 min apart but step_minutes still declares 15: dt_h would silently double
+    # the integrated energy for every step. That must raise rather than mis-integrate.
+    points = [
+        ForecastPoint(t=_NOW, pv_w=4000.0, pv_raw_w=4000.0),
+        ForecastPoint(t=_NOW + timedelta(minutes=30), pv_w=4000.0, pv_raw_w=4000.0),
+    ]
+    with pytest.raises(StepCadenceError):
+        project_battery_soc(_config(), 0.5, points, _flat_load(0.0), now=_NOW, tz=_UTC, step_minutes=15)
 
 
 def test_horizon_window_excludes_out_of_range_points() -> None:

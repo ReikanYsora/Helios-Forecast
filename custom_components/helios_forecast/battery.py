@@ -23,6 +23,14 @@ from .config import BatteryConfig
 from .consumption import ConsumptionProfile
 from .forecast import ForecastPoint
 
+# Tolerance (minutes) on how far a real timestamp gap may drift from the declared step_minutes
+# before it is treated as a cadence mismatch, not float/scheduling jitter.
+_STEP_TOLERANCE_MIN = 0.5
+
+
+class StepCadenceError(ValueError):
+    """Raised when the forecast points' real timestamp spacing does not match step_minutes."""
+
 
 @dataclass(frozen=True)
 class BatterySocPoint:
@@ -50,6 +58,10 @@ def project_battery_soc(
     battery, clamped to [min reserve, full] and to the charge / discharge power. Returns one
     point per step (SoC in percent); empty when the battery is unusable or no points fall in
     the window.
+
+    Raises ``StepCadenceError`` if two consecutive points inside the window are spaced further
+    than ``step_minutes`` (beyond a small tolerance) apart: ``dt_h`` trusts ``step_minutes``
+    alone, so a real gap that disagrees with it would otherwise mis-integrate silently.
     """
     cap_wh = config.capacity_kwh * 1000.0
     if cap_wh <= 0:
@@ -63,9 +75,19 @@ def project_battery_soc(
 
     soc_wh = min(cap_wh, max(min_wh, start_soc_frac * cap_wh))
     out: List[BatterySocPoint] = []
+    prev_t: datetime | None = None
     for point in points:
         if point.t < now or point.t >= end:
             continue
+        if prev_t is not None:
+            # dt_h above is derived from step_minutes alone; if the real spacing between the points
+            # being integrated does not match it, every energy delta from here on is silently wrong.
+            gap_min = (point.t - prev_t).total_seconds() / 60.0
+            if abs(gap_min - step_minutes) > _STEP_TOLERANCE_MIN:
+                raise StepCadenceError(
+                    f"forecast points are {gap_min:g} min apart, step_minutes={step_minutes} was declared"
+                )
+        prev_t = point.t
         net_w = point.pv_w - profile.at(point.t.astimezone(tz))
         if net_w >= 0.0:
             # Surplus charges the battery, capped by the charge power and the room left.
