@@ -209,6 +209,66 @@ async def test_consumption_profile_no_energy_sources_keeps_previous(hass, caplog
     assert "no configured sources" in caplog.text
 
 
+async def test_consumption_profile_throttle_engages_even_when_profile_stays_none(hass, monkeypatch) -> None:
+    """Sources are configured but the recorder has no history yet, so the build keeps returning
+    None. The hourly throttle must still engage on the attempt, not only on a successful build."""
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    now = dt_util.now().replace(minute=5, second=0, microsecond=0)
+
+    class _Manager:
+        data = {"energy_sources": [{"type": "solar", "stat_energy_from": "sensor.solar_production"}]}
+
+    manager_mock = AsyncMock(return_value=_Manager())
+    monkeypatch.setattr("homeassistant.components.energy.async_get_manager", manager_mock)
+
+    result1 = await coordinator._consumption_profile_for(now)
+    result2 = await coordinator._consumption_profile_for(now + timedelta(minutes=30))
+
+    assert result1 is None
+    assert result2 is None
+    manager_mock.assert_awaited_once()
+
+
+async def test_consumption_profile_source_fetch_failure_logs_and_uses_remaining_sources(
+    hass, monkeypatch, caplog
+) -> None:
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    now = dt_util.now().replace(minute=5, second=0, microsecond=0)
+
+    class _Manager:
+        data = {
+            "energy_sources": [
+                {"type": "solar", "stat_energy_from": "sensor.solar_production"},
+                {
+                    "type": "grid",
+                    "stat_energy_from": "sensor.grid_import",
+                    "stat_energy_to": "sensor.grid_export",
+                },
+            ]
+        }
+
+    monkeypatch.setattr("homeassistant.components.energy.async_get_manager", AsyncMock(return_value=_Manager()))
+
+    from custom_components.helios_forecast.solar.residual import ProductionBucket
+
+    good_bucket = ProductionBucket(start_ms=now.timestamp() * 1000.0, end_ms=(now.timestamp() + 3600) * 1000.0, kwh=1.0)
+
+    async def _fetch(stat_id, _start, _end):
+        if stat_id == "sensor.solar_production":
+            raise RuntimeError("recorder timeout")
+        return [good_bucket]
+
+    monkeypatch.setattr(coordinator, "_fetch_change_buckets", _fetch)
+
+    with caplog.at_level(logging.WARNING, logger=coordinator_mod._LOGGER.name):
+        result = await coordinator._consumption_profile_for(now)
+
+    assert result is not None
+    assert "sensor.solar_production" in caplog.text
+
+
 async def test_consumption_profile_energy_manager_error_keeps_previous(hass, monkeypatch, caplog) -> None:
     entry = _entry(hass)
     coordinator = HeliosForecastCoordinator(hass, entry)

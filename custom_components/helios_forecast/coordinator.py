@@ -1,9 +1,10 @@
 """DataUpdateCoordinator: fetch Open-Meteo + recorder history and build the forecast.
 
 Runs the model on a timer, holding the assembled points and the derived summary.
-One combined Open-Meteo fetch (60 past days for the learning, 7 future days for
-the forecast) per weather + per distinct fixed orientation; the learned residual
-map is built from the recorder's own production / SoC history.
+One combined Open-Meteo fetch per refresh (60 past days for the learning, 7 future
+days for the forecast), regardless of how many panel orientations are configured;
+the model splits that single weather series across orientations itself. The learned
+residual map is built from the recorder's own production / SoC history.
 """
 
 from __future__ import annotations
@@ -108,10 +109,10 @@ _LOGGER = logging.getLogger(__name__)
 UPDATE_INTERVAL = timedelta(minutes=30)
 STEP_MINUTES = 15
 FORECAST_DAYS = 7
-# How far ahead the battery SoC projection runs. Was 24h, too short to show the projection recover
-# through the FOLLOWING day's solar peak (a chart reading it past that point just sees the reserve
-# floor, looking "stuck"). The PV forecast itself already reaches FORECAST_DAYS ahead, so widening
-# this only uses points already being fetched, nothing new to source.
+# How far ahead the battery SoC projection runs. Reaches past the FOLLOWING day's solar peak, so a
+# chart reading the projection past that point sees it recover rather than reading as stuck at the
+# reserve floor. The PV forecast itself already reaches FORECAST_DAYS ahead, so this only uses
+# points already being fetched, nothing new to source.
 BATTERY_SOC_HORIZON_HOURS = 48.0
 
 
@@ -166,8 +167,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         self._last_weather_stat_hour: Optional[datetime] = None
         # Home consumption profile for the battery SoC projection, rebuilt at most once an hour. Its
         # multi-sensor 60-day recorder fetch is the expensive part, so it runs on the same hourly cadence
-        # as the prediction archive rather than on every 30-minute refresh (the 2026.8.3 CPU/network
-        # lesson); a 60-day average barely moves within an hour. Reused in between.
+        # as the prediction archive rather than on every 30-minute refresh; a 60-day average barely moves
+        # within an hour. Reused in between.
         self._consumption_profile: Optional[ConsumptionProfile] = None
         self._last_consumption_hour: Optional[datetime] = None
         # Production history (recorder change buckets) from the most recent refresh, kept so the
@@ -351,13 +352,16 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         The multi-sensor 60-day recorder fetch is the expensive part, so it runs on the archive's hourly
         cadence rather than on every 30-minute refresh; a 60-day average is stable within the hour, and
-        the cached profile is reused in between. A transient Energy-dashboard problem keeps the last-good
+        the cached profile is reused in between. The hour marker is set as soon as a build is attempted,
+        whether or not it yields a profile, so an unconfigured or history-less Energy dashboard is not
+        re-queried every 30 minutes either. A transient Energy-dashboard problem keeps the last-good
         profile instead of dropping the projection. Consumption is signed so the ids sum to it: solar +
         grid import - export + battery discharge - charge.
         """
         this_hour = now.replace(minute=0, second=0, microsecond=0)
-        if self._consumption_profile is not None and self._last_consumption_hour == this_hour:
+        if self._last_consumption_hour == this_hour:
             return self._consumption_profile
+        self._last_consumption_hour = this_hour
 
         try:
             from homeassistant.components.energy import async_get_manager
@@ -382,14 +386,20 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             *(self._fetch_change_buckets(stat_id, learn_start, now) for stat_id in ids),
             return_exceptions=True,
         )
-        buckets_by_id = {
-            stat_id: result for stat_id, result in zip(ids, fetched) if not isinstance(result, BaseException)
-        }
+        buckets_by_id: Dict[str, List[ProductionBucket]] = {}
+        for stat_id, result in zip(ids, fetched):
+            if isinstance(result, BaseException):
+                _LOGGER.warning(
+                    "Helios battery projection: recorder fetch failed for %s, that source is skipped: %s",
+                    stat_id,
+                    result,
+                )
+                continue
+            buckets_by_id[stat_id] = result
 
         profile = build_consumption_profile(sources, buckets_by_id, dt_util.DEFAULT_TIME_ZONE)
         if profile is not None:
             self._consumption_profile = profile
-            self._last_consumption_hour = this_hour
         return self._consumption_profile
 
     async def _today_trend(self, data, now, summary) -> TodayTrend:
