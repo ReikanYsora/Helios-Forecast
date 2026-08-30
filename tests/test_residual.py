@@ -19,13 +19,19 @@ sys.path.insert(0, str(_REPO_ROOT))
 from custom_components.helios_forecast.forecast import build_forecast_series  # noqa: E402
 from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: E402
 from custom_components.helios_forecast.solar.irradiance import PanelOrientation, snow_cover_factor  # noqa: E402
-from custom_components.helios_forecast.solar.power import PvLayout, WeatherSample, compute_pv_power_weighted  # noqa: E402
+from custom_components.helios_forecast.solar.power import (  # noqa: E402
+    PvLayout,
+    WeatherSample,
+    compute_pv_power_per_array,
+    compute_pv_power_weighted,
+)
 from custom_components.helios_forecast.solar.residual import (  # noqa: E402
     LEARN_SUBSAMPLES,
     M_MAX,
     ProductionBucket,
     SkyResidualInput,
     SkyResidualMap,
+    _capped_model_kwh,
     _dt,
     _nearest_cloud_idx,
     build_sky_residual_map,
@@ -163,6 +169,76 @@ def test_ratio_clamped_high() -> None:
     sky_map = build_sky_residual_map(_input(over))
     assert sky_map is not None
     assert sky_map.global_ratio == M_MAX  # 5x clamps to the ceiling
+
+
+def _capped_layout() -> PvLayout:
+    # Same 5 kWp single-array layout as _layout(), plus a per-array inverter cap tight enough that
+    # a clear midday hour saturates it (5 kWp at full pct -> up to 5000 W; the cap is 2000 W).
+    return PvLayout(orientations=[PanelOrientation(30, 180)], shares=[1.0], coords=[None], total_kwp=5.0, caps=[2000.0])
+
+
+def _theoretical_model_kwh(bucket: ProductionBucket, inp: SkyResidualInput) -> float:
+    """Model kWh ignoring any per-array cap (what an uncapped panel would theoretically produce)."""
+    k = inp.layout.total_kwp * 10.0
+    mid = (bucket.start_ms + bucket.end_ms) / 2
+    ci = _nearest_cloud_idx(inp.cloud_times, mid)
+    sample = WeatherSample(
+        cloud=inp.cloud[ci],
+        ghi=inp.shortwave[ci],
+        direct=inp.direct[ci],
+        diffuse=inp.diffuse[ci],
+        temp=inp.temp[ci],
+        wind=inp.wind[ci],
+    )
+    w_sum, w_n = 0.0, 0
+    for s in range(LEARN_SUBSAMPLES):
+        sub_t = bucket.start_ms + (s + 0.5) * (bucket.end_ms - bucket.start_ms) / LEARN_SUBSAMPLES
+        moment = _dt(sub_t)
+        w_sum += compute_pv_power_weighted(moment, inp.lat, inp.lon, sample, inp.layout)
+        w_n += 1
+    return (w_sum / w_n) * k * snow_cover_factor(inp.snow[ci], inp.temp[ci]) / 1000.0
+
+
+def _capped_bucket_model_kwh(bucket: ProductionBucket, inp: SkyResidualInput) -> float:
+    """Model kWh with the layout's per-array cap applied, the way build_sky_residual_map computes it."""
+    k = inp.layout.total_kwp * 10.0
+    mid = (bucket.start_ms + bucket.end_ms) / 2
+    ci = _nearest_cloud_idx(inp.cloud_times, mid)
+    sample = WeatherSample(
+        cloud=inp.cloud[ci],
+        ghi=inp.shortwave[ci],
+        direct=inp.direct[ci],
+        diffuse=inp.diffuse[ci],
+        temp=inp.temp[ci],
+        wind=inp.wind[ci],
+    )
+    snow_factor = snow_cover_factor(inp.snow[ci], inp.temp[ci])
+    w_sum_kwh, w_n = 0.0, 0
+    for s in range(LEARN_SUBSAMPLES):
+        sub_t = bucket.start_ms + (s + 0.5) * (bucket.end_ms - bucket.start_ms) / LEARN_SUBSAMPLES
+        moment = _dt(sub_t)
+        pcts = compute_pv_power_per_array(moment, inp.lat, inp.lon, sample, inp.layout)
+        w_sum_kwh += _capped_model_kwh(pcts, inp.layout, k, snow_factor)
+        w_n += 1
+    return w_sum_kwh / w_n
+
+
+def test_build_applies_per_array_cap_to_the_model() -> None:
+    # Production set to the CAPPED model kWh (what a real, cap-limited install actually harvests) must
+    # learn ratio 1, not a ratio that conflates the hardware clip with weather bias. Before the fix the
+    # build used the uncapped theoretical model, which is strictly higher whenever the cap bites, so the
+    # learned ratio would come out under 1 even though production exactly matches the physically capped
+    # model.
+    buckets = _midday_buckets()
+    inp0 = _input(buckets, layout=_capped_layout())
+    theoretical = [_theoretical_model_kwh(b, inp0) for b in buckets]
+    capped = [_capped_bucket_model_kwh(b, inp0) for b in buckets]
+    assert any(c < t - 1e-9 for c, t in zip(capped, theoretical))  # the cap actually bites at some hour
+
+    matched = [ProductionBucket(b.start_ms, b.end_ms, c) for b, c in zip(buckets, capped)]
+    sky_map = build_sky_residual_map(_input(matched, layout=_capped_layout()))
+    assert sky_map is not None
+    assert abs(sky_map.global_ratio - 1.0) < 1e-9
 
 
 def test_build_survives_missing_cloud_hours() -> None:
