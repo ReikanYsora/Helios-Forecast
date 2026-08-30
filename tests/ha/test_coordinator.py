@@ -214,9 +214,7 @@ async def test_consumption_profile_energy_manager_error_keeps_previous(hass, mon
     coordinator = HeliosForecastCoordinator(hass, entry)
     sentinel = object()
     coordinator._consumption_profile = sentinel
-    coordinator._last_consumption_hour = dt_util.now().replace(minute=0, second=0, microsecond=0) - timedelta(
-        hours=5
-    )
+    coordinator._last_consumption_hour = dt_util.now().replace(minute=0, second=0, microsecond=0) - timedelta(hours=5)
 
     async def _boom(_hass):
         raise RuntimeError("energy store corrupt")

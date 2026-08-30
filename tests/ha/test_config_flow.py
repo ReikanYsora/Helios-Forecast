@@ -74,7 +74,8 @@ async def test_options_settings_step_keeps_lines_untouched(
     assert result["step_id"] == "settings"
 
     result = await hass.config_entries.options.async_configure(
-        result["flow_id"], {"inverter_max_kw": 8.0, "trend_anchor_hour": 6, "battery_min_soc": 10, "battery_efficiency": 90}
+        result["flow_id"],
+        {"inverter_max_kw": 8.0, "trend_anchor_hour": 6, "battery_min_soc": 10, "battery_efficiency": 90},
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_INVERTER_MAX_KW] == 8.0
@@ -121,9 +122,7 @@ async def test_options_lines_step_removing_every_line_keeps_existing(
     result = await hass.config_entries.options.async_init(entry.entry_id)
     result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "lines"})
 
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"], {**_LINE_A, "remove_this_line": True}
-    )
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {**_LINE_A, "remove_this_line": True})
     result = await hass.config_entries.options.async_configure(
         result["flow_id"], {**_LINE_B, "remove_this_line": True, "add_another": False}
     )

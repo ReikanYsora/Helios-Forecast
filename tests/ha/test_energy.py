@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-import pytest
 
 from custom_components.helios_forecast.const import DOMAIN
 from custom_components.helios_forecast.energy import async_get_solar_forecast

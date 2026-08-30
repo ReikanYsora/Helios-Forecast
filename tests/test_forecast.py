@@ -204,9 +204,7 @@ def test_daily_integration_buckets_by_the_given_day_tz() -> None:
 def test_build_forecast_series_empty_when_no_weather_or_no_span() -> None:
     layout = _single_south_layout()
     start = datetime(2026, 6, 21, 0, tzinfo=timezone.utc)
-    empty_weather = WeatherSeries(
-        times=[], cloud=[], shortwave=[], direct=[], diffuse=[], temp=[], wind=[], snow=[]
-    )
+    empty_weather = WeatherSeries(times=[], cloud=[], shortwave=[], direct=[], diffuse=[], temp=[], wind=[], snow=[])
     assert build_forecast_series(empty_weather, layout, _LAT, _LON, start=start, end=start + timedelta(hours=1)) == []
 
     weather = _constant_weather()
