@@ -76,8 +76,8 @@ def async_register_services(hass: HomeAssistant) -> None:
     async def _async_get_battery_soc(call: ServiceCall) -> dict[str, Any]:
         """Return the projected battery SoC curve (next 48 h) for one installation.
 
-        Empty when the battery feature is off or has no usable input; the state-of-charge sensor
-        explains what is missing."""
+        Empty when the battery feature is off or has no usable input; the reason is logged (the
+        state-of-charge sensor itself just reads "unknown", with no diagnostic attribute)."""
         data = _resolve(call).data
         soc = data.battery_soc if data is not None else []
         return {"forecast": [_soc_point_dict(p) for p in soc]}
