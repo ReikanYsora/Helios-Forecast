@@ -98,9 +98,11 @@ residual-corrected**, so it tracks the site's real behaviour better than a raw
 model. The card does not depend on these entity names for its baseline layer.
 
 Only the everyday values are **enabled by default** (`power_now`, `energy_today_remaining`,
-`energy_day_1` = today, `energy_day_2` = tomorrow, and `reliability`). The rest of the set
-below is registered but **disabled by default**, so the recorder stays lean and each user
-enables the entities they actually automate on; enabling one later never loses its history.
+`energy_day_1` = today, `energy_day_2` = tomorrow, `reliability`, and the archive pair
+`predicted_power` / `predicted_energy`, whose long-term statistics back the card's
+past-forecast curve). The rest of the set below is registered but **disabled by default**,
+so the recorder stays lean and each user enables the entities they actually automate on;
+enabling one later never loses its history.
 
 Days are numbered uniformly, **`day_1` = today** through **`day_7` = J+6**.
 
@@ -109,6 +111,8 @@ Power, now / next hour:
 | Entity | State | Notes |
 |---|---|---|
 | `sensor.helios_forecast_power_now` | predicted PV power now, **W** | `device_class: power`, `state_class: measurement` |
+| `sensor.helios_forecast_power_now_low` | analog P10 (low-bound) power now, **W** | disabled by default; `null` until the analog support is solid enough to publish a band |
+| `sensor.helios_forecast_power_now_high` | analog P90 (high-bound) power now, **W** | disabled by default; `null` until the analog support is solid enough to publish a band |
 | `sensor.helios_forecast_power_next_hour` | predicted average power over the next hour, **W** | |
 
 Peak, per day over the 7-day horizon:
@@ -132,11 +136,20 @@ Energy, intraday:
 | `sensor.helios_forecast_energy_this_hour` | predicted production this hour, **kWh** | |
 | `sensor.helios_forecast_energy_next_hour` | predicted production next hour, **kWh** | |
 
+Archive (enabled by default: their long-term statistics are what backs the card's
+past-forecast curve, kept by HA well beyond Open-Meteo's rolling window):
+
+| Entity | State | Notes |
+|---|---|---|
+| `sensor.helios_forecast_predicted_power` | predicted PV power, **W** | `device_class: power`, `state_class: measurement`. Mirrors `power_now`; its purpose is the point the statistics import backfills from. |
+| `sensor.helios_forecast_predicted_energy` | predicted energy this hour, **kWh** | `state_class: measurement` (no `device_class`: kWh + `measurement` is only valid without the energy class, the entity-bound long-term statistics need a state class). |
+
 Forecast quality:
 
 | Entity | State | Notes |
 |---|---|---|
 | `sensor.helios_forecast_reliability` | forecast reliability, **0..100 %** | `state_class: measurement`. Blends learning maturity, recent predicted-vs-actual skill and today's cloud predictability. Attributes: `data_maturity`, `recent_skill`, `today_predictability`, `days_learned`, and a per-horizon-day `per_day` list (chart-style, kept off the recorder). |
+| `sensor.helios_forecast_today_trend` | how much today's predicted total has moved since its frozen daily reference, signed **kWh** | `state_class: measurement`, disabled by default. Positive when the day now looks better than at the reference, negative when worse. Attributes: `reference_kwh`, `reference_time`, `current_kwh`, `direction`. The reference hour is a config knob (section 5). |
 
 Battery state of charge (2026.9.0, only when the battery block in §5 is configured):
 
@@ -187,7 +200,9 @@ the card's "Graph detail" setting; the integration resamples server-side).
       "pv_w": 3120,        // residual-corrected predicted power (the curve drawn)
       "pv_raw_w": 3340,    // pre-correction (the card's forecast vs forecastRaw)
       "pv_p10": 2650,      // analog P10/P90 uncertainty band (null until learning is solid)
-      "pv_p90": 3450 }
+      "pv_p90": 3450,
+      "ghi": 610,          // global horizontal irradiance at this bucket, W/m2
+      "cloud": 32 }        // cloud cover at this bucket, %
   ],
   "daily": [
     { "date": "2026-06-11", "kwh": 21.4, "kwh_raw": 22.9 }
