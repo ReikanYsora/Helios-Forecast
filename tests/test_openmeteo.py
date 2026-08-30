@@ -13,6 +13,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pytest
+
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
@@ -125,6 +127,102 @@ def test_get_json_returns_none_on_timeout() -> None:
     assert result is None
 
 
+def test_get_json_returns_none_on_malformed_body() -> None:
+    # A 200 response with a non-JSON content-type (aiohttp raises ContentTypeError) must not raise
+    # out of _get_json: it degrades to None like a non-200 or a timeout, so the retry loop recovers.
+    class _BadContentTypeResp:
+        status = 200
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def json(self):
+            raise om.ContentTypeError(None, ())
+
+    class _BadContentTypeSession:
+        def get(self, url):
+            return _BadContentTypeResp()
+
+    result = asyncio.run(om._get_json(_BadContentTypeSession(), "https://example.invalid"))
+    assert result is None
+
+
+def test_get_json_returns_none_on_invalid_json() -> None:
+    # A 200 response with a truncated/malformed JSON body (json.JSONDecodeError, a ValueError) must
+    # also degrade to None rather than raise.
+    class _BadJsonResp:
+        status = 200
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def json(self):
+            raise ValueError("Expecting value: line 1 column 1 (char 0)")
+
+    class _BadJsonSession:
+        def get(self, url):
+            return _BadJsonResp()
+
+    result = asyncio.run(om._get_json(_BadJsonSession(), "https://example.invalid"))
+    assert result is None
+
+
+def test_fetch_parsed_retries_after_malformed_body() -> None:
+    # A malformed-but-200 first attempt must not escape _get_json as an uncaught exception: the
+    # retry loop in _fetch_parsed keeps running and recovers on the next, good attempt.
+    om._RETRY_DELAY_S = 0.0
+
+    class _BadThenGoodResp:
+        def __init__(self, raise_bad):
+            self._raise_bad = raise_bad
+            self.status = 200
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def json(self):
+            if self._raise_bad:
+                raise ValueError("bad json")
+            return _GOOD_WEATHER
+
+    class _Session:
+        def __init__(self):
+            self.calls = 0
+
+        def get(self, url):
+            self.calls += 1
+            return _BadThenGoodResp(raise_bad=self.calls == 1)
+
+    session = _Session()
+    result = asyncio.run(om._fetch_parsed(session, "https://example.invalid", parse_weather))
+    assert result is not None
+    assert session.calls == 2  # first attempt malformed and swallowed, second attempt succeeds
+
+
+def test_parse_cloud_spread_asserts_on_layer_key_collision() -> None:
+    # If a payload ever carried both the per-layer keys and the aggregate 'cloud_cover' key together,
+    # the prefix match in _model_arrays would silently fold the per-layer arrays into the spread
+    # lookup. This must fail loudly instead of returning a corrupted result.
+    payload = {
+        "hourly": {
+            "time": ["2026-06-11T00:00"],
+            "cloud_cover": [50.0],
+            "cloud_cover_low": [10.0],
+        }
+    }
+    with pytest.raises(AssertionError):
+        parse_cloud_spread(payload)
+
+
 def test_parse_cloud_spread() -> None:
     # From an ensemble payload: per-hour stdev of cloud across the models, with its own times.
     payload = {
@@ -212,16 +310,31 @@ class _FakeResp:
         return self._payload
 
 
-class _FakeSession:
-    """Serves a scripted list of responses, one per get() call."""
+def _is_ensemble_url(url: str) -> bool:
+    return "&hourly=cloud_cover&" in url
 
-    def __init__(self, responses):
-        self._responses = list(responses)
-        self.calls = 0
+
+class _FakeSession:
+    """Serves two independent scripted response queues, one per request family (values vs.
+    ensemble), routed by URL rather than by call order - fetch_weather now fires both concurrently,
+    so the two families' calls can interleave in either order."""
+
+    def __init__(self, values_responses, ensemble_responses=()):
+        self._values = list(values_responses)
+        self._ensemble = list(ensemble_responses)
+        self.values_calls = 0
+        self.ensemble_calls = 0
+
+    @property
+    def calls(self):
+        return self.values_calls + self.ensemble_calls
 
     def get(self, url):
-        self.calls += 1
-        return self._responses.pop(0)
+        if _is_ensemble_url(url):
+            self.ensemble_calls += 1
+            return self._ensemble.pop(0)
+        self.values_calls += 1
+        return self._values.pop(0)
 
 
 _ENSEMBLE_SPREAD = {
@@ -238,12 +351,12 @@ def test_fetch_weather_values_with_ensemble_spread() -> None:
     # Values call: empty, non-200, then good (the third try wins). Then the ensemble call overlays
     # the cross-model cloud spread onto the values.
     session = _FakeSession(
-        [
+        values_responses=[
             _FakeResp(200, {"hourly": {}}),
             _FakeResp(429, None),
             _FakeResp(200, _GOOD_WEATHER),
-            _FakeResp(200, _ENSEMBLE_SPREAD),
-        ]
+        ],
+        ensemble_responses=[_FakeResp(200, _ENSEMBLE_SPREAD)],
     )
     result = asyncio.run(fetch_weather(session, 1.0, 2.0))
     assert result is not None
@@ -257,7 +370,8 @@ def test_fetch_weather_ensemble_failure_degrades_to_zero_spread() -> None:
     # Values succeed on the first try; the ensemble call fails every retry. The series still returns,
     # with the baseline zero spread rather than failing the refresh (best-effort).
     session = _FakeSession(
-        [_FakeResp(200, _GOOD_WEATHER), _FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)]
+        values_responses=[_FakeResp(200, _GOOD_WEATHER)],
+        ensemble_responses=[_FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)],
     )
     result = asyncio.run(fetch_weather(session, 1.0, 2.0))
     assert result is not None
@@ -268,10 +382,61 @@ def test_fetch_weather_ensemble_failure_degrades_to_zero_spread() -> None:
 
 def test_fetch_weather_none_after_exhausting_retries() -> None:
     om._RETRY_DELAY_S = 0.0
-    session = _FakeSession([_FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)])
+    # Values fail every retry. The two calls now run concurrently (see the dedicated concurrency
+    # test below), so the ensemble call is also attempted here even though its result is discarded.
+    session = _FakeSession(
+        values_responses=[_FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)],
+        ensemble_responses=[_FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)],
+    )
     result = asyncio.run(fetch_weather(session, 1.0, 2.0))
     assert result is None
-    assert session.calls == 3  # values call capped at _RETRY_ATTEMPTS; the ensemble call is never reached
+    assert session.values_calls == 3  # values call capped at _RETRY_ATTEMPTS
+    assert session.ensemble_calls == 3
+
+
+def test_fetch_weather_runs_values_and_ensemble_concurrently() -> None:
+    # Both requests hit independent endpoints. Each response only unblocks once both requests have
+    # started, so this deadlocks (and the wait_for below times out) if fetch_weather awaited them
+    # one after another instead of concurrently.
+    class _Gate:
+        def __init__(self):
+            self._arrivals = 0
+            self._both_arrived = asyncio.Event()
+
+        async def arrive(self):
+            self._arrivals += 1
+            if self._arrivals >= 2:
+                self._both_arrived.set()
+            await asyncio.wait_for(self._both_arrived.wait(), timeout=0.3)
+
+    class _GatedResp:
+        def __init__(self, gate, payload):
+            self._gate = gate
+            self._payload = payload
+            self.status = 200
+
+        async def __aenter__(self):
+            await self._gate.arrive()
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def json(self):
+            return self._payload
+
+    class _GatedSession:
+        def __init__(self, gate):
+            self._gate = gate
+
+        def get(self, url):
+            payload = _ENSEMBLE_SPREAD if _is_ensemble_url(url) else _GOOD_WEATHER
+            return _GatedResp(self._gate, payload)
+
+    result = asyncio.run(fetch_weather(_GatedSession(_Gate()), 1.0, 2.0))
+    assert result is not None
+    assert result.cloud == [50.0, 60.0]
+    assert result.cloud_spread == [10.0, 0.0]
 
 
 if __name__ == "__main__":

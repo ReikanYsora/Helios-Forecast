@@ -28,6 +28,14 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional, TypeVar
 if TYPE_CHECKING:
     from aiohttp import ClientSession
 
+try:
+    from aiohttp import ContentTypeError
+except ImportError:  # aiohttp is not installed in the pure-python test env; only used for isinstance checks
+
+    class ContentTypeError(Exception):  # type: ignore[no-redef]
+        pass
+
+
 _BASE_URL = "https://api.open-meteo.com/v1/forecast"
 
 _T = TypeVar("_T")
@@ -217,8 +225,6 @@ def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
     hourly = payload.get("hourly") or {}
     time_strs = hourly.get("time") or []
     low_arrays = _model_arrays(hourly, "cloud_cover_low")
-    mid_arrays = _model_arrays(hourly, "cloud_cover_mid")
-    high_arrays = _model_arrays(hourly, "cloud_cover_high")
     if not time_strs or not any(low_arrays):
         return None
     n = len(time_strs)
@@ -229,14 +235,8 @@ def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
 
     # Median each layer across models first, then combine into the weighted cover the card uses.
     # cloud_effective always returns a float, but the field is list[float | None] like the fused layers.
-    cloud: list[float | None] = [
-        cloud_effective(
-            _median(_finite_at(low_arrays, i)),
-            _median(_finite_at(mid_arrays, i)),
-            _median(_finite_at(high_arrays, i)),
-        )
-        for i in range(n)
-    ]
+    low, mid, high = fuse("cloud_cover_low"), fuse("cloud_cover_mid"), fuse("cloud_cover_high")
+    cloud: list[float | None] = [cloud_effective(low[i], mid[i], high[i]) for i in range(n)]
 
     return WeatherSeries(
         times=parse_times(time_strs),
@@ -261,6 +261,13 @@ def parse_cloud_spread(payload: dict[str, Any]) -> tuple[list[datetime], list[fl
     """
     hourly = payload.get("hourly") or {}
     time_strs = hourly.get("time") or []
+    # "cloud_cover" is a string-prefix of the per-layer keys ("cloud_cover_low" and friends), so
+    # _model_arrays' prefix match would silently fold them into this aggregate lookup if a payload
+    # ever carried both key families at once. Today the values and ensemble calls are always two
+    # separate HTTP responses, so this never happens; fail loudly instead of drifting quietly if it ever does.
+    assert not any(k.startswith(("cloud_cover_low", "cloud_cover_mid", "cloud_cover_high")) for k in hourly), (
+        "ensemble payload unexpectedly also carries per-layer cloud keys, would corrupt the spread lookup"
+    )
     cloud_arrays = _model_arrays(hourly, "cloud_cover")
     if not time_strs or not any(cloud_arrays):
         return None
@@ -277,15 +284,19 @@ def _overlay_cloud_spread(
 
 
 async def _get_json(session: ClientSession, url: str) -> Optional[dict]:
-    """GET ``url`` as JSON once. None on a non-200 or a timeout, so the caller's retry +
-    last-good-reuse path recovers instead of a stalled request hanging the whole refresh. Other
-    transport errors propagate and become an UpdateFailed, retried on the next cycle."""
+    """GET ``url`` as JSON once. None on a non-200, a timeout, or a malformed/non-JSON 200 body, so
+    the caller's retry + last-good-reuse path recovers instead of a stalled or garbled response
+    hanging or failing the whole refresh. Other transport errors propagate and become an
+    UpdateFailed, retried on the next cycle."""
     try:
         async with asyncio.timeout(_REQUEST_TIMEOUT_S):
             async with session.get(url) as resp:
                 if resp.status != 200:
                     return None
-                return await resp.json()
+                try:
+                    return await resp.json()
+                except (ContentTypeError, ValueError):
+                    return None
     except TimeoutError:
         return None
 
@@ -304,6 +315,15 @@ async def _fetch_parsed(
     return None
 
 
+async def _ensemble_spread(session: ClientSession, url: str) -> Optional[tuple[list[datetime], list[float]]]:
+    """Best-effort ensemble fetch: any failure, whether a bad response exhausting its retries or a
+    raised transport error, reads as 'no spread this refresh' instead of failing the whole call."""
+    try:
+        return await _fetch_parsed(session, url, parse_cloud_spread)
+    except Exception:
+        return None
+
+
 async def fetch_weather(
     session: ClientSession,
     lat: float,
@@ -313,14 +333,18 @@ async def fetch_weather(
     forecast_days: int = 7,
 ) -> WeatherSeries | None:
     """GET the weather inputs. The picker-median call carries the values (required); a second,
-    best-effort ensemble call adds only the cross-model cloud spread. If the ensemble call fails, the
-    values series is returned with a zero spread rather than failing the whole refresh."""
+    best-effort ensemble call adds only the cross-model cloud spread. The two hit independent
+    Open-Meteo endpoints and are fetched concurrently, so a slow or retried values call does not also
+    serialize the ensemble call's own latency on top of it. If the ensemble call fails, the values
+    series is returned with a zero spread rather than failing the whole refresh."""
     base_url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days)
-    series = await _fetch_parsed(session, base_url, parse_weather)
+    ensemble_url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days, ensemble=True)
+    series, spread = await asyncio.gather(
+        _fetch_parsed(session, base_url, parse_weather),
+        _ensemble_spread(session, ensemble_url),
+    )
     if series is None:
         return None
-    ensemble_url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days, ensemble=True)
-    spread = await _fetch_parsed(session, ensemble_url, parse_cloud_spread)
     if spread is not None:
         series = _overlay_cloud_spread(series, spread[0], spread[1])
     return series
