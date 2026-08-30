@@ -109,6 +109,11 @@ def _as_float(value: Any) -> Optional[float]:
     return f
 
 
+def _kw_to_w_or_inf(value: Optional[float]) -> float:
+    """A kW cap in watts, or INF when unset/non-positive (uncapped)."""
+    return value * 1000.0 if (value is not None and value > 0) else INF
+
+
 def layout_from_config(data: Dict[str, Any]) -> PvLayout:
     """Resolve the configured arrays into orientations + kWp-normalised shares."""
     arrays = data.get(CONF_ARRAYS) or []
@@ -133,7 +138,7 @@ def layout_from_config(data: Dict[str, Any]) -> PvLayout:
         coords.append((lat, lon) if (lat is not None and lon is not None) else None)
 
         cap_kw = _as_float(arr.get(CONF_LINE_INVERTER_MAX_KW))
-        caps.append(cap_kw * 1000.0 if (cap_kw is not None and cap_kw > 0) else INF)
+        caps.append(_kw_to_w_or_inf(cap_kw))
 
     total_kwp = sum(kwps)
     if total_kwp > 0:
@@ -164,7 +169,7 @@ def location_from_config(
 def inverter_max_w_from_config(data: Dict[str, Any]) -> float:
     """Inverter clip in watts, INF when unset, matching the card's pvInverterMaxW."""
     kw = _as_float(data.get(CONF_INVERTER_MAX_KW))
-    return kw * 1000.0 if (kw is not None and kw > 0) else INF
+    return _kw_to_w_or_inf(kw)
 
 
 def learning_from_config(data: Dict[str, Any]) -> Optional[str]:
@@ -222,8 +227,8 @@ def battery_from_config(data: Dict[str, Any]) -> Optional[BatteryConfig]:
     return BatteryConfig(
         capacity_kwh=capacity,
         soc_entity=soc_entity,
-        max_charge_w=max_charge_kw * 1000.0 if (max_charge_kw is not None and max_charge_kw > 0) else INF,
-        max_discharge_w=max_discharge_kw * 1000.0 if (max_discharge_kw is not None and max_discharge_kw > 0) else INF,
+        max_charge_w=_kw_to_w_or_inf(max_charge_kw),
+        max_discharge_w=_kw_to_w_or_inf(max_discharge_kw),
         min_soc_frac=max(0.0, min(1.0, min_soc / 100.0)),
         efficiency=max(0.1, min(1.0, efficiency / 100.0)),
     )

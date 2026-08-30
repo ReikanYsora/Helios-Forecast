@@ -94,6 +94,11 @@ _PERCENT = selector.NumberSelector(
 )
 
 
+def _optional(fields: dict[Any, Any], key: str, sel: Any, suggested_value: Any) -> None:
+    """Add one optional field to ``fields``, pre-filled with ``suggested_value`` when given."""
+    fields[vol.Optional(key, description={"suggested_value": suggested_value})] = sel
+
+
 def _line_fields(
     arr: dict[str, Any] | None,
     home_lat: float,
@@ -119,17 +124,13 @@ def _line_fields(
     fields[kwp_key] = _KWP
     # Optional per-line inverter cap: a micro-inverter string that saturates on its own, distinct from the
     # entry-level cap that bounds the combined total. Left empty, the line is uncapped and behaves exactly as before.
-    fields[
-        vol.Optional(CONF_LINE_INVERTER_MAX_KW, description={"suggested_value": arr.get(CONF_LINE_INVERTER_MAX_KW)})
-    ] = _INVERTER
+    _optional(fields, CONF_LINE_INVERTER_MAX_KW, _INVERTER, arr.get(CONF_LINE_INVERTER_MAX_KW))
     fields[vol.Required(CONF_TRACKER, default=arr.get(CONF_TRACKER, TRACKER_NONE))] = _TRACKER
     # Optional per-line location override, for a line far enough from the entry's home coordinates
     # (e.g. a detached outbuilding) that it needs its own sun geometry. Suggested with the entry's
     # home coordinates so the field never comes up blank, but it is only stored once actually set.
-    fields[vol.Optional(CONF_LATITUDE, description={"suggested_value": arr.get(CONF_LATITUDE, home_lat)})] = _LATITUDE
-    fields[vol.Optional(CONF_LONGITUDE, description={"suggested_value": arr.get(CONF_LONGITUDE, home_lon)})] = (
-        _LONGITUDE
-    )
+    _optional(fields, CONF_LATITUDE, _LATITUDE, arr.get(CONF_LATITUDE, home_lat))
+    _optional(fields, CONF_LONGITUDE, _LONGITUDE, arr.get(CONF_LONGITUDE, home_lon))
     if allow_remove:
         fields[vol.Optional(_REMOVE, default=False)] = _BOOL
     if with_add_another:
@@ -151,31 +152,19 @@ def _settings_fields(
     """
     s = settings or {}
     fields: dict[Any, Any] = {}
-    fields[vol.Optional(CONF_LATITUDE, description={"suggested_value": s.get(CONF_LATITUDE, home_lat)})] = _LATITUDE
-    fields[vol.Optional(CONF_LONGITUDE, description={"suggested_value": s.get(CONF_LONGITUDE, home_lon)})] = _LONGITUDE
-    fields[vol.Optional(CONF_INVERTER_MAX_KW, description={"suggested_value": s.get(CONF_INVERTER_MAX_KW)})] = _INVERTER
-    fields[vol.Optional(CONF_PRODUCTION_ENTITY, description={"suggested_value": s.get(CONF_PRODUCTION_ENTITY)})] = (
-        _SENSOR
-    )
+    _optional(fields, CONF_LATITUDE, _LATITUDE, s.get(CONF_LATITUDE, home_lat))
+    _optional(fields, CONF_LONGITUDE, _LONGITUDE, s.get(CONF_LONGITUDE, home_lon))
+    _optional(fields, CONF_INVERTER_MAX_KW, _INVERTER, s.get(CONF_INVERTER_MAX_KW))
+    _optional(fields, CONF_PRODUCTION_ENTITY, _SENSOR, s.get(CONF_PRODUCTION_ENTITY))
     fields[vol.Optional(CONF_TREND_ANCHOR_HOUR, default=s.get(CONF_TREND_ANCHOR_HOUR, DEFAULT_TREND_ANCHOR_HOUR))] = (
         _HOUR
     )
     # Battery SoC projection (all optional): capacity + the live SoC entity switch the feature on; the rest
     # keep their defaults when left empty. Consumption is not asked for, it comes from the Energy dashboard.
-    fields[
-        vol.Optional(CONF_BATTERY_CAPACITY_KWH, description={"suggested_value": s.get(CONF_BATTERY_CAPACITY_KWH)})
-    ] = _KWH
-    fields[vol.Optional(CONF_BATTERY_SOC_ENTITY, description={"suggested_value": s.get(CONF_BATTERY_SOC_ENTITY)})] = (
-        _SOC_ENTITY
-    )
-    fields[
-        vol.Optional(CONF_BATTERY_MAX_CHARGE_KW, description={"suggested_value": s.get(CONF_BATTERY_MAX_CHARGE_KW)})
-    ] = _INVERTER
-    fields[
-        vol.Optional(
-            CONF_BATTERY_MAX_DISCHARGE_KW, description={"suggested_value": s.get(CONF_BATTERY_MAX_DISCHARGE_KW)}
-        )
-    ] = _INVERTER
+    _optional(fields, CONF_BATTERY_CAPACITY_KWH, _KWH, s.get(CONF_BATTERY_CAPACITY_KWH))
+    _optional(fields, CONF_BATTERY_SOC_ENTITY, _SOC_ENTITY, s.get(CONF_BATTERY_SOC_ENTITY))
+    _optional(fields, CONF_BATTERY_MAX_CHARGE_KW, _INVERTER, s.get(CONF_BATTERY_MAX_CHARGE_KW))
+    _optional(fields, CONF_BATTERY_MAX_DISCHARGE_KW, _INVERTER, s.get(CONF_BATTERY_MAX_DISCHARGE_KW))
     fields[vol.Optional(CONF_BATTERY_MIN_SOC, default=s.get(CONF_BATTERY_MIN_SOC, DEFAULT_BATTERY_MIN_SOC))] = _PERCENT
     fields[
         vol.Optional(CONF_BATTERY_EFFICIENCY, default=s.get(CONF_BATTERY_EFFICIENCY, DEFAULT_BATTERY_EFFICIENCY))
