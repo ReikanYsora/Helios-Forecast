@@ -126,7 +126,7 @@ class ForecastData:
     observed: Dict[str, Optional[float]]
     # Forward-looking hourly series per weather field (today + horizon), keyed by
     # WEATHER_FIELDS key, exposed as each weather sensor's `forecast` attribute for
-    # charting (issue #21).
+    # charting.
     weather_forecast: Dict[str, List[dict]]
     # Forecast reliability index (0..100) and its components, feeds the
     # reliability sensor.
@@ -195,7 +195,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         try:
             weather = await fetch_weather(session, lat, lon, past_days=LEARN_DAYS, forecast_days=FORECAST_DAYS)
             # A transient empty response should not blank the forecast: reuse the last good
-            # fetch so the model still runs (issue #19). The data is only ~30 min old and the
+            # fetch so the model still runs. The data is only ~30 min old and the
             # next refresh recovers; a first-ever empty response (no prior fetch) still fails.
             if weather is None and self.weather_series is not None:
                 _LOGGER.warning("Open-Meteo returned no weather data; reusing the last successful fetch")
@@ -245,7 +245,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         self.write_weather_statistics(now_utc)
         observed = observed_snapshot(weather, now_utc)
         # Forward-looking weather per field (from today's local midnight), for the sensors'
-        # `forecast` chart attribute (issue #21). Shares the `start` used by the power forecast.
+        # `forecast` chart attribute. Shares the `start` used by the power forecast.
         weather_forecast = weather_forecast_series(weather, start, dt_util.DEFAULT_TIME_ZONE)
 
         # Archive the predicted production over the past 60-day window at an hourly step, for HA's

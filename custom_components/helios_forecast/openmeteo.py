@@ -34,7 +34,7 @@ _T = TypeVar("_T")
 
 # Open-Meteo occasionally answers a valid request with a non-200 or an empty payload (a brief
 # rate-limit or hiccup). A couple of short retries turn that transient blank into a success instead
-# of a failed 30-minute refresh (issue #19).
+# of a failed 30-minute refresh.
 _RETRY_ATTEMPTS = 3
 _RETRY_DELAY_S = 2.0
 # Per-request timeout. Without it a stalled connection could hang a refresh indefinitely and leave a
@@ -293,7 +293,7 @@ async def _get_json(session: ClientSession, url: str) -> Optional[dict]:
 async def _fetch_parsed(
     session: ClientSession, url: str, parser: Callable[[dict[str, Any]], Optional[_T]]
 ) -> Optional[_T]:
-    """GET ``url`` and run ``parser``, retrying an empty/non-200 response (issue #19). None once exhausted."""
+    """GET ``url`` and run ``parser``, retrying an empty/non-200 response. None once exhausted."""
     for attempt in range(_RETRY_ATTEMPTS):
         payload = await _get_json(session, url)
         result = parser(payload) if payload is not None else None

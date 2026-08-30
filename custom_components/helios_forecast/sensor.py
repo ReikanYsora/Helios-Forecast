@@ -144,7 +144,7 @@ def _timestamp(
 
 
 def _build_descriptions() -> list[HeliosSensorDescription]:
-    # Keep the recorder lean by default (#30): only the everyday headline values are enabled, the rest
+    # Keep the recorder lean by default: only the everyday headline values are enabled, the rest
     # are registered but disabled so the user opts into the ones they actually automate on. The two
     # `predicted_*` archive entities stay enabled because their long-term statistics are the card's
     # past predicted-production curve. Enabling a disabled entity later never loses history.
@@ -295,7 +295,7 @@ class HeliosWeatherSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEn
     coordinator (see write_weather_statistics), which is what keeps it available
     beyond Open-Meteo's rolling 60-day window. Each also carries a `forecast`
     attribute (the forward-looking hourly series) for charting, mirroring the
-    power sensor (issue #21).
+    power sensor.
     """
 
     _attr_has_entity_name = True
@@ -417,7 +417,7 @@ class HeliosTodayTrendSensor(CoordinatorEntity[HeliosForecastCoordinator], Senso
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_suggested_display_precision = 2
     _attr_icon = "mdi:trending-up"
-    # A nuance most users don't automate on; registered but off by default to keep the recorder lean (#30).
+    # A nuance most users don't automate on; registered but off by default to keep the recorder lean.
     _attr_entity_registry_enabled_default = False
 
     def __init__(self, coordinator: HeliosForecastCoordinator, entry: ConfigEntry) -> None:

@@ -72,7 +72,7 @@ def observed_snapshot(weather: WeatherSeries, now: datetime) -> Dict[str, Option
 def weather_forecast_series(weather: WeatherSeries, start: datetime, tz: tzinfo) -> Dict[str, List[dict]]:
     """Forward-looking hourly series per weather field, for charting.
 
-    Mirrors the power sensor's ``forecast`` attribute (issue #21): one list per field key, each
+    Mirrors the power sensor's ``forecast`` attribute: one list per field key, each
     entry ``{"datetime": <local ISO>, "<field key>": <value>}`` for hours at or after ``start``.
     Timestamps are localised to ``tz`` so they line up with the power forecast on the same chart.
     Non-finite samples are dropped. ``start`` is typically local midnight today, giving today +

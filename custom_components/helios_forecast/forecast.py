@@ -139,7 +139,7 @@ def build_forecast_series(
             ratio = sample_sky_residual(residual_map, sun.azimuth, sun.altitude)
         else:
             ratio = 1.0
-        # Each array is clipped at its own cap before summing (#26); the entry-level cap then bounds the combined total.
+        # Each array is clipped at its own cap before summing; the entry-level cap then bounds the combined total.
         raw_w, corrected_w = _sum_arrays(pcts, layout, snow, ratio)
         if math.isfinite(raw_w):
             raw_clamped = min(inverter_max_w, max(0.0, raw_w))

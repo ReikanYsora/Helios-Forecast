@@ -54,7 +54,7 @@ _K = 60
 # capped at the 90th percentile of what the site ACTUALLY produced under similar sun+cloud, times a
 # margin. The physical model cannot see near-field shadows (a tree in the morning, a roof in the
 # evening), but the real production already reflects them, so this stops the model over-predicting on
-# shaded sites while the margin still allows an unusually clear day (#28).
+# shaded sites while the margin still allows an unusually clear day.
 _CEILING_MIN_ANALOGS = 5
 _CEILING_MARGIN = 1.25
 
@@ -239,7 +239,7 @@ def enrich_points(
         blended = c * band.p50 + (1.0 - c) * p.pv_w
         # Never predict above what the site has actually produced under similar sun+cloud (with a
         # margin). At low confidence the blend leans on the physical model, which is blind to
-        # near-field shadows; the learned ceiling reins that back in (#28).
+        # near-field shadows; the learned ceiling reins that back in.
         if band.ceiling is not None:
             blended = min(blended, band.ceiling)
         if c >= BAND_MIN_CONFIDENCE:

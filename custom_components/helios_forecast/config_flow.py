@@ -64,7 +64,7 @@ _BOOL = selector.BooleanSelector()
 _HOUR = selector.NumberSelector(selector.NumberSelectorConfig(min=0, max=23, step=1, mode=_BOX))
 # Numeric geometry / power fields as explicit NumberSelectors: a proper numeric input
 # with a defined decimal step, so decimals (e.g. 2.61 kWp) are entered and stored as
-# real floats instead of being misparsed by the browser locale (issue #13).
+# real floats instead of being misparsed by the browser locale.
 _TILT = selector.NumberSelector(
     selector.NumberSelectorConfig(min=0, max=90, step=1, mode=_BOX, unit_of_measurement="°")
 )
@@ -110,7 +110,7 @@ def _line_fields(
     # current value so the field comes up filled.
     kwp_key = vol.Required(CONF_KWP, default=arr[CONF_KWP]) if CONF_KWP in arr else vol.Required(CONF_KWP)
     fields[kwp_key] = _KWP
-    # Optional per-line inverter cap (#26): a micro-inverter string that saturates on its own, distinct from the
+    # Optional per-line inverter cap: a micro-inverter string that saturates on its own, distinct from the
     # entry-level cap that bounds the combined total. Left empty, the line is uncapped and behaves exactly as before.
     fields[
         vol.Optional(CONF_LINE_INVERTER_MAX_KW, description={"suggested_value": arr.get(CONF_LINE_INVERTER_MAX_KW)})
