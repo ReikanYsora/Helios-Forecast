@@ -3,7 +3,8 @@
 Computes a PV production forecast server-side from Open-Meteo irradiance and the
 installation geometry, and publishes it three ways: a first-class entity set for
 automations, the Energy dashboard's solar-forecast provider, and a websocket
-detail series for the Helios card. The learned correction lands in a later phase.
+detail series for the Helios card. A learned residual, built from the recorder's
+own production history, corrects the model against the site's real output.
 
 Home Assistant imports stay inside the setup / unload functions so importing this
 package needs no running Home Assistant: the pure forecast model under it can be
