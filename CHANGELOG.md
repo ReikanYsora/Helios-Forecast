@@ -59,6 +59,7 @@ cloud-cover layers, and instant irradiance. Card and forecast read the same sky.
 A coming Home Assistant version tightens what the long-term statistics import
 expects; the integration now declares the new fields up front, so the archived
 weather and predicted-production history keep importing cleanly across the change.
+No user action needed. Thanks to @FoxP for pointing out the breakage radar (#38).
 
 ### Fixed: the battery SoC projection could crash, and now says why it skips
 
@@ -76,7 +77,6 @@ read the sensor at that instant, found it unavailable and stayed off until the
 next 30-minute refresh. It now re-projects as soon as the sensor becomes available
 again, and a brief startup gap is logged gently rather than as a warning. Thanks
 to @FoxP (#42).
-No user action needed. Thanks to @FoxP for pointing out the breakage radar (#38).
 
 ### Fixed: border locations pick the right regional weather model
 
