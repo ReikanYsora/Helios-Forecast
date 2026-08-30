@@ -16,7 +16,9 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
 from custom_components.helios_forecast.forecast import (  # noqa: E402
+    ForecastPoint,
     build_forecast_series,
+    forecast_point_dict,
     integrate_daily_kwh,
     lerp_finite,
     lerp_plain,
@@ -47,6 +49,21 @@ def _east_west_layout() -> PvLayout:
         coords=[None, None],
         total_kwp=6.0,
     )
+
+
+def test_forecast_point_dict_rounds_watts_and_bands() -> None:
+    # Shared shape read by both the get_forecast service response and the power_now sensor's
+    # `forecast` attribute; a null band must stay null, a present one rounds to 2 dp.
+    with_band = ForecastPoint(t=_NOON, pv_w=100.005, pv_raw_w=90.0, pv_p10=80.001, pv_p90=120.0)
+    assert forecast_point_dict(with_band) == {
+        "datetime": _NOON.isoformat(),
+        "watts": 100.0,
+        "p10": 80.0,
+        "p90": 120.0,
+    }
+    no_band = ForecastPoint(t=_NOON, pv_w=50.0, pv_raw_w=45.0)
+    assert forecast_point_dict(no_band)["p10"] is None
+    assert forecast_point_dict(no_band)["p90"] is None
 
 
 def test_weighted_equals_share_weighted_sum() -> None:

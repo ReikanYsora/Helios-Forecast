@@ -191,6 +191,31 @@ def test_weather_descriptions_cover_every_field(hass) -> None:
     assert {d.key for d in descriptions} == {f.key for f in WEATHER_FIELDS}
 
 
+async def test_weather_field_without_meta_is_skipped_not_fatal(hass, entry, coordinator, monkeypatch) -> None:
+    # A future WEATHER_FIELDS entry with no matching _WEATHER_META must degrade to "skip that one
+    # sensor", not abort description building (and so the whole sensor platform) for everything else.
+    from custom_components.helios_forecast.statistics import WeatherField
+
+    mystery = WeatherField("mystery_field", "mystery", "x")
+    monkeypatch.setattr(sensor_mod, "WEATHER_FIELDS", (*sensor_mod.WEATHER_FIELDS, mystery))
+
+    descriptions = sensor_mod._build_weather_descriptions()
+    assert "mystery_field" not in {d.key for d in descriptions}
+    assert len(descriptions) == len(sensor_mod.WEATHER_FIELDS) - 1
+
+    now = datetime(2026, 6, 21, 10, tzinfo=_UTC)
+    coordinator.data = _forecast_data(now)
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
+    added: list = []
+
+    def _add_entities(entities, update_before_add=False):
+        added.extend(entities)
+
+    await sensor_mod.async_setup_entry(hass, entry, _add_entities)
+    assert len(added) > 0
+    assert any(e.unique_id == f"{entry.entry_id}_power_now" for e in added)
+
+
 def test_reliability_sensor(hass, entry, coordinator) -> None:
     now = datetime(2026, 6, 21, 10, tzinfo=_UTC)
     coordinator.data = _forecast_data(now)

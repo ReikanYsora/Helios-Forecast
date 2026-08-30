@@ -7,6 +7,7 @@ and this/next hour. All values are produced in summary.py.
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -36,8 +37,11 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .config import battery_from_config
 from .const import DOMAIN
 from .coordinator import ForecastData, HeliosForecastCoordinator
+from .forecast import forecast_point_dict
 from .statistics import WEATHER_FIELDS
 from .summary import ForecastSummary
+
+_LOGGER = logging.getLogger(__name__)
 
 _HORIZON_DAYS = 7
 _ValueType = Optional[Union[float, datetime]]
@@ -56,17 +60,7 @@ class HeliosSensorDescription(SensorEntityDescription):
 def _forecast_attrs(data: ForecastData) -> dict:
     """The dense forecast curve as a chart-friendly attribute: watts per bucket, plus the
     P10/P90 analog band (null on a bucket until the analog support is solid enough for one)."""
-    return {
-        "forecast": [
-            {
-                "datetime": p.t.isoformat(),
-                "watts": round(p.pv_w, 2),
-                "p10": round(p.pv_p10, 2) if p.pv_p10 is not None else None,
-                "p90": round(p.pv_p90, 2) if p.pv_p90 is not None else None,
-            }
-            for p in data.points
-        ]
-    }
+    return {"forecast": [forecast_point_dict(p) for p in data.points]}
 
 
 def _power(
@@ -214,7 +208,13 @@ def _build_weather_descriptions() -> list[SensorEntityDescription]:
     """One MEASUREMENT sensor per archived Open-Meteo weather variable."""
     descriptions: list[SensorEntityDescription] = []
     for field in WEATHER_FIELDS:
-        device_class, unit, name, precision = _WEATHER_META[field.key]
+        meta = _WEATHER_META.get(field.key)
+        if meta is None:
+            # A WEATHER_FIELDS entry with no display metadata: skip just this sensor rather than
+            # aborting the whole platform (every other entity, weather or not, still sets up).
+            _LOGGER.error("No display metadata for weather field '%s', skipping its sensor", field.key)
+            continue
+        device_class, unit, name, precision = meta
         descriptions.append(
             SensorEntityDescription(
                 key=field.key,
@@ -367,8 +367,9 @@ class HeliosReliabilitySensor(CoordinatorEntity[HeliosForecastCoordinator], Sens
 
 class HeliosBatterySocSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEntity):
     """Predicted battery state of charge. The state is the near-term projection; the full 48-hour SoC
-    curve rides along as the `forecast` attribute, with the projected daily low/high and the forecast
-    reliability so an automation can weigh how much to trust it. Charge decisions stay with the user."""
+    curve rides along as the `forecast` attribute, with the low/high across that whole projection
+    window and the forecast reliability so an automation can weigh how much to trust it. Charge
+    decisions stay with the user."""
 
     _attr_has_entity_name = True
     _attr_name = "Predicted battery state of charge"

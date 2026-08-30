@@ -18,24 +18,13 @@ from homeassistant.helpers import config_validation as cv
 
 from .battery import BatterySocPoint
 from .const import DOMAIN
-from .forecast import ForecastPoint
+from .forecast import forecast_point_dict
 
 _SERVICE_GET_FORECAST = "get_forecast"
 _SERVICE_GET_BATTERY_SOC = "get_battery_soc_forecast"
 _SERVICES_REGISTERED = f"{DOMAIN}_services_registered"
 
 _SCHEMA = vol.Schema({vol.Optional("config_entry_id"): cv.string})
-
-
-def _point_dict(p: ForecastPoint) -> dict[str, Any]:
-    """One forecast bucket for the response: the chosen watts plus the P10/P90 band
-    (null when the analog support is too thin to surface one)."""
-    return {
-        "datetime": p.t.isoformat(),
-        "watts": round(p.pv_w, 2),
-        "p10": round(p.pv_p10, 2) if p.pv_p10 is not None else None,
-        "p90": round(p.pv_p90, 2) if p.pv_p90 is not None else None,
-    }
 
 
 def _soc_point_dict(p: BatterySocPoint) -> dict[str, Any]:
@@ -71,13 +60,13 @@ def async_register_services(hass: HomeAssistant) -> None:
         """Return the production forecast curve (today onward) for one installation."""
         data = _resolve(call).data
         points = data.points if data is not None else []
-        return {"forecast": [_point_dict(p) for p in points]}
+        return {"forecast": [forecast_point_dict(p) for p in points]}
 
     async def _async_get_battery_soc(call: ServiceCall) -> dict[str, Any]:
         """Return the projected battery SoC curve (next 48 h) for one installation.
 
-        Empty when the battery feature is off or has no usable input; the state-of-charge sensor
-        explains what is missing."""
+        Empty when the battery feature is off or has no usable input; the reason is logged (the
+        state-of-charge sensor itself just reads "unknown", with no diagnostic attribute)."""
         data = _resolve(call).data
         soc = data.battery_soc if data is not None else []
         return {"forecast": [_soc_point_dict(p) for p in soc]}

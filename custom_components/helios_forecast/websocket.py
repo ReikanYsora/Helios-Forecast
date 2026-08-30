@@ -7,7 +7,8 @@ solar-forecast otherwise.
 
 from __future__ import annotations
 
-from typing import Any
+from datetime import timedelta
+from typing import Any, Optional
 
 import voluptuous as vol
 from homeassistant.components import websocket_api
@@ -15,6 +16,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN
+from .forecast import ForecastPoint
 
 _WS_REGISTERED = f"{DOMAIN}_ws_registered"
 
@@ -28,12 +30,63 @@ def async_register(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_series)
 
 
+def _point_dict(p: ForecastPoint) -> dict[str, Any]:
+    """One native-resolution bucket for the response."""
+    return {
+        "t": p.t.isoformat(),
+        "pv_w": p.pv_w,
+        "pv_raw_w": p.pv_raw_w,
+        "pv_p10": p.pv_p10,
+        "pv_p90": p.pv_p90,
+        "ghi": getattr(p, "ghi", None),
+        "cloud": getattr(p, "cloud", None),
+    }
+
+
+def _native_step_minutes(points: list[ForecastPoint]) -> Optional[float]:
+    """The finest spacing between consecutive points in the series, or None when there
+    are fewer than two (nothing to compare a resolution against)."""
+    deltas = [(b.t - a.t).total_seconds() / 60.0 for a, b in zip(points, points[1:]) if b.t > a.t]
+    return min(deltas) if deltas else None
+
+
+def _bucket_average(values: list[Optional[float]]) -> Optional[float]:
+    present = [v for v in values if v is not None]
+    return sum(present) / len(present) if present else None
+
+
+def _resample(points: list[ForecastPoint], resolution_min: int) -> list[dict[str, Any]]:
+    """Downsample into resolution_min-wide buckets aligned to the series' first point,
+    averaging pv_w / pv_raw_w / pv_p10 / pv_p90 (None values excluded from the average;
+    a bucket with no non-None values for a field stays None for that field)."""
+    if not points:
+        return []
+    origin = points[0].t
+    width = timedelta(minutes=resolution_min)
+    buckets: dict[int, list[ForecastPoint]] = {}
+    for p in points:
+        buckets.setdefault(int((p.t - origin) // width), []).append(p)
+    return [
+        {
+            "t": (origin + idx * width).isoformat(),
+            "pv_w": _bucket_average([p.pv_w for p in buckets[idx]]),
+            "pv_raw_w": _bucket_average([p.pv_raw_w for p in buckets[idx]]),
+            "pv_p10": _bucket_average([p.pv_p10 for p in buckets[idx]]),
+            "pv_p90": _bucket_average([p.pv_p90 for p in buckets[idx]]),
+            "ghi": None,
+            "cloud": None,
+        }
+        for idx in sorted(buckets)
+    ]
+
+
 @websocket_api.websocket_command(
     {
         vol.Required("type"): "helios_forecast/series",
         vol.Required("entry_id"): str,
         vol.Optional("start"): str,
         vol.Optional("end"): str,
+        vol.Optional("resolution_min"): vol.All(int, vol.Range(min=1)),
     }
 )
 @callback
@@ -46,6 +99,10 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
 
     start = dt_util.parse_datetime(msg["start"]) if msg.get("start") else None
     end = dt_util.parse_datetime(msg["end"]) if msg.get("end") else None
+    for label, value in (("start", start), ("end", end)):
+        if value is not None and value.tzinfo is None:
+            connection.send_error(msg["id"], "invalid_format", f"'{label}' must include a UTC offset")
+            return
 
     # Full curve = the hourly past archive (before the live series starts) followed by the live
     # sub-hourly points (today onward). The live points are higher resolution, so the past archive is
@@ -55,23 +112,20 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
     series = [p for p in coordinator.archive_points if live_start is None or p.t < live_start]
     series.extend(live)
 
-    points = []
+    in_range = []
     for p in series:
         if start is not None and p.t < start:
             continue
         if end is not None and p.t >= end:
             continue
-        points.append(
-            {
-                "t": p.t.isoformat(),
-                "pv_w": p.pv_w,
-                "pv_raw_w": p.pv_raw_w,
-                "pv_p10": p.pv_p10,
-                "pv_p90": p.pv_p90,
-                "ghi": getattr(p, "ghi", None),
-                "cloud": getattr(p, "cloud", None),
-            }
-        )
+        in_range.append(p)
 
-    daily = [{"date": d.date, "kwh": d.energy_kwh, "kwh_raw": d.energy_kwh} for d in coordinator.data.summary.days]
+    resolution_min = msg.get("resolution_min")
+    native_step = _native_step_minutes(in_range)
+    if resolution_min is not None and native_step is not None and resolution_min > native_step:
+        points = _resample(in_range, resolution_min)
+    else:
+        points = [_point_dict(p) for p in in_range]
+
+    daily = [{"date": d.date, "kwh": d.energy_kwh, "kwh_raw": d.energy_raw_kwh} for d in coordinator.data.summary.days]
     connection.send_result(msg["id"], {"points": points, "daily": daily})

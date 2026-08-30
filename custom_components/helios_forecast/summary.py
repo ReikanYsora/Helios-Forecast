@@ -26,6 +26,9 @@ class DayForecast:
     energy_kwh: float
     peak_power_w: float
     peak_time: Optional[datetime]
+    # Pre-correction total (summed from pv_raw_w the same way energy_kwh sums pv_w), so a
+    # consumer can show the physical-model figure alongside the residual-corrected one.
+    energy_raw_kwh: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -118,6 +121,7 @@ def summarize(
         end = start + timedelta(days=1)
         in_day = [p for p in points if start <= p.t < end]
         energy = sum(p.pv_w * step_h / 1000.0 for p in in_day)
+        energy_raw = sum(p.pv_raw_w * step_h / 1000.0 for p in in_day)
         peak = max(in_day, key=lambda p: p.pv_w, default=None)
         days.append(
             DayForecast(
@@ -125,6 +129,7 @@ def summarize(
                 energy_kwh=energy,
                 peak_power_w=peak.pv_w if peak else 0.0,
                 peak_time=peak.t if peak else None,
+                energy_raw_kwh=energy_raw,
             )
         )
 
