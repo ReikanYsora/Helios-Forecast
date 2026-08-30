@@ -16,6 +16,8 @@ sys.path.insert(0, str(_REPO_ROOT))
 from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: E402
 from custom_components.helios_forecast.reliability import (  # noqa: E402
     MATURITY_TARGET_DAYS,
+    SKILL_MIN_DAY_KWH,
+    _day_predictability,
     _horizon_decay,
     compute_reliability,
     data_maturity,
@@ -67,6 +69,19 @@ def test_recent_skill_none_when_too_few_days() -> None:
     assert recent_skill(pts, prod, now, UTC) is None
 
 
+def test_recent_skill_ignores_days_below_the_minimum_actual_kwh() -> None:
+    # A near-zero actual day (overcast / sensor gap) must not count as a comparable day,
+    # however wrong the prediction was for it, or it would dominate the relative error.
+    now = datetime(2026, 6, 10, 12, tzinfo=UTC)
+    below_floor = SKILL_MIN_DAY_KWH / 2.0
+    prod = [_Bucket(datetime(2026, 6, d, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0) for d in range(5, 8)]
+    prod.append(_Bucket(datetime(2026, 6, 8, 12, tzinfo=UTC).timestamp() * 1000.0, below_floor))
+    pts = [_Pt(datetime(2026, 6, d, 12, tzinfo=UTC), 10_000.0) for d in range(5, 8)]
+    # Wildly wrong prediction on the excluded day; if it were counted, skill would collapse.
+    pts.append(_Pt(datetime(2026, 6, 8, 12, tzinfo=UTC), 999_000.0))
+    assert recent_skill(pts, prod, now, UTC) == 1.0
+
+
 def _weather_today(clouds, *, ghi=500.0) -> WeatherSeries:
     base = datetime(2026, 6, 10, 8, tzinfo=UTC)
     times = [base + timedelta(hours=i) for i in range(len(clouds))]
@@ -81,6 +96,34 @@ def _weather_today(clouds, *, ghi=500.0) -> WeatherSeries:
         wind=[5.0] * n,
         snow=[0.0] * n,
     )
+
+
+def _weather_today_with_spread(clouds, spreads, *, ghi=500.0) -> WeatherSeries:
+    weather = _weather_today(clouds, ghi=ghi)
+    weather.cloud_spread.extend(spreads)
+    return weather
+
+
+def test_day_predictability_falls_when_model_ensemble_disagrees() -> None:
+    # Same steady cloud reading (zero temporal variance) but a high cross-model spread:
+    # predictability must be pulled down by the spread signal, not stay at the variance-only 1.0.
+    day = datetime(2026, 6, 10, tzinfo=UTC).date()
+    steady_clouds = [10.0, 10.0, 10.0, 10.0, 10.0]
+    agree = _weather_today_with_spread(steady_clouds, [0.0, 0.0, 0.0, 0.0, 0.0])
+    disagree = _weather_today_with_spread(steady_clouds, [30.0, 30.0, 30.0, 30.0, 30.0])
+
+    p_agree = _day_predictability(agree, day, UTC)
+    p_disagree = _day_predictability(disagree, day, UTC)
+    assert p_agree is not None and p_disagree is not None
+    assert p_agree == 1.0  # zero temporal variance, zero model spread
+    assert p_disagree < p_agree
+
+
+def test_day_predictability_none_without_enough_daytime_samples() -> None:
+    # Fewer than 3 daytime (above-GHI-gate) hours: neither signal has enough support.
+    day = datetime(2026, 6, 10, tzinfo=UTC).date()
+    weather = _weather_today([10.0, 10.0], ghi=500.0)
+    assert _day_predictability(weather, day, UTC) is None
 
 
 def test_today_predictability_clear_vs_broken() -> None:
