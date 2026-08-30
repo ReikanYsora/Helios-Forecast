@@ -73,6 +73,10 @@ _AZIMUTH = selector.NumberSelector(
 )
 _KWP = selector.NumberSelector(selector.NumberSelectorConfig(min=0, step=0.01, mode=_BOX, unit_of_measurement="kWp"))
 _INVERTER = selector.NumberSelector(selector.NumberSelectorConfig(min=0, step=0.1, mode=_BOX, unit_of_measurement="kW"))
+# step "any": user input is not rounded to it (HA only uses it for the slider / keyboard step), so
+# coordinates keep whatever precision is typed instead of being rounded to a fixed decimal count.
+_LATITUDE = selector.NumberSelector(selector.NumberSelectorConfig(min=-90, max=90, step="any", mode=_BOX))
+_LONGITUDE = selector.NumberSelector(selector.NumberSelectorConfig(min=-180, max=180, step="any", mode=_BOX))
 _TRACKER = selector.SelectSelector(
     selector.SelectSelectorConfig(
         options=[TRACKER_NONE, "dual-axis", "single-axis-h", "single-axis-v"],
@@ -137,12 +141,8 @@ def _settings_fields(
     """
     s = settings or {}
     fields: dict[Any, Any] = {}
-    fields[vol.Optional(CONF_LATITUDE, description={"suggested_value": s.get(CONF_LATITUDE, home_lat)})] = vol.Coerce(
-        float
-    )
-    fields[vol.Optional(CONF_LONGITUDE, description={"suggested_value": s.get(CONF_LONGITUDE, home_lon)})] = vol.Coerce(
-        float
-    )
+    fields[vol.Optional(CONF_LATITUDE, description={"suggested_value": s.get(CONF_LATITUDE, home_lat)})] = _LATITUDE
+    fields[vol.Optional(CONF_LONGITUDE, description={"suggested_value": s.get(CONF_LONGITUDE, home_lon)})] = _LONGITUDE
     fields[vol.Optional(CONF_INVERTER_MAX_KW, description={"suggested_value": s.get(CONF_INVERTER_MAX_KW)})] = _INVERTER
     fields[vol.Optional(CONF_PRODUCTION_ENTITY, description={"suggested_value": s.get(CONF_PRODUCTION_ENTITY)})] = (
         _SENSOR

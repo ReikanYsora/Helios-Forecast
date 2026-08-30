@@ -11,7 +11,14 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
-from custom_components.helios_forecast.config import CONF_ARRAYS, CONF_INVERTER_MAX_KW, CONF_KWP, CONF_TRACKER
+from custom_components.helios_forecast.config import (
+    CONF_ARRAYS,
+    CONF_INVERTER_MAX_KW,
+    CONF_KWP,
+    CONF_LATITUDE,
+    CONF_LONGITUDE,
+    CONF_TRACKER,
+)
 from custom_components.helios_forecast.const import DOMAIN
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -148,3 +155,31 @@ async def test_options_lines_step_can_append_a_new_line(
     result = await hass.config_entries.options.async_configure(result["flow_id"], {**_LINE_B, "add_another": False})
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert len(result["data"][CONF_ARRAYS]) == 2
+
+
+async def test_options_settings_step_decimal_latitude_longitude_roundtrip(
+    recorder_mock, hass: HomeAssistant, enable_custom_integrations
+) -> None:
+    """Latitude/longitude go through NumberSelectors: a decimal value must survive the round-trip
+    through the real schema at full precision, the way it does for kWp (regression for the same
+    browser-locale misparsing class of bug)."""
+    entry = MockConfigEntry(domain=DOMAIN, data={CONF_ARRAYS: [_LINE_A]})
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "settings"})
+    assert result["type"] == FlowResultType.FORM
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {
+            CONF_LATITUDE: 45.7597,
+            CONF_LONGITUDE: 4.8422,
+            "trend_anchor_hour": 6,
+            "battery_min_soc": 10,
+            "battery_efficiency": 90,
+        },
+    )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_LATITUDE] == 45.7597
+    assert result["data"][CONF_LONGITUDE] == 4.8422
