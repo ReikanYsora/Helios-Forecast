@@ -177,13 +177,13 @@ def test_compute_reliability_today_entry_matches_predict() -> None:
 
 
 def test_horizon_decay_is_gentle() -> None:
-    # The horizon decay must degrade gently (exponential toward a 0.5 floor), not the old steep
-    # 0.12/day linear ramp that bottomed out at 0.40 by J+5.
+    # The horizon decay must degrade gently: exponential toward a 0.5 floor, matching how
+    # NWP skill actually degrades with lead time.
     vals = [_horizon_decay(n) for n in range(7)]
     assert vals[0] == 1.0
     assert all(vals[i] > vals[i + 1] for i in range(6))  # strictly decreasing
-    assert vals[6] >= 0.5  # floor lifted from the old 0.40
-    assert vals[3] > 0.65  # J+3 still meaningfully reliable (was 0.64 under the old ramp)
+    assert vals[6] >= 0.5  # floor
+    assert vals[3] > 0.65  # J+3 still meaningfully reliable
 
 
 if __name__ == "__main__":
