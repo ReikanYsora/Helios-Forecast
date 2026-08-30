@@ -99,6 +99,17 @@ def test_profile_averages_same_slot_and_falls_back() -> None:
     assert abs(profile.at(tuesday_3) - 1500.0) < 1e-9
 
 
+def test_profile_partial_source_missing_from_buckets() -> None:
+    # "b" is signed but never fetched (e.g. a failed history call): it must drop out silently
+    # rather than crash, leaving the profile built from whatever sources did come back.
+    monday_10 = datetime(2026, 1, 5, 10, tzinfo=_UTC)
+    sources = ConsumptionSources(signed={"a": 1, "b": -1})
+    buckets = {"a": [_bucket(monday_10, 3.0)]}
+    profile = build_consumption_profile(sources, buckets, _UTC)
+    assert profile is not None
+    assert abs(profile.at(monday_10) - 3000.0) < 1e-9
+
+
 def test_profile_none_without_history() -> None:
     sources = ConsumptionSources(signed={"load": 1})
     assert build_consumption_profile(sources, {}, _UTC) is None

@@ -80,6 +80,25 @@ def test_unit_efficiency_is_lossless() -> None:
     assert soc[0].soc == round((5000.0 + 1000.0) / 10000.0 * 100.0, 2)
 
 
+def test_zero_capacity_yields_no_projection() -> None:
+    soc = _project([4000.0], load_w=0.0, capacity_kwh=0.0)
+    assert soc == []
+
+
+def test_multistep_accumulation_compounds_across_steps() -> None:
+    # Lossless, 1000 W surplus for 15 min = 250 Wh added each step, on top of the previous step's
+    # result (not reset every iteration).
+    soc = _project([1000.0] * 4, load_w=0.0, efficiency=1.0)
+    assert [p.soc for p in soc] == [52.5, 55.0, 57.5, 60.0]
+
+
+def test_multistep_stays_capped_once_full() -> None:
+    # A huge surplus fills a small battery on the first step; later steps must hold at 100%,
+    # not overflow the running soc_wh past the capacity clamp.
+    soc = _project([50_000.0] * 3, load_w=0.0, efficiency=1.0, capacity_kwh=1.0)
+    assert [p.soc for p in soc] == [100.0, 100.0, 100.0]
+
+
 def test_horizon_window_excludes_out_of_range_points() -> None:
     points = [
         ForecastPoint(t=_NOW - timedelta(minutes=15), pv_w=0.0, pv_raw_w=0.0),  # before now
