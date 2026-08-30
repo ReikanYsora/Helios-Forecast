@@ -200,7 +200,9 @@ the card's "Graph detail" setting; the integration resamples server-side).
       "pv_w": 3120,        // residual-corrected predicted power (the curve drawn)
       "pv_raw_w": 3340,    // pre-correction (the card's forecast vs forecastRaw)
       "pv_p10": 2650,      // analog P10/P90 uncertainty band (null until learning is solid)
-      "pv_p90": 3450 }
+      "pv_p90": 3450,
+      "ghi": 610,          // global horizontal irradiance at this bucket, W/m2
+      "cloud": 32 }        // cloud cover at this bucket, %
   ],
   "daily": [
     { "date": "2026-06-11", "kwh": 21.4, "kwh_raw": 22.9 }
