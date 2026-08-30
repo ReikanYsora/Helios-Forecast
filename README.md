@@ -215,7 +215,9 @@ wired to its own card. Add the integration once per line.
 single combined value. Add the first line, then tick *add another line* for each
 extra orientation. The lines share one production sensor and one inverter limit,
 and the forecast sums them by their kWp share. Use **Configure** to edit the
-shared settings or the lines later.
+shared settings or the lines later. Each line can also override the shared
+inverter cap and GPS coordinates, for a micro-inverter string that saturates on
+its own or a line mounted somewhere other than the entry's home location.
 
 ---
 
