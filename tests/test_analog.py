@@ -44,6 +44,10 @@ def test_az_diff_wraps() -> None:
     assert _az_diff(90, 95) == 5
 
 
+def test_weighted_percentiles_empty_list_does_not_raise() -> None:
+    assert _weighted_percentiles([], (0.10, 0.50, 0.90)) == []
+
+
 def test_weighted_percentiles_monotonic() -> None:
     pairs = [(v, 1.0) for v in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]]
     p10, p50, p90 = _weighted_percentiles(pairs, (0.10, 0.50, 0.90))

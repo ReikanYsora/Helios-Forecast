@@ -156,6 +156,8 @@ def _az_diff(a: float, b: float) -> float:
 def _weighted_percentiles(pairs: List[tuple], qs: tuple) -> List[float]:
     """Weighted percentiles of (value, weight) pairs for the quantiles in ``qs``."""
     items = sorted(pairs, key=lambda p: p[0])
+    if not items:
+        return []
     total = sum(w for _, w in items)
     if total <= 0:
         return [items[len(items) // 2][0] for _ in qs]
