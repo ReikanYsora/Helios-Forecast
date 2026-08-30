@@ -217,8 +217,6 @@ def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
     hourly = payload.get("hourly") or {}
     time_strs = hourly.get("time") or []
     low_arrays = _model_arrays(hourly, "cloud_cover_low")
-    mid_arrays = _model_arrays(hourly, "cloud_cover_mid")
-    high_arrays = _model_arrays(hourly, "cloud_cover_high")
     if not time_strs or not any(low_arrays):
         return None
     n = len(time_strs)
@@ -229,14 +227,8 @@ def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
 
     # Median each layer across models first, then combine into the weighted cover the card uses.
     # cloud_effective always returns a float, but the field is list[float | None] like the fused layers.
-    cloud: list[float | None] = [
-        cloud_effective(
-            _median(_finite_at(low_arrays, i)),
-            _median(_finite_at(mid_arrays, i)),
-            _median(_finite_at(high_arrays, i)),
-        )
-        for i in range(n)
-    ]
+    low, mid, high = fuse("cloud_cover_low"), fuse("cloud_cover_mid"), fuse("cloud_cover_high")
+    cloud: list[float | None] = [cloud_effective(low[i], mid[i], high[i]) for i in range(n)]
 
     return WeatherSeries(
         times=parse_times(time_strs),
