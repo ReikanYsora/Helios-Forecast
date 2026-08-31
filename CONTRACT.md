@@ -35,6 +35,10 @@
 > (#40) and left no data to chart 48 h out (#41). The PV forecast itself already reaches
 > a week ahead, so this only uses points already being fetched. Shape unchanged
 > (`[{datetime, soc}]`), only the count of points grows.
+>
+> Revision (2026-08-31): a panel line can carry an optional **per-line coordinate
+> override** (latitude/longitude), the same optional-with-entry-level-fallback shape
+> as the per-line inverter cap (section 5). Output surfaces are unchanged.
 
 The integration owns one **config entry per panel line** (a group of co-oriented
 panels). Add it once per line. Every surface below is scoped to that entry, so
@@ -240,8 +244,10 @@ The card no longer carries these; they become Helios-Forecast's config entry.
 One entry describes one panel line, so the geometry is a single orientation, not
 a list.
 
-- Panel line geometry: `tilt`, `azimuth`, `kwp`, tracker type, and an optional per-line
-  inverter cap (kW) that clips that line before the lines are summed.
+- Panel line geometry: `tilt`, `azimuth`, `kwp`, tracker type, an optional per-line
+  inverter cap (kW) that clips that line before the lines are summed, and an optional
+  per-line coordinate override (latitude/longitude) for a line mounted somewhere other
+  than the entry's own location.
 - Location (defaults to the HA home), optional per entry.
 - Inverter max kW (optional clip) at the entry level, bounding the combined output of all
   lines.
