@@ -37,8 +37,12 @@ _W_TEMP = 0.3
 _W_AZ = 0.3
 # Outdoor temperature (degC) that normalises to one unit of distance: a ~15 degC gap
 # is treated as a full "feature away", so temperature nudges the match without
-# overriding cloud/geometry. Samples with no temperature skip the term entirely.
+# overriding cloud/geometry.
 _TEMP_SCALE = 15.0
+# Distance contributed when either side has no temperature reading. A missing reading is not a
+# match: it is worse than a real 8 degC mismatch (about half a typical seasonal swing) but still
+# small enough that an otherwise excellent geometry+cloud analog is not thrown out for it.
+_TEMP_MISSING_PENALTY = _W_TEMP * (8.0 / _TEMP_SCALE) ** 2
 
 # Kernel bandwidth on the squared normalised distance for the analog weights.
 _BANDWIDTH2 = 0.02
@@ -54,7 +58,7 @@ _K = 60
 # capped at the 90th percentile of what the site ACTUALLY produced under similar sun+cloud, times a
 # margin. The physical model cannot see near-field shadows (a tree in the morning, a roof in the
 # evening), but the real production already reflects them, so this stops the model over-predicting on
-# shaded sites while the margin still allows an unusually clear day (#28).
+# shaded sites while the margin still allows an unusually clear day.
 _CEILING_MIN_ANALOGS = 5
 _CEILING_MARGIN = 1.25
 
@@ -156,6 +160,8 @@ def _az_diff(a: float, b: float) -> float:
 def _weighted_percentiles(pairs: List[tuple], qs: tuple) -> List[float]:
     """Weighted percentiles of (value, weight) pairs for the quantiles in ``qs``."""
     items = sorted(pairs, key=lambda p: p[0])
+    if not items:
+        return []
     total = sum(w for _, w in items)
     if total <= 0:
         return [items[len(items) // 2][0] for _ in qs]
@@ -177,8 +183,9 @@ def predict(
     library: List[AnalogSample], alt: float, az: float, cloud: float, temp: Optional[float] = None
 ) -> Optional[AnalogBand]:
     """Weighted P10/P50/P90 of actual production among the analogs nearest to
-    (alt, az, cloud, temperature), or None when the library is empty. The temperature
-    term is skipped for any pair where either side has no reading."""
+    (alt, az, cloud, temperature), or None when the library is empty. A pair where
+    either side has no temperature reading takes the fixed missing-data penalty
+    instead of a real temperature distance."""
     if not library or alt <= 0:
         return None
     scored: List[tuple] = []
@@ -190,6 +197,8 @@ def predict(
         if temp is not None and s.temp is not None:
             dtemp = (s.temp - temp) / _TEMP_SCALE
             d2 += _W_TEMP * dtemp * dtemp
+        else:
+            d2 += _TEMP_MISSING_PENALTY
         scored.append((d2, s.watt))
     scored.sort(key=lambda x: x[0])
     top = scored[:_K]
@@ -239,7 +248,7 @@ def enrich_points(
         blended = c * band.p50 + (1.0 - c) * p.pv_w
         # Never predict above what the site has actually produced under similar sun+cloud (with a
         # margin). At low confidence the blend leans on the physical model, which is blind to
-        # near-field shadows; the learned ceiling reins that back in (#28).
+        # near-field shadows; the learned ceiling reins that back in.
         if band.ceiling is not None:
             blended = min(blended, band.ceiling)
         if c >= BAND_MIN_CONFIDENCE:

@@ -59,6 +59,20 @@ def test_bounds() -> None:
         assert 0.0 <= got.azimuth <= 360.0
 
 
+def test_pole_latitude_does_not_raise() -> None:
+    # cos(lat) is ~0 at the poles, the same singularity the existing cos_alt guard handles for the
+    # zenith case. Azimuth is mathematically undefined at the exact pole, so the guard must settle on
+    # the same 0.0 "undefined" fallback the cos_alt branch already uses (a fixed 90/270 split by the
+    # hour-angle sign), rather than the platform-incidental noise dividing by a near-zero-but-nonzero
+    # cos(lat) would otherwise produce.
+    for lat in (90.0, -90.0):
+        am = sun_position(datetime(2026, 6, 21, 0, tzinfo=timezone.utc), lat, 0.0)
+        pm = sun_position(datetime(2026, 6, 21, 3, tzinfo=timezone.utc), lat, 0.0)
+        assert -90.0 <= am.altitude <= 90.0
+        assert am.azimuth == 270.0
+        assert pm.azimuth == 90.0
+
+
 def test_naive_datetime_treated_as_utc() -> None:
     aware = datetime(2026, 6, 21, 12, tzinfo=timezone.utc)
     naive = datetime(2026, 6, 21, 12)
@@ -68,6 +82,7 @@ def test_naive_datetime_treated_as_utc() -> None:
 if __name__ == "__main__":
     test_parity_against_typescript()
     test_bounds()
+    test_pole_latitude_does_not_raise()
     test_naive_datetime_treated_as_utc()
     alt, az, _ = _max_errors()
     print(f"OK  {len(_FIXTURES)} samples")

@@ -8,7 +8,7 @@ orientation, exactly as the card does, built from:
   2. An optional tilt transposition (Liu-Jordan isotropic), or Open-Meteo's
      anisotropic plane-of-array (GTI) when supplied, with a direct / diffuse
      split from real irradiance when available else cloud-derived.
-  3. A Sandia-style cell-temperature derate when air temperature is known.
+  3. A NOCT-based linear-wind cell-temperature derate when air temperature is known.
 
 Kept identical to the TypeScript so the server-side forecast matches the card
 and can be proven by parity against golden values from the same function.

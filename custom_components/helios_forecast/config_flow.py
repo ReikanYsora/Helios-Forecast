@@ -22,6 +22,12 @@ from homeassistant.helpers import selector
 
 from .config import (
     CONF_AZIMUTH,
+    CONF_BATTERY_CAPACITY_KWH,
+    CONF_BATTERY_EFFICIENCY,
+    CONF_BATTERY_MAX_CHARGE_KW,
+    CONF_BATTERY_MAX_DISCHARGE_KW,
+    CONF_BATTERY_MIN_SOC,
+    CONF_BATTERY_SOC_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
     CONF_LATITUDE,
@@ -31,9 +37,12 @@ from .config import (
     CONF_TILT,
     CONF_TRACKER,
     CONF_TREND_ANCHOR_HOUR,
+    DEFAULT_BATTERY_EFFICIENCY,
+    DEFAULT_BATTERY_MIN_SOC,
     DEFAULT_TREND_ANCHOR_HOUR,
     TRACKER_NONE,
     lines_from_config,
+    location_from_config,
     merge_entry_data,
     split_line,
     split_settings,
@@ -56,7 +65,7 @@ _BOOL = selector.BooleanSelector()
 _HOUR = selector.NumberSelector(selector.NumberSelectorConfig(min=0, max=23, step=1, mode=_BOX))
 # Numeric geometry / power fields as explicit NumberSelectors: a proper numeric input
 # with a defined decimal step, so decimals (e.g. 2.61 kWp) are entered and stored as
-# real floats instead of being misparsed by the browser locale (issue #13).
+# real floats instead of being misparsed by the browser locale.
 _TILT = selector.NumberSelector(
     selector.NumberSelectorConfig(min=0, max=90, step=1, mode=_BOX, unit_of_measurement="°")
 )
@@ -65,6 +74,10 @@ _AZIMUTH = selector.NumberSelector(
 )
 _KWP = selector.NumberSelector(selector.NumberSelectorConfig(min=0, step=0.01, mode=_BOX, unit_of_measurement="kWp"))
 _INVERTER = selector.NumberSelector(selector.NumberSelectorConfig(min=0, step=0.1, mode=_BOX, unit_of_measurement="kW"))
+# step "any": user input is not rounded to it (HA only uses it for the slider / keyboard step), so
+# coordinates keep whatever precision is typed instead of being rounded to a fixed decimal count.
+_LATITUDE = selector.NumberSelector(selector.NumberSelectorConfig(min=-90, max=90, step="any", mode=_BOX))
+_LONGITUDE = selector.NumberSelector(selector.NumberSelectorConfig(min=-180, max=180, step="any", mode=_BOX))
 _TRACKER = selector.SelectSelector(
     selector.SelectSelectorConfig(
         options=[TRACKER_NONE, "dual-axis", "single-axis-h", "single-axis-v"],
@@ -72,10 +85,24 @@ _TRACKER = selector.SelectSelector(
         mode=selector.SelectSelectorMode.DROPDOWN,
     )
 )
+# Battery SoC projection fields. Capacity in kWh, the live SoC entity (a % battery sensor), and the optional
+# limits / efficiency as percentages. Charge / discharge power reuse the kW input.
+_KWH = selector.NumberSelector(selector.NumberSelectorConfig(min=0, step=0.1, mode=_BOX, unit_of_measurement="kWh"))
+_SOC_ENTITY = selector.EntitySelector(selector.EntitySelectorConfig(domain="sensor", device_class="battery"))
+_PERCENT = selector.NumberSelector(
+    selector.NumberSelectorConfig(min=0, max=100, step=1, mode=_BOX, unit_of_measurement="%")
+)
+
+
+def _optional(fields: dict[Any, Any], key: str, sel: Any, suggested_value: Any) -> None:
+    """Add one optional field to ``fields``, pre-filled with ``suggested_value`` when given."""
+    fields[vol.Optional(key, description={"suggested_value": suggested_value})] = sel
 
 
 def _line_fields(
     arr: dict[str, Any] | None,
+    home_lat: float,
+    home_lon: float,
     *,
     with_add_another: bool,
     add_another_default: bool = False,
@@ -95,12 +122,15 @@ def _line_fields(
     # current value so the field comes up filled.
     kwp_key = vol.Required(CONF_KWP, default=arr[CONF_KWP]) if CONF_KWP in arr else vol.Required(CONF_KWP)
     fields[kwp_key] = _KWP
-    # Optional per-line inverter cap (#26): a micro-inverter string that saturates on its own, distinct from the
+    # Optional per-line inverter cap: a micro-inverter string that saturates on its own, distinct from the
     # entry-level cap that bounds the combined total. Left empty, the line is uncapped and behaves exactly as before.
-    fields[
-        vol.Optional(CONF_LINE_INVERTER_MAX_KW, description={"suggested_value": arr.get(CONF_LINE_INVERTER_MAX_KW)})
-    ] = _INVERTER
+    _optional(fields, CONF_LINE_INVERTER_MAX_KW, _INVERTER, arr.get(CONF_LINE_INVERTER_MAX_KW))
     fields[vol.Required(CONF_TRACKER, default=arr.get(CONF_TRACKER, TRACKER_NONE))] = _TRACKER
+    # Optional per-line location override, for a line far enough from the entry's home coordinates
+    # (e.g. a detached outbuilding) that it needs its own sun geometry. Suggested with the entry's
+    # home coordinates so the field never comes up blank, but it is only stored once actually set.
+    _optional(fields, CONF_LATITUDE, _LATITUDE, arr.get(CONF_LATITUDE, home_lat))
+    _optional(fields, CONF_LONGITUDE, _LONGITUDE, arr.get(CONF_LONGITUDE, home_lon))
     if allow_remove:
         fields[vol.Optional(_REMOVE, default=False)] = _BOOL
     if with_add_another:
@@ -122,19 +152,23 @@ def _settings_fields(
     """
     s = settings or {}
     fields: dict[Any, Any] = {}
-    fields[vol.Optional(CONF_LATITUDE, description={"suggested_value": s.get(CONF_LATITUDE, home_lat)})] = vol.Coerce(
-        float
-    )
-    fields[vol.Optional(CONF_LONGITUDE, description={"suggested_value": s.get(CONF_LONGITUDE, home_lon)})] = vol.Coerce(
-        float
-    )
-    fields[vol.Optional(CONF_INVERTER_MAX_KW, description={"suggested_value": s.get(CONF_INVERTER_MAX_KW)})] = _INVERTER
-    fields[vol.Optional(CONF_PRODUCTION_ENTITY, description={"suggested_value": s.get(CONF_PRODUCTION_ENTITY)})] = (
-        _SENSOR
-    )
+    _optional(fields, CONF_LATITUDE, _LATITUDE, s.get(CONF_LATITUDE, home_lat))
+    _optional(fields, CONF_LONGITUDE, _LONGITUDE, s.get(CONF_LONGITUDE, home_lon))
+    _optional(fields, CONF_INVERTER_MAX_KW, _INVERTER, s.get(CONF_INVERTER_MAX_KW))
+    _optional(fields, CONF_PRODUCTION_ENTITY, _SENSOR, s.get(CONF_PRODUCTION_ENTITY))
     fields[vol.Optional(CONF_TREND_ANCHOR_HOUR, default=s.get(CONF_TREND_ANCHOR_HOUR, DEFAULT_TREND_ANCHOR_HOUR))] = (
         _HOUR
     )
+    # Battery SoC projection (all optional): capacity + the live SoC entity switch the feature on; the rest
+    # keep their defaults when left empty. Consumption is not asked for, it comes from the Energy dashboard.
+    _optional(fields, CONF_BATTERY_CAPACITY_KWH, _KWH, s.get(CONF_BATTERY_CAPACITY_KWH))
+    _optional(fields, CONF_BATTERY_SOC_ENTITY, _SOC_ENTITY, s.get(CONF_BATTERY_SOC_ENTITY))
+    _optional(fields, CONF_BATTERY_MAX_CHARGE_KW, _INVERTER, s.get(CONF_BATTERY_MAX_CHARGE_KW))
+    _optional(fields, CONF_BATTERY_MAX_DISCHARGE_KW, _INVERTER, s.get(CONF_BATTERY_MAX_DISCHARGE_KW))
+    fields[vol.Optional(CONF_BATTERY_MIN_SOC, default=s.get(CONF_BATTERY_MIN_SOC, DEFAULT_BATTERY_MIN_SOC))] = _PERCENT
+    fields[
+        vol.Optional(CONF_BATTERY_EFFICIENCY, default=s.get(CONF_BATTERY_EFFICIENCY, DEFAULT_BATTERY_EFFICIENCY))
+    ] = _PERCENT
     return fields
 
 
@@ -157,9 +191,10 @@ class HeliosForecastConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-
             if user_input.get(_ADD_ANOTHER):
                 return await self.async_step_line()
             return self._finish()
+        home_lat, home_lon = self.hass.config.latitude, self.hass.config.longitude
         fields = {vol.Optional(_NAME, default=_DEFAULT_NAME): str}
-        fields.update(_line_fields(None, with_add_another=False))
-        fields.update(_settings_fields(self.hass.config.latitude, self.hass.config.longitude))
+        fields.update(_line_fields(None, home_lat, home_lon, with_add_another=False))
+        fields.update(_settings_fields(home_lat, home_lon))
         fields[vol.Optional(_ADD_ANOTHER, default=False)] = _BOOL
         return self.async_show_form(step_id="user", data_schema=vol.Schema(fields))
 
@@ -170,9 +205,12 @@ class HeliosForecastConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-
             if user_input.get(_ADD_ANOTHER):
                 return await self.async_step_line()
             return self._finish()
+        # The entry-level location was already collected on the first step: suggest it (falling
+        # back to the Home Assistant home) rather than the raw HA home for this additional line.
+        home_lat, home_lon = location_from_config(self._settings, self.hass.config.latitude, self.hass.config.longitude)
         return self.async_show_form(
             step_id="line",
-            data_schema=vol.Schema(_line_fields(None, with_add_another=True)),
+            data_schema=vol.Schema(_line_fields(None, home_lat, home_lon, with_add_another=True)),
             description_placeholders={"index": str(len(self._lines) + 1)},
         )
 
@@ -228,11 +266,14 @@ class HeliosForecastOptionsFlow(OptionsFlow):
         arr = existing[self._index] if editing_existing else None
         # Auto-advance through the remaining existing lines without forcing a manual tick.
         more_existing = self._index + 1 < len(existing)
+        home_lat, home_lon = location_from_config(current, self.hass.config.latitude, self.hass.config.longitude)
         return self.async_show_form(
             step_id="lines",
             data_schema=vol.Schema(
                 _line_fields(
                     arr,
+                    home_lat,
+                    home_lon,
                     with_add_another=True,
                     add_another_default=more_existing,
                     allow_remove=editing_existing and len(existing) > 1,

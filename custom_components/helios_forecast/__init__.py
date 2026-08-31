@@ -3,7 +3,8 @@
 Computes a PV production forecast server-side from Open-Meteo irradiance and the
 installation geometry, and publishes it three ways: a first-class entity set for
 automations, the Energy dashboard's solar-forecast provider, and a websocket
-detail series for the Helios card. The learned correction lands in a later phase.
+detail series for the Helios card. A learned residual, built from the recorder's
+own production history, corrects the model against the site's real output.
 
 Home Assistant imports stay inside the setup / unload functions so importing this
 package needs no running Home Assistant: the pure forecast model under it can be
@@ -33,7 +34,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     from homeassistant.const import Platform
     from homeassistant.helpers import issue_registry as ir
 
-    from . import websocket
+    from . import services, websocket
+    from .config import CONF_BATTERY_SOC_ENTITY
     from .coordinator import HeliosForecastCoordinator
 
     # Several panel lines in one entry are supported again (they share one production
@@ -50,7 +52,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # The sensor entities now exist, so the weather archive's first backfill can land. It walks a
     # 60-day window and is not needed for the live forecast, so run it off the setup path as a
     # background task: a fresh install finishes setting up promptly instead of waiting on the
-    # trailing statistics build (#31).
+    # trailing statistics build.
     from homeassistant.util import dt as dt_util
 
     async def _initial_statistics_archive() -> None:
@@ -63,19 +65,45 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_create_background_task(hass, _initial_statistics_archive(), "helios_forecast_initial_statistics")
 
     entry.async_on_unload(entry.add_update_listener(_async_reload_entry))
+
+    # Re-project the battery SoC the moment its source entity comes back from unavailable/unknown,
+    # instead of waiting up to the 30-minute refresh. A battery integration is often briefly
+    # unavailable at startup (a modbus link opening can take ~10 s), which would otherwise leave the
+    # projection off until the next cycle.
+    soc_entity = {**entry.data, **entry.options}.get(CONF_BATTERY_SOC_ENTITY)
+    if soc_entity:
+        from homeassistant.core import callback
+        from homeassistant.helpers.event import async_track_state_change_event
+
+        _UNAVAILABLE = ("unavailable", "unknown")
+
+        @callback
+        def _soc_recovered(event) -> None:
+            new_state = event.data.get("new_state")
+            if new_state is None or new_state.state in _UNAVAILABLE:
+                return
+            # Only on the transition TO available (first appearance or recovery), so ordinary SoC %
+            # changes don't force off-cycle refreshes; the 30-minute cadence handles those.
+            old_state = event.data.get("old_state")
+            if old_state is None or old_state.state in _UNAVAILABLE:
+                hass.async_create_task(coordinator.async_request_refresh())
+
+        entry.async_on_unload(async_track_state_change_event(hass, [soc_entity], _soc_recovered))
+
     websocket.async_register(hass)
+    services.async_register_services(hass)
     return True
 
 
 def _purge_orphan_forecast_stats(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Clear long-term statistics left on the live forecast energy sensors.
 
-    Earlier versions gave these sensors a state_class, so HA recorded statistics for them. They
-    are point-in-time forecast values, not meters, and now carry no state_class, which makes HA
-    flag "entity no longer has a state class" on every statistics cycle. We clear those orphan
-    stats so testers do not have to do it by hand. predicted_energy is excluded: it is the archive
-    entity whose statistics are kept on purpose (it carries a valid state_class again). Idempotent:
-    the live sensors never regain a state_class, so this is a no-op once their stats are gone.
+    These sensors are point-in-time forecast values, not meters, and carry no state_class, which
+    makes HA flag "entity no longer has a state class" on every statistics cycle if any statistics
+    exist for them. We clear those to keep that warning from firing. predicted_energy is excluded:
+    it is the archive entity whose statistics are kept on purpose (it carries a valid state_class).
+    Idempotent: the live sensors never regain a state_class, so this is a no-op once their stats
+    are gone.
     """
     from homeassistant.components.recorder import get_instance
     from homeassistant.helpers import entity_registry as er

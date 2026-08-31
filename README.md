@@ -74,6 +74,112 @@ Every entity is listed on the [website](https://helios-ha.org/helios-forecast/).
 
 ---
 
+## The full forecast, in your automations
+
+Helios Forecast computes the **whole production curve**, not just the current
+value: one point every 15 minutes, from midnight today through the seven-day
+horizon, each with the predicted watts and its **P10/P90 confidence band**. An
+Energy Management System can read it to shift battery charging into the expected
+peak, work out how much sun is still to come, or find the latest safe charging
+start.
+
+**As a service (recommended).** `helios_forecast.get_forecast` returns the curve
+as response data, on demand:
+
+```yaml
+# How much PV energy is still forecast for the rest of today
+script:
+  sun_left_today:
+    sequence:
+      - action: helios_forecast.get_forecast
+        response_variable: helios
+      - variables:
+          remaining_kwh: >
+            {{ (helios.forecast
+                 | selectattr('datetime', 'match', now().strftime('%Y-%m-%d'))
+                 | selectattr('datetime', 'ge', now().isoformat())
+                 | map(attribute='watts') | map('float') | sum
+                 * 0.25 / 1000) | round(1) }}
+      - action: persistent_notification.create
+        data:
+          title: Solar forecast
+          message: "About {{ remaining_kwh }} kWh of sun still to come today."
+```
+
+The response is a list of buckets (`p10` / `p90` are `null` until the forecast has
+learned enough of your history to publish a band):
+
+```yaml
+forecast:
+  - datetime: "2026-09-12T14:00:00+02:00"
+    watts: 3120.4
+    p10: 2610.0
+    p90: 3450.8
+  - datetime: "2026-09-12T14:15:00+02:00"
+    watts: 3038.1
+    p10: 2550.2
+    p90: 3380.5
+  # ... one point every 15 minutes
+```
+
+With more than one installation, pass `config_entry_id` (from **Settings** >
+**Devices and services**) to choose which one to read.
+
+**As an attribute.** The same curve rides on the `power_now` sensor as its
+`forecast` attribute, handy in a template sensor:
+
+```jinja
+{{ state_attr('sensor.helios_forecast_power_now', 'forecast') }}
+```
+
+---
+
+## Predicted battery state of charge
+
+If you have a battery, Helios Forecast can project its **state of charge over the
+next 48 hours**. It runs the production forecast against your home's own
+consumption, which it derives from your **Home Assistant Energy dashboard** (no
+extra sensor to wire), and integrates the battery's charge from your current SoC.
+
+Turn it on in the integration settings by filling in your **battery capacity** and
+your **state-of-charge sensor**; the reserve, efficiency and charge/discharge
+limits are optional. A **Predicted battery state of charge** sensor then appears,
+carrying the full curve as its `forecast` attribute (plus the day's projected low
+and high, and the forecast reliability so you know how far to trust it).
+
+It predicts, it never commands. Sending the charge order stays with your own
+automation, which knows your inverter — Helios just tells it what's coming:
+
+```yaml
+# Top the battery up from the grid tonight only if it's predicted to run low
+- action: helios_forecast.get_battery_soc_forecast
+  response_variable: soc
+- variables:
+    lowest: "{{ soc.forecast | map(attribute='soc') | map('float') | min }}"
+- condition: template
+  value_template: "{{ lowest < 20 }}"
+- action: switch.turn_on
+  target:
+    entity_id: switch.force_battery_charge
+```
+
+The response:
+
+```yaml
+forecast:
+  - datetime: "2026-09-12T14:00:00+02:00"
+    soc: 78.4
+  - datetime: "2026-09-12T14:15:00+02:00"
+    soc: 80.1
+  # ... one point every 15 minutes, 48 hours ahead
+```
+
+One honest note: home consumption is a **learned average**, so the projection is a
+good steer, not a guarantee — read it alongside the reliability figure, and it gets
+better as it sees more of your history.
+
+---
+
 ## How it learns
 
 It starts from physics: Open-Meteo irradiance, global tilted irradiance per panel
@@ -109,7 +215,9 @@ wired to its own card. Add the integration once per line.
 single combined value. Add the first line, then tick *add another line* for each
 extra orientation. The lines share one production sensor and one inverter limit,
 and the forecast sums them by their kWp share. Use **Configure** to edit the
-shared settings or the lines later.
+shared settings or the lines later. Each line can also override the shared
+inverter cap and GPS coordinates, for a micro-inverter string that saturates on
+its own or a line mounted somewhere other than the entry's home location.
 
 ---
 
@@ -152,6 +260,14 @@ next cycle going.
 <div align="center">
 <a href="https://www.buymeacoffee.com/reikanysora"><img src="https://img.buymeacoffee.com/button-api/?text=Support this project&emoji=☀️&slug=reikanysora&button_colour=5F7FFF&font_colour=ffffff&font_family=Arial&outline_colour=000000&coffee_colour=FFDD00" alt="Buy me a coffee"></a>
 </div>
+
+---
+
+## Special thanks
+
+- [antoineguilbert.fr](https://www.antoineguilbert.fr/helios-home-assistant-carte-3d-avec-lidar/) ([Helios Forecast](https://www.antoineguilbert.fr/prevision-solaire-home-assistant-avec-helios-forecast/))
+- [Glooob Domo](https://www.youtube.com/watch?v=bTg4mzb9jwA)
+- [Smart-Live](https://youtu.be/zFbppiAmCr0)
 
 ---
 

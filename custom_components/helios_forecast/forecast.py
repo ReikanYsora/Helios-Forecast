@@ -4,8 +4,9 @@ Ports the deterministic core of the card's buildForecast. Walks the horizon at a
 sub-hourly step, interpolates the hourly Open-Meteo weather between samples with
 a moving cursor (so the magnitude stays smooth at any cadence), computes the
 weighted PV percentage, maps it to watts (x pvCalibK x snow), and clips at the
-inverter cap. The learned correction is the next phase; here ``pv_w`` equals
-``pv_raw_w`` (ratio 1).
+inverter cap. ``pv_w`` applies the learned per-sky-cell residual ratio when a
+map is given (else it equals ``pv_raw_w``, the pure physical model); the
+analog blend on top of that lives in the sibling ``analog`` module.
 """
 
 from __future__ import annotations
@@ -17,7 +18,6 @@ from typing import Dict, List, Optional
 
 from .openmeteo import WeatherSeries
 from .solar.geometry import sun_position
-from .solar.gti import GtiStore, make_gti_sampler
 from .solar.irradiance import snow_cover_factor
 from .solar.power import PvLayout, WeatherSample, compute_pv_power_per_array
 from .solar.residual import SkyResidualMap, sample_sky_residual
@@ -41,6 +41,18 @@ class ForecastPoint:
     # irradiance / cloud at that exact instant when scrubbing (already computed for the model).
     ghi: Optional[float] = None
     cloud: Optional[float] = None
+
+
+def forecast_point_dict(p: ForecastPoint) -> Dict[str, object]:
+    """One forecast bucket in the response/attribute shape shared by the get_forecast service
+    and the power_now sensor's `forecast` attribute: watts and the P10/P90 band rounded to 2 dp
+    (null when the analog support is too thin to surface a band)."""
+    return {
+        "datetime": p.t.isoformat(),
+        "watts": round(p.pv_w, 2),
+        "p10": round(p.pv_p10, 2) if p.pv_p10 is not None else None,
+        "p90": round(p.pv_p90, 2) if p.pv_p90 is not None else None,
+    }
 
 
 def lerp_plain(a: float, b: float, f: float) -> float:
@@ -72,7 +84,7 @@ def _at(arr: List, i: int) -> Optional[float]:
 def _sum_arrays(pcts: List[float], layout: PvLayout, snow: float, ratio: float) -> tuple[float, float]:
     """Per-array watts (``pct * kWp * 10 * snow``), each clipped at its OWN inverter cap, then summed. Returns
     ``(raw, corrected)``; corrected also applies the learned sky ratio. With no per-array caps the clips are all INF,
-    so the sum is exactly the old single-total figure; a single-element ``pcts`` (fallback layout) reproduces it too."""
+    so the sum reduces to the plain total; a single-element ``pcts`` (fallback layout) reproduces it too."""
     orientations = layout.orientations
     if not orientations or len(pcts) != len(orientations):
         base = pcts[0] * layout.total_kwp * 10.0 * snow
@@ -89,7 +101,6 @@ def _sum_arrays(pcts: List[float], layout: PvLayout, snow: float, ratio: float) 
 
 def build_forecast_series(
     weather: WeatherSeries,
-    gti_store: Optional[GtiStore],
     layout: PvLayout,
     home_lat: float,
     home_lon: float,
@@ -105,7 +116,6 @@ def build_forecast_series(
     step = timedelta(minutes=step_minutes)
     times = weather.times
     epochs = [t.timestamp() for t in times]
-    sampler = make_gti_sampler(gti_store)
 
     points: List[ForecastPoint] = []
     if not times:
@@ -135,14 +145,14 @@ def build_forecast_series(
             snow=lerp_finite(_at(weather.snow, i0), _at(weather.snow, i1), f),
         )
 
-        pcts = compute_pv_power_per_array(t, home_lat, home_lon, sample, layout, sampler)
+        pcts = compute_pv_power_per_array(t, home_lat, home_lon, sample, layout)
         snow = snow_cover_factor(sample.snow, sample.temp)
         if residual_map is not None:
             sun = sun_position(t, home_lat, home_lon)
             ratio = sample_sky_residual(residual_map, sun.azimuth, sun.altitude)
         else:
             ratio = 1.0
-        # Each array is clipped at its own cap before summing (#26); the entry-level cap then bounds the combined total.
+        # Each array is clipped at its own cap before summing; the entry-level cap then bounds the combined total.
         raw_w, corrected_w = _sum_arrays(pcts, layout, snow, ratio)
         if math.isfinite(raw_w):
             raw_clamped = min(inverter_max_w, max(0.0, raw_w))

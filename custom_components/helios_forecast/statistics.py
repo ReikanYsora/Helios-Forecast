@@ -2,9 +2,9 @@
 
 The 7 weather variables here are orientation-independent: they describe the sky
 over the home, not the panels, so this archive stays valid across any PV layout
-change. GTI is deliberately not archived, it depends on orientation and is
-recomputable from the direct / diffuse / global irradiance kept here plus the sun
-geometry (see solar/irradiance.py).
+change. Plane-of-array irradiance is deliberately not archived: it depends on
+orientation and is recomputed from the direct / diffuse / global irradiance kept
+here plus the sun geometry (see solar/irradiance.py).
 
 Open-Meteo only serves a rolling 60-day past window. By copying each refresh's
 past hours into Home Assistant's long-term statistics (which are never purged),
@@ -72,7 +72,7 @@ def observed_snapshot(weather: WeatherSeries, now: datetime) -> Dict[str, Option
 def weather_forecast_series(weather: WeatherSeries, start: datetime, tz: tzinfo) -> Dict[str, List[dict]]:
     """Forward-looking hourly series per weather field, for charting.
 
-    Mirrors the power sensor's ``forecast`` attribute (issue #21): one list per field key, each
+    Mirrors the power sensor's ``forecast`` attribute: one list per field key, each
     entry ``{"datetime": <local ISO>, "<field key>": <value>}`` for hours at or after ``start``.
     Timestamps are localised to ``tz`` so they line up with the power forecast on the same chart.
     Non-finite samples are dropped. ``start`` is typically local midnight today, giving today +

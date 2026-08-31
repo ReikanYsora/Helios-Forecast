@@ -16,7 +16,16 @@
           "inverter_max_kw": "Maksimalna izlazna snaga izmjenjivača (kW, neobavezno)",
           "production_entity": "Senzor PV proizvodnje (za naučenu korekciju)",
           "trend_anchor_hour": "Referentni sat za današnji trend (0-23, zadano 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Iskoristivi kapacitet baterije (kWh)",
+          "battery_soc_entity": "Senzor stanja napunjenosti baterije (%)",
+          "battery_max_charge_kw": "Maks. snaga punjenja baterije (kW, neobavezno)",
+          "battery_max_discharge_kw": "Maks. snaga pražnjenja baterije (kW, neobavezno)",
+          "battery_min_soc": "Rezerva baterije — minimalno stanje napunjenosti (%, zadano 10)",
+          "battery_efficiency": "Učinkovitost punog ciklusa baterije (%, zadano 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Ispunite kapacitet i ovaj senzor da biste uključili projekciju stanja napunjenosti. Potrošnja kuće uzima se s vaše Energetske nadzorne ploče, senzor ovdje nije potreban."
         }
       },
       "line": {
@@ -28,6 +37,8 @@
           "kwp": "Vršna snaga (kWp)",
           "line_inverter_max_kw": "Maks. snaga izmjenjivača za ovu liniju (kW, opcionalno)",
           "tracker": "Praćenje Sunca",
+          "latitude": "Zemljopisna širina za ovu liniju (opcionalno)",
+          "longitude": "Zemljopisna dužina za ovu liniju (opcionalno)",
           "add_another": "Add another panel line"
         }
       }
@@ -51,7 +62,16 @@
           "longitude": "Zemljopisna dužina (neobavezno)",
           "inverter_max_kw": "Maksimalna izlazna snaga izmjenjivača (kW, neobavezno)",
           "production_entity": "Senzor PV proizvodnje (za naučenu korekciju)",
-          "trend_anchor_hour": "Referentni sat za današnji trend (0-23, zadano 6)"
+          "trend_anchor_hour": "Referentni sat za današnji trend (0-23, zadano 6)",
+          "battery_capacity_kwh": "Iskoristivi kapacitet baterije (kWh)",
+          "battery_soc_entity": "Senzor stanja napunjenosti baterije (%)",
+          "battery_max_charge_kw": "Maks. snaga punjenja baterije (kW, neobavezno)",
+          "battery_max_discharge_kw": "Maks. snaga pražnjenja baterije (kW, neobavezno)",
+          "battery_min_soc": "Rezerva baterije — minimalno stanje napunjenosti (%, zadano 10)",
+          "battery_efficiency": "Učinkovitost punog ciklusa baterije (%, zadano 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Ispunite kapacitet i ovaj senzor da biste uključili projekciju stanja napunjenosti. Potrošnja kuće uzima se s vaše Energetske nadzorne ploče, senzor ovdje nije potreban."
         }
       },
       "lines": {
@@ -63,6 +83,8 @@
           "kwp": "Vršna snaga (kWp)",
           "line_inverter_max_kw": "Maks. snaga izmjenjivača za ovu liniju (kW, opcionalno)",
           "tracker": "Praćenje Sunca",
+          "latitude": "Zemljopisna širina za ovu liniju (opcionalno)",
+          "longitude": "Zemljopisna dužina za ovu liniju (opcionalno)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }
@@ -76,6 +98,28 @@
         "dual-axis": "Dvoosno (prati Sunce)",
         "single-axis-h": "Jednoosno vodoravno (nagib se prilagođava)",
         "single-axis-v": "Jednoosno okomito (azimut se prilagođava)"
+      }
+    }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Dohvati prognozu",
+      "description": "Vraća potpunu prognozu proizvodnje (od danas nadalje, jedna točka svakih 15 minuta, svaka s predviđenim vatima i pojasom pouzdanosti P10/P90) kao podatke odgovora za upotrebu u automatizacijama.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Instalacija",
+          "description": "Koju Helios Forecast instalaciju čitati. Neobavezno kada je konfigurirana samo jedna."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Dohvati prognozu stanja napunjenosti",
+      "description": "Vraća predviđeno stanje napunjenosti baterije za sljedeća 48 sata (jedna točka svakih 15 minuta) kao podatke odgovora za upotrebu u automatizacijama.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Instalacija",
+          "description": "Koju Helios Forecast instalaciju čitati. Neobavezno kada je konfigurirana samo jedna."
+        }
       }
     }
   }

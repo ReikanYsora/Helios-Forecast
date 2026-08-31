@@ -16,7 +16,16 @@
           "inverter_max_kw": "Maximálny výkon meniča (kW, voliteľné)",
           "production_entity": "Senzor výroby FV (pre naučenú korekciu)",
           "trend_anchor_hour": "Referenčná hodina dnešného trendu (0-23, predvolene 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Využiteľná kapacita batérie (kWh)",
+          "battery_soc_entity": "Senzor stavu nabitia batérie (%)",
+          "battery_max_charge_kw": "Max. nabíjací výkon batérie (kW, voliteľné)",
+          "battery_max_discharge_kw": "Max. vybíjací výkon batérie (kW, voliteľné)",
+          "battery_min_soc": "Rezerva batérie — minimálny stav nabitia (%, predvolené 10)",
+          "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor."
         }
       },
       "line": {
@@ -28,6 +37,8 @@
           "kwp": "Špičkový výkon (kWp)",
           "line_inverter_max_kw": "Max. výkon meniča pre túto líniu (kW, voliteľné)",
           "tracker": "Sledovač slnka",
+          "latitude": "Zemepisná šírka pre túto líniu (voliteľné)",
+          "longitude": "Zemepisná dĺžka pre túto líniu (voliteľné)",
           "add_another": "Add another panel line"
         }
       }
@@ -51,7 +62,16 @@
           "longitude": "Zemepisná dĺžka (voliteľné)",
           "inverter_max_kw": "Maximálny výkon meniča (kW, voliteľné)",
           "production_entity": "Senzor výroby FV (pre naučenú korekciu)",
-          "trend_anchor_hour": "Referenčná hodina dnešného trendu (0-23, predvolene 6)"
+          "trend_anchor_hour": "Referenčná hodina dnešného trendu (0-23, predvolene 6)",
+          "battery_capacity_kwh": "Využiteľná kapacita batérie (kWh)",
+          "battery_soc_entity": "Senzor stavu nabitia batérie (%)",
+          "battery_max_charge_kw": "Max. nabíjací výkon batérie (kW, voliteľné)",
+          "battery_max_discharge_kw": "Max. vybíjací výkon batérie (kW, voliteľné)",
+          "battery_min_soc": "Rezerva batérie — minimálny stav nabitia (%, predvolené 10)",
+          "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor."
         }
       },
       "lines": {
@@ -63,6 +83,8 @@
           "kwp": "Špičkový výkon (kWp)",
           "line_inverter_max_kw": "Max. výkon meniča pre túto líniu (kW, voliteľné)",
           "tracker": "Sledovač slnka",
+          "latitude": "Zemepisná šírka pre túto líniu (voliteľné)",
+          "longitude": "Zemepisná dĺžka pre túto líniu (voliteľné)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }
@@ -76,6 +98,28 @@
         "dual-axis": "Dvojosový (sleduje slnko)",
         "single-axis-h": "Jednoosový vodorovný (sleduje sklon)",
         "single-axis-v": "Jednoosový zvislý (sleduje azimut)"
+      }
+    }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Získať predpoveď",
+      "description": "Vráti úplnú predpoveď výroby (od dnešného dňa, jeden bod každých 15 minút, každý s predpokladanými wattmi a intervalom spoľahlivosti P10/P90) ako údaje odpovede na použitie v automatizáciách.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Inštalácia",
+          "description": "Ktorú inštaláciu Helios Forecast načítať. Voliteľné, keď je nakonfigurovaná len jedna."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Získať predpoveď stavu nabitia",
+      "description": "Vráti predpokladaný stav nabitia batérie na nasledujúcich 48 hodín (jeden bod každých 15 minút) ako údaje odpovede na použitie v automatizáciách.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Inštalácia",
+          "description": "Ktorú inštaláciu Helios Forecast načítať. Voliteľné, keď je nakonfigurovaná len jedna."
+        }
       }
     }
   }

@@ -16,8 +16,12 @@ sys.path.insert(0, str(_REPO_ROOT))
 from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: E402
 from custom_components.helios_forecast.reliability import (  # noqa: E402
     MATURITY_TARGET_DAYS,
+    SKILL_MIN_DAY_KWH,
+    _blend,
+    _day_predictability,
     _horizon_decay,
     compute_reliability,
+    daily_predicted_kwh,
     data_maturity,
     recent_skill,
     today_predictability,
@@ -60,11 +64,35 @@ def test_recent_skill_perfect_and_off() -> None:
     assert recent_skill(pts_off, prod, now, UTC) == 0.0
 
 
+def test_daily_predicted_kwh_scales_with_step_minutes() -> None:
+    # A bucket duration other than the hourly default must scale the kWh conversion,
+    # not silently assume 1 h per point.
+    day = datetime(2026, 6, 5, tzinfo=UTC).date()
+    pts = [_Pt(datetime(2026, 6, 5, 12, tzinfo=UTC), 4_000.0)]
+    hourly = daily_predicted_kwh(pts, UTC)
+    quarter_hourly = daily_predicted_kwh(pts, UTC, step_minutes=15.0)
+    assert hourly[day] == 4.0
+    assert quarter_hourly[day] == 1.0
+
+
 def test_recent_skill_none_when_too_few_days() -> None:
     now = datetime(2026, 6, 10, 12, tzinfo=UTC)
     prod = [_Bucket(datetime(2026, 6, 8, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0)]
     pts = [_Pt(datetime(2026, 6, 8, 12, tzinfo=UTC), 10_000.0)]
     assert recent_skill(pts, prod, now, UTC) is None
+
+
+def test_recent_skill_ignores_days_below_the_minimum_actual_kwh() -> None:
+    # A near-zero actual day (overcast / sensor gap) must not count as a comparable day,
+    # however wrong the prediction was for it, or it would dominate the relative error.
+    now = datetime(2026, 6, 10, 12, tzinfo=UTC)
+    below_floor = SKILL_MIN_DAY_KWH / 2.0
+    prod = [_Bucket(datetime(2026, 6, d, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0) for d in range(5, 8)]
+    prod.append(_Bucket(datetime(2026, 6, 8, 12, tzinfo=UTC).timestamp() * 1000.0, below_floor))
+    pts = [_Pt(datetime(2026, 6, d, 12, tzinfo=UTC), 10_000.0) for d in range(5, 8)]
+    # Wildly wrong prediction on the excluded day; if it were counted, skill would collapse.
+    pts.append(_Pt(datetime(2026, 6, 8, 12, tzinfo=UTC), 999_000.0))
+    assert recent_skill(pts, prod, now, UTC) == 1.0
 
 
 def _weather_today(clouds, *, ghi=500.0) -> WeatherSeries:
@@ -81,6 +109,34 @@ def _weather_today(clouds, *, ghi=500.0) -> WeatherSeries:
         wind=[5.0] * n,
         snow=[0.0] * n,
     )
+
+
+def _weather_today_with_spread(clouds, spreads, *, ghi=500.0) -> WeatherSeries:
+    weather = _weather_today(clouds, ghi=ghi)
+    weather.cloud_spread.extend(spreads)
+    return weather
+
+
+def test_day_predictability_falls_when_model_ensemble_disagrees() -> None:
+    # Same steady cloud reading (zero temporal variance) but a high cross-model spread:
+    # predictability must be pulled down by the spread signal, not stay at the variance-only 1.0.
+    day = datetime(2026, 6, 10, tzinfo=UTC).date()
+    steady_clouds = [10.0, 10.0, 10.0, 10.0, 10.0]
+    agree = _weather_today_with_spread(steady_clouds, [0.0, 0.0, 0.0, 0.0, 0.0])
+    disagree = _weather_today_with_spread(steady_clouds, [30.0, 30.0, 30.0, 30.0, 30.0])
+
+    p_agree = _day_predictability(agree, day, UTC)
+    p_disagree = _day_predictability(disagree, day, UTC)
+    assert p_agree is not None and p_disagree is not None
+    assert p_agree == 1.0  # zero temporal variance, zero model spread
+    assert p_disagree < p_agree
+
+
+def test_day_predictability_none_without_enough_daytime_samples() -> None:
+    # Fewer than 3 daytime (above-GHI-gate) hours: neither signal has enough support.
+    day = datetime(2026, 6, 10, tzinfo=UTC).date()
+    weather = _weather_today([10.0, 10.0], ghi=500.0)
+    assert _day_predictability(weather, day, UTC) is None
 
 
 def test_today_predictability_clear_vs_broken() -> None:
@@ -104,14 +160,30 @@ def test_compute_reliability_shape_and_range() -> None:
     assert r.per_day[0] >= r.per_day[6]
 
 
+def test_compute_reliability_today_entry_matches_predict() -> None:
+    # The n=0 per-day entry reuses the already-computed `predict` value rather than
+    # recomputing today's predictability a second time; horizon decay at n=0 is 1.0,
+    # so the entry must equal the blend built with `predict` exactly.
+    now = datetime(2026, 6, 10, 12, tzinfo=UTC)
+    prod = [_Bucket(datetime(2026, 6, d, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0) for d in range(1, 9)]
+    pts = [_Pt(datetime(2026, 6, d, 12, tzinfo=UTC), 10_000.0) for d in range(1, 9)]
+    weather = _weather_today([10, 12, 11, 10, 13])
+    r = compute_reliability(prod, pts, weather, now, UTC)
+    maturity, _ = data_maturity(prod, UTC)
+    skill = recent_skill(pts, prod, now, UTC, step_minutes=60.0)
+    predict = today_predictability(weather, now, UTC)
+    expected_today = round(_blend(maturity, skill, predict), 1)
+    assert r.per_day[0] == expected_today
+
+
 def test_horizon_decay_is_gentle() -> None:
-    # The horizon decay must degrade gently (exponential toward a 0.5 floor), not the old steep
-    # 0.12/day linear ramp that bottomed out at 0.40 by J+5.
+    # The horizon decay must degrade gently: exponential toward a 0.5 floor, matching how
+    # NWP skill actually degrades with lead time.
     vals = [_horizon_decay(n) for n in range(7)]
     assert vals[0] == 1.0
     assert all(vals[i] > vals[i + 1] for i in range(6))  # strictly decreasing
-    assert vals[6] >= 0.5  # floor lifted from the old 0.40
-    assert vals[3] > 0.65  # J+3 still meaningfully reliable (was 0.64 under the old ramp)
+    assert vals[6] >= 0.5  # floor
+    assert vals[3] > 0.65  # J+3 still meaningfully reliable
 
 
 if __name__ == "__main__":

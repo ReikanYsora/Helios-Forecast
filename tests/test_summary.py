@@ -26,6 +26,18 @@ def _triangular_points() -> list[ForecastPoint]:
     return points
 
 
+def test_day_energy_raw_kwh_sums_pv_raw_w_the_same_way_as_energy_kwh() -> None:
+    # pv_raw_w set to double pv_w so a day's raw total is independently checkable against the
+    # corrected total, the same watt-to-kWh conversion and local-day bucketing as energy_kwh.
+    base = datetime(2026, 6, 21, tzinfo=_UTC)
+    pts = [ForecastPoint(t=base + timedelta(hours=h), pv_w=100.0, pv_raw_w=200.0) for h in range(24)]
+    now = base + timedelta(hours=10)
+    s = summarize(pts, now=now, tz=_UTC, step_minutes=60)
+    assert abs(s.days[0].energy_kwh - 2.4) < 1e-9  # 24 x 100 W x 1h
+    assert abs(s.days[0].energy_raw_kwh - 4.8) < 1e-9  # 24 x 200 W x 1h
+    assert abs(s.days[0].energy_raw_kwh - 2 * s.days[0].energy_kwh) < 1e-9
+
+
 def test_power_now_and_next_hour() -> None:
     pts = _triangular_points()
     now = datetime(2026, 6, 21, 10, tzinfo=_UTC)
@@ -68,6 +80,33 @@ def test_empty_points() -> None:
     assert s.wh_hours == {}
     assert len(s.days) == 7
     assert s.days[0].peak_power_w == 0.0
+    assert s.energy_today_remaining_kwh is None
+    assert s.energy_this_hour_kwh is None
+    assert s.power_now_low_w is None and s.power_now_high_w is None
+
+
+def test_power_now_band_interpolates_when_both_buckets_have_one() -> None:
+    base = datetime(2026, 6, 21, tzinfo=_UTC)
+    pts = [
+        ForecastPoint(t=base + timedelta(hours=10), pv_w=700.0, pv_raw_w=700.0, pv_p10=600.0, pv_p90=800.0),
+        ForecastPoint(t=base + timedelta(hours=11), pv_w=800.0, pv_raw_w=800.0, pv_p10=650.0, pv_p90=900.0),
+    ]
+    now = base + timedelta(hours=10, minutes=30)
+    s = summarize(pts, now=now, tz=_UTC, step_minutes=60)
+    assert abs(s.power_now_low_w - 625.0) < 1e-9
+    assert abs(s.power_now_high_w - 850.0) < 1e-9
+
+
+def test_power_now_band_none_when_either_bracketing_bucket_lacks_one() -> None:
+    base = datetime(2026, 6, 21, tzinfo=_UTC)
+    pts = [
+        ForecastPoint(t=base + timedelta(hours=10), pv_w=700.0, pv_raw_w=700.0, pv_p10=None, pv_p90=None),
+        ForecastPoint(t=base + timedelta(hours=11), pv_w=800.0, pv_raw_w=800.0, pv_p10=650.0, pv_p90=900.0),
+    ]
+    now = base + timedelta(hours=10, minutes=30)
+    s = summarize(pts, now=now, tz=_UTC, step_minutes=60)
+    assert s.power_now_low_w is None
+    assert s.power_now_high_w is None
 
 
 if __name__ == "__main__":

@@ -17,10 +17,12 @@ sys.path.insert(0, str(_REPO_ROOT))
 from custom_components.helios_forecast.analog import (  # noqa: E402
     AnalogSample,
     _az_diff,
+    _sample_series,
     _weighted_percentiles,
     build_library,
     enrich_points,
     predict,
+    series_epochs,
 )
 from custom_components.helios_forecast.forecast import ForecastPoint  # noqa: E402
 from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: E402
@@ -42,6 +44,10 @@ def test_az_diff_wraps() -> None:
     assert _az_diff(90, 95) == 5
 
 
+def test_weighted_percentiles_empty_list_does_not_raise() -> None:
+    assert _weighted_percentiles([], (0.10, 0.50, 0.90)) == []
+
+
 def test_weighted_percentiles_monotonic() -> None:
     pairs = [(v, 1.0) for v in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]]
     p10, p50, p90 = _weighted_percentiles(pairs, (0.10, 0.50, 0.90))
@@ -50,9 +56,10 @@ def test_weighted_percentiles_monotonic() -> None:
 
 
 def test_predict_median_and_confidence() -> None:
-    # Tight cluster of analogs at one condition, all producing ~2000 W.
-    lib = [AnalogSample(alt=40.0, az=180.0, cloud=50.0, watt=2000.0 + (i % 5) * 10) for i in range(40)]
-    band = predict(lib, 40.0, 180.0, 50.0)
+    # Tight cluster of analogs at one condition, all producing ~2000 W. Temperature matches the
+    # query on both sides so the missing-data penalty does not enter into it.
+    lib = [AnalogSample(alt=40.0, az=180.0, cloud=50.0, watt=2000.0 + (i % 5) * 10, temp=20.0) for i in range(40)]
+    band = predict(lib, 40.0, 180.0, 50.0, temp=20.0)
     assert band is not None
     assert 1980.0 <= band.p50 <= 2060.0
     assert band.p10 <= band.p50 <= band.p90
@@ -83,9 +90,63 @@ def test_temperature_influences_match() -> None:
     band_hot = predict(lib, 40.0, 180.0, 30.0, temp=35.0)
     assert band_cool is not None and band_hot is not None
     assert band_cool.p50 > band_hot.p50
-    # No query temperature (or samples without temp) falls back to the old geometry+cloud match.
+    # No query temperature: every analog takes the same missing-data penalty, so the match
+    # falls back to geometry+cloud alone (still a valid band, just untied to either regime).
     band_none = predict(lib, 40.0, 180.0, 30.0)
     assert band_none is not None
+
+
+def test_missing_temperature_is_penalised_not_a_perfect_match() -> None:
+    # Three equally-sized groups at identical geometry+cloud (so distance is temperature-only),
+    # tagged with distinct watts so the winning group is visible in the percentiles: an exact
+    # temperature match, a small real mismatch, and no temperature reading at all.
+    exact = [AnalogSample(alt=40.0, az=180.0, cloud=30.0, watt=1000.0, temp=20.0) for _ in range(10)]
+    small_mismatch = [AnalogSample(alt=40.0, az=180.0, cloud=30.0, watt=2000.0, temp=21.0) for _ in range(10)]
+    no_temp = [AnalogSample(alt=40.0, az=180.0, cloud=30.0, watt=3000.0, temp=None) for _ in range(10)]
+    lib = exact + small_mismatch + no_temp
+    band = predict(lib, 40.0, 180.0, 30.0, temp=20.0)
+    assert band is not None
+    # Ranking by distance (closest wins the lowest quantiles first): exact is closest (wins p10),
+    # small mismatch is second (wins p50 and p90 too). No-temperature-data never wins a quantile
+    # here: it is ranked last, not tied with the exact match as it was before the fix (where it
+    # used to pull p90 all the way to its own 3000 W).
+    assert band.p10 == 1000.0
+    assert band.p50 == 2000.0
+    assert band.p90 == 2000.0
+
+
+def test_sample_series_clamps_outside_range() -> None:
+    times = [datetime(2026, 1, 1, h, tzinfo=UTC) for h in range(3)]
+    values = [10.0, 20.0, 30.0]
+    epochs = series_epochs(times)
+    assert _sample_series(times, values, epochs[0] - 1000.0, epochs) == 10.0
+    assert _sample_series(times, values, epochs[-1] + 1000.0, epochs) == 30.0
+
+
+def test_sample_series_interpolates_between_brackets() -> None:
+    times = [datetime(2026, 1, 1, h, tzinfo=UTC) for h in range(3)]
+    values = [10.0, 20.0, 30.0]
+    epochs = series_epochs(times)
+    mid = (epochs[0] + epochs[1]) / 2.0
+    assert _sample_series(times, values, mid, epochs) == 15.0
+    # epochs argument is optional: recomputing internally must agree.
+    assert _sample_series(times, values, mid) == 15.0
+
+
+def test_sample_series_skips_missing_bracket_side() -> None:
+    times = [datetime(2026, 1, 1, h, tzinfo=UTC) for h in range(3)]
+    values = [10.0, None, 30.0]
+    epochs = series_epochs(times)
+    # Querying inside [hour0, hour1] where hour1 is missing falls back to hour0's value.
+    just_after_0 = epochs[0] + 1.0
+    assert _sample_series(times, values, just_after_0, epochs) == 10.0
+    # Querying inside [hour1, hour2] where hour1 is missing falls back to hour2's value.
+    just_before_2 = epochs[2] - 1.0
+    assert _sample_series(times, values, just_before_2, epochs) == 30.0
+
+
+def test_sample_series_empty_series_returns_none() -> None:
+    assert _sample_series([], [], 0.0) is None
 
 
 def _june_noon(hour: int) -> datetime:
@@ -123,9 +184,10 @@ def test_enrich_points_past_untouched_future_blended() -> None:
     past = ForecastPoint(t=_june_noon(8), pv_w=1000.0, pv_raw_w=1000.0)
     fut = ForecastPoint(t=_june_noon(13), pv_w=1000.0, pv_raw_w=1000.0)
 
-    # Seed the library at the future point's exact sun position so analogs are close.
+    # Seed the library at the future point's exact sun position so analogs are close. Temperature
+    # matches the weather series below so the missing-data penalty does not enter into it.
     sun = sun_position(fut.t, lat, lon)
-    lib = [AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=30.0, watt=2500.0) for _ in range(40)]
+    lib = [AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=30.0, watt=2500.0, temp=20.0) for _ in range(40)]
     times = [_june_noon(h) for h in range(24)]
     weather = WeatherSeries(
         times=times,
@@ -167,7 +229,8 @@ def test_ceiling_caps_overprediction() -> None:
     now = _june_noon(12)
     fut = ForecastPoint(t=_june_noon(13), pv_w=6500.0, pv_raw_w=6500.0)  # physical over-predicts
     sun = sun_position(fut.t, lat, lon)
-    lib = [AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=30.0, watt=4500.0) for _ in range(10)]
+    # Temperature matches _flat_weather()'s 20.0 so the missing-data penalty does not enter into it.
+    lib = [AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=30.0, watt=4500.0, temp=20.0) for _ in range(10)]
     out = enrich_points([fut], lib, _flat_weather(), lat, lon, now)
     assert out[0].pv_w <= 4500.0 * 1.25 + 1e-6  # capped at p90 * margin, well below the physical 6500
     assert out[0].pv_w < 6500.0

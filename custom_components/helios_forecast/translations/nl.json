@@ -16,7 +16,16 @@
           "inverter_max_kw": "Max. uitgangsvermogen omvormer (kW, optioneel)",
           "production_entity": "PV-productiesensor (voor de aangeleerde correctie)",
           "trend_anchor_hour": "Referentie-uur voor dagtrend (0-23, standaard 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Bruikbare batterijcapaciteit (kWh)",
+          "battery_soc_entity": "Batterijladingssensor (%)",
+          "battery_max_charge_kw": "Max. laadvermogen batterij (kW, optioneel)",
+          "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
+          "battery_min_soc": "Batterijreserve — minimale laadtoestand (%, standaard 10)",
+          "battery_efficiency": "Retourrendement batterij (%, standaard 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig."
         }
       },
       "line": {
@@ -28,6 +37,8 @@
           "kwp": "Piekvermogen (kWp)",
           "line_inverter_max_kw": "Max. omvormervermogen voor deze lijn (kW, optioneel)",
           "tracker": "Zonnevolger",
+          "latitude": "Breedtegraad voor deze lijn (optioneel)",
+          "longitude": "Lengtegraad voor deze lijn (optioneel)",
           "add_another": "Add another panel line"
         }
       }
@@ -51,7 +62,16 @@
           "longitude": "Lengtegraad (optioneel)",
           "inverter_max_kw": "Max. uitgangsvermogen omvormer (kW, optioneel)",
           "production_entity": "PV-productiesensor (voor de aangeleerde correctie)",
-          "trend_anchor_hour": "Referentie-uur voor dagtrend (0-23, standaard 6)"
+          "trend_anchor_hour": "Referentie-uur voor dagtrend (0-23, standaard 6)",
+          "battery_capacity_kwh": "Bruikbare batterijcapaciteit (kWh)",
+          "battery_soc_entity": "Batterijladingssensor (%)",
+          "battery_max_charge_kw": "Max. laadvermogen batterij (kW, optioneel)",
+          "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
+          "battery_min_soc": "Batterijreserve — minimale laadtoestand (%, standaard 10)",
+          "battery_efficiency": "Retourrendement batterij (%, standaard 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig."
         }
       },
       "lines": {
@@ -63,6 +83,8 @@
           "kwp": "Piekvermogen (kWp)",
           "line_inverter_max_kw": "Max. omvormervermogen voor deze lijn (kW, optioneel)",
           "tracker": "Zonnevolger",
+          "latitude": "Breedtegraad voor deze lijn (optioneel)",
+          "longitude": "Lengtegraad voor deze lijn (optioneel)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }
@@ -76,6 +98,28 @@
         "dual-axis": "Dubbele as (volgt de zon)",
         "single-axis-h": "Enkele as horizontaal (hellingshoek volgt)",
         "single-axis-v": "Enkele as verticaal (azimut volgt)"
+      }
+    }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Prognose ophalen",
+      "description": "Geeft de volledige productieprognose terug (vanaf vandaag, één punt per 15 minuten, elk met de voorspelde watts en de P10/P90-betrouwbaarheidsband) als reactiegegevens, voor gebruik in automatiseringen.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installatie",
+          "description": "Welke Helios Forecast-installatie moet worden gelezen. Optioneel wanneer er slechts één is geconfigureerd."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Laadtoestandsprognose ophalen",
+      "description": "Geeft de voorspelde batterijladingstoestand voor de komende 48 uur (één punt per 15 minuten) terug als reactiegegevens, voor gebruik in automatiseringen.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installatie",
+          "description": "Welke Helios Forecast-installatie moet worden gelezen. Optioneel wanneer er slechts één is geconfigureerd."
+        }
       }
     }
   }

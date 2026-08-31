@@ -16,7 +16,16 @@
           "inverter_max_kw": "Potência máxima do inversor (kW, opcional)",
           "production_entity": "Sensor de produção fotovoltaica (para a correção aprendida)",
           "trend_anchor_hour": "Hora de referência da tendência do dia (0-23, predefinição 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Capacidade útil da bateria (kWh)",
+          "battery_soc_entity": "Sensor de estado de carga da bateria (%)",
+          "battery_max_charge_kw": "Potência máx. de carga da bateria (kW, opcional)",
+          "battery_max_discharge_kw": "Potência máx. de descarga da bateria (kW, opcional)",
+          "battery_min_soc": "Reserva da bateria — estado de carga mínimo (%, predefinição 10)",
+          "battery_efficiency": "Eficiência de ida e volta da bateria (%, predefinição 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Preencha a capacidade e este sensor para ativar a projeção do estado de carga. O consumo da casa vem do seu painel de Energia, aqui não é necessário nenhum sensor."
         }
       },
       "line": {
@@ -28,6 +37,8 @@
           "kwp": "Potência de pico (kWp)",
           "line_inverter_max_kw": "Potência máx. do inversor para esta linha (kW, opcional)",
           "tracker": "Seguidor solar",
+          "latitude": "Latitude para esta linha (opcional)",
+          "longitude": "Longitude para esta linha (opcional)",
           "add_another": "Add another panel line"
         }
       }
@@ -51,7 +62,16 @@
           "longitude": "Longitude (opcional)",
           "inverter_max_kw": "Potência máxima do inversor (kW, opcional)",
           "production_entity": "Sensor de produção fotovoltaica (para a correção aprendida)",
-          "trend_anchor_hour": "Hora de referência da tendência do dia (0-23, predefinição 6)"
+          "trend_anchor_hour": "Hora de referência da tendência do dia (0-23, predefinição 6)",
+          "battery_capacity_kwh": "Capacidade útil da bateria (kWh)",
+          "battery_soc_entity": "Sensor de estado de carga da bateria (%)",
+          "battery_max_charge_kw": "Potência máx. de carga da bateria (kW, opcional)",
+          "battery_max_discharge_kw": "Potência máx. de descarga da bateria (kW, opcional)",
+          "battery_min_soc": "Reserva da bateria — estado de carga mínimo (%, predefinição 10)",
+          "battery_efficiency": "Eficiência de ida e volta da bateria (%, predefinição 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Preencha a capacidade e este sensor para ativar a projeção do estado de carga. O consumo da casa vem do seu painel de Energia, aqui não é necessário nenhum sensor."
         }
       },
       "lines": {
@@ -63,6 +83,8 @@
           "kwp": "Potência de pico (kWp)",
           "line_inverter_max_kw": "Potência máx. do inversor para esta linha (kW, opcional)",
           "tracker": "Seguidor solar",
+          "latitude": "Latitude para esta linha (opcional)",
+          "longitude": "Longitude para esta linha (opcional)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }
@@ -76,6 +98,28 @@
         "dual-axis": "Dois eixos (segue o sol)",
         "single-axis-h": "Eixo único horizontal (a inclinação segue)",
         "single-axis-v": "Eixo único vertical (o azimute segue)"
+      }
+    }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Obter previsão",
+      "description": "Devolve a previsão de produção completa (de hoje em diante, um ponto a cada 15 minutos, cada um com os watts previstos e a banda de confiança P10/P90) como dados de resposta, para usar em automações.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Instalação",
+          "description": "Qual instalação Helios Forecast ler. Opcional quando apenas uma está configurada."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Obter previsão do estado de carga",
+      "description": "Devolve o estado de carga projetado da bateria para as próximas 48 horas (um ponto a cada 15 minutos) como dados de resposta, para usar em automações.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Instalação",
+          "description": "Qual instalação Helios Forecast ler. Opcional quando apenas uma está configurada."
+        }
       }
     }
   }

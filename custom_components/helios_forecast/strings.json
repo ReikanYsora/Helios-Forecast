@@ -16,10 +16,17 @@
           "inverter_max_kw": "Inverter max output (kW, optional)",
           "production_entity": "PV production energy sensor (kWh, for the learned correction)",
           "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Battery usable capacity (kWh)",
+          "battery_soc_entity": "Battery state of charge sensor (%)",
+          "battery_max_charge_kw": "Battery max charge power (kW, optional)",
+          "battery_max_discharge_kw": "Battery max discharge power (kW, optional)",
+          "battery_min_soc": "Battery reserve — minimum state of charge (%, default 10)",
+          "battery_efficiency": "Battery round-trip efficiency (%, default 90)"
         },
         "data_description": {
-          "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off."
+          "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off.",
+          "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here."
         }
       },
       "line": {
@@ -31,6 +38,8 @@
           "kwp": "Peak power (kWp)",
           "line_inverter_max_kw": "Inverter max output for this line (kW, optional)",
           "tracker": "Sun tracker",
+          "latitude": "Latitude override (optional)",
+          "longitude": "Longitude override (optional)",
           "add_another": "Add another panel line"
         }
       }
@@ -54,10 +63,17 @@
           "longitude": "Longitude (optional)",
           "inverter_max_kw": "Inverter max output (kW, optional)",
           "production_entity": "PV production energy sensor (kWh, for the learned correction)",
-          "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)"
+          "trend_anchor_hour": "Today-trend reference hour (0-23, default 6)",
+          "battery_capacity_kwh": "Battery usable capacity (kWh)",
+          "battery_soc_entity": "Battery state of charge sensor (%)",
+          "battery_max_charge_kw": "Battery max charge power (kW, optional)",
+          "battery_max_discharge_kw": "Battery max discharge power (kW, optional)",
+          "battery_min_soc": "Battery reserve — minimum state of charge (%, default 10)",
+          "battery_efficiency": "Battery round-trip efficiency (%, default 90)"
         },
         "data_description": {
-          "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off."
+          "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off.",
+          "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here."
         }
       },
       "lines": {
@@ -69,6 +85,8 @@
           "kwp": "Peak power (kWp)",
           "line_inverter_max_kw": "Inverter max output for this line (kW, optional)",
           "tracker": "Sun tracker",
+          "latitude": "Latitude override (optional)",
+          "longitude": "Longitude override (optional)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }
@@ -82,6 +100,28 @@
         "dual-axis": "Dual-axis (follows the sun)",
         "single-axis-h": "Single-axis horizontal (tilt follows)",
         "single-axis-v": "Single-axis vertical (azimuth follows)"
+      }
+    }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Get forecast",
+      "description": "Returns the full production forecast (today onward, one point per 15 minutes, each with the predicted watts and the P10/P90 confidence band) as response data, for use in automations.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installation",
+          "description": "Which Helios Forecast installation to read. Optional when only one is configured."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Get battery SoC forecast",
+      "description": "Returns the projected battery state of charge for the next 48 hours (one point per 15 minutes) as response data, for use in automations.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installation",
+          "description": "Which Helios Forecast installation to read. Optional when only one is configured."
+        }
       }
     }
   }

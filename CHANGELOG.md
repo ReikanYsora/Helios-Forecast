@@ -5,6 +5,158 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.9.0
+
+A release about putting the forecast to work: the full curve now reaches your
+automations, a battery can be projected forward, and the forecast now reads the
+sky exactly like the Helios card.
+
+### Added: the full forecast, in your automations
+
+The integration already computes the whole production curve, not just the current
+value. It's now available to automations two ways: a **`helios_forecast.get_forecast`
+service** that returns the remaining curve on demand (15-minute points, each with
+the predicted watts and the P10/P90 confidence band), and the same curve as a
+`forecast` attribute on the `power_now` sensor. An energy management system can
+read it to shift battery charging into the expected peak, work out how much sun is
+still to come, or find the latest safe charging start. Thanks to the detailed
+write-up on #35.
+
+### Added: a predicted battery state of charge
+
+If you have a battery, Helios Forecast can now project its **state of charge over
+the next 48 hours**. It runs the production forecast against your home's own
+consumption — derived straight from your **Home Assistant Energy dashboard**, so
+there's no extra sensor to wire — and integrates the battery's charge from your
+current level, within your capacity, reserve and charge/discharge limits. Turn it
+on by filling in your battery capacity and state-of-charge sensor in the
+integration settings; a **Predicted battery state of charge** sensor then appears,
+carrying the full curve, the day's projected low and high, and the forecast
+reliability. There's also a `helios_forecast.get_battery_soc_forecast` service.
+
+It predicts, it never commands: sending the charge order stays with your own
+automation, which knows your inverter. And because home consumption is a learned
+average, it's an honest steer read alongside the reliability figure, not a
+guarantee. Thanks to @brunnwart and @jasonyates for the design brief (#25).
+
+### Changed: the forecast transposes the sun itself, no GTI dependency
+
+Helios Forecast no longer pulls a global tilted-irradiance (plane-of-array)
+supply; it transposes the horizontal irradiance onto each panel plane itself,
+exactly like the Helios card does. One fewer external dependency, and the two
+stay in lockstep. It also removes a flip-flop where some refreshes used
+Open-Meteo's own tilted value and others a fallback, giving different
+magnitudes from one update to the next.
+
+### Changed: the weather request now matches the Helios card
+
+The Open-Meteo request mirrors the card's: the same model picker (a regional
+high-resolution model paired with a global one, median-fused), the same weighted
+cloud-cover layers, and instant irradiance. Card and forecast read the same sky.
+
+### Fixed: the learned correction no longer confuses inverter clipping with weather
+
+If a panel line has its own inverter cap, the correction the forecast learns from
+your production history used to be trained against the *uncapped* theoretical
+output, so an afternoon where the cap genuinely limited output read as an
+underperforming sky and pulled the learned ratio down for that reason alone. The
+learning now sees the same capped output the forecast itself produces, so the
+correction reflects the weather, not your hardware ceiling. Only affects
+installations with a per-line inverter cap configured.
+
+### Fixed: a gap in temperature history no longer inflates forecast confidence
+
+The forecast picks its closest historical matches partly on outdoor temperature,
+and a match missing that reading used to count as a perfect one — tying with, or
+even beating, a match with a real but tiny temperature difference. If your
+temperature source has gaps (added partway through the learning window, or
+occasional dropouts), those gaps no longer masquerade as ideal matches: reported
+confidence and the learned production ceiling now reflect what the history
+actually supports.
+
+### Fixed: ready for a future Home Assistant statistics change
+
+A coming Home Assistant version tightens what the long-term statistics import
+expects; the integration now declares the new fields up front, so the archived
+weather and predicted-production history keep importing cleanly across the change.
+No user action needed. Thanks to @FoxP for pointing out the breakage radar (#38).
+
+### Fixed: the battery SoC projection could crash, and now says why it skips
+
+The state-of-charge projection could error out, and when it correctly declined
+to run because an input was missing it did so silently, so an empty
+`get_battery_soc_forecast` gave no clue why. It no longer crashes, and it logs a
+clear reason whenever the projection is off, so you can tell at a glance what to
+fill in. Thanks to @FoxP (#40).
+
+### Fixed: the SoC projection recovers the moment the battery sensor is back
+
+On startup a battery integration can leave its state-of-charge sensor unavailable
+for a few seconds while it connects (a modbus link, for instance). The projection
+read the sensor at that instant, found it unavailable and stayed off until the
+next 30-minute refresh. It now re-projects as soon as the sensor becomes available
+again, and a brief startup gap is logged gently rather than as a warning. Thanks
+to @FoxP (#42).
+
+### Fixed: border locations pick the right regional weather model
+
+The forecast pairs a global weather model with the best regional high-resolution
+one for your location, using the same picker as the Helios card. The regional
+coverage areas overlap at national borders, and the first area listed used to
+win, so a site near a border, or inside a smaller area enclosed by a larger one,
+could be read with a neighbour's model. It now picks the area your location sits
+most centrally within, so the regional model matches where you actually are.
+Thanks to @MatCos.
+
+### Fixed: wind speed was read in the wrong unit, running the forecast hot
+
+Open-Meteo returns wind at 10 m in km/h, but the cell-temperature model that
+derates the forecast for a hot panel expects m/s. Reading the km/h figure as
+if it were m/s made the modelled cell run too cool, which overstated the
+forecast: about 7% high at a moderate 5 m/s wind, and 14% at 10 m/s. Converted
+at the single point wind enters the model; your wind sensor and its history
+are untouched, still in km/h. Thanks to @Happyfield7 (#44, #45).
+
+### Added: a coordinate override per panel line
+
+A panel line normally inherits the entry's home coordinates, which is right for
+one roof but not for a line mounted somewhere else entirely, like a garage or a
+carport. Each line can now set its own latitude and longitude, left blank to
+keep inheriting the shared location.
+
+### Fixed: a decimal latitude or longitude could get misread
+
+Latitude and longitude used the same plain numeric field every other decimal
+value in this integration had already moved away from, for the same reason:
+a browser's own locale can misparse a typed decimal. They now use the same
+numeric input as every other geometry and power field.
+
+### Fixed: the detail series honours the resolution and pre-correction total it already documented
+
+The `helios_forecast/series` websocket command has always documented an optional
+`resolution_min` parameter and a pre-correction `kwh_raw` daily figure, but
+sending the former was rejected outright, and the latter silently mirrored the
+corrected total instead of a genuine one. Both now do what they always said they
+did: an explicit resolution resamples the curve server-side, and `kwh_raw` is a
+real daily total summed from the uncorrected physical model. Omitting the
+resolution parameter, which is what the Helios card does today, is unaffected.
+
+### Fixed: a broken Open-Meteo reply no longer skips the retry it was meant to use
+
+A reply that came back with the right HTTP status but a malformed or unexpected
+body (a proxy hiccup, a truncated response) used to escape the retry logic
+entirely and fail the whole refresh outright, instead of being treated as the
+transient blip the retry mechanism already exists to absorb.
+
+### Fixed: a weather sensor with no display details no longer takes the rest down with it
+
+A single weather field missing its display metadata used to abort the entire
+sensor platform setup, taking down power, energy, reliability and every other
+entity along with the one weather sensor actually at fault. It's now skipped on
+its own; every other entity sets up normally.
+
+---
+
 ## 2026.8.3
 
 A performance and reliability release on top of 2026.8.2.

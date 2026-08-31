@@ -11,12 +11,9 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Callable, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from .irradiance import PanelOrientation, PvContext, _supplied, compute_pv_power
-
-# (tilt, azimuth, moment) -> plane-of-array W/m2, or None when no GTI covers it.
-GtiSampler = Callable[[float, float, datetime], Optional[float]]
 
 
 @dataclass(frozen=True)
@@ -56,7 +53,6 @@ def compute_pv_power_per_array(
     home_lon: float,
     sample: WeatherSample,
     layout: PvLayout,
-    gti_sampler: Optional[GtiSampler] = None,
 ) -> List[float]:
     """PV percentage (0..100) for each configured array, in layout order. Returns a single-element list
     ``[horizontal_pct]`` when the layout cannot be split per array (empty or out-of-lockstep), so callers can
@@ -67,7 +63,7 @@ def compute_pv_power_per_array(
     base_ctx = (
         PvContext(
             air_temp_c=sample.temp,
-            wind_ms=sample.wind,
+            wind_ms=(sample.wind / 3.6) if sample.wind is not None else None,
             ghi_wm2=sample.ghi if has_ghi else None,
             direct_wm2=sample.direct if has_split else None,
             diffuse_wm2=sample.diffuse if has_split else None,
@@ -88,27 +84,9 @@ def compute_pv_power_per_array(
         coord = layout.coords[idx]
         array_lat = coord[0] if coord else home_lat
         array_lon = coord[1] if coord else home_lon
-
-        gti_poa = (
-            gti_sampler(orientation.tilt_deg, orientation.azimuth_deg, moment)
-            if (gti_sampler is not None and not orientation.tracker)
-            else None
-        )
-
-        if base_present or gti_poa is not None:
-            array_ctx: Optional[PvContext] = PvContext(
-                air_temp_c=base_ctx.air_temp_c if base_ctx else None,
-                wind_ms=base_ctx.wind_ms if base_ctx else None,
-                ghi_wm2=base_ctx.ghi_wm2 if base_ctx else None,
-                direct_wm2=base_ctx.direct_wm2 if base_ctx else None,
-                diffuse_wm2=base_ctx.diffuse_wm2 if base_ctx else None,
-                poa_wm2=gti_poa,
-                shading=False,
-            )
-        else:
-            array_ctx = None
-
-        out.append(compute_pv_power(moment, array_lat, array_lon, sample.cloud, orientation, array_ctx))
+        # Every array shares the same weather context; each orientation self-transposes the GHI to its
+        # own plane in compute_pv_power.
+        out.append(compute_pv_power(moment, array_lat, array_lon, sample.cloud, orientation, base_ctx))
 
     return out
 
@@ -119,11 +97,10 @@ def compute_pv_power_weighted(
     home_lon: float,
     sample: WeatherSample,
     layout: PvLayout,
-    gti_sampler: Optional[GtiSampler] = None,
 ) -> float:
     """Forecast PV percentage (0..100) summed across arrays, weighted by kWp share. Thin wrapper over
     ``compute_pv_power_per_array`` so the two never diverge."""
-    pcts = compute_pv_power_per_array(moment, home_lat, home_lon, sample, layout, gti_sampler)
+    pcts = compute_pv_power_per_array(moment, home_lat, home_lon, sample, layout)
     orientations = layout.orientations
     if not orientations or len(pcts) != len(orientations):
         return pcts[0]

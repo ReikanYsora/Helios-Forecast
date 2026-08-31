@@ -16,7 +16,16 @@
           "inverter_max_kw": "Inverterens maksimale effekt (kW, valgfrit)",
           "production_entity": "Sensor for solcelleproduktion (til den lærte korrektion)",
           "trend_anchor_hour": "Referencetime for dagens tendens (0-23, standard 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Brugbar batterikapacitet (kWh)",
+          "battery_soc_entity": "Sensor for batteriets ladetilstand (%)",
+          "battery_max_charge_kw": "Maks. ladeeffekt for batteri (kW, valgfrit)",
+          "battery_max_discharge_kw": "Maks. afladningseffekt for batteri (kW, valgfrit)",
+          "battery_min_soc": "Batterireserve — minimal ladetilstand (%, standard 10)",
+          "battery_efficiency": "Batteriets rundtursvirkningsgrad (%, standard 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Udfyld kapaciteten og denne sensor for at slå projektionen af ladetilstand til. Husforbruget hentes fra dit Energi-dashboard, så der kræves ingen sensor her."
         }
       },
       "line": {
@@ -28,6 +37,8 @@
           "kwp": "Spidseffekt (kWp)",
           "line_inverter_max_kw": "Maks. inverterydelse for denne linje (kW, valgfrit)",
           "tracker": "Solfølger",
+          "latitude": "Breddegrad for denne linje (valgfrit)",
+          "longitude": "Længdegrad for denne linje (valgfrit)",
           "add_another": "Add another panel line"
         }
       }
@@ -51,7 +62,16 @@
           "longitude": "Længdegrad (valgfrit)",
           "inverter_max_kw": "Inverterens maksimale effekt (kW, valgfrit)",
           "production_entity": "Sensor for solcelleproduktion (til den lærte korrektion)",
-          "trend_anchor_hour": "Referencetime for dagens tendens (0-23, standard 6)"
+          "trend_anchor_hour": "Referencetime for dagens tendens (0-23, standard 6)",
+          "battery_capacity_kwh": "Brugbar batterikapacitet (kWh)",
+          "battery_soc_entity": "Sensor for batteriets ladetilstand (%)",
+          "battery_max_charge_kw": "Maks. ladeeffekt for batteri (kW, valgfrit)",
+          "battery_max_discharge_kw": "Maks. afladningseffekt for batteri (kW, valgfrit)",
+          "battery_min_soc": "Batterireserve — minimal ladetilstand (%, standard 10)",
+          "battery_efficiency": "Batteriets rundtursvirkningsgrad (%, standard 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Udfyld kapaciteten og denne sensor for at slå projektionen af ladetilstand til. Husforbruget hentes fra dit Energi-dashboard, så der kræves ingen sensor her."
         }
       },
       "lines": {
@@ -63,6 +83,8 @@
           "kwp": "Spidseffekt (kWp)",
           "line_inverter_max_kw": "Maks. inverterydelse for denne linje (kW, valgfrit)",
           "tracker": "Solfølger",
+          "latitude": "Breddegrad for denne linje (valgfrit)",
+          "longitude": "Længdegrad for denne linje (valgfrit)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }
@@ -76,6 +98,28 @@
         "dual-axis": "Toakset (følger solen)",
         "single-axis-h": "Enakset vandret (hældning følger)",
         "single-axis-v": "Enakset lodret (azimut følger)"
+      }
+    }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Hent prognose",
+      "description": "Returnerer hele produktionsprognosen (fra i dag og frem, ét punkt hvert 15. minut, hver med de forudsagte watt og P10/P90-konfidensbåndet) som svardata til brug i automatiseringer.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installation",
+          "description": "Hvilken Helios Forecast-installation der skal læses. Valgfrit, når kun én er konfigureret."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Hent ladetilstandsprognose",
+      "description": "Returnerer den forventede ladetilstand for batteriet for de næste 48 timer (ét punkt hvert 15. minut) som svardata til brug i automatiseringer.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Installation",
+          "description": "Hvilken Helios Forecast-installation der skal læses. Valgfrit, når kun én er konfigureret."
+        }
       }
     }
   }

@@ -16,7 +16,16 @@
           "inverter_max_kw": "Inverter maximális teljesítménye (kW, opcionális)",
           "production_entity": "PV termelés érzékelő (a tanult korrekcióhoz)",
           "trend_anchor_hour": "Mai trend referenciaórája (0-23, alapértelmezett 6)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "battery_capacity_kwh": "Hasznos akkumulátorkapacitás (kWh)",
+          "battery_soc_entity": "Akkumulátor töltöttségi szint érzékelő (%)",
+          "battery_max_charge_kw": "Max. akkumulátor töltési teljesítmény (kW, opcionális)",
+          "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
+          "battery_min_soc": "Akkumulátor tartalék — minimális töltöttségi szint (%, alapértelmezett 10)",
+          "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre."
         }
       },
       "line": {
@@ -28,6 +37,8 @@
           "kwp": "Csúcsteljesítmény (kWp)",
           "line_inverter_max_kw": "Max. inverter teljesítmény ehhez a sorhoz (kW, opcionális)",
           "tracker": "Napkövető",
+          "latitude": "Szélességi fok ehhez a sorhoz (opcionális)",
+          "longitude": "Hosszúsági fok ehhez a sorhoz (opcionális)",
           "add_another": "Add another panel line"
         }
       }
@@ -51,7 +62,16 @@
           "longitude": "Hosszúsági fok (opcionális)",
           "inverter_max_kw": "Inverter maximális teljesítménye (kW, opcionális)",
           "production_entity": "PV termelés érzékelő (a tanult korrekcióhoz)",
-          "trend_anchor_hour": "Mai trend referenciaórája (0-23, alapértelmezett 6)"
+          "trend_anchor_hour": "Mai trend referenciaórája (0-23, alapértelmezett 6)",
+          "battery_capacity_kwh": "Hasznos akkumulátorkapacitás (kWh)",
+          "battery_soc_entity": "Akkumulátor töltöttségi szint érzékelő (%)",
+          "battery_max_charge_kw": "Max. akkumulátor töltési teljesítmény (kW, opcionális)",
+          "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
+          "battery_min_soc": "Akkumulátor tartalék — minimális töltöttségi szint (%, alapértelmezett 10)",
+          "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)"
+        },
+        "data_description": {
+          "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre."
         }
       },
       "lines": {
@@ -63,6 +83,8 @@
           "kwp": "Csúcsteljesítmény (kWp)",
           "line_inverter_max_kw": "Max. inverter teljesítmény ehhez a sorhoz (kW, opcionális)",
           "tracker": "Napkövető",
+          "latitude": "Szélességi fok ehhez a sorhoz (opcionális)",
+          "longitude": "Hosszúsági fok ehhez a sorhoz (opcionális)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
         }
@@ -76,6 +98,28 @@
         "dual-axis": "Kéttengelyes (követi a napot)",
         "single-axis-h": "Egytengelyes vízszintes (dőlésszög követ)",
         "single-axis-v": "Egytengelyes függőleges (azimut követ)"
+      }
+    }
+  },
+  "services": {
+    "get_forecast": {
+      "name": "Előrejelzés lekérése",
+      "description": "Visszaadja a teljes termelési előrejelzést (a mai naptól kezdve, 15 percenként egy pont, mindegyik az előre jelzett wattokkal és a P10/P90 megbízhatósági sávval) válaszadatként, automatizálásokban való használatra.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Telepítés",
+          "description": "Melyik Helios Forecast telepítést olvassa be. Nem kötelező, ha csak egy van beállítva."
+        }
+      }
+    },
+    "get_battery_soc_forecast": {
+      "name": "Töltöttségi szint előrejelzés lekérése",
+      "description": "Visszaadja az akkumulátor előre jelzett töltöttségi szintjét a következő 48 órára (15 percenként egy pont) válaszadatként, automatizálásokban való használatra.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Telepítés",
+          "description": "Melyik Helios Forecast telepítést olvassa be. Nem kötelező, ha csak egy van beállítva."
+        }
       }
     }
   }

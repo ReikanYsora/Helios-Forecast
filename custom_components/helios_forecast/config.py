@@ -8,6 +8,7 @@ mapping is testable on its own.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 from .solar.irradiance import PanelOrientation
@@ -25,6 +26,17 @@ CONF_PRODUCTION_ENTITY = "production_entity"
 # Today-trend reference anchor (local hour at which the day's reference is frozen).
 CONF_TREND_ANCHOR_HOUR = "trend_anchor_hour"
 DEFAULT_TREND_ANCHOR_HOUR = 6
+# Battery state-of-charge projection (optional). The whole feature is off until both the capacity and the
+# live SoC entity are set; the rest carry sensible defaults. Consumption is not configured here: it is derived
+# from the Home Assistant Energy dashboard.
+CONF_BATTERY_CAPACITY_KWH = "battery_capacity_kwh"
+CONF_BATTERY_SOC_ENTITY = "battery_soc_entity"
+CONF_BATTERY_MAX_CHARGE_KW = "battery_max_charge_kw"
+CONF_BATTERY_MAX_DISCHARGE_KW = "battery_max_discharge_kw"
+CONF_BATTERY_MIN_SOC = "battery_min_soc"
+CONF_BATTERY_EFFICIENCY = "battery_efficiency"
+DEFAULT_BATTERY_MIN_SOC = 10.0
+DEFAULT_BATTERY_EFFICIENCY = 90.0
 # Per-array keys.
 CONF_TILT = "tilt"
 CONF_AZIMUTH = "azimuth"
@@ -41,8 +53,18 @@ _VALID_TRACKERS = {"dual-axis", "single-axis-h", "single-axis-v"}
 # Per-line geometry keys, split out of the flat form into one entry in the
 # ``arrays`` list. An entry may hold several lines (e.g. two strings on one
 # inverter): the model sums them by kWp share and the entry-level inverter cap
-# applies to their combined output.
-LINE_KEYS: Tuple[str, ...] = (CONF_TILT, CONF_AZIMUTH, CONF_KWP, CONF_TRACKER, CONF_LINE_INVERTER_MAX_KW)
+# applies to their combined output. Latitude/longitude here are an optional
+# per-line override of the entry-level location (e.g. two roofs far enough
+# apart to matter); unset, a line falls back to the entry's location.
+LINE_KEYS: Tuple[str, ...] = (
+    CONF_TILT,
+    CONF_AZIMUTH,
+    CONF_KWP,
+    CONF_TRACKER,
+    CONF_LINE_INVERTER_MAX_KW,
+    CONF_LATITUDE,
+    CONF_LONGITUDE,
+)
 # Entry-level settings, shared by every line in the entry.
 SETTINGS_KEYS: Tuple[str, ...] = (
     CONF_LATITUDE,
@@ -50,6 +72,12 @@ SETTINGS_KEYS: Tuple[str, ...] = (
     CONF_INVERTER_MAX_KW,
     CONF_PRODUCTION_ENTITY,
     CONF_TREND_ANCHOR_HOUR,
+    CONF_BATTERY_CAPACITY_KWH,
+    CONF_BATTERY_SOC_ENTITY,
+    CONF_BATTERY_MAX_CHARGE_KW,
+    CONF_BATTERY_MAX_DISCHARGE_KW,
+    CONF_BATTERY_MIN_SOC,
+    CONF_BATTERY_EFFICIENCY,
 )
 
 
@@ -81,6 +109,11 @@ def _as_float(value: Any) -> Optional[float]:
     return f
 
 
+def _kw_to_w_or_inf(value: Optional[float]) -> float:
+    """A kW cap in watts, or INF when unset/non-positive (uncapped)."""
+    return value * 1000.0 if (value is not None and value > 0) else INF
+
+
 def layout_from_config(data: Dict[str, Any]) -> PvLayout:
     """Resolve the configured arrays into orientations + kWp-normalised shares."""
     arrays = data.get(CONF_ARRAYS) or []
@@ -105,7 +138,7 @@ def layout_from_config(data: Dict[str, Any]) -> PvLayout:
         coords.append((lat, lon) if (lat is not None and lon is not None) else None)
 
         cap_kw = _as_float(arr.get(CONF_LINE_INVERTER_MAX_KW))
-        caps.append(cap_kw * 1000.0 if (cap_kw is not None and cap_kw > 0) else INF)
+        caps.append(_kw_to_w_or_inf(cap_kw))
 
     total_kwp = sum(kwps)
     if total_kwp > 0:
@@ -136,7 +169,7 @@ def location_from_config(
 def inverter_max_w_from_config(data: Dict[str, Any]) -> float:
     """Inverter clip in watts, INF when unset, matching the card's pvInverterMaxW."""
     kw = _as_float(data.get(CONF_INVERTER_MAX_KW))
-    return kw * 1000.0 if (kw is not None and kw > 0) else INF
+    return _kw_to_w_or_inf(kw)
 
 
 def learning_from_config(data: Dict[str, Any]) -> Optional[str]:
@@ -155,3 +188,47 @@ def trend_anchor_hour_from_config(data: Dict[str, Any]) -> int:
     if h is None:
         return DEFAULT_TREND_ANCHOR_HOUR
     return int(max(0, min(23, h)))
+
+
+@dataclass(frozen=True)
+class BatteryConfig:
+    """Resolved battery inputs for the SoC projection. Powers are in watts (INF when uncapped), the SoC
+    bounds are fractions 0..1, and efficiency is the round-trip fraction applied on the charging side."""
+
+    capacity_kwh: float
+    soc_entity: str
+    max_charge_w: float
+    max_discharge_w: float
+    min_soc_frac: float
+    efficiency: float
+
+
+def battery_from_config(data: Dict[str, Any]) -> Optional[BatteryConfig]:
+    """Resolve the battery config, or None when the feature is off.
+
+    The projection needs a usable capacity and a live SoC entity to start from; without either the whole
+    feature stays off. The remaining fields fall back to sensible defaults (10% reserve, 90% round-trip).
+    """
+    capacity = _as_float(data.get(CONF_BATTERY_CAPACITY_KWH))
+    soc_entity = data.get(CONF_BATTERY_SOC_ENTITY) or None
+    if capacity is None or capacity <= 0 or not soc_entity:
+        return None
+
+    max_charge_kw = _as_float(data.get(CONF_BATTERY_MAX_CHARGE_KW))
+    max_discharge_kw = _as_float(data.get(CONF_BATTERY_MAX_DISCHARGE_KW))
+    min_soc = _as_float(data.get(CONF_BATTERY_MIN_SOC))
+    efficiency = _as_float(data.get(CONF_BATTERY_EFFICIENCY))
+
+    if min_soc is None:
+        min_soc = DEFAULT_BATTERY_MIN_SOC
+    if efficiency is None:
+        efficiency = DEFAULT_BATTERY_EFFICIENCY
+
+    return BatteryConfig(
+        capacity_kwh=capacity,
+        soc_entity=soc_entity,
+        max_charge_w=_kw_to_w_or_inf(max_charge_kw),
+        max_discharge_w=_kw_to_w_or_inf(max_discharge_kw),
+        min_soc_frac=max(0.0, min(1.0, min_soc / 100.0)),
+        efficiency=max(0.1, min(1.0, efficiency / 100.0)),
+    )
