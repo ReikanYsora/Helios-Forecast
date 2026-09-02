@@ -66,8 +66,16 @@ def _value_at(points: List[ForecastPoint], t: datetime) -> Optional[float]:
 
 
 def _band_at(points: List[ForecastPoint], t: datetime, attr: str) -> Optional[float]:
-    """Interpolated P10/P90 band value at ``t``, or None when either bracketing
-    bucket has no band (analog support too thin there)."""
+    """P10/P90 band value at ``t``, interpolated when both bracketing buckets
+    have one, or taken from whichever side does when only one does.
+
+    The lower bracket is, by construction, always at or before ``t`` - for a
+    lookup at "now" that's always a past point, and past points never carry a
+    band (`enrich_points` only attaches one to the future). So at "now" this
+    almost always falls back to the upper (future) bracket rather than
+    interpolating; that's the intended behaviour, not a compromise, since the
+    band's whole purpose is future uncertainty. None only means the analog
+    ensemble genuinely has no support this close to ``t`` on either side."""
     if not points or t < points[0].t or t > points[-1].t:
         return None
     lo = 0
@@ -80,8 +88,12 @@ def _band_at(points: List[ForecastPoint], t: datetime, attr: str) -> Optional[fl
             hi = mid
     v0 = getattr(points[lo], attr)
     v1 = getattr(points[hi], attr)
-    if v0 is None or v1 is None:
+    if v0 is None and v1 is None:
         return None
+    if v0 is None:
+        return v1
+    if v1 is None:
+        return v0
     t0, t1 = points[lo].t, points[hi].t
     if t1 <= t0:
         return v0

@@ -5,6 +5,23 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.9.1
+
+A corrective release on top of 2026.9.0.
+
+### Fixed: `power_now_low` / `power_now_high` stayed unknown forever
+
+These two sensors interpolate the analog P10/P90 band around the current instant, but
+the bucket immediately before "now" never carries a band (past points are left as the
+plain physical-model output, by design), so the interpolation always had a missing
+side and gave up. Every install hit this from the first refresh, though it only became
+visible once the analog library had enough history for the band to actually exist on
+the future side. Both sensors now fall back to whichever side of "now" does have a
+band. Thanks to @Manama2011 for the detailed report and root-cause diagnosis (#51,
+filed as Helios#421).
+
+---
+
 ## 2026.9.0
 
 A release about putting the forecast to work: the full curve now reaches your

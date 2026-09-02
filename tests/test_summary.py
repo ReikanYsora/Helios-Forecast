@@ -97,11 +97,30 @@ def test_power_now_band_interpolates_when_both_buckets_have_one() -> None:
     assert abs(s.power_now_high_w - 850.0) < 1e-9
 
 
-def test_power_now_band_none_when_either_bracketing_bucket_lacks_one() -> None:
+def test_power_now_band_falls_back_to_the_future_side_when_the_past_side_lacks_one() -> None:
+    """The realistic shape at "now": the lower bracket is always at or before
+    ``now``, and past points never carry a band (enrich_points only attaches
+    one to the future). #421/#51: this used to return None here, permanently,
+    on any install with a solid enough analog library for the future side to
+    actually have a band - which is exactly when it should stop being None."""
     base = datetime(2026, 6, 21, tzinfo=_UTC)
     pts = [
         ForecastPoint(t=base + timedelta(hours=10), pv_w=700.0, pv_raw_w=700.0, pv_p10=None, pv_p90=None),
         ForecastPoint(t=base + timedelta(hours=11), pv_w=800.0, pv_raw_w=800.0, pv_p10=650.0, pv_p90=900.0),
+    ]
+    now = base + timedelta(hours=10, minutes=30)
+    s = summarize(pts, now=now, tz=_UTC, step_minutes=60)
+    assert s.power_now_low_w == 650.0
+    assert s.power_now_high_w == 900.0
+
+
+def test_power_now_band_none_when_neither_bucket_has_one() -> None:
+    """Genuinely no analog support yet on either side: still None, not a
+    fallback to some unrelated value."""
+    base = datetime(2026, 6, 21, tzinfo=_UTC)
+    pts = [
+        ForecastPoint(t=base + timedelta(hours=10), pv_w=700.0, pv_raw_w=700.0, pv_p10=None, pv_p90=None),
+        ForecastPoint(t=base + timedelta(hours=11), pv_w=800.0, pv_raw_w=800.0, pv_p10=None, pv_p90=None),
     ]
     now = base + timedelta(hours=10, minutes=30)
     s = summarize(pts, now=now, tz=_UTC, step_minutes=60)
