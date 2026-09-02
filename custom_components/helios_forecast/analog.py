@@ -224,7 +224,9 @@ def enrich_points(
 
     Past points (t < now) are left as the physical model output. The future P50
     blends analog and physical by confidence; the band is surfaced only once the
-    analog support is solid (BAND_MIN_CONFIDENCE)."""
+    analog support is solid (BAND_MIN_CONFIDENCE). Points with the sun below the
+    horizon carry a zero band: nothing is produced then, so the uncertainty is
+    zero rather than undefined."""
     if not library:
         return points
     out: List[ForecastPoint] = []
@@ -235,7 +237,11 @@ def enrich_points(
             continue
         sun = sun_position(p.t, lat, lon)
         if sun.altitude <= 0:
-            out.append(p)
+            # Below the horizon the output is not uncertain, it is known: 0 W, and so are its
+            # 10th and 90th percentiles. Surfacing that as a zero band, rather than leaving it
+            # unset, keeps power_now_low / power_now_high continuous instead of reading unknown
+            # from dusk to dawn and punching a nightly hole into their statistics.
+            out.append(replace(p, pv_p10=0.0, pv_p90=0.0))
             continue
         ms = p.t.timestamp() * 1000.0
         cloud = _sample_series(weather.times, weather.cloud, ms, w_epochs)

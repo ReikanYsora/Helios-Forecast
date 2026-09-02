@@ -35,6 +35,16 @@ own first appearance at startup: the projection stayed `unknown` for a full 30-m
 cycle before recovering on its own. The listener now arms before that first refresh
 runs. Thanks to @Manama2011 for the detailed report and root-cause diagnosis (#53).
 
+### Improved: `power_now_low` / `power_now_high` report 0 W at night instead of unknown
+
+Night points carried no P10/P90 band at all (nothing to draw an analog ensemble from
+with the sun below the horizon), so both sensors went `unknown` from dusk to dawn every
+day, punching a nightly hole into their history and long-term statistics. The output
+there isn't uncertain though, it's known exactly: 0 W, and so are its 10th and 90th
+percentiles. Night points now carry that zero band, keeping both sensors continuous
+across the night. Thanks to @Manama2011 for the report, root-cause diagnosis and patch
+(#54).
+
 ---
 
 ## 2026.9.0

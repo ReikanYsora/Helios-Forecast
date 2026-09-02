@@ -208,6 +208,30 @@ def test_enrich_points_past_untouched_future_blended() -> None:
     assert out[1].pv_p10 <= out[1].pv_w <= out[1].pv_p90 + 1e-6
 
 
+def test_enrich_points_future_night_gets_zero_band() -> None:
+    """Below the horizon the output isn't uncertain, it's known: 0 W either side, not unknown."""
+    lat, lon = 45.0, 0.0
+    now = _june_noon(12)
+    night = ForecastPoint(t=_june_noon(1) + timedelta(days=1), pv_w=0.0, pv_raw_w=0.0)
+
+    lib = [AnalogSample(alt=10.0, az=180.0, cloud=30.0, watt=1000.0, temp=20.0)]
+    times = [_june_noon(h) for h in range(24)]
+    weather = WeatherSeries(
+        times=times,
+        cloud=[30.0] * 24,
+        shortwave=[0.0] * 24,
+        direct=[0.0] * 24,
+        diffuse=[0.0] * 24,
+        temp=[20.0] * 24,
+        wind=[5.0] * 24,
+        snow=[0.0] * 24,
+    )
+    out = enrich_points([night], lib, weather, lat, lon, now)
+    assert out[0].pv_p10 == 0.0
+    assert out[0].pv_p90 == 0.0
+    assert out[0].pv_w == night.pv_w  # only the band is set, the physical model's power is untouched
+
+
 def _flat_weather() -> WeatherSeries:
     times = [_june_noon(h) for h in range(24)]
     return WeatherSeries(
