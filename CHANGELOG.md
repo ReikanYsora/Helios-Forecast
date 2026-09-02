@@ -27,6 +27,14 @@ no battery is configured..." as a WARNING on every restart, even though there is
 nothing to act on: the projection simply doesn't apply without a battery. It now
 logs at INFO instead. Thanks to @huma-meng for pointing it out (#50).
 
+### Fixed: battery SoC projection off for a full cycle after every restart
+
+The listener that re-projects the SoC the moment its source entity comes back was
+registered after the coordinator's first refresh, so it always missed the entity's
+own first appearance at startup: the projection stayed `unknown` for a full 30-minute
+cycle before recovering on its own. The listener now arms before that first refresh
+runs. Thanks to @Manama2011 for the detailed report and root-cause diagnosis (#53).
+
 ---
 
 ## 2026.9.0
