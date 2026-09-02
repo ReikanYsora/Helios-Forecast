@@ -292,7 +292,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         if battery is None:
             return self._battery_off(
                 "no battery is configured in the integration options (set the battery capacity and the "
-                "live SoC entity to enable it)"
+                "live SoC entity to enable it)",
+                not_applicable=True,
             )
 
         soc_state = self.hass.states.get(battery.soc_entity)
@@ -330,18 +331,23 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             )
         )
 
-    def _battery_off(self, reason: str, *, transient: bool = False) -> List[BatterySocPoint]:
+    def _battery_off(self, reason: str, *, transient: bool = False, not_applicable: bool = False) -> List[BatterySocPoint]:
         """Return an empty SoC projection, logging why the first time a given reason occurs.
 
         The projection is deliberately skipped when an input is missing rather than guessed; without
         this the sensor just read ``unknown`` with no hint, which made it impossible to tell a
         misconfiguration from a transient gap. Logged once per distinct reason (re-armed when the
-        projection recovers) so a steady-state 'off' does not spam the log every refresh. A
-        ``transient`` reason (the SoC entity briefly unavailable at startup, which the state listener
-        recovers from within seconds) logs at INFO; an actionable misconfiguration logs at WARNING."""
+        projection recovers) so a steady-state 'off' does not spam the log every refresh. Three
+        levels: a ``transient`` reason (the SoC entity briefly unavailable at startup, which the state
+        listener recovers from within seconds) logs at INFO with "will retry"; ``not_applicable`` (no
+        battery configured at all, a perfectly normal PV-only setup with nothing to act on) logs at
+        INFO too, but without implying anything will change on its own; anything else is an actionable
+        misconfiguration and logs at WARNING."""
         if self._battery_off_logged != reason:
             if transient:
                 _LOGGER.info("Helios battery SoC projection is off (transient, will retry): %s", reason)
+            elif not_applicable:
+                _LOGGER.info("Helios battery SoC projection is off: %s", reason)
             else:
                 _LOGGER.warning("Helios battery SoC projection is off: %s", reason)
             self._battery_off_logged = reason

@@ -107,18 +107,22 @@ async def test_fetch_exception_becomes_update_failed(hass, monkeypatch) -> None:
 # --- battery SoC projection: the "off" reasons ------------------------------------------------
 
 
-async def test_battery_off_missing_config_logs_once(hass, caplog) -> None:
+async def test_battery_off_missing_config_logs_once_at_info(hass, caplog) -> None:
+    """#50: no battery configured is a normal PV-only setup, not a misconfiguration -
+    it belongs at INFO, not WARNING, and every restart otherwise nags for nothing."""
     entry = _entry(hass)
     coordinator = HeliosForecastCoordinator(hass, entry)
     now = dt_util.now()
 
-    with caplog.at_level(logging.WARNING, logger=coordinator_mod._LOGGER.name):
+    with caplog.at_level(logging.INFO, logger=coordinator_mod._LOGGER.name):
         result1 = await coordinator._project_battery_soc({}, [], now)
         result2 = await coordinator._project_battery_soc({}, [], now)
 
     assert result1 == [] and result2 == []
     matching = [r for r in caplog.records if "battery SoC projection is off" in r.message]
     assert len(matching) == 1, "the second identical reason must not re-log"
+    assert matching[0].levelno == logging.INFO
+    assert "transient" not in matching[0].message, "not a retry - there is simply no battery to project"
 
 
 async def test_battery_off_soc_entity_missing_state(hass) -> None:

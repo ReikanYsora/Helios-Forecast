@@ -20,6 +20,13 @@ the future side. Both sensors now fall back to whichever side of "now" does have
 band. Thanks to @Manama2011 for the detailed report and root-cause diagnosis (#51,
 filed as Helios#421).
 
+### Fixed: "no battery configured" logged as a WARNING on every restart
+
+A PV-only install with no battery would log "Helios battery SoC projection is off:
+no battery is configured..." as a WARNING on every restart, even though there is
+nothing to act on: the projection simply doesn't apply without a battery. It now
+logs at INFO instead. Thanks to @huma-meng for pointing it out (#50).
+
 ---
 
 ## 2026.9.0
