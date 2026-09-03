@@ -55,6 +55,18 @@ bucket. An empty window now reports 0.0 kWh whenever it still falls inside the f
 horizon, and only stays `unknown` for a genuine gap outside it. Thanks to @Manama2011 for
 the report, root-cause diagnosis and patch (#55).
 
+### Fixed: the past-forecast archive could hug the panels' nameplate ceiling on a clear day
+
+The hourly archive that backs HA's long-term statistics and the card's past-forecast curve
+was residual-corrected, but never analog-enriched: unlike the live forecast's future points,
+it never got the ceiling that reins the physical model back down to what the site has
+actually produced under similar sun and cloud conditions. A well-learned install (weeks of
+history, properly sized inverter) could still see its archived curve flatten at the array's
+DC nameplate for hours around midday, right where the live forecast next to it, which does
+get the clamp, looked accurate. The archive now goes through the same analog enrichment as
+the live forecast. Thanks to @ruteclrp for the report and for ruling out the simpler
+explanations (#52).
+
 ---
 
 ## 2026.9.0

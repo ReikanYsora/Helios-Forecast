@@ -39,7 +39,7 @@ from .config import (
     location_from_config,
     trend_anchor_hour_from_config,
 )
-from .analog import build_library, enrich_points
+from .analog import build_library, enrich_archive_points, enrich_points
 from .battery import BatterySocPoint, project_battery_soc
 from .consumption import ConsumptionProfile, build_consumption_profile, consumption_sources
 from .trend import TodayTrend, TrendReference, compute_trend, should_capture
@@ -255,7 +255,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         archive_hour = now_utc.replace(minute=0, second=0, microsecond=0)
         if self._last_archive_hour != archive_hour:
             self.archive_points = await self.hass.async_add_executor_job(
-                self._compute_archive_points, now_utc, weather, layout, lat, lon, cap, residual_map
+                self._compute_archive_points, now_utc, weather, layout, lat, lon, cap, residual_map, analog_library
             )
             self._forecast_stat_rows = await self.hass.async_add_executor_job(forecast_statistics, self.archive_points)
             self.write_forecast_statistics()
@@ -486,16 +486,21 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         if wrote_any:
             self._last_weather_stat_hour = cutoff
 
-    def _compute_archive_points(self, now, weather, layout, lat, lon, cap, residual_map):
+    def _compute_archive_points(self, now, weather, layout, lat, lon, cap, residual_map, analog_library):
         """Hourly predicted points over the past window [now - LEARN_DAYS, current hour).
 
         Runs the same model used for the live forecast across the past at an hourly step (the cadence
-        HA statistics keep), residual-corrected. Feeds both the statistics backfill and the detail
-        websocket's past curve.
+        HA statistics keep), residual-corrected, then analog-enriched exactly like the live forecast's
+        future points: without that second pass, this archive only ever got the residual's sky-position
+        bias correction, never the analog ceiling that reins the physical model back down to what the
+        site has actually produced under similar conditions - so a well-learned install could still see
+        its archived curve hug the panels' nameplate ceiling on a clear day while the live forecast right
+        next to it, which does get the clamp, looked accurate. Feeds both the statistics backfill and the
+        detail websocket's past curve.
         """
         cutoff = now.replace(minute=0, second=0, microsecond=0)
         arch_start = cutoff - timedelta(days=LEARN_DAYS)
-        return build_forecast_series(
+        points = build_forecast_series(
             weather,
             layout,
             lat,
@@ -506,6 +511,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             step_minutes=60,
             residual_map=residual_map,
         )
+        return enrich_archive_points(points, analog_library, weather, lat, lon)
 
     @callback
     def write_forecast_statistics(self) -> None:

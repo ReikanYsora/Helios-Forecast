@@ -215,8 +215,11 @@ the card's "Graph detail" setting; the integration resamples server-side).
 ```
 
 - Not future only: `points` also carries an **hourly past archive** (back to
-  `now - LEARN_DAYS`), the same model re-run against the real historical weather
-  and residual-corrected against recorded production. `start`/`end` bound the
+  `now - LEARN_DAYS`), the same model re-run against the real historical weather,
+  residual-corrected against recorded production, and analog-enriched exactly
+  like the live forecast's future points (the ceiling that reins the physical
+  model back down to what the site has actually produced under similar
+  conditions applies here too, not just going forward). `start`/`end` bound the
   full range, past and future, in one call. **Past actuals are unchanged
   regardless**: the card's own production curve keeps reading them straight
   from the recorder `change` series, this archive only backs the *predicted*

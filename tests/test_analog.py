@@ -20,6 +20,7 @@ from custom_components.helios_forecast.analog import (  # noqa: E402
     _sample_series,
     _weighted_percentiles,
     build_library,
+    enrich_archive_points,
     enrich_points,
     predict,
     series_epochs,
@@ -258,6 +259,34 @@ def test_ceiling_caps_overprediction() -> None:
     out = enrich_points([fut], lib, _flat_weather(), lat, lon, now)
     assert out[0].pv_w <= 4500.0 * 1.25 + 1e-6  # capped at p90 * margin, well below the physical 6500
     assert out[0].pv_w < 6500.0
+
+
+def test_enrich_archive_points_caps_a_past_point_enrich_points_would_leave_untouched() -> None:
+    # Same over-prediction as test_ceiling_caps_overprediction, but on a point that is already in
+    # the past relative to any "now" - enrich_points() would leave it as the raw physical model by
+    # design (see test_enrich_points_past_untouched_future_blended). The archive has no future side
+    # to gate on, so every one of its points needs this same ceiling clamp, not just future ones (#52).
+    lat, lon = 45.0, 0.0
+    past = ForecastPoint(t=_june_noon(13), pv_w=6500.0, pv_raw_w=6500.0)  # physical over-predicts
+    sun = sun_position(past.t, lat, lon)
+    lib = [AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=30.0, watt=4500.0, temp=20.0) for _ in range(10)]
+
+    # enrich_points, called with "now" after the point, leaves it exactly as the raw model (the
+    # bug: this is what the archive pipeline used to do for every single one of its points).
+    untouched = enrich_points([past], lib, _flat_weather(), lat, lon, now=_june_noon(23))
+    assert untouched[0].pv_w == 6500.0
+
+    # enrich_archive_points has no "now" to gate on and clamps it like enrich_points does for a
+    # future point.
+    out = enrich_archive_points([past], lib, _flat_weather(), lat, lon)
+    assert out[0].pv_w <= 4500.0 * 1.25 + 1e-6
+    assert out[0].pv_w < 6500.0
+
+
+def test_enrich_archive_points_empty_library_is_a_noop() -> None:
+    past = ForecastPoint(t=_june_noon(13), pv_w=1000.0, pv_raw_w=1000.0)
+    out = enrich_archive_points([past], [], _flat_weather(), 45.0, 0.0)
+    assert out == [past]
 
 
 def test_ceiling_skipped_when_analogs_thin() -> None:

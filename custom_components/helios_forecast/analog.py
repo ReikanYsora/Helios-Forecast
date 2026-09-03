@@ -212,6 +212,41 @@ def predict(
     return AnalogBand(p10=p10, p50=p50, p90=p90, confidence=confidence, ceiling=ceiling)
 
 
+def _enrich_one(
+    p: ForecastPoint,
+    library: List[AnalogSample],
+    weather: WeatherSeries,
+    w_epochs: Optional[List[float]],
+    lat: float,
+    lon: float,
+) -> ForecastPoint:
+    """Blend the analog median into one point and attach its P10/P90 band, regardless of where
+    it sits relative to "now" - the caller decides which points this applies to."""
+    sun = sun_position(p.t, lat, lon)
+    if sun.altitude <= 0:
+        # Below the horizon the output is not uncertain, it is known: 0 W, and so are its
+        # 10th and 90th percentiles. Surfacing that as a zero band, rather than leaving it
+        # unset, keeps power_now_low / power_now_high continuous instead of reading unknown
+        # from dusk to dawn and punching a nightly hole into their statistics.
+        return replace(p, pv_p10=0.0, pv_p90=0.0)
+    ms = p.t.timestamp() * 1000.0
+    cloud = _sample_series(weather.times, weather.cloud, ms, w_epochs)
+    temp = _sample_series(weather.times, weather.temp, ms, w_epochs)
+    band = predict(library, sun.altitude, sun.azimuth, cloud if cloud is not None else 50.0, temp)
+    if band is None:
+        return p
+    c = band.confidence
+    blended = c * band.p50 + (1.0 - c) * p.pv_w
+    # Never predict above what the site has actually produced under similar sun+cloud (with a
+    # margin). At low confidence the blend leans on the physical model, which is blind to
+    # near-field shadows; the learned ceiling reins that back in.
+    if band.ceiling is not None:
+        blended = min(blended, band.ceiling)
+    if c >= BAND_MIN_CONFIDENCE:
+        return replace(p, pv_w=blended, pv_p10=band.p10, pv_p90=band.p90)
+    return replace(p, pv_w=blended)
+
+
 def enrich_points(
     points: List[ForecastPoint],
     library: List[AnalogSample],
@@ -222,43 +257,39 @@ def enrich_points(
 ) -> List[ForecastPoint]:
     """Blend the analog median into the future points and attach the P10/P90 band.
 
-    Past points (t < now) are left as the physical model output. The future P50
-    blends analog and physical by confidence; the band is surfaced only once the
-    analog support is solid (BAND_MIN_CONFIDENCE). Points with the sun below the
-    horizon carry a zero band: nothing is produced then, so the uncertainty is
-    zero rather than undefined."""
+    Past points (t < now) are left as the physical model output: this is the live series, where
+    a past point already stood as "what the forecast said" at the time and isn't reworked after
+    the fact. The future P50 blends analog and physical by confidence; the band is surfaced only
+    once the analog support is solid (BAND_MIN_CONFIDENCE)."""
     if not library:
         return points
-    out: List[ForecastPoint] = []
     w_epochs = series_epochs(weather.times) if weather.times else None
+    out: List[ForecastPoint] = []
     for p in points:
         if p.t < now:
             out.append(p)
             continue
-        sun = sun_position(p.t, lat, lon)
-        if sun.altitude <= 0:
-            # Below the horizon the output is not uncertain, it is known: 0 W, and so are its
-            # 10th and 90th percentiles. Surfacing that as a zero band, rather than leaving it
-            # unset, keeps power_now_low / power_now_high continuous instead of reading unknown
-            # from dusk to dawn and punching a nightly hole into their statistics.
-            out.append(replace(p, pv_p10=0.0, pv_p90=0.0))
-            continue
-        ms = p.t.timestamp() * 1000.0
-        cloud = _sample_series(weather.times, weather.cloud, ms, w_epochs)
-        temp = _sample_series(weather.times, weather.temp, ms, w_epochs)
-        band = predict(library, sun.altitude, sun.azimuth, cloud if cloud is not None else 50.0, temp)
-        if band is None:
-            out.append(p)
-            continue
-        c = band.confidence
-        blended = c * band.p50 + (1.0 - c) * p.pv_w
-        # Never predict above what the site has actually produced under similar sun+cloud (with a
-        # margin). At low confidence the blend leans on the physical model, which is blind to
-        # near-field shadows; the learned ceiling reins that back in.
-        if band.ceiling is not None:
-            blended = min(blended, band.ceiling)
-        if c >= BAND_MIN_CONFIDENCE:
-            out.append(replace(p, pv_w=blended, pv_p10=band.p10, pv_p90=band.p90))
-        else:
-            out.append(replace(p, pv_w=blended))
+        out.append(_enrich_one(p, library, weather, w_epochs, lat, lon))
     return out
+
+
+def enrich_archive_points(
+    points: List[ForecastPoint],
+    library: List[AnalogSample],
+    weather: WeatherSeries,
+    lat: float,
+    lon: float,
+) -> List[ForecastPoint]:
+    """Same blend and ceiling clamp as `enrich_points`, applied to every point unconditionally.
+
+    The archive (HA's long-term statistics, the card's past-forecast curve) has no "future" side
+    to gate on: every point in it is already in the past by construction. Without this, archived
+    points only ever got the residual's sky-position bias correction, never the analog ceiling
+    that reins the physical model back down to what the site has actually produced under similar
+    conditions - so a well-learned install could still see its archived curve hug the panels'
+    nameplate ceiling on a clear day while the live forecast, which does get the clamp, looked
+    accurate right next to it."""
+    if not library:
+        return points
+    w_epochs = series_epochs(weather.times) if weather.times else None
+    return [_enrich_one(p, library, weather, w_epochs, lat, lon) for p in points]
