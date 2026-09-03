@@ -102,14 +102,28 @@ def _band_at(points: List[ForecastPoint], t: datetime, attr: str) -> Optional[fl
 
 
 def _energy_kwh(points: List[ForecastPoint], start: datetime, end: datetime, step_h: float) -> Optional[float]:
-    """kWh over [start, end) summing each bucket's pv_w x step hours."""
+    """kWh over [start, end) summing each bucket's pv_w x step hours.
+
+    An empty window is only a knowledge gap when it falls outside the forecast
+    horizon. Inside the horizon the sum is a genuine 0.0: the series simply has
+    no bucket left there. This matters for ``energy_today_remaining`` every
+    night -- after the day's last point (23:45 local at a 15 min step) the
+    window [now, local midnight) holds no bucket at all, so returning None
+    published ``unknown`` until the next coordinator refresh, when the honest
+    answer is "0 kWh left today".
+    """
     total = 0.0
     any_bucket = False
     for p in points:
         if start <= p.t < end and math.isfinite(p.pv_w):
             total += p.pv_w * step_h / 1000.0
             any_bucket = True
-    return total if any_bucket else None
+    if any_bucket:
+        return total
+    covered = [p.t for p in points if math.isfinite(p.pv_w)]
+    if covered and min(covered) <= start and end <= max(covered) + timedelta(hours=step_h):
+        return 0.0
+    return None
 
 
 def summarize(

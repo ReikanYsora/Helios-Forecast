@@ -73,6 +73,17 @@ def test_hourly_buckets_and_wh_hours() -> None:
     assert abs(s.energy_today_remaining_kwh - remaining) < 1e-9
 
 
+def test_energy_today_remaining_is_zero_not_none_after_the_last_bucket_of_the_day() -> None:
+    # 15-minute step, points covering all of today; `now` sits 5 minutes after the day's
+    # last bucket (23:45) starts, so [now, midnight) holds zero buckets. That's a genuine
+    # 0 kWh left, not a gap: the horizon still covers all the way to midnight.
+    base = datetime(2026, 6, 21, tzinfo=_UTC)
+    pts = [ForecastPoint(t=base + timedelta(minutes=15 * i), pv_w=50.0, pv_raw_w=50.0) for i in range(96)]
+    now = base + timedelta(hours=23, minutes=50)
+    s = summarize(pts, now=now, tz=_UTC, step_minutes=15)
+    assert s.energy_today_remaining_kwh == 0.0
+
+
 def test_empty_points() -> None:
     now = datetime(2026, 6, 21, 10, tzinfo=_UTC)
     s = summarize([], now=now, tz=_UTC, step_minutes=60)

@@ -45,6 +45,16 @@ percentiles. Night points now carry that zero band, keeping both sensors continu
 across the night. Thanks to @Manama2011 for the report, root-cause diagnosis and patch
 (#54).
 
+### Fixed: `energy_today_remaining` went `unknown` for the last 15-30 minutes of every day
+
+Once the day's last forecast bucket had passed (23:45 local, at the default 15-minute
+step), the `[now, midnight)` window used to compute the sensor held no bucket at all, so
+it published `unknown` instead of the honest answer: 0 kWh left today. `energy_this_hour`
+/ `energy_next_hour` never showed this since their hour-aligned windows still contain a
+bucket. An empty window now reports 0.0 kWh whenever it still falls inside the forecast
+horizon, and only stays `unknown` for a genuine gap outside it. Thanks to @Manama2011 for
+the report, root-cause diagnosis and patch (#55).
+
 ---
 
 ## 2026.9.0
