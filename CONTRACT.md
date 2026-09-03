@@ -115,8 +115,8 @@ Power, now / next hour:
 | Entity | State | Notes |
 |---|---|---|
 | `sensor.helios_forecast_power_now` | predicted PV power now, **W** | `device_class: power`, `state_class: measurement` |
-| `sensor.helios_forecast_power_now_low` | analog P10 (low-bound) power now, **W** | disabled by default; `null` until the analog support is solid enough to publish a band |
-| `sensor.helios_forecast_power_now_high` | analog P90 (high-bound) power now, **W** | disabled by default; `null` until the analog support is solid enough to publish a band |
+| `sensor.helios_forecast_power_now_low` | analog P10 (low-bound) power now, **W** | disabled by default; **0** with the sun below the horizon (known, not uncertain), `null` in daylight until the analog support is solid enough to publish a band |
+| `sensor.helios_forecast_power_now_high` | analog P90 (high-bound) power now, **W** | disabled by default; **0** with the sun below the horizon (known, not uncertain), `null` in daylight until the analog support is solid enough to publish a band |
 | `sensor.helios_forecast_power_next_hour` | predicted average power over the next hour, **W** | |
 
 Peak, per day over the 7-day horizon:
@@ -131,7 +131,7 @@ Energy, daily totals over the 7-day horizon:
 | Entity | State | Notes |
 |---|---|---|
 | `sensor.helios_forecast_energy_day_1` … `_day_7` | predicted daily total, **kWh** | `device_class: energy` (no `state_class`: a forecast, not a metered total), one per day |
-| `sensor.helios_forecast_energy_today_remaining` | predicted production left today, **kWh** | the one exception to day numbering, "remaining" only applies to today; drives "run the dishwasher if enough sun left" automations |
+| `sensor.helios_forecast_energy_today_remaining` | predicted production left today, **kWh** | the one exception to day numbering, "remaining" only applies to today; drives "run the dishwasher if enough sun left" automations; **0** once the day's forecast is exhausted (from ~23:45 local at the default step), not `unknown` |
 
 Energy, intraday:
 
