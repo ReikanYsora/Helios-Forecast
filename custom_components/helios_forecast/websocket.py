@@ -104,13 +104,17 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
             connection.send_error(msg["id"], "invalid_format", f"'{label}' must include a UTC offset")
             return
 
-    # Full curve = the hourly past archive (before the live series starts) followed by the live
-    # sub-hourly points (today onward). The live points are higher resolution, so the past archive is
-    # only used for the hours the live series does not cover.
+    # Full curve = the hourly past archive followed by the live sub-hourly points. Split on the
+    # archive's own last point, not on the live series' start (today's midnight): the live series
+    # covers the whole day from midnight, but enrich_points() deliberately leaves its already-elapsed
+    # points unclamped (a past point there means "what the forecast said at the time"), so today's own
+    # elapsed hours need the archive's analog-clamped values too, exactly like yesterday's do - only
+    # the still-uncovered stretch between the archive's cutoff and now falls back to the live points.
     live = coordinator.data.points
-    live_start = live[0].t if live else None
-    series = [p for p in coordinator.archive_points if live_start is None or p.t < live_start]
-    series.extend(live)
+    archive = coordinator.archive_points
+    archive_end = archive[-1].t if archive else None
+    series = list(archive)
+    series.extend(p for p in live if archive_end is None or p.t > archive_end)
 
     in_range = []
     for p in series:

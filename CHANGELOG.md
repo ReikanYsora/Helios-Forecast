@@ -67,6 +67,18 @@ get the clamp, looked accurate. The archive now goes through the same analog enr
 the live forecast. Thanks to @ruteclrp for the report and for ruling out the simpler
 explanations (#52).
 
+### Fixed: today's own elapsed hours still weren't corrected on the card's past curve
+
+The previous fix corrected the archive itself, but the card reads its past-forecast curve
+through a separate websocket command that was splitting archive vs. live at today's
+midnight, not at the archive's own last point. Today's already-elapsed hours came from the
+live series instead, which deliberately leaves past points unclamped (a past point there
+means "what the forecast said at the time"), so they kept the same nameplate-hugging
+behaviour the first half of this fix was meant to remove. The split now happens at the
+archive's own last point regardless of the calendar day, so today's elapsed hours get the
+same analog-clamped values yesterday's already did. Thanks to @ruteclrp again for confirming
+the first fix only got halfway there (#52).
+
 ---
 
 ## 2026.9.0

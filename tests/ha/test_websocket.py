@@ -86,23 +86,42 @@ async def test_ws_series_filters_by_start_and_end(hass, hass_ws_client) -> None:
     assert [p["pv_w"] for p in response["result"]["points"]] == [1.0, 2.0]
 
 
-async def test_ws_series_uses_archive_only_before_live_start(hass, hass_ws_client) -> None:
-    live_start = datetime(2026, 6, 21, 0, tzinfo=_UTC)
+async def test_ws_series_uses_archive_up_to_its_own_last_point_then_live(hass, hass_ws_client) -> None:
+    # Archive reaches well past midnight into today (14:00) - its own last point, not the
+    # live series' start, is the switch-over instant. This matters because enrich_points()
+    # deliberately leaves the live series' already-elapsed points unclamped (#52): if the
+    # split still happened at midnight, today's own elapsed hours would come from those
+    # raw live points instead of the archive's analog-clamped ones.
+    midnight = datetime(2026, 6, 21, 0, tzinfo=_UTC)
+    archive_end = midnight + timedelta(hours=14)
     archive = [
-        ForecastPoint(t=live_start - timedelta(hours=2), pv_w=1.0, pv_raw_w=1.0),
-        ForecastPoint(t=live_start - timedelta(hours=1), pv_w=2.0, pv_raw_w=2.0),
-        # An archive point landing on/after live_start must be dropped: the live series
-        # already covers that instant at higher resolution.
-        ForecastPoint(t=live_start, pv_w=999.0, pv_raw_w=999.0),
+        ForecastPoint(t=midnight - timedelta(hours=1), pv_w=1.0, pv_raw_w=1.0),
+        ForecastPoint(t=midnight, pv_w=2.0, pv_raw_w=2.0),
+        ForecastPoint(t=archive_end, pv_w=50.0, pv_raw_w=50.0),  # today, 14:00 - the corrected value
     ]
-    live = [ForecastPoint(t=live_start, pv_w=3.0, pv_raw_w=3.0)]
+    live = [
+        # Same instant as the archive's last point: the archive's corrected value wins,
+        # this raw one must be dropped, not just deduplicated arbitrarily.
+        ForecastPoint(t=archive_end, pv_w=999.0, pv_raw_w=999.0),
+        ForecastPoint(t=archive_end + timedelta(minutes=15), pv_w=4.0, pv_raw_w=4.0),
+    ]
     hass.data[DOMAIN] = {"entry1": _coordinator_with(points=live, archive_points=archive)}
     client = await hass_ws_client(hass)
 
     await client.send_json({"id": 1, "type": "helios_forecast/series", "entry_id": "entry1"})
     response = await client.receive_json()
     watts = [p["pv_w"] for p in response["result"]["points"]]
-    assert watts == [1.0, 2.0, 3.0]
+    assert watts == [1.0, 2.0, 50.0, 4.0]
+
+
+async def test_ws_series_empty_archive_falls_back_to_live_entirely(hass, hass_ws_client) -> None:
+    live = [ForecastPoint(t=datetime(2026, 6, 21, 0, tzinfo=_UTC), pv_w=5.0, pv_raw_w=5.0)]
+    hass.data[DOMAIN] = {"entry1": _coordinator_with(points=live, archive_points=[])}
+    client = await hass_ws_client(hass)
+
+    await client.send_json({"id": 1, "type": "helios_forecast/series", "entry_id": "entry1"})
+    response = await client.receive_json()
+    assert [p["pv_w"] for p in response["result"]["points"]] == [5.0]
 
 
 async def test_ws_series_not_found_when_entry_id_unknown(hass, hass_ws_client) -> None:

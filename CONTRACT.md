@@ -223,7 +223,13 @@ the card's "Graph detail" setting; the integration resamples server-side).
   full range, past and future, in one call. **Past actuals are unchanged
   regardless**: the card's own production curve keeps reading them straight
   from the recorder `change` series, this archive only backs the *predicted*
-  curve on a day already gone.
+  curve.
+- The switch from the archive to the live series happens at the archive's own
+  last point, not at today's midnight: the live series' already-elapsed points
+  are deliberately left unclamped (a past point there means "what the forecast
+  said at the time"), so today's own elapsed hours need the archive's
+  analog-clamped values exactly like yesterday's do, not the live series' raw
+  ones (#52 - it wasn't, until this was caught and fixed).
 - Sub-hourly for the live (future) half, hourly for the archived (past) half,
   so the short shadow dips the residual map carves (a tree clipping
   production for half an hour) survive resampling on what matters most. This
