@@ -331,7 +331,9 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             )
         )
 
-    def _battery_off(self, reason: str, *, transient: bool = False, not_applicable: bool = False) -> List[BatterySocPoint]:
+    def _battery_off(
+        self, reason: str, *, transient: bool = False, not_applicable: bool = False
+    ) -> List[BatterySocPoint]:
         """Return an empty SoC projection, logging why the first time a given reason occurs.
 
         The projection is deliberately skipped when an input is missing rather than guessed; without
