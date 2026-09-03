@@ -45,6 +45,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     coordinator = HeliosForecastCoordinator(hass, entry)
 
+    # Force an off-cycle refresh right when an hour rolls over, instead of waiting for the next
+    # 30-minute tick to notice. The archive (the card's past-forecast curve) only rebuilds once an
+    # hour by design (see coordinator._last_archive_hour, a deliberate CPU saving), but that check
+    # only runs inside a refresh: without this nudge, the hour that just elapsed could sit up to
+    # 30 minutes past its own boundary still served from the unclamped live series, hugging the
+    # panels' nameplate ceiling right where the archive's analog clamp should already apply. #52
+    from homeassistant.core import callback
+    from homeassistant.helpers.event import async_track_time_change
+
+    @callback
+    def _hour_rolled_over(_now) -> None:
+        hass.async_create_task(coordinator.async_request_refresh())
+
+    entry.async_on_unload(async_track_time_change(hass, _hour_rolled_over, minute=0, second=5))
+
     # Re-project the battery SoC the moment its source entity comes back from unavailable/unknown,
     # instead of waiting up to the 30-minute refresh. A battery integration is often briefly
     # unavailable at startup (a modbus link opening can take ~10 s), which would otherwise leave the

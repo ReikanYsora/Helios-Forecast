@@ -234,6 +234,13 @@ the card's "Graph detail" setting; the integration resamples server-side).
   so the short shadow dips the residual map carves (a tree clipping
   production for half an hour) survive resampling on what matters most. This
   is the fidelity the hourly baseline `wh_hours` cannot carry either way.
+- The archive itself only rebuilds once an hour (a deliberate CPU saving, see
+  `coordinator._last_archive_hour`), triggered by a dedicated hourly listener
+  right when the hour rolls over, not left to the next 30-minute refresh to
+  notice. Without that trigger, the hour that had just elapsed could still
+  read from the unclamped live series for up to half a cycle, which is exactly
+  what made #52 look intermittent (fixed, then not, depending on refresh
+  timing) even after the analog-enrichment fix above landed.
 
 ## 4. What the card STOPS doing in v1.9.0
 

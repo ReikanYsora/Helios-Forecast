@@ -6,13 +6,14 @@ __init__.py itself is responsible for.
 
 from __future__ import annotations
 
+from datetime import timedelta
 from unittest.mock import AsyncMock
 
 import pytest
 from homeassistant.config_entries import ConfigEntryState, current_entry
 from homeassistant.const import Platform
 from homeassistant.util import dt as dt_util
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 import custom_components.helios_forecast.coordinator as coordinator_mod
 from custom_components.helios_forecast import async_setup_entry, async_unload_entry, _legacy_issue_id
@@ -145,3 +146,22 @@ async def test_no_soc_listener_registered_without_battery_soc_entity(hass, monke
     await hass.async_block_till_done()
 
     refresh_mock.assert_not_awaited()
+
+
+async def test_hour_rollover_triggers_off_cycle_refresh(hass, monkeypatch) -> None:
+    """The archive (past-forecast curve) only rebuilds once an hour, but that check only
+    runs inside a refresh: without this listener, the just-elapsed hour could sit up to 30
+    minutes past its own boundary still served unclamped. #52
+    """
+    entry = await _setup(hass, monkeypatch)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+
+    refresh_mock = AsyncMock()
+    monkeypatch.setattr(coordinator, "async_request_refresh", refresh_mock)
+
+    now = dt_util.utcnow()
+    next_hour = (now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)).replace(second=5)
+    async_fire_time_changed(hass, next_hour)
+    await hass.async_block_till_done()
+
+    refresh_mock.assert_awaited_once()

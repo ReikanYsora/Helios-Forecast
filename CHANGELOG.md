@@ -79,6 +79,17 @@ archive's own last point regardless of the calendar day, so today's elapsed hour
 same analog-clamped values yesterday's already did. Thanks to @ruteclrp again for confirming
 the first fix only got halfway there (#52).
 
+### Fixed: the just-elapsed hour could stay unclamped for up to 30 minutes
+
+The archive rebuilds at most once an hour by design, a deliberate CPU saving, but that
+check only ran inside the regular 30-minute refresh, not right when the hour actually
+rolled over. Depending on where in that 30-minute cycle the boundary fell, the hour that
+had just finished could sit unclamped (hugging the nameplate ceiling again) for up to half
+an hour before the next refresh caught up, which is exactly what made the previous fix look
+like it was working, then not, then working again. A dedicated hourly trigger now forces
+the refresh the moment the hour changes, instead of waiting on the next tick. Thanks to
+@ruteclrp for the patience through three rounds of this (#52).
+
 ---
 
 ## 2026.9.0
