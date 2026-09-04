@@ -9,6 +9,27 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 A corrective release on top of 2026.9.0, plus one addition for the card.
 
+### Added: the battery projection's low and high points as entities
+
+`battery_min_soc`, `battery_min_soc_time`, `battery_max_soc` and `battery_max_soc_time`
+join the predicted battery state of charge as entities of their own (disabled by
+default, like the day peaks), so a tile can show when the battery bottoms out and an
+automation can trigger on the projected low without a template sensor in between. The
+attributes on the SoC sensor stay as they were. Thanks to @Manama2011 for the
+proposal (#57).
+
+### Fixed: a nameplate-high plateau right before "now" on the card's forecast curve
+
+Third round of #52. The card's series switched from the hourly archive to the live
+points at the archive's last point, but that point stands for its whole hour, so the
+sub-hourly live points inside that hour, plus the stretch up to "now", came through raw:
+the live series deliberately leaves its already-elapsed points unclamped (what the
+forecast said at the time), and next to the archive's clamped hours they drew a plateau
+at the panels' nameplate for up to an hour before "now". The series now takes the
+archive through the end of its last hour, then a clamped copy of the elapsed stretch,
+then the live points from "now" on. Thanks to @ruteclrp for the screenshots that showed
+exactly where the plateau sat (#52).
+
 ### Added: the card can read where your arrays are
 
 A new `helios_forecast/layout` websocket command hands the Helios card the lines of

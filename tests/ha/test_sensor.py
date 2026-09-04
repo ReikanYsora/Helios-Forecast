@@ -251,6 +251,27 @@ def test_battery_soc_sensor_reads_first_point_and_min_max(hass, entry, coordinat
     assert len(attrs["forecast"]) == 3
 
 
+def test_battery_extreme_sensors_read_the_projection_low_and_high(hass, entry, coordinator) -> None:
+    now = datetime(2026, 6, 21, 10, tzinfo=_UTC)
+    soc = [
+        BatterySocPoint(t=now, soc=50.0),
+        BatterySocPoint(t=now + timedelta(hours=2), soc=20.0),
+        BatterySocPoint(t=now + timedelta(hours=5), soc=90.0),
+    ]
+    coordinator.data = _forecast_data(now, battery_soc=soc)
+    by_kind = {k: sensor_mod.HeliosBatteryExtremeSensor(coordinator, entry, k) for k in sensor_mod._BATTERY_EXTREMES}
+    assert by_kind["battery_min_soc"].native_value == 20.0
+    assert by_kind["battery_min_soc_time"].native_value == now + timedelta(hours=2)
+    assert by_kind["battery_max_soc"].native_value == 90.0
+    assert by_kind["battery_max_soc_time"].native_value == now + timedelta(hours=5)
+    assert by_kind["battery_min_soc"].unique_id == f"{entry.entry_id}_battery_min_soc"
+    assert by_kind["battery_min_soc"].entity_registry_enabled_default is False
+    assert by_kind["battery_min_soc"].device_class == sensor_mod.SensorDeviceClass.BATTERY
+    assert by_kind["battery_max_soc_time"].device_class == sensor_mod.SensorDeviceClass.TIMESTAMP
+    coordinator.data = _forecast_data(now, battery_soc=[])
+    assert all(e.native_value is None for e in by_kind.values())
+
+
 def test_battery_soc_sensor_none_when_projection_empty(hass, entry, coordinator) -> None:
     now = datetime(2026, 6, 21, 10, tzinfo=_UTC)
     coordinator.data = _forecast_data(now, battery_soc=[])
@@ -328,3 +349,5 @@ async def test_async_setup_entry_with_battery_config_adds_soc_sensor(hass) -> No
     await sensor_mod.async_setup_entry(hass, entry, _add_entities)
     unique_ids = {e.unique_id for e in added}
     assert f"{entry.entry_id}_predicted_battery_soc" in unique_ids
+    for kind in ("battery_min_soc", "battery_min_soc_time", "battery_max_soc", "battery_max_soc_time"):
+        assert f"{entry.entry_id}_{kind}" in unique_ids
