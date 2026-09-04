@@ -254,3 +254,54 @@ async def test_ws_series_naive_start_returns_clean_error_not_a_crash(hass, hass_
     response = await client.receive_json()
     assert response["success"] is False
     assert response["error"]["code"] == "invalid_format"
+
+
+def _coordinator_with_entry(data, options=None):
+    return SimpleNamespace(data=None, archive_points=[], entry=SimpleNamespace(data=data, options=options or {}))
+
+
+async def test_ws_layout_returns_one_item_per_line_with_own_or_no_coords(hass, hass_ws_client) -> None:
+    hass.config.latitude = 48.0
+    hass.config.longitude = 2.0
+    hass.data[DOMAIN] = {
+        "entry1": _coordinator_with_entry(
+            {
+                "arrays": [
+                    {"azimuth": 180, "tilt": 30, "kwp": 6.0, "latitude": 48.0005, "longitude": 2.0007},
+                    {"azimuth": 90, "tilt": 20, "kwp": 2.0, "tracker": "none"},
+                ]
+            }
+        )
+    }
+    client = await hass_ws_client(hass)
+
+    await client.send_json({"id": 1, "type": "helios_forecast/layout", "entry_id": "entry1"})
+    response = await client.receive_json()
+    assert response["success"] is True
+    lines = response["result"]["lines"]
+    assert [line["index"] for line in lines] == [0, 1]
+    assert lines[0]["azimuth"] == 180 and lines[0]["tilt"] == 30
+    assert lines[0]["lat"] == 48.0005 and lines[0]["lon"] == 2.0007
+    assert lines[0]["kwp"] == pytest.approx(6.0) and lines[0]["share"] == pytest.approx(0.75)
+    assert lines[1]["lat"] is None and lines[1]["lon"] is None
+    assert lines[1]["tracker"] is None
+    assert response["result"]["home"] == {"lat": 48.0, "lon": 2.0}
+
+
+async def test_ws_layout_uses_the_entry_location_as_home_when_set(hass, hass_ws_client) -> None:
+    hass.data[DOMAIN] = {"entry1": _coordinator_with_entry({"arrays": [], "latitude": 45.5, "longitude": 5.5})}
+    client = await hass_ws_client(hass)
+    await client.send_json({"id": 1, "type": "helios_forecast/layout", "entry_id": "entry1"})
+    response = await client.receive_json()
+    assert response["success"] is True
+    assert response["result"]["lines"] == []
+    assert response["result"]["home"] == {"lat": 45.5, "lon": 5.5}
+
+
+async def test_ws_layout_unknown_entry_is_not_found(hass, hass_ws_client) -> None:
+    hass.data[DOMAIN] = {}
+    client = await hass_ws_client(hass)
+    await client.send_json({"id": 1, "type": "helios_forecast/layout", "entry_id": "nope"})
+    response = await client.receive_json()
+    assert response["success"] is False
+    assert response["error"]["code"] == "not_found"

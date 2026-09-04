@@ -7,7 +7,15 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ## 2026.9.1
 
-A corrective release on top of 2026.9.0.
+A corrective release on top of 2026.9.0, plus one addition for the card.
+
+### Added: the card can read where your arrays are
+
+A new `helios_forecast/layout` websocket command hands the Helios card the lines of
+a config entry: each line's azimuth, tilt, tracker kind, share and, when the line
+carries its own coordinates, where it stands. The card (from 2026.9.4) uses it to
+mark every array in the scene and point its own ray at the sun. Geometry only,
+nothing about production, and nothing changes for an install without the card.
 
 ### Fixed: `power_now_low` / `power_now_high` stayed unknown forever
 

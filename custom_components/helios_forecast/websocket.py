@@ -15,6 +15,7 @@ from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.util import dt as dt_util
 
+from .config import layout_from_config, location_from_config
 from .const import DOMAIN
 from .forecast import ForecastPoint
 
@@ -28,6 +29,7 @@ def async_register(hass: HomeAssistant) -> None:
         return
     hass.data[_WS_REGISTERED] = True
     websocket_api.async_register_command(hass, ws_series)
+    websocket_api.async_register_command(hass, ws_layout)
 
 
 def _point_dict(p: ForecastPoint) -> dict[str, Any]:
@@ -133,3 +135,44 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
 
     daily = [{"date": d.date, "kwh": d.energy_kwh, "kwh_raw": d.energy_raw_kwh} for d in coordinator.data.summary.days]
     connection.send_result(msg["id"], {"points": points, "daily": daily})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "helios_forecast/layout",
+        vol.Required("entry_id"): str,
+    }
+)
+@callback
+def ws_layout(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """Return the panel lines of one config entry, for the card's array markers.
+
+    One item per configured line: its orientation (azimuth clockwise from north, tilt from horizontal, degrees),
+    its kWp share, its tracker kind (None = fixed) and its own coordinates when the line carries some (None
+    otherwise: the card then places the marker on the home). `home` is the entry's resolved location, the same
+    fallback the forecast itself uses. Geometry only, nothing about production."""
+    coordinator = hass.data.get(DOMAIN, {}).get(msg["entry_id"])
+    if coordinator is None:
+        connection.send_error(msg["id"], "not_found", "no forecast for that entry")
+        return
+    data = {**coordinator.entry.data, **coordinator.entry.options}
+    layout = layout_from_config(data)
+    home_lat, home_lon = location_from_config(data, hass.config.latitude, hass.config.longitude)
+    lines = []
+    for i, orientation in enumerate(layout.orientations):
+        coords = layout.coords[i] if i < len(layout.coords) else None
+        lines.append(
+            {
+                "index": i,
+                "azimuth": orientation.azimuth_deg,
+                "tilt": orientation.tilt_deg,
+                "tracker": orientation.tracker,
+                "share": layout.shares[i] if i < len(layout.shares) else None,
+                "kwp": (layout.shares[i] * layout.total_kwp)
+                if (i < len(layout.shares) and layout.total_kwp > 0)
+                else None,
+                "lat": coords[0] if coords else None,
+                "lon": coords[1] if coords else None,
+            }
+        )
+    connection.send_result(msg["id"], {"lines": lines, "home": {"lat": home_lat, "lon": home_lon}})
