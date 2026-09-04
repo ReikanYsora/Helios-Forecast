@@ -20,6 +20,8 @@ from .const import DOMAIN
 from .forecast import ForecastPoint
 
 _WS_REGISTERED = f"{DOMAIN}_ws_registered"
+# The archive is hourly by construction: its last point stands for the whole hour that starts there.
+_ARCHIVE_STEP = timedelta(hours=1)
 
 
 @callback
@@ -106,17 +108,22 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
             connection.send_error(msg["id"], "invalid_format", f"'{label}' must include a UTC offset")
             return
 
-    # Full curve = the hourly past archive followed by the live sub-hourly points. Split on the
-    # archive's own last point, not on the live series' start (today's midnight): the live series
-    # covers the whole day from midnight, but enrich_points() deliberately leaves its already-elapsed
-    # points unclamped (a past point there means "what the forecast said at the time"), so today's own
-    # elapsed hours need the archive's analog-clamped values too, exactly like yesterday's do - only
-    # the still-uncovered stretch between the archive's cutoff and now falls back to the live points.
+    # Full curve = the hourly past archive, then today's elapsed stretch the archive does not cover yet
+    # (clamped like the archive, see coordinator.elapsed_points), then the live points from now on. The
+    # archive's last point stands for its whole hour, so live points inside that hour are dropped too: the
+    # live series deliberately leaves its already-elapsed points unclamped (a past point there means
+    # "what the forecast said at the time"), and any of them drawn next to the archive hugged the panels'
+    # nameplate ceiling for up to an hour.
     live = coordinator.data.points
     archive = coordinator.archive_points
-    archive_end = archive[-1].t if archive else None
+    elapsed = getattr(coordinator, "elapsed_points", [])
+    covered_until = archive[-1].t + _ARCHIVE_STEP if archive else None
     series = list(archive)
-    series.extend(p for p in live if archive_end is None or p.t > archive_end)
+    series.extend(p for p in elapsed if covered_until is None or p.t >= covered_until)
+    live_after = series[-1].t if series else None
+    series.extend(
+        p for p in live if (covered_until is None or p.t >= covered_until) and (live_after is None or p.t > live_after)
+    )
 
     in_range = []
     for p in series:

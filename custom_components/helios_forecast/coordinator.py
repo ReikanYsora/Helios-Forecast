@@ -159,6 +159,9 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # the detail websocket can serve the past forecast curve the live `points` (today onward) do
         # not cover.
         self.archive_points: List[ForecastPoint] = []
+        # Today's already-elapsed live points with the archive's analog clamp applied, for the card's series:
+        # the stretch between the archive's last hour and now, which the live series deliberately leaves raw.
+        self.elapsed_points: List[ForecastPoint] = []
         # The UTC hour the archive was last recomputed. The 60-day past curve only changes at its
         # trailing hour, so it is rebuilt once an hour rather than on every 30-minute refresh.
         self._last_archive_hour: Optional[datetime] = None
@@ -236,6 +239,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             build_library, self._production_buckets, weather, lat, lon
         )
         points = await self.hass.async_add_executor_job(enrich_points, points, analog_library, weather, lat, lon, now)
+        # The live series keeps its elapsed points raw on purpose (what the forecast said at the time), but the
+        # card draws them next to the archive's clamped hours, where a raw point hugs the nameplate ceiling for
+        # up to an hour before the archive catches up. Serve the card a clamped copy of that stretch instead.
+        self.elapsed_points = await self.hass.async_add_executor_job(
+            enrich_archive_points, [p for p in points if p.t < now], analog_library, weather, lat, lon
+        )
 
         summary = await self.hass.async_add_executor_job(
             partial(summarize, points, now=now, tz=dt_util.DEFAULT_TIME_ZONE, step_minutes=STEP_MINUTES)

@@ -15,12 +15,12 @@ from custom_components.helios_forecast.summary import DayForecast
 _UTC = timezone.utc
 
 
-def _coordinator_with(points=None, archive_points=None, days=None):
+def _coordinator_with(points=None, archive_points=None, days=None, elapsed_points=None):
     """A minimal stand-in exposing only what ws_series reads: .data.points, .archive_points,
     .data.summary.days."""
     summary = SimpleNamespace(days=days or [])
     data = SimpleNamespace(points=points or [], summary=summary)
-    return SimpleNamespace(data=data, archive_points=archive_points or [])
+    return SimpleNamespace(data=data, archive_points=archive_points or [], elapsed_points=elapsed_points or [])
 
 
 @pytest.fixture(autouse=True)
@@ -103,7 +103,9 @@ async def test_ws_series_uses_archive_up_to_its_own_last_point_then_live(hass, h
         # Same instant as the archive's last point: the archive's corrected value wins,
         # this raw one must be dropped, not just deduplicated arbitrarily.
         ForecastPoint(t=archive_end, pv_w=999.0, pv_raw_w=999.0),
-        ForecastPoint(t=archive_end + timedelta(minutes=15), pv_w=4.0, pv_raw_w=4.0),
+        # Inside the archive's last hour: still covered by that hour, dropped too (it is raw).
+        ForecastPoint(t=archive_end + timedelta(minutes=30), pv_w=998.0, pv_raw_w=998.0),
+        ForecastPoint(t=archive_end + timedelta(hours=1), pv_w=4.0, pv_raw_w=4.0),
     ]
     hass.data[DOMAIN] = {"entry1": _coordinator_with(points=live, archive_points=archive)}
     client = await hass_ws_client(hass)
@@ -112,6 +114,46 @@ async def test_ws_series_uses_archive_up_to_its_own_last_point_then_live(hass, h
     response = await client.receive_json()
     watts = [p["pv_w"] for p in response["result"]["points"]]
     assert watts == [1.0, 2.0, 50.0, 4.0]
+
+
+async def test_ws_series_serves_the_elapsed_stretch_clamped_then_live(hass, hass_ws_client) -> None:
+    # Between the archive's last hour and now, the live series only has raw (unclamped) points, which
+    # is what drew a nameplate-high plateau right before "now" (#52). The coordinator keeps a clamped
+    # copy of that stretch; the series takes it, then the live points strictly after it.
+    midnight = datetime(2026, 6, 21, 0, tzinfo=_UTC)
+    archive = [ForecastPoint(t=midnight + timedelta(hours=h), pv_w=10.0 * h, pv_raw_w=10.0 * h) for h in range(13)]
+    raw = lambda t, w: ForecastPoint(t=t, pv_w=w, pv_raw_w=w)  # noqa: E731
+    t13, t13q, t13h, t13t, t14 = (midnight + timedelta(hours=13, minutes=m) for m in (0, 15, 30, 45, 60))
+    live = [
+        raw(midnight + timedelta(hours=12, minutes=30), 900.0),
+        raw(t13, 900.0),
+        raw(t13q, 900.0),
+        raw(t13h, 700.0),
+        raw(t13t, 650.0),
+        raw(t14, 600.0),
+    ]
+    elapsed = [raw(midnight + timedelta(hours=12, minutes=30), 120.0), raw(t13, 130.0), raw(t13q, 135.0)]
+    hass.data[DOMAIN] = {"entry1": _coordinator_with(points=live, archive_points=archive, elapsed_points=elapsed)}
+    client = await hass_ws_client(hass)
+
+    await client.send_json(
+        {
+            "id": 1,
+            "type": "helios_forecast/series",
+            "entry_id": "entry1",
+            "start": (midnight + timedelta(hours=12)).isoformat(),
+        }
+    )
+    response = await client.receive_json()
+    got = [(p["t"][11:16], p["pv_w"]) for p in response["result"]["points"]]
+    assert got == [
+        ("12:00", 120.0),
+        ("13:00", 130.0),
+        ("13:15", 135.0),
+        ("13:30", 700.0),
+        ("13:45", 650.0),
+        ("14:00", 600.0),
+    ]
 
 
 async def test_ws_series_empty_archive_falls_back_to_live_entirely(hass, hass_ws_client) -> None:
