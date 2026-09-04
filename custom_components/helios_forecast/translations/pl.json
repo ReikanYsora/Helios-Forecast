@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Maks. moc ładowania akumulatora (kW, opcjonalnie)",
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
           "battery_min_soc": "Rezerwa akumulatora — minimalny stan naładowania (%, domyślnie 10)",
-          "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)"
+          "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
+          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, opcjonalny)"
         },
         "data_description": {
-          "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik."
+          "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
+          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Maks. moc ładowania akumulatora (kW, opcjonalnie)",
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
           "battery_min_soc": "Rezerwa akumulatora — minimalny stan naładowania (%, domyślnie 10)",
-          "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)"
+          "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
+          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, opcjonalny)"
         },
         "data_description": {
-          "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik."
+          "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
+          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
         }
       },
       "lines": {

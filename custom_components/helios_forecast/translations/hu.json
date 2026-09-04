@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Max. akkumulátor töltési teljesítmény (kW, opcionális)",
           "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
           "battery_min_soc": "Akkumulátor tartalék — minimális töltöttségi szint (%, alapértelmezett 10)",
-          "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)"
+          "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)",
+          "curtailment_entity": "Korlátozási jel (bináris érzékelő, opcionális)"
         },
         "data_description": {
-          "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre."
+          "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre.",
+          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Max. akkumulátor töltési teljesítmény (kW, opcionális)",
           "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
           "battery_min_soc": "Akkumulátor tartalék — minimális töltöttségi szint (%, alapértelmezett 10)",
-          "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)"
+          "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)",
+          "curtailment_entity": "Korlátozási jel (bináris érzékelő, opcionális)"
         },
         "data_description": {
-          "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre."
+          "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre.",
+          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel."
         }
       },
       "lines": {

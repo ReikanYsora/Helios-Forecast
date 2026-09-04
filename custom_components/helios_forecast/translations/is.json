@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Hámarks hleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_max_discharge_kw": "Hámarks afhleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_min_soc": "Varaforði rafhlöðu — lágmarks hleðslustaða (%, sjálfgefið 10)",
-          "battery_efficiency": "Heildarnýtni rafhlöðu (%, sjálfgefið 90)"
+          "battery_efficiency": "Heildarnýtni rafhlöðu (%, sjálfgefið 90)",
+          "curtailment_entity": "Skerðingarmerki (tvíundarskynjari, valfrjálst)"
         },
         "data_description": {
-          "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér."
+          "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér.",
+          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Hámarks hleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_max_discharge_kw": "Hámarks afhleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_min_soc": "Varaforði rafhlöðu — lágmarks hleðslustaða (%, sjálfgefið 10)",
-          "battery_efficiency": "Heildarnýtni rafhlöðu (%, sjálfgefið 90)"
+          "battery_efficiency": "Heildarnýtni rafhlöðu (%, sjálfgefið 90)",
+          "curtailment_entity": "Skerðingarmerki (tvíundarskynjari, valfrjálst)"
         },
         "data_description": {
-          "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér."
+          "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér.",
+          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins."
         }
       },
       "lines": {

@@ -28,6 +28,7 @@ from .config import (
     CONF_BATTERY_MAX_DISCHARGE_KW,
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_SOC_ENTITY,
+    CONF_CURTAILMENT_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
     CONF_LATITUDE,
@@ -62,6 +63,10 @@ _BOX = selector.NumberSelectorMode.BOX
 # learning and capped the reliability index (it only records a mean).
 _SENSOR = selector.EntitySelector(selector.EntitySelectorConfig(domain="sensor", device_class="energy"))
 _BOOL = selector.BooleanSelector()
+# The curtailment signal: anything that reads on/off.
+_CURTAIL_ENTITY = selector.EntitySelector(
+    selector.EntitySelectorConfig(domain=["binary_sensor", "input_boolean", "switch"])
+)
 _HOUR = selector.NumberSelector(selector.NumberSelectorConfig(min=0, max=23, step=1, mode=_BOX))
 # Numeric geometry / power fields as explicit NumberSelectors: a proper numeric input
 # with a defined decimal step, so decimals (e.g. 2.61 kWp) are entered and stored as
@@ -169,6 +174,9 @@ def _settings_fields(
     fields[
         vol.Optional(CONF_BATTERY_EFFICIENCY, default=s.get(CONF_BATTERY_EFFICIENCY, DEFAULT_BATTERY_EFFICIENCY))
     ] = _PERCENT
+    # Curtailment signal: on while the inverter is held back for a reason the sky cannot explain, so those
+    # hours are not learned as low production (zero export, grid limits; a full battery is detected without it).
+    _optional(fields, CONF_CURTAILMENT_ENTITY, _CURTAIL_ENTITY, s.get(CONF_CURTAILMENT_ENTITY))
     return fields
 
 

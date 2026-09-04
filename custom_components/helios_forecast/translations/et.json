@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Aku maksimaalne laadimisvõimsus (kW, valikuline)",
           "battery_max_discharge_kw": "Aku maksimaalne tühjenemisvõimsus (kW, valikuline)",
           "battery_min_soc": "Aku reserv — minimaalne laetus (%, vaikimisi 10)",
-          "battery_efficiency": "Aku edasi-tagasi kasutegur (%, vaikimisi 90)"
+          "battery_efficiency": "Aku edasi-tagasi kasutegur (%, vaikimisi 90)",
+          "curtailment_entity": "Piirangu signaal (binaarandur, valikuline)"
         },
         "data_description": {
-          "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja."
+          "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
+          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Aku maksimaalne laadimisvõimsus (kW, valikuline)",
           "battery_max_discharge_kw": "Aku maksimaalne tühjenemisvõimsus (kW, valikuline)",
           "battery_min_soc": "Aku reserv — minimaalne laetus (%, vaikimisi 10)",
-          "battery_efficiency": "Aku edasi-tagasi kasutegur (%, vaikimisi 90)"
+          "battery_efficiency": "Aku edasi-tagasi kasutegur (%, vaikimisi 90)",
+          "curtailment_entity": "Piirangu signaal (binaarandur, valikuline)"
         },
         "data_description": {
-          "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja."
+          "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
+          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi."
         }
       },
       "lines": {

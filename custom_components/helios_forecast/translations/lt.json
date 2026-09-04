@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Maks. akumuliatoriaus įkrovimo galia (kW, neprivaloma)",
           "battery_max_discharge_kw": "Maks. akumuliatoriaus iškrovimo galia (kW, neprivaloma)",
           "battery_min_soc": "Akumuliatoriaus rezervas — minimali įkrova (%, numatytoji 10)",
-          "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)"
+          "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)",
+          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, neprivaloma)"
         },
         "data_description": {
-          "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia."
+          "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
+          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Maks. akumuliatoriaus įkrovimo galia (kW, neprivaloma)",
           "battery_max_discharge_kw": "Maks. akumuliatoriaus iškrovimo galia (kW, neprivaloma)",
           "battery_min_soc": "Akumuliatoriaus rezervas — minimali įkrova (%, numatytoji 10)",
-          "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)"
+          "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)",
+          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, neprivaloma)"
         },
         "data_description": {
-          "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia."
+          "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
+          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą."
         }
       },
       "lines": {

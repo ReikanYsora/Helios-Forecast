@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Max. laadvermogen batterij (kW, optioneel)",
           "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
           "battery_min_soc": "Batterijreserve — minimale laadtoestand (%, standaard 10)",
-          "battery_efficiency": "Retourrendement batterij (%, standaard 90)"
+          "battery_efficiency": "Retourrendement batterij (%, standaard 90)",
+          "curtailment_entity": "Beperkingssignaal (binaire sensor, optioneel)"
         },
         "data_description": {
-          "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig."
+          "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
+          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Max. laadvermogen batterij (kW, optioneel)",
           "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
           "battery_min_soc": "Batterijreserve — minimale laadtoestand (%, standaard 10)",
-          "battery_efficiency": "Retourrendement batterij (%, standaard 90)"
+          "battery_efficiency": "Retourrendement batterij (%, standaard 90)",
+          "curtailment_entity": "Beperkingssignaal (binaire sensor, optioneel)"
         },
         "data_description": {
-          "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig."
+          "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
+          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
         }
       },
       "lines": {

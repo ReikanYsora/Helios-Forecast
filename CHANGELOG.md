@@ -9,6 +9,24 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 A corrective release on top of 2026.9.0, plus one addition for the card.
 
+### Changed: the learning no longer counts your inverter's limits twice
+
+The learned sky correction kept every produced hour, curtailed ones included, on
+the reasoning that curtailment is part of what the home really harvests. It is,
+but the cap was then counted twice: once burned into the learned ratio (a run of
+full-battery afternoons pulled the ratio for those sun positions well below one),
+and once more at forecast time, where the inverter cap is already applied. The
+depressed ratio then hit the days nothing was clipped, an empty battery after a
+cloudy day, and the forecast landed below the cap for the whole afternoon. A
+curtailed hour is now treated for what it is, a lower bound: when it sits under
+the model it is left out of both the sky-residual map and the analog library,
+when it reaches the model it counts as before. The battery case needs nothing
+new, a full battery (state of charge sensor) at the inverter cap is enough; for
+zero-export and grid-limited installs a new optional **curtailment signal**
+(binary sensor, input boolean or switch, on while the inverter is held back)
+marks the hours. Thanks to @Manama2011 for the analysis and the proposal, and to
+@Legotechniker for the case that started it (#46).
+
 ### Added: the battery projection's low and high points as entities
 
 `battery_min_soc`, `battery_min_soc_time`, `battery_max_soc` and `battery_max_soc_time`

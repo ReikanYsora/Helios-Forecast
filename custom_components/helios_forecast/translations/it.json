@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Potenza massima di carica della batteria (kW, opzionale)",
           "battery_max_discharge_kw": "Potenza massima di scarica della batteria (kW, opzionale)",
           "battery_min_soc": "Riserva della batteria — stato di carica minimo (%, predefinito 10)",
-          "battery_efficiency": "Efficienza di andata e ritorno della batteria (%, predefinito 90)"
+          "battery_efficiency": "Efficienza di andata e ritorno della batteria (%, predefinito 90)",
+          "curtailment_entity": "Segnale di limitazione (sensore binario, opzionale)"
         },
         "data_description": {
-          "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore."
+          "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore.",
+          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Potenza massima di carica della batteria (kW, opzionale)",
           "battery_max_discharge_kw": "Potenza massima di scarica della batteria (kW, opzionale)",
           "battery_min_soc": "Riserva della batteria — stato di carica minimo (%, predefinito 10)",
-          "battery_efficiency": "Efficienza di andata e ritorno della batteria (%, predefinito 90)"
+          "battery_efficiency": "Efficienza di andata e ritorno della batteria (%, predefinito 90)",
+          "curtailment_entity": "Segnale di limitazione (sensore binario, opzionale)"
         },
         "data_description": {
-          "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore."
+          "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore.",
+          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter."
         }
       },
       "lines": {

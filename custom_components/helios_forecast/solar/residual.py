@@ -6,10 +6,12 @@ recency-weighted. At forecast time the ratio replaces a flat scalar: forecast =
 model x sky-ratio(sun position). A thin cell leans on the global mean ratio; too
 little history returns None so the caller keeps the uncorrected forecast.
 
-The learning deliberately keeps every produced hour, including hours where a
-hybrid inverter curtailed output once the battery was full: that curtailment is
-part of what the home really harvests, so learning it pulls the forecast toward
-the realistic (curtailed) production instead of the theoretical potential.
+The learning describes the sky, not the hardware: an hour flagged as curtailed
+(a full battery, a zero-export rule, a grid limit, see curtailment.py) whose
+measurement fell short of the model is a censored sample (true production was
+at least the measurement) and is left out, so the limits stay where the forecast
+already applies them, forward, instead of being learned a second time as a low
+ratio and applied on the days nothing is clipped.
 
 Pure, no Home Assistant imports. The map is stored as plain float lists (the card
 uses Float32Array; the values agree to single-precision).
@@ -51,6 +53,8 @@ class ProductionBucket:
     start_ms: float
     end_ms: float
     kwh: float
+    # The inverter was held back this hour: the kWh is a lower bound, not what the sky allowed.
+    curtailed: bool = False
 
 
 @dataclass(frozen=True)
@@ -186,6 +190,11 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
             continue
         model_kwh = w_sum_kwh / w_n
         if model_kwh < MODEL_KWH_FLOOR:
+            continue
+
+        # Right-censored: the inverter, not the sky, set this hour's figure, and it sits below the model.
+        # When the measurement is at or above the model the bound is not binding and the hour is kept.
+        if bucket.curtailed and kwh < model_kwh:
             continue
 
         ratio = kwh / model_kwh

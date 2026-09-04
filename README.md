@@ -190,8 +190,21 @@ over-predicted.
 Then it stops trusting the physics alone. It learns a correction from your home's
 own recorded production, matching past hours on cloud cover, sun geometry and
 outdoor temperature. Over time the prediction absorbs what no generic model can
-know about your site: shading, soiling, an orientation that is a few degrees off,
-inverter clipping, even battery curtailment.
+know about your site: shading, soiling, an orientation that is a few degrees off.
+
+What it does not learn is your hardware's limits. An hour where the inverter was
+held back, by a full battery, a zero-export rule or a grid limit, says nothing
+about the sky, so it is left out of the learning and the limits stay where the
+forecast already applies them: forward, at forecast time. A full battery is
+recognised on its own from the state of charge sensor and the inverter cap you
+configured; for what the integration cannot see (zero export, a grid limit), point
+the optional **curtailment signal** at a binary sensor, input boolean or switch
+that is on while the inverter is being held back.
+
+> On a DC-coupled hybrid, learn from a production reading taken **before** the
+> battery tap (inverter DC power plus battery DC power, integrated to kWh), not
+> from the AC meter: the AC side never sees the energy that went straight into
+> the battery, and learns nightly discharge as production.
 
 It also publishes a **reliability score**, which reflects how much history backs
 the learning, how accurate it has been recently, and how predictable today's sky

@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Max. laddningseffekt för batteri (kW, valfritt)",
           "battery_max_discharge_kw": "Max. urladdningseffekt för batteri (kW, valfritt)",
           "battery_min_soc": "Batterireserv — minimal laddningsnivå (%, standard 10)",
-          "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)"
+          "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)",
+          "curtailment_entity": "Begränsningssignal (binär sensor, valfri)"
         },
         "data_description": {
-          "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här."
+          "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här.",
+          "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Max. laddningseffekt för batteri (kW, valfritt)",
           "battery_max_discharge_kw": "Max. urladdningseffekt för batteri (kW, valfritt)",
           "battery_min_soc": "Batterireserv — minimal laddningsnivå (%, standard 10)",
-          "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)"
+          "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)",
+          "curtailment_entity": "Begränsningssignal (binär sensor, valfri)"
         },
         "data_description": {
-          "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här."
+          "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här.",
+          "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket."
         }
       },
       "lines": {

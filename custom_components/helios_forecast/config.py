@@ -31,6 +31,8 @@ DEFAULT_TREND_ANCHOR_HOUR = 6
 # from the Home Assistant Energy dashboard.
 CONF_BATTERY_CAPACITY_KWH = "battery_capacity_kwh"
 CONF_BATTERY_SOC_ENTITY = "battery_soc_entity"
+# Optional binary signal, on while the inverter is held back (zero export, grid limit): its hours are not learned.
+CONF_CURTAILMENT_ENTITY = "curtailment_entity"
 CONF_BATTERY_MAX_CHARGE_KW = "battery_max_charge_kw"
 CONF_BATTERY_MAX_DISCHARGE_KW = "battery_max_discharge_kw"
 CONF_BATTERY_MIN_SOC = "battery_min_soc"
@@ -78,6 +80,7 @@ SETTINGS_KEYS: Tuple[str, ...] = (
     CONF_BATTERY_MAX_DISCHARGE_KW,
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_EFFICIENCY,
+    CONF_CURTAILMENT_ENTITY,
 )
 
 
@@ -175,11 +178,15 @@ def inverter_max_w_from_config(data: Dict[str, Any]) -> float:
 def learning_from_config(data: Dict[str, Any]) -> Optional[str]:
     """The PV production entity that drives the learned correction, or None.
 
-    The learning reads this entity's real production (curtailment included), so the
-    forecast tracks what the home actually harvests; without it the forecast stays
-    uncorrected.
+    The learning reads this entity's real production; without it the forecast stays
+    uncorrected. Hours the inverter was held back are left out (see curtailment.py).
     """
     return data.get(CONF_PRODUCTION_ENTITY) or None
+
+
+def curtailment_entity_from_config(data: Dict[str, Any]) -> Optional[str]:
+    """The optional curtailment signal entity, or None."""
+    return data.get(CONF_CURTAILMENT_ENTITY) or None
 
 
 def trend_anchor_hour_from_config(data: Dict[str, Any]) -> int:

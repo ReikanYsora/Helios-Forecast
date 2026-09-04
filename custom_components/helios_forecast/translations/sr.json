@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Макс. снага пуњења батерије (kW, опционо)",
           "battery_max_discharge_kw": "Макс. снага пражњења батерије (kW, опционо)",
           "battery_min_soc": "Резерва батерије — минимално стање напуњености (%, подразумевано 10)",
-          "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)"
+          "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)",
+          "curtailment_entity": "Signal ograničenja (binarni senzor, opciono)"
         },
         "data_description": {
-          "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан."
+          "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Макс. снага пуњења батерије (kW, опционо)",
           "battery_max_discharge_kw": "Макс. снага пражњења батерије (kW, опционо)",
           "battery_min_soc": "Резерва батерије — минимално стање напуњености (%, подразумевано 10)",
-          "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)"
+          "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)",
+          "curtailment_entity": "Signal ograničenja (binarni senzor, opciono)"
         },
         "data_description": {
-          "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан."
+          "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
         }
       },
       "lines": {

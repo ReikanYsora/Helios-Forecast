@@ -22,11 +22,13 @@
           "battery_max_charge_kw": "Battery max charge power (kW, optional)",
           "battery_max_discharge_kw": "Battery max discharge power (kW, optional)",
           "battery_min_soc": "Battery reserve — minimum state of charge (%, default 10)",
-          "battery_efficiency": "Battery round-trip efficiency (%, default 90)"
+          "battery_efficiency": "Battery round-trip efficiency (%, default 90)",
+          "curtailment_entity": "Curtailment signal (binary sensor, optional)"
         },
         "data_description": {
           "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off.",
-          "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here."
+          "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here.",
+          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap."
         }
       },
       "line": {
@@ -69,11 +71,13 @@
           "battery_max_charge_kw": "Battery max charge power (kW, optional)",
           "battery_max_discharge_kw": "Battery max discharge power (kW, optional)",
           "battery_min_soc": "Battery reserve — minimum state of charge (%, default 10)",
-          "battery_efficiency": "Battery round-trip efficiency (%, default 90)"
+          "battery_efficiency": "Battery round-trip efficiency (%, default 90)",
+          "curtailment_entity": "Curtailment signal (binary sensor, optional)"
         },
         "data_description": {
           "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off.",
-          "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here."
+          "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here.",
+          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap."
         }
       },
       "lines": {

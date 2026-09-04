@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Akun suurin latausteho (kW, valinnainen)",
           "battery_max_discharge_kw": "Akun suurin purkausteho (kW, valinnainen)",
           "battery_min_soc": "Akun varaus — vähimmäisvaraustila (%, oletus 10)",
-          "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)"
+          "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)",
+          "curtailment_entity": "Rajoitussignaali (binäärianturi, valinnainen)"
         },
         "data_description": {
-          "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia."
+          "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
+          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Akun suurin latausteho (kW, valinnainen)",
           "battery_max_discharge_kw": "Akun suurin purkausteho (kW, valinnainen)",
           "battery_min_soc": "Akun varaus — vähimmäisvaraustila (%, oletus 10)",
-          "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)"
+          "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)",
+          "curtailment_entity": "Rajoitussignaali (binäärianturi, valinnainen)"
         },
         "data_description": {
-          "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia."
+          "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
+          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
         }
       },
       "lines": {

@@ -22,11 +22,13 @@
           "battery_max_charge_kw": "Puissance de charge max de la batterie (kW, optionnel)",
           "battery_max_discharge_kw": "Puissance de décharge max de la batterie (kW, optionnel)",
           "battery_min_soc": "Réserve batterie — état de charge minimum (%, défaut 10)",
-          "battery_efficiency": "Rendement aller-retour de la batterie (%, défaut 90)"
+          "battery_efficiency": "Rendement aller-retour de la batterie (%, défaut 90)",
+          "curtailment_entity": "Signal de bridage (capteur binaire, optionnel)"
         },
         "data_description": {
           "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs.",
-          "battery_soc_entity": "Renseignez la capacité et ce capteur pour activer la projection d'état de charge. La consommation de la maison vient de votre tableau de bord Énergie, aucun capteur n'est requis ici."
+          "battery_soc_entity": "Renseignez la capacité et ce capteur pour activer la projection d'état de charge. La consommation de la maison vient de votre tableau de bord Énergie, aucun capteur n'est requis ici.",
+          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur."
         }
       },
       "line": {
@@ -69,11 +71,13 @@
           "battery_max_charge_kw": "Puissance de charge max de la batterie (kW, optionnel)",
           "battery_max_discharge_kw": "Puissance de décharge max de la batterie (kW, optionnel)",
           "battery_min_soc": "Réserve batterie — état de charge minimum (%, défaut 10)",
-          "battery_efficiency": "Rendement aller-retour de la batterie (%, défaut 90)"
+          "battery_efficiency": "Rendement aller-retour de la batterie (%, défaut 90)",
+          "curtailment_entity": "Signal de bridage (capteur binaire, optionnel)"
         },
         "data_description": {
           "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs.",
-          "battery_soc_entity": "Renseignez la capacité et ce capteur pour activer la projection d'état de charge. La consommation de la maison vient de votre tableau de bord Énergie, aucun capteur n'est requis ici."
+          "battery_soc_entity": "Renseignez la capacité et ce capteur pour activer la projection d'état de charge. La consommation de la maison vient de votre tableau de bord Énergie, aucun capteur n'est requis ici.",
+          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur."
         }
       },
       "lines": {

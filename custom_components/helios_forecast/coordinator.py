@@ -10,13 +10,14 @@ residual map is built from the recorder's own production / SoC history.
 from __future__ import annotations
 
 import asyncio
+import math
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import partial
 from typing import Any, Dict, List, Optional
 
-from homeassistant.components.recorder import get_instance
+from homeassistant.components.recorder import get_instance, history
 from homeassistant.components.recorder.models import StatisticMetaData
 from homeassistant.components.recorder.statistics import (
     async_import_statistics,
@@ -38,8 +39,11 @@ from .config import (
     learning_from_config,
     location_from_config,
     trend_anchor_hour_from_config,
+    curtailment_entity_from_config,
+    CONF_BATTERY_SOC_ENTITY,
 )
 from .analog import build_library, enrich_archive_points, enrich_points
+from .curtailment import flag_curtailed, on_intervals_from_states
 from .battery import BatterySocPoint, project_battery_soc
 from .consumption import ConsumptionProfile, build_consumption_profile, consumption_sources
 from .trend import TodayTrend, TrendReference, compute_trend, should_capture
@@ -569,6 +573,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             _LOGGER.warning("Helios learning history fetch failed, forecast stays uncorrected: %s", err)
             return None
 
+        # Mark the hours the inverter was held back before anything learns from them (curtailment.py).
+        production = await self._flag_curtailed(data, production, learn_start, now)
         self._production_buckets = production
         if not production:
             _LOGGER.warning(
@@ -599,6 +605,44 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 now_ms=now.timestamp() * 1000.0,
             ),
         )
+
+    async def _flag_curtailed(self, data, production, start, end) -> List[ProductionBucket]:
+        """Flag the curtailed hours from what the config makes visible: the battery's hourly maximum state of
+        charge against the inverter cap, and the optional curtailment entity's on periods. Best-effort: a
+        history that cannot be read leaves the buckets unflagged rather than failing the learning."""
+        if not production:
+            return production
+        soc_max_by_start_ms = None
+        soc_entity = data.get(CONF_BATTERY_SOC_ENTITY) or None
+        cap = inverter_max_w_from_config(data)
+        if soc_entity and math.isfinite(cap):
+            try:
+                rows = await self._statistics(soc_entity, start, end, {"max"}, None)
+                soc_max_by_start_ms = {r["start"] * 1000.0: float(r["max"]) for r in rows if r.get("max") is not None}
+            except Exception as err:  # noqa: BLE001 - best-effort
+                _LOGGER.debug("Battery state-of-charge history unavailable for curtailment detection: %s", err)
+        on_intervals = None
+        curtail_entity = curtailment_entity_from_config(data)
+        if curtail_entity:
+            try:
+                changes = await get_instance(self.hass).async_add_executor_job(
+                    partial(
+                        history.state_changes_during_period,
+                        self.hass,
+                        start,
+                        end,
+                        curtail_entity,
+                        no_attributes=True,
+                        include_start_time_state=True,
+                    )
+                )
+                states = [(st.last_updated.timestamp() * 1000.0, st.state) for st in changes.get(curtail_entity, [])]
+                on_intervals = on_intervals_from_states(states, start.timestamp() * 1000.0, end.timestamp() * 1000.0)
+            except Exception as err:  # noqa: BLE001 - best-effort
+                _LOGGER.debug("Curtailment entity history unavailable: %s", err)
+        if soc_max_by_start_ms is None and not on_intervals:
+            return production
+        return flag_curtailed(production, soc_max_by_start_ms=soc_max_by_start_ms, cap_w=cap, on_intervals=on_intervals)
 
     async def _statistics(self, stat_id, start, end, types, units):
         result = await get_instance(self.hass).async_add_executor_job(

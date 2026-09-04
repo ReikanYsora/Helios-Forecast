@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Max. nabíjecí výkon baterie (kW, volitelné)",
           "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
           "battery_min_soc": "Rezerva baterie — minimální stav nabití (%, výchozí 10)",
-          "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)"
+          "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)",
+          "curtailment_entity": "Signál omezení (binární senzor, volitelné)"
         },
         "data_description": {
-          "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor."
+          "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
+          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Max. nabíjecí výkon baterie (kW, volitelné)",
           "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
           "battery_min_soc": "Rezerva baterie — minimální stav nabití (%, výchozí 10)",
-          "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)"
+          "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)",
+          "curtailment_entity": "Signál omezení (binární senzor, volitelné)"
         },
         "data_description": {
-          "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor."
+          "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
+          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
         }
       },
       "lines": {

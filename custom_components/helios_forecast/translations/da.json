@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Maks. ladeeffekt for batteri (kW, valgfrit)",
           "battery_max_discharge_kw": "Maks. afladningseffekt for batteri (kW, valgfrit)",
           "battery_min_soc": "Batterireserve — minimal ladetilstand (%, standard 10)",
-          "battery_efficiency": "Batteriets rundtursvirkningsgrad (%, standard 90)"
+          "battery_efficiency": "Batteriets rundtursvirkningsgrad (%, standard 90)",
+          "curtailment_entity": "Begrænsningssignal (binær sensor, valgfri)"
         },
         "data_description": {
-          "battery_soc_entity": "Udfyld kapaciteten og denne sensor for at slå projektionen af ladetilstand til. Husforbruget hentes fra dit Energi-dashboard, så der kræves ingen sensor her."
+          "battery_soc_entity": "Udfyld kapaciteten og denne sensor for at slå projektionen af ladetilstand til. Husforbruget hentes fra dit Energi-dashboard, så der kræves ingen sensor her.",
+          "curtailment_entity": "Tændt, så længe din inverter holdes tilbage af en grund, himlen ikke forklarer: fuldt batteri, nul-eksport, netgrænse. De markerede timer læres ikke som lav produktion. Uden det opdages et fuldt batteri stadig ud fra ladetilstandssensoren og inverterloftet."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Maks. ladeeffekt for batteri (kW, valgfrit)",
           "battery_max_discharge_kw": "Maks. afladningseffekt for batteri (kW, valgfrit)",
           "battery_min_soc": "Batterireserve — minimal ladetilstand (%, standard 10)",
-          "battery_efficiency": "Batteriets rundtursvirkningsgrad (%, standard 90)"
+          "battery_efficiency": "Batteriets rundtursvirkningsgrad (%, standard 90)",
+          "curtailment_entity": "Begrænsningssignal (binær sensor, valgfri)"
         },
         "data_description": {
-          "battery_soc_entity": "Udfyld kapaciteten og denne sensor for at slå projektionen af ladetilstand til. Husforbruget hentes fra dit Energi-dashboard, så der kræves ingen sensor her."
+          "battery_soc_entity": "Udfyld kapaciteten og denne sensor for at slå projektionen af ladetilstand til. Husforbruget hentes fra dit Energi-dashboard, så der kræves ingen sensor her.",
+          "curtailment_entity": "Tændt, så længe din inverter holdes tilbage af en grund, himlen ikke forklarer: fuldt batteri, nul-eksport, netgrænse. De markerede timer læres ikke som lav produktion. Uden det opdages et fuldt batteri stadig ud fra ladetilstandssensoren og inverterloftet."
         }
       },
       "lines": {

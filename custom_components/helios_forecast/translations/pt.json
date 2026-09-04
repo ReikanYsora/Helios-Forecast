@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Potência máx. de carga da bateria (kW, opcional)",
           "battery_max_discharge_kw": "Potência máx. de descarga da bateria (kW, opcional)",
           "battery_min_soc": "Reserva da bateria — estado de carga mínimo (%, predefinição 10)",
-          "battery_efficiency": "Eficiência de ida e volta da bateria (%, predefinição 90)"
+          "battery_efficiency": "Eficiência de ida e volta da bateria (%, predefinição 90)",
+          "curtailment_entity": "Sinal de limitação (sensor binário, opcional)"
         },
         "data_description": {
-          "battery_soc_entity": "Preencha a capacidade e este sensor para ativar a projeção do estado de carga. O consumo da casa vem do seu painel de Energia, aqui não é necessário nenhum sensor."
+          "battery_soc_entity": "Preencha a capacidade e este sensor para ativar a projeção do estado de carga. O consumo da casa vem do seu painel de Energia, aqui não é necessário nenhum sensor.",
+          "curtailment_entity": "Ativo enquanto o inversor está limitado por um motivo que o céu não explica: bateria cheia, injeção zero, limite de rede. As horas que marca não são aprendidas como produção baixa. Sem ele, uma bateria cheia continua a ser detetada pelo sensor de estado de carga e pelo limite do inversor."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Potência máx. de carga da bateria (kW, opcional)",
           "battery_max_discharge_kw": "Potência máx. de descarga da bateria (kW, opcional)",
           "battery_min_soc": "Reserva da bateria — estado de carga mínimo (%, predefinição 10)",
-          "battery_efficiency": "Eficiência de ida e volta da bateria (%, predefinição 90)"
+          "battery_efficiency": "Eficiência de ida e volta da bateria (%, predefinição 90)",
+          "curtailment_entity": "Sinal de limitação (sensor binário, opcional)"
         },
         "data_description": {
-          "battery_soc_entity": "Preencha a capacidade e este sensor para ativar a projeção do estado de carga. O consumo da casa vem do seu painel de Energia, aqui não é necessário nenhum sensor."
+          "battery_soc_entity": "Preencha a capacidade e este sensor para ativar a projeção do estado de carga. O consumo da casa vem do seu painel de Energia, aqui não é necessário nenhum sensor.",
+          "curtailment_entity": "Ativo enquanto o inversor está limitado por um motivo que o céu não explica: bateria cheia, injeção zero, limite de rede. As horas que marca não são aprendidas como produção baixa. Sem ele, uma bateria cheia continua a ser detetada pelo sensor de estado de carga e pelo limite do inversor."
         }
       },
       "lines": {

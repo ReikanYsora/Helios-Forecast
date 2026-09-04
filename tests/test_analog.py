@@ -179,6 +179,30 @@ def test_build_library_drops_night() -> None:
     assert lib[0].watt == 3.0 * 1000.0  # kWh -> W over the hour
 
 
+def test_build_library_drops_curtailed_hours() -> None:
+    lat, lon = 45.0, 0.0
+    noon = _june_noon(12)
+    one = _june_noon(13)
+    prod = [
+        _Bucket(noon.timestamp() * 1000.0, (noon + timedelta(hours=1)).timestamp() * 1000.0, 3.0),
+        _Bucket(one.timestamp() * 1000.0, (one + timedelta(hours=1)).timestamp() * 1000.0, 1.2),
+    ]
+    prod[1].curtailed = True
+    times = [_june_noon(h) for h in range(24)]
+    weather = WeatherSeries(
+        times=times,
+        cloud=[20.0] * 24,
+        shortwave=[0.0] * 24,
+        direct=[0.0] * 24,
+        diffuse=[0.0] * 24,
+        temp=[20.0] * 24,
+        wind=[5.0] * 24,
+        snow=[0.0] * 24,
+    )
+    lib = build_library(prod, weather, lat, lon)
+    assert [s.watt for s in lib] == [3000.0]
+
+
 def test_enrich_points_past_untouched_future_blended() -> None:
     lat, lon = 45.0, 0.0
     now = _june_noon(12)

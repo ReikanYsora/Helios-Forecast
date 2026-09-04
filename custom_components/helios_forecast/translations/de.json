@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Max. Ladeleistung der Batterie (kW, optional)",
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
           "battery_min_soc": "Batteriereserve — minimaler Ladezustand (%, Standard 10)",
-          "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)"
+          "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
+          "curtailment_entity": "Abregelungssignal (Binärsensor, optional)"
         },
         "data_description": {
-          "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig."
+          "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Max. Ladeleistung der Batterie (kW, optional)",
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
           "battery_min_soc": "Batteriereserve — minimaler Ladezustand (%, Standard 10)",
-          "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)"
+          "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
+          "curtailment_entity": "Abregelungssignal (Binärsensor, optional)"
         },
         "data_description": {
-          "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig."
+          "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
         }
       },
       "lines": {

@@ -135,6 +135,10 @@ def build_library(production: list, weather: WeatherSeries, lat: float, lon: flo
     for b in production:
         if not _finite(getattr(b, "kwh", None)):
             continue
+        # A curtailed hour is what the inverter allowed, not what the sky gave: it has no place in a
+        # library of actual production under similar conditions.
+        if getattr(b, "curtailed", False):
+            continue
         mid_ms = (b.start_ms + b.end_ms) / 2.0
         moment = datetime.fromtimestamp(mid_ms / 1000.0, tz=weather.times[0].tzinfo) if weather.times else None
         if moment is None:

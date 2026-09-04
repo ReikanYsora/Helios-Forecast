@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Putere max. de încărcare a bateriei (kW, opțional)",
           "battery_max_discharge_kw": "Putere max. de descărcare a bateriei (kW, opțional)",
           "battery_min_soc": "Rezerva bateriei — stare de încărcare minimă (%, implicit 10)",
-          "battery_efficiency": "Randamentul dus-întors al bateriei (%, implicit 90)"
+          "battery_efficiency": "Randamentul dus-întors al bateriei (%, implicit 90)",
+          "curtailment_entity": "Semnal de limitare (senzor binar, opțional)"
         },
         "data_description": {
-          "battery_soc_entity": "Completați capacitatea și acest senzor pentru a activa proiecția stării de încărcare. Consumul casei este preluat din tabloul de bord Energie, aici nu este nevoie de niciun senzor."
+          "battery_soc_entity": "Completați capacitatea și acest senzor pentru a activa proiecția stării de încărcare. Consumul casei este preluat din tabloul de bord Energie, aici nu este nevoie de niciun senzor.",
+          "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Putere max. de încărcare a bateriei (kW, opțional)",
           "battery_max_discharge_kw": "Putere max. de descărcare a bateriei (kW, opțional)",
           "battery_min_soc": "Rezerva bateriei — stare de încărcare minimă (%, implicit 10)",
-          "battery_efficiency": "Randamentul dus-întors al bateriei (%, implicit 90)"
+          "battery_efficiency": "Randamentul dus-întors al bateriei (%, implicit 90)",
+          "curtailment_entity": "Semnal de limitare (senzor binar, opțional)"
         },
         "data_description": {
-          "battery_soc_entity": "Completați capacitatea și acest senzor pentru a activa proiecția stării de încărcare. Consumul casei este preluat din tabloul de bord Energie, aici nu este nevoie de niciun senzor."
+          "battery_soc_entity": "Completați capacitatea și acest senzor pentru a activa proiecția stării de încărcare. Consumul casei este preluat din tabloul de bord Energie, aici nu este nevoie de niciun senzor.",
+          "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului."
         }
       },
       "lines": {

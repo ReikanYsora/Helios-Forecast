@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Max. nabíjací výkon batérie (kW, voliteľné)",
           "battery_max_discharge_kw": "Max. vybíjací výkon batérie (kW, voliteľné)",
           "battery_min_soc": "Rezerva batérie — minimálny stav nabitia (%, predvolené 10)",
-          "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)"
+          "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)",
+          "curtailment_entity": "Signál obmedzenia (binárny senzor, voliteľné)"
         },
         "data_description": {
-          "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor."
+          "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor.",
+          "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Max. nabíjací výkon batérie (kW, voliteľné)",
           "battery_max_discharge_kw": "Max. vybíjací výkon batérie (kW, voliteľné)",
           "battery_min_soc": "Rezerva batérie — minimálny stav nabitia (%, predvolené 10)",
-          "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)"
+          "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)",
+          "curtailment_entity": "Signál obmedzenia (binárny senzor, voliteľné)"
         },
         "data_description": {
-          "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor."
+          "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor.",
+          "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača."
         }
       },
       "lines": {

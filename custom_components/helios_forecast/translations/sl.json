@@ -22,10 +22,12 @@
           "battery_max_charge_kw": "Najv. moč polnjenja baterije (kW, izbirno)",
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
           "battery_min_soc": "Rezerva baterije — najmanjše stanje napolnjenosti (%, privzeto 10)",
-          "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)"
+          "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
+          "curtailment_entity": "Signal omejitve (binarni senzor, neobvezno)"
         },
         "data_description": {
-          "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben."
+          "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
         }
       },
       "line": {
@@ -68,10 +70,12 @@
           "battery_max_charge_kw": "Najv. moč polnjenja baterije (kW, izbirno)",
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
           "battery_min_soc": "Rezerva baterije — najmanjše stanje napolnjenosti (%, privzeto 10)",
-          "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)"
+          "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
+          "curtailment_entity": "Signal omejitve (binarni senzor, neobvezno)"
         },
         "data_description": {
-          "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben."
+          "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
         }
       },
       "lines": {

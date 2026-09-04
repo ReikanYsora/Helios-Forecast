@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock
 
 import pytest
@@ -402,3 +402,38 @@ async def test_write_weather_statistics_advances_marker_once_entity_exists(hass)
     coordinator.write_weather_statistics(now_utc, full=True)
 
     assert coordinator._last_weather_stat_hour == now_utc.replace(minute=0, second=0, microsecond=0)
+
+
+# --- curtailment flagging ------------------------------------------------------------------
+
+
+async def test_flag_curtailed_marks_full_battery_hours_at_the_cap(hass, monkeypatch) -> None:
+    from custom_components.helios_forecast.solar.residual import ProductionBucket
+
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    hour = 3_600_000.0
+    buckets = [ProductionBucket(start_ms=h * hour, end_ms=(h + 1) * hour, kwh=1.15) for h in (10, 11)]
+
+    async def _statistics(stat_id, start, end, types, units):
+        assert stat_id == "sensor.soc" and types == {"max"}
+        return [
+            {"start": 10 * 3600.0, "end": 11 * 3600.0, "max": 100.0},
+            {"start": 11 * 3600.0, "end": 12 * 3600.0, "max": 80.0},
+        ]
+
+    monkeypatch.setattr(coordinator, "_statistics", _statistics)
+    data = {"battery_soc_entity": "sensor.soc", "inverter_max_kw": 1.2}
+    start = datetime.fromtimestamp(0, tz=timezone.utc)
+    out = await coordinator._flag_curtailed(data, buckets, start, start + timedelta(hours=24))
+    assert [b.curtailed for b in out] == [True, False]
+
+    # No cap configured: the battery signal is unusable, nothing is flagged and the history is not read.
+    async def _no_call(*_a, **_k):
+        raise AssertionError("statistics must not be read without a cap")
+
+    monkeypatch.setattr(coordinator, "_statistics", _no_call)
+    out = await coordinator._flag_curtailed(
+        {"battery_soc_entity": "sensor.soc"}, buckets, start, start + timedelta(hours=24)
+    )
+    assert [b.curtailed for b in out] == [False, False]
