@@ -54,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Muokkaa asetuksia (sijainti, invertteri, tuotantoanturi, akku, rajoitussignaali)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Osallistu yhteisön vertailuun"
         }
       },
       "settings": {
@@ -93,6 +94,20 @@
           "longitude": "Pituusaste tälle linjalle (valinnainen)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: yhteisön vertailu",
+        "description": "Avoin mittaus siitä, kuinka tarkka Helios Forecast todella on, oikeilla järjestelmillä, julkaistuna sitä mukaa. Haluatko osallistua? Täältä pääset: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHae avain yhdellä klikkauksella, ilman tiliä ja ilman nimeä, ja liitä se alle. Poista se lopettaaksesi kaiken.",
+        "data": {
+          "benchmark_enabled": "Osallistu julkiseen tarkkuusvertailuun (valinnainen)",
+          "benchmark_key": "Vertailun avain",
+          "benchmark_url": "Kerääjän osoite"
+        },
+        "data_description": {
+          "benchmark_enabled": "Lähettää kerran tunnissa sen, mitä tämä järjestelmä ennustaa, jotta sitä voidaan verrata todelliseen tuotantoon. Tulokset julkaistaan avoimesti. Lähetetään vain paneelien geometria, ennustettu käyrä, mitattu tuotanto ja luotettavuusindeksi: ei entiteettien nimiä, ei kulutusta, ei muita antureita, ja koordinaatit pyöristettyinä noin kilometriin. Pois päältä, kunnes otat sen käyttöön.",
+          "benchmark_key": "Kirjoitusavain, jonka sait liittyessäsi vertailuun. Ilman sitä mitään ei lähetetä.",
+          "benchmark_url": "Osoite, johon mittaukset lähetetään, näytettynä jotta tiedät tarkalleen minne."
         }
       }
     }

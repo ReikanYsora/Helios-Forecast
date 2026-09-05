@@ -54,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Edytuj ustawienia (lokalizacja, falownik, czujnik produkcji, akumulator, sygnał ograniczenia)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Dołącz do testu społecznościowego"
         }
       },
       "settings": {
@@ -93,6 +94,20 @@
           "longitude": "Długość geograficzna dla tej linii (opcjonalnie)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: test społecznościowy",
+        "description": "Otwarty pomiar rzeczywistej dokładności Helios Forecast, na prawdziwych instalacjach, publikowany na bieżąco. Chcesz wziąć udział? Tędy: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nPobierz klucz jednym kliknięciem, bez konta i bez nazwiska, a potem wklej go poniżej. Aby wszystko zatrzymać, usuń go.",
+        "data": {
+          "benchmark_enabled": "Udział w publicznym teście dokładności (opcjonalnie)",
+          "benchmark_key": "Klucz testu",
+          "benchmark_url": "Adres kolektora testu"
+        },
+        "data_description": {
+          "benchmark_enabled": "Wysyła raz na godzinę to, co ta instalacja przewiduje, aby porównać to z rzeczywistą produkcją. Wyniki są publikowane otwarcie. Wysyłane sa tylko geometria paneli, przewidywana krzywa, zmierzona produkcja i wskaźnik wiarygodności: żadnych nazw encji, żadnego zużycia, żadnych innych czujników, a współrzędne zaokrąglone do około kilometra. Wyłączone, dopóki tego nie włączysz.",
+          "benchmark_key": "Klucz zapisu otrzymany przy dołączeniu do testu. Bez niego nic nie jest wysyłane.",
+          "benchmark_url": "Adres, na który wysyłane są pomiary, pokazany, abyś wiedział dokładnie, dokąd trafiają."
         }
       }
     }

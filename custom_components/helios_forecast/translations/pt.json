@@ -54,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Editar definições (localização, inversor, sensor de produção, bateria, sinal de limitação)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Participar no teste comunitário"
         }
       },
       "settings": {
@@ -93,6 +94,20 @@
           "longitude": "Longitude para esta linha (opcional)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: teste comunitário",
+        "description": "Uma medição aberta da precisão real do Helios Forecast, em instalações reais, publicada à medida. Quer participar? É por aqui: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nObtenha uma chave num clique, sem conta e sem nome, e cole-a abaixo. Para parar tudo, apague-a.",
+        "data": {
+          "benchmark_enabled": "Contribuir para o teste público de precisão (opcional)",
+          "benchmark_key": "Chave do teste",
+          "benchmark_url": "Endereço do coletor"
+        },
+        "data_description": {
+          "benchmark_enabled": "Envia uma vez por hora o que esta instalação prevê, para comparar com o que realmente produziu. Os resultados são publicados abertamente. Apenas a geometria dos seus painéis, a curva prevista, a produção medida e o índice de fiabilidade são enviados: nenhum nome de entidade, nenhum consumo, nenhum outro sensor, e as suas coordenadas arredondadas a cerca de um quilómetro. Desativado enquanto não o ativar.",
+          "benchmark_key": "A chave de escrita que recebeu ao aderir ao teste. Sem ela nada é enviado.",
+          "benchmark_url": "O endereço para onde as medições são enviadas, mostrado para que saiba exatamente para onde vão."
         }
       }
     }

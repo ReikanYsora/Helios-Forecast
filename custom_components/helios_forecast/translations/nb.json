@@ -54,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Rediger innstillinger (plassering, inverter, produksjonssensor, batteri, begrensningssignal)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Delta i fellesskapets test"
         }
       },
       "settings": {
@@ -93,6 +94,20 @@
           "longitude": "Lengdegrad for denne linjen (valgfritt)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: fellesskapets test",
+        "description": "En åpen måling av hvor nøyaktig Helios Forecast faktisk er, på virkelige anlegg, publisert underveis. Vil du være med? Det skjer her: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHent en nøkkel med ett klikk, uten konto og uten navn, og lim den inn nedenfor. Slett den for å stoppe alt.",
+        "data": {
+          "benchmark_enabled": "Bidra til den offentlige nøyaktighetstesten (valgfritt)",
+          "benchmark_key": "Testnøkkel",
+          "benchmark_url": "Adresse til innsamleren"
+        },
+        "data_description": {
+          "benchmark_enabled": "Sender en gang i timen hva dette anlegget forutsier, slik at det kan sammenlignes med hva det faktisk produserte. Resultatene publiseres åpent. Bare panelenes geometri, den forutsagte kurven, den målte produksjonen og påliteligheten sendes: ingen entitetsnavn, intet forbruk, ingen andre sensorer, og koordinatene dine avrundet til omtrent en kilometer. Av til du slår det på.",
+          "benchmark_key": "Skrivenøkkelen du fikk da du ble med i testen. Uten den sendes ingenting.",
+          "benchmark_url": "Adressen målingene sendes til, vist så du vet nøyaktig hvor."
         }
       }
     }

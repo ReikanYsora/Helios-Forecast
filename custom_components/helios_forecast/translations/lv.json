@@ -54,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Rediģēt iestatījumus (atrašanās vieta, invertors, ražošanas sensors, baterija, ierobežojuma signāls)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Piedalies kopienas salīdzinājumā"
         }
       },
       "settings": {
@@ -93,6 +94,20 @@
           "longitude": "Garums šai līnijai (neobligāti)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: kopienas salīdzinājums",
+        "description": "Atklāts mērījums tam, cik precīzs Helios Forecast patiešām ir, uz reālām iekārtām, publicēts pakāpeniski. Vai vēlaties piedalīties? Šeit: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nIegūstiet atslēgu ar vienu klikšķi, bez konta un bez vārda, un ielīmējiet to zemāk. Lai visu apturētu, izdzēsiet to.",
+        "data": {
+          "benchmark_enabled": "Piedalīties publiskajā precizitātes salīdzinājumā (neobligāti)",
+          "benchmark_key": "Salīdzinājuma atslēga",
+          "benchmark_url": "Savācēja adrese"
+        },
+        "data_description": {
+          "benchmark_enabled": "Reizi stundā nosūta to, ko šī iekārta prognozē, lai to varētu salīdzināt ar patieso ražošanu. Rezultāti tiek publicēti atklāti. Tiek nosūtīta tikai paneļu ģeometrija, prognozētā līkne, izmērītā ražošana un uzticamības indekss: nekādu entītiju nosaukumu, nekāda patēriņa, nekādu citu sensoru, un koordinātas noapaļotas līdz aptuveni kilometram. Izslēgts, līdz to ieslēgsiet.",
+          "benchmark_key": "Rakstīšanas atslēga, ko saņēmāt, pievienojoties salīdzinājumam. Bez tās nekas netiek nosūtīts.",
+          "benchmark_url": "Adrese, uz kuru tiek sūtīti mērījumi, parādīta, lai zinātu, kurp tie dodas."
         }
       }
     }

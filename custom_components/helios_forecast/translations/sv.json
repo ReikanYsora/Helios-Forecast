@@ -54,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Redigera inställningar (plats, växelriktare, produktionssensor, batteri, begränsningssignal)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Delta i gemenskapens jämförelse"
         }
       },
       "settings": {
@@ -93,6 +94,20 @@
           "longitude": "Longitud för denna rad (valfritt)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: gemenskapens jämförelse",
+        "description": "En öppen mätning av hur noggrann Helios Forecast verkligen är, på riktiga anläggningar, publicerad efter hand. Vill du vara med? Det sker här: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHämta en nyckel med ett klick, utan konto och utan namn, och klistra in den nedan. Radera den för att stoppa allt.",
+        "data": {
+          "benchmark_enabled": "Bidra till den offentliga noggrannhetsjämförelsen (valfritt)",
+          "benchmark_key": "Jämförelsenyckel",
+          "benchmark_url": "Adress till insamlaren"
+        },
+        "data_description": {
+          "benchmark_enabled": "Skickar en gång i timmen vad den här anläggningen förutser, så att det kan jämföras med vad den faktiskt producerade. Resultaten publiceras öppet. Endast panelernas geometri, den förutsagda kurvan, den uppmätta produktionen och tillförlitlighetsindexet skickas: inga entitetsnamn, ingen förbrukning, inga andra sensorer, och dina koordinater avrundade till ungefär en kilometer. Av tills du slår på det.",
+          "benchmark_key": "Skrivnyckeln du fick när du gick med i jämförelsen. Utan den skickas ingenting.",
+          "benchmark_url": "Adressen dit mätningarna skickas, visad så att du vet exakt vart."
         }
       }
     }

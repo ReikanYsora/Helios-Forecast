@@ -44,6 +44,11 @@
 > (section 5), detected from the SoC sensor and the inverter cap or from an optional
 > curtailment signal entity. (e) The series split between archive and live points
 > is documented as implemented (section 3).
+>
+> Revision (2026-09-05, second): an entry can opt in to the **public accuracy
+> benchmark** (section 5). It changes nothing the card sees: no new entity, no new
+> command, no change to any series. The upload runs beside the refresh and its
+> failure is invisible to every other surface.
 
 The integration owns one **config entry per installation**, holding one or more
 **panel lines** (a group of co-oriented panels each). Every surface below is scoped
@@ -328,6 +333,15 @@ orientation.
   export, a grid limit). Its hours are excluded from the learning as above.
 - Today-trend reference hour: the local hour at which today's outlook reference
   is frozen.
+- **Public accuracy benchmark (optional, off by default).** Its own step in the
+  options menu, holding a switch, a write key and the collector address, the last
+  shown read only and only stored when it is not the standard one. Switched on, the
+  entry posts once an hour what it currently predicts, the cloud cover behind it,
+  the production already measured over the last 72 hours, its panel geometry, its
+  country and its coordinates rounded to two decimals, under a hash of the entry.
+  Nothing else leaves the installation, and clearing the key stops it. This is a
+  contract with the collector, not with the card: no output surface above is
+  affected, and an upload that fails never reaches a forecast.
 - **Battery SoC projection (2026.9.0, optional).** A separate block, off unless
   both the usable **capacity (kWh)** and a live **state-of-charge sensor (%)** are
   set; the reserve (min SoC %), round-trip efficiency (%) and charge / discharge

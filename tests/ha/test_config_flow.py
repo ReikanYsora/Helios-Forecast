@@ -20,6 +20,7 @@ from custom_components.helios_forecast.config import (
     CONF_TRACKER,
     layout_from_config,
 )
+from custom_components.helios_forecast.benchmark import DEFAULT_ENDPOINT
 from custom_components.helios_forecast.const import DOMAIN
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -67,7 +68,36 @@ async def test_options_init_shows_menu(recorder_mock, hass: HomeAssistant, enabl
 
     result = await hass.config_entries.options.async_init(entry.entry_id)
     assert result["type"] == FlowResultType.MENU
-    assert set(result["menu_options"]) == {"settings", "lines"}
+    assert set(result["menu_options"]) == {"settings", "lines", "benchmark"}
+
+
+async def test_benchmark_step_joins_without_disturbing_the_installation(
+    recorder_mock, hass: HomeAssistant, enable_custom_integrations
+) -> None:
+    """Opting in must not quietly drop the settings or the panel lines it was not shown."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={CONF_ARRAYS: [_LINE_A, _LINE_B], CONF_INVERTER_MAX_KW: 5.0, "production_entity": "sensor.pv"},
+    )
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "benchmark"})
+    assert result["step_id"] == "benchmark"
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {"benchmark_enabled": True, "benchmark_key": "a-key", "benchmark_url": DEFAULT_ENDPOINT},
+    )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    data = result["data"]
+    assert data["benchmark_enabled"] is True
+    assert data["benchmark_key"] == "a-key"
+    assert data[CONF_INVERTER_MAX_KW] == 5.0
+    assert data["production_entity"] == "sensor.pv"
+    assert len(data[CONF_ARRAYS]) == 2
+    # The standard address is never written down, so the day the collector moves everyone follows.
+    assert "benchmark_url" not in data
 
 
 async def test_options_settings_step_keeps_lines_untouched(

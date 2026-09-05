@@ -54,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Upravit nastavení (poloha, střídač, senzor výroby, baterie, signál omezení)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Zapojit se do komunitního srovnání"
         }
       },
       "settings": {
@@ -93,6 +94,20 @@
           "longitude": "Zeměpisná délka pro tuto linii (volitelné)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: komunitní srovnání",
+        "description": "Otevřené měření skutečné přesnosti Helios Forecast na reálných instalacích, průběžně zveřejňované. Chcete se zapojit? Tudy: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nZískejte klíč jedním kliknutím, bez účtu a bez jména, a vložte ho níže. Chcete-li vše zastavit, smažte ho.",
+        "data": {
+          "benchmark_enabled": "Přispět do veřejného srovnávacího testu přesnosti (volitelné)",
+          "benchmark_key": "Klíč srovnávacího testu",
+          "benchmark_url": "Adresa sběrače"
+        },
+        "data_description": {
+          "benchmark_enabled": "Jednou za hodinu odešle, co tato instalace předpovídá, aby to šlo porovnat se skutečnou výrobou. Výsledky jsou zveřejňovány otevřeně. Odesílá se pouze geometrie panelů, předpovězená křivka, naměřená výroba a index spolehlivosti: žádné názvy entit, žádná spotřeba, žádné jiné senzory a souřadnice zaokrouhlené asi na kilometr. Vypnuto, dokud to nezapnete.",
+          "benchmark_key": "Zapisovací klíč, který jste dostali při zapojení do testu. Bez něj se nic neodesílá.",
+          "benchmark_url": "Adresa, kam se měření odesílají, zobrazená, abyste přesně věděli, kam míří."
         }
       }
     }

@@ -54,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Beállítások szerkesztése (hely, inverter, termelésérzékelő, akkumulátor, korlátozási jel)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Csatlakozás a közösségi méréshez"
         }
       },
       "settings": {
@@ -93,6 +94,20 @@
           "longitude": "Hosszúsági fok ehhez a sorhoz (opcionális)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: közösségi mérés",
+        "description": "Nyílt mérés arról, mennyire pontos valójában a Helios Forecast, valódi rendszereken, folyamatosan közzétéve. Szeretne részt venni? Erre tessék: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nSzerezzen kulcsot egy kattintással, fiók és név nélkül, majd illessze be alább. A leállításhoz törölje.",
+        "data": {
+          "benchmark_enabled": "Részvétel a nyilvános pontossági összehasonlításban (opcionális)",
+          "benchmark_key": "Összehasonlítási kulcs",
+          "benchmark_url": "A gyűjtő címe"
+        },
+        "data_description": {
+          "benchmark_enabled": "Óránként elküldi, amit ez a rendszer előrejelez, hogy összevethető legyen a valóban megtermelt energiával. Az eredmények nyilvánosan megjelennek. Csak a panelek geometriája, az előrejelzett görbe, a mért termelés és a megbízhatósági index kerül elküldésre: semmilyen entitásnév, semmilyen fogyasztás, semmilyen más érzékelő, a koordináták pedig körülbelül egy kilométerre kerekítve. Kikapcsolva, amíg be nem kapcsolja.",
+          "benchmark_key": "Az írási kulcs, amelyet a csatlakozáskor kapott. Nélküle semmi nem kerül elküldésre.",
+          "benchmark_url": "A cím, ahová a mérések mennek, megjelenítve, hogy pontosan tudja, hová kerülnek."
         }
       }
     }

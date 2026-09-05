@@ -5,6 +5,42 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.9.2
+
+### Added: contribute to the public accuracy benchmark
+
+A forecast can only be judged against what actually happened, and no provider
+serves its own past emissions: a prediction nobody wrote down at the moment it
+was made cannot be recovered later. So "accurate" stays an adjective until
+somebody starts recording. This release adds the recorder, and a menu of its own
+to join it: Configure, then the community benchmark, with a link to the page.
+
+Switched on there, an installation posts once an hour the curve it is currently
+predicting, together with the production it has already measured. A collector
+scores the two against each other once the day is over, alongside the same
+measurement taken from other forecast providers, and the results are published
+openly at helios-ha.org/benchmark.
+
+It is off unless you turn it on, and it needs a key, which you get in one click
+with no account and no name. What it sends is fixed and small: your panel
+geometry, the predicted curve with the cloud cover behind it, the measured
+production and the reliability index. No entity names, no consumption, no other
+sensor, and your coordinates rounded to about a kilometre, which no weather model
+can tell apart from the exact spot. The installation is identified by a hash, so
+one site can be followed over time without the collector ever being told whose it
+is. The upload runs beside the forecast and never inside it: a collector that is
+slow, unreachable or gone cannot delay or break anything. Clear the key and
+everything stops within the second.
+
+
+### Fixed: the type check on the curtailment cap
+
+The inverter cap was validated through a local flag the type checker could not
+follow, so the published tree failed its own type gate. Same behaviour, narrowed
+where it is read.
+
+---
+
 ## 2026.9.1
 
 A corrective release on top of 2026.9.0, plus the battery projection's extremes as

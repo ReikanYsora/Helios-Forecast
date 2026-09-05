@@ -54,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Uredi postavke (lokacija, pretvarač, senzor proizvodnje, baterija, signal ograničenja)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Sudjeluj u usporedbi zajednice"
         }
       },
       "settings": {
@@ -93,6 +94,20 @@
           "longitude": "Zemljopisna dužina za ovu liniju (opcionalno)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: usporedba zajednice",
+        "description": "Otvoreno mjerenje stvarne točnosti Helios Forecasta, na pravim instalacijama, objavljivano usput. Želite sudjelovati? Ovuda: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nUzmite ključ jednim klikom, bez računa i bez imena, pa ga zalijepite ispod. Za zaustavljanje svega, obrišite ga.",
+        "data": {
+          "benchmark_enabled": "Doprinesi javnoj usporedbi točnosti (neobavezno)",
+          "benchmark_key": "Ključ usporedbe",
+          "benchmark_url": "Adresa sakupljača"
+        },
+        "data_description": {
+          "benchmark_enabled": "Jednom na sat šalje ono što ova instalacija predviđa, kako bi se usporedilo sa stvarnom proizvodnjom. Rezultati se objavljuju otvoreno. Šalju se samo geometrija panela, predviđena krivulja, izmjerena proizvodnja i indeks pouzdanosti: nikakvi nazivi entiteta, nikakva potrošnja, nikakvi drugi senzori, a koordinate zaokružene na otprilike kilometar. Isključeno dok ga ne uključite.",
+          "benchmark_key": "Ključ za pisanje dobiven pri pristupanju usporedbi. Bez njega se ništa ne šalje.",
+          "benchmark_url": "Adresa na koju se šalju mjerenja, prikazana da znate točno kamo idu."
         }
       }
     }

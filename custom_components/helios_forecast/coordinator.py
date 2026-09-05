@@ -30,6 +30,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.loader import async_get_integration
 from homeassistant.util import dt as dt_util
 
 from .config import (
@@ -40,8 +41,15 @@ from .config import (
     location_from_config,
     trend_anchor_hour_from_config,
     curtailment_entity_from_config,
+    lines_from_config,
+    CONF_BATTERY_CAPACITY_KWH,
     CONF_BATTERY_SOC_ENTITY,
+    CONF_BENCHMARK_ENABLED,
+    CONF_BENCHMARK_KEY,
+    CONF_BENCHMARK_URL,
+    CONF_INVERTER_MAX_KW,
 )
+from .benchmark import DEFAULT_ENDPOINT, async_upload, build_payload
 from .analog import build_library, enrich_archive_points, enrich_points
 from .curtailment import flag_curtailed, on_intervals_from_states
 from .battery import BatterySocPoint, project_battery_soc
@@ -184,6 +192,10 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         self._trend_loaded = False
         # Last-logged reason the battery SoC projection was skipped, so _battery_off() warns once per reason.
         self._battery_off_logged: Optional[str] = None
+        # The hour whose prediction was last handed to the benchmark collector, and this integration's
+        # version, read once from the manifest so every emission says which model produced it.
+        self._last_upload_hour: Optional[datetime] = None
+        self._version: Optional[str] = None
 
     def _config(self) -> Dict[str, Any]:
         return {**self.entry.data, **self.entry.options}
@@ -278,6 +290,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         trend = await self._today_trend(data, now, summary)
         battery_soc = await self._project_battery_soc(data, points, now)
+        await self._maybe_upload_benchmark(data, lat, lon, points, reliability, now_utc)
 
         return ForecastData(
             points=points,
@@ -287,6 +300,54 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             reliability=reliability,
             trend=trend,
             battery_soc=battery_soc,
+        )
+
+    async def _maybe_upload_benchmark(self, data, lat, lon, points, reliability, now_utc) -> None:
+        """Hand this hour's prediction to the benchmark collector, when the entry opted in.
+
+        Started beside the refresh instead of inside it: a collector that is slow, unreachable or
+        gone must never hold up a forecast. Once an hour, whatever the refresh rate. The whole
+        thing is wrapped: an optional upload has no business failing a forecast, so anything that
+        goes wrong on the way out is a debug line and nothing more (see benchmark.py).
+        """
+        if not data.get(CONF_BENCHMARK_ENABLED):
+            return
+        key = str(data.get(CONF_BENCHMARK_KEY) or "").strip()
+        if not key:
+            return
+        hour = now_utc.replace(minute=0, second=0, microsecond=0)
+        if self._last_upload_hour == hour:
+            return
+        self._last_upload_hour = hour
+        try:
+            await self._upload_benchmark(data, lat, lon, points, reliability, now_utc, key)
+        except Exception as err:  # noqa: BLE001 - see the docstring
+            _LOGGER.debug("Benchmark emission skipped: %s", err)
+
+    async def _upload_benchmark(self, data, lat, lon, points, reliability, now_utc, key) -> None:
+        """Assemble this hour's emission and hand it to a background task."""
+        if self._version is None:
+            integration = await async_get_integration(self.hass, DOMAIN)
+            self._version = str(integration.version)
+        payload = build_payload(
+            entry_id=self.entry.entry_id,
+            version=self._version,
+            emitted_at=now_utc,
+            latitude=lat,
+            longitude=lon,
+            lines=lines_from_config(data),
+            country=self.hass.config.country,
+            inverter_max_kw=data.get(CONF_INVERTER_MAX_KW),
+            points=points,
+            reliability=reliability,
+            production=self._production_buckets,
+            has_battery=bool(data.get(CONF_BATTERY_CAPACITY_KWH) and data.get(CONF_BATTERY_SOC_ENTITY)),
+            has_curtailment_signal=bool(curtailment_entity_from_config(data)),
+        )
+        url = str(data.get(CONF_BENCHMARK_URL) or "").strip() or DEFAULT_ENDPOINT
+        session = async_get_clientsession(self.hass)
+        self.entry.async_create_background_task(
+            self.hass, async_upload(session, url, key, payload), name=f"{DOMAIN}-benchmark-upload"
         )
 
     async def _project_battery_soc(self, data, points, now) -> List[BatterySocPoint]:

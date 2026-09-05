@@ -54,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Editați setările (locație, invertor, senzor de producție, baterie, semnal de limitare)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Participă la testul comunității"
         }
       },
       "settings": {
@@ -93,6 +94,20 @@
           "longitude": "Longitudine pentru această linie (opțional)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: testul comunității",
+        "description": "O măsurătoare deschisă a preciziei reale a Helios Forecast, pe instalații adevărate, publicată pe măsură. Doriți să participați? Pe aici: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nObțineți o cheie dintr-un clic, fără cont și fără nume, apoi lipiți-o mai jos. Pentru a opri totul, ștergeți-o.",
+        "data": {
+          "benchmark_enabled": "Contribuie la testul public de precizie (opțional)",
+          "benchmark_key": "Cheia testului",
+          "benchmark_url": "Adresa colectorului"
+        },
+        "data_description": {
+          "benchmark_enabled": "Trimite o dată pe oră ceea ce prezice această instalație, pentru a fi comparat cu ce a produs în realitate. Rezultatele sunt publicate deschis. Se trimit doar geometria panourilor, curba prezisă, producția măsurată și indicele de fiabilitate: niciun nume de entitate, niciun consum, niciun alt senzor, iar coordonatele rotunjite la aproximativ un kilometru. Dezactivat până când îl activați.",
+          "benchmark_key": "Cheia de scriere primită la înscrierea în test. Fără ea nu se trimite nimic.",
+          "benchmark_url": "Adresa la care sunt trimise măsurătorile, afișată ca să știți exact unde ajung."
         }
       }
     }
