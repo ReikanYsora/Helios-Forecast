@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Aku maksimaalne tühjenemisvõimsus (kW, valikuline)",
           "battery_min_soc": "Aku reserv, minimaalne laetus (%, vaikimisi 10)",
           "battery_efficiency": "Aku edasi-tagasi kasutegur (%, vaikimisi 90)",
-          "curtailment_entity": "Piirangu signaal (binaarandur, valikuline)"
+          "curtailment_entity": "Piirangu signaal (binaarandur, valikuline)",
+          "benchmark_enabled": "Osale avalikus täpsuse võrdlustestis (valikuline)",
+          "benchmark_key": "Võrdlustesti võti",
+          "benchmark_url": "Koguja aadress"
         },
         "data_description": {
           "production_entity": "Kumulatiivne energiaandur (kWh), nt inverteri või energiaarvesti kogutoodang. Võimsusandur (W) ei tööta: sellel puudub pikaajaline summastatistika, nii et õppimine ja usaldusväärsuse indeks jääksid välja.",
           "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
-          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi."
+          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi.",
+          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegeliku toodanguga. Tulemused avaldatakse avalikult. Saadetakse ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: mitte ühtegi olemi nime, mitte mingit tarbimist, mitte ühtegi muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Väljas, kuni selle sisse lülitate.",
+          "benchmark_key": "Kirjutusvõti, mille saite võrdlustestiga liitudes. Ilma selleta ei saadeta midagi.",
+          "benchmark_url": "Jätke muutmata, kui te ei majuta oma kogujat."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Aku maksimaalne tühjenemisvõimsus (kW, valikuline)",
           "battery_min_soc": "Aku reserv, minimaalne laetus (%, vaikimisi 10)",
           "battery_efficiency": "Aku edasi-tagasi kasutegur (%, vaikimisi 90)",
-          "curtailment_entity": "Piirangu signaal (binaarandur, valikuline)"
+          "curtailment_entity": "Piirangu signaal (binaarandur, valikuline)",
+          "benchmark_enabled": "Osale avalikus täpsuse võrdlustestis (valikuline)",
+          "benchmark_key": "Võrdlustesti võti",
+          "benchmark_url": "Koguja aadress"
         },
         "data_description": {
           "production_entity": "Kumulatiivne energiaandur (kWh), nt inverteri või energiaarvesti kogutoodang. Võimsusandur (W) ei tööta: sellel puudub pikaajaline summastatistika, nii et õppimine ja usaldusväärsuse indeks jääksid välja.",
           "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
-          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi."
+          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi.",
+          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegeliku toodanguga. Tulemused avaldatakse avalikult. Saadetakse ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: mitte ühtegi olemi nime, mitte mingit tarbimist, mitte ühtegi muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Väljas, kuni selle sisse lülitate.",
+          "benchmark_key": "Kirjutusvõti, mille saite võrdlustestiga liitudes. Ilma selleta ei saadeta midagi.",
+          "benchmark_url": "Jätke muutmata, kui te ei majuta oma kogujat."
         }
       },
       "lines": {

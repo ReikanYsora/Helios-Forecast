@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
           "battery_min_soc": "Batteriereserve, minimaler Ladezustand (%, Standard 10)",
           "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
-          "curtailment_entity": "Abregelungssignal (Binärsensor, optional)"
+          "curtailment_entity": "Abregelungssignal (Binärsensor, optional)",
+          "benchmark_enabled": "Am öffentlichen Genauigkeits-Benchmark teilnehmen (optional)",
+          "benchmark_key": "Benchmark-Schlüssel",
+          "benchmark_url": "Adresse des Benchmark-Sammlers"
         },
         "data_description": {
           "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
           "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
-          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt.",
+          "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit der tatsächlichen Produktion verglichen werden kann. Die Ergebnisse werden offen veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Produktion und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, keine anderen Sensoren, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Aus, solange Sie es nicht einschalten.",
+          "benchmark_key": "Der Schreibschlüssel, den Sie beim Beitritt zum Benchmark erhalten haben. Ohne ihn wird nichts gesendet.",
+          "benchmark_url": "Unverändert lassen, außer Sie betreiben einen eigenen Sammler."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
           "battery_min_soc": "Batteriereserve, minimaler Ladezustand (%, Standard 10)",
           "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
-          "curtailment_entity": "Abregelungssignal (Binärsensor, optional)"
+          "curtailment_entity": "Abregelungssignal (Binärsensor, optional)",
+          "benchmark_enabled": "Am öffentlichen Genauigkeits-Benchmark teilnehmen (optional)",
+          "benchmark_key": "Benchmark-Schlüssel",
+          "benchmark_url": "Adresse des Benchmark-Sammlers"
         },
         "data_description": {
           "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
           "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
-          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt.",
+          "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit der tatsächlichen Produktion verglichen werden kann. Die Ergebnisse werden offen veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Produktion und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, keine anderen Sensoren, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Aus, solange Sie es nicht einschalten.",
+          "benchmark_key": "Der Schreibschlüssel, den Sie beim Beitritt zum Benchmark erhalten haben. Ohne ihn wird nichts gesendet.",
+          "benchmark_url": "Unverändert lassen, außer Sie betreiben einen eigenen Sammler."
         }
       },
       "lines": {

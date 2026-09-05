@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Maks. akumulatora izlādes jauda (kW, neobligāti)",
           "battery_min_soc": "Akumulatora rezerve, minimālais uzlādes līmenis (%, noklusējums 10)",
           "battery_efficiency": "Akumulatora cikla lietderības koeficients (%, noklusējums 90)",
-          "curtailment_entity": "Ierobežojuma signāls (binārais sensors, pēc izvēles)"
+          "curtailment_entity": "Ierobežojuma signāls (binārais sensors, pēc izvēles)",
+          "benchmark_enabled": "Piedalīties publiskajā precizitātes salīdzinājumā (neobligāti)",
+          "benchmark_key": "Salīdzinājuma atslēga",
+          "benchmark_url": "Savācēja adrese"
         },
         "data_description": {
           "production_entity": "Kumulatīvs enerģijas sensors (kWh), piem., invertora vai skaitītāja kopējā ražošana. Jaudas sensors (W) nedarbosies: tam nav ilgtermiņa summas statistikas, tāpēc mācīšanās un uzticamības indekss paliktu izslēgti.",
           "battery_soc_entity": "Aizpildiet ietilpību un šo sensoru, lai ieslēgtu uzlādes līmeņa prognozi. Mājas patēriņš tiek ņemts no Enerģijas paneļa, sensors šeit nav vajadzīgs.",
-          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita."
+          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita.",
+          "benchmark_enabled": "Reizi stundā nosūta to, ko šī iekārta prognozē, lai to varētu salīdzināt ar patieso ražošanu. Rezultāti tiek publicēti atklāti. Tiek nosūtīta tikai paneļu ģeometrija, prognozētā līkne, izmērītā ražošana un uzticamības indekss: nekādu entītiju nosaukumu, nekāda patēriņa, nekādu citu sensoru, un koordinātas noapaļotas līdz aptuveni kilometram. Izslēgts, līdz to ieslēgsiet.",
+          "benchmark_key": "Rakstīšanas atslēga, ko saņēmāt, pievienojoties salīdzinājumam. Bez tās nekas netiek nosūtīts.",
+          "benchmark_url": "Atstājiet nemainītu, ja vien neuzturat savu savācēju."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Maks. akumulatora izlādes jauda (kW, neobligāti)",
           "battery_min_soc": "Akumulatora rezerve, minimālais uzlādes līmenis (%, noklusējums 10)",
           "battery_efficiency": "Akumulatora cikla lietderības koeficients (%, noklusējums 90)",
-          "curtailment_entity": "Ierobežojuma signāls (binārais sensors, pēc izvēles)"
+          "curtailment_entity": "Ierobežojuma signāls (binārais sensors, pēc izvēles)",
+          "benchmark_enabled": "Piedalīties publiskajā precizitātes salīdzinājumā (neobligāti)",
+          "benchmark_key": "Salīdzinājuma atslēga",
+          "benchmark_url": "Savācēja adrese"
         },
         "data_description": {
           "production_entity": "Kumulatīvs enerģijas sensors (kWh), piem., invertora vai skaitītāja kopējā ražošana. Jaudas sensors (W) nedarbosies: tam nav ilgtermiņa summas statistikas, tāpēc mācīšanās un uzticamības indekss paliktu izslēgti.",
           "battery_soc_entity": "Aizpildiet ietilpību un šo sensoru, lai ieslēgtu uzlādes līmeņa prognozi. Mājas patēriņš tiek ņemts no Enerģijas paneļa, sensors šeit nav vajadzīgs.",
-          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita."
+          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita.",
+          "benchmark_enabled": "Reizi stundā nosūta to, ko šī iekārta prognozē, lai to varētu salīdzināt ar patieso ražošanu. Rezultāti tiek publicēti atklāti. Tiek nosūtīta tikai paneļu ģeometrija, prognozētā līkne, izmērītā ražošana un uzticamības indekss: nekādu entītiju nosaukumu, nekāda patēriņa, nekādu citu sensoru, un koordinātas noapaļotas līdz aptuveni kilometram. Izslēgts, līdz to ieslēgsiet.",
+          "benchmark_key": "Rakstīšanas atslēga, ko saņēmāt, pievienojoties salīdzinājumam. Bez tās nekas netiek nosūtīts.",
+          "benchmark_url": "Atstājiet nemainītu, ja vien neuzturat savu savācēju."
         }
       },
       "lines": {

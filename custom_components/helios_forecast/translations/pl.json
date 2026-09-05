@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
           "battery_min_soc": "Rezerwa akumulatora, minimalny stan naładowania (%, domyślnie 10)",
           "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
-          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, opcjonalny)"
+          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, opcjonalny)",
+          "benchmark_enabled": "Udział w publicznym teście dokładności (opcjonalnie)",
+          "benchmark_key": "Klucz testu",
+          "benchmark_url": "Adres kolektora testu"
         },
         "data_description": {
           "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
           "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
-          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
+          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika.",
+          "benchmark_enabled": "Wysyła raz na godzinę to, co ta instalacja przewiduje, aby porównać to z rzeczywistą produkcją. Wyniki są publikowane otwarcie. Wysyłane sa tylko geometria paneli, przewidywana krzywa, zmierzona produkcja i wskaźnik wiarygodności: żadnych nazw encji, żadnego zużycia, żadnych innych czujników, a współrzędne zaokrąglone do około kilometra. Wyłączone, dopóki tego nie włączysz.",
+          "benchmark_key": "Klucz zapisu otrzymany przy dołączeniu do testu. Bez niego nic nie jest wysyłane.",
+          "benchmark_url": "Zostaw bez zmian, chyba że prowadzisz własny kolektor."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
           "battery_min_soc": "Rezerwa akumulatora, minimalny stan naładowania (%, domyślnie 10)",
           "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
-          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, opcjonalny)"
+          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, opcjonalny)",
+          "benchmark_enabled": "Udział w publicznym teście dokładności (opcjonalnie)",
+          "benchmark_key": "Klucz testu",
+          "benchmark_url": "Adres kolektora testu"
         },
         "data_description": {
           "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
           "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
-          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
+          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika.",
+          "benchmark_enabled": "Wysyła raz na godzinę to, co ta instalacja przewiduje, aby porównać to z rzeczywistą produkcją. Wyniki są publikowane otwarcie. Wysyłane sa tylko geometria paneli, przewidywana krzywa, zmierzona produkcja i wskaźnik wiarygodności: żadnych nazw encji, żadnego zużycia, żadnych innych czujników, a współrzędne zaokrąglone do około kilometra. Wyłączone, dopóki tego nie włączysz.",
+          "benchmark_key": "Klucz zapisu otrzymany przy dołączeniu do testu. Bez niego nic nie jest wysyłane.",
+          "benchmark_url": "Zostaw bez zmian, chyba że prowadzisz własny kolektor."
         }
       },
       "lines": {

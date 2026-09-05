@@ -20,6 +20,7 @@ from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFl
 from homeassistant.core import callback
 from homeassistant.helpers import selector
 
+from .benchmark import DEFAULT_ENDPOINT
 from .config import (
     CONF_AZIMUTH,
     CONF_BATTERY_CAPACITY_KWH,
@@ -28,6 +29,9 @@ from .config import (
     CONF_BATTERY_MAX_DISCHARGE_KW,
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_SOC_ENTITY,
+    CONF_BENCHMARK_ENABLED,
+    CONF_BENCHMARK_KEY,
+    CONF_BENCHMARK_URL,
     CONF_CURTAILMENT_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
@@ -97,6 +101,10 @@ _SOC_ENTITY = selector.EntitySelector(selector.EntitySelectorConfig(domain="sens
 _PERCENT = selector.NumberSelector(
     selector.NumberSelectorConfig(min=0, max=100, step=1, mode=_BOX, unit_of_measurement="%")
 )
+# Benchmark upload: the write key is the only secret this integration holds, so it is typed and
+# redisplayed as a password rather than sitting in clear in the form.
+_TEXT = selector.TextSelector(selector.TextSelectorConfig(type=selector.TextSelectorType.TEXT))
+_SECRET = selector.TextSelector(selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD))
 
 
 def _optional(fields: dict[Any, Any], key: str, sel: Any, suggested_value: Any) -> None:
@@ -177,6 +185,11 @@ def _settings_fields(
     # Curtailment signal: on while the inverter is held back for a reason the sky cannot explain, so those
     # hours are not learned as low production (zero export, grid limits; a full battery is detected without it).
     _optional(fields, CONF_CURTAILMENT_ENTITY, _CURTAIL_ENTITY, s.get(CONF_CURTAILMENT_ENTITY))
+    # Benchmark upload, off unless deliberately switched on and given a key. What it sends, and why it
+    # has to be sent at the moment it is predicted rather than reconstructed later, is in benchmark.py.
+    fields[vol.Optional(CONF_BENCHMARK_ENABLED, default=bool(s.get(CONF_BENCHMARK_ENABLED, False)))] = _BOOL
+    _optional(fields, CONF_BENCHMARK_KEY, _SECRET, s.get(CONF_BENCHMARK_KEY))
+    _optional(fields, CONF_BENCHMARK_URL, _TEXT, s.get(CONF_BENCHMARK_URL, DEFAULT_ENDPOINT))
     return fields
 
 

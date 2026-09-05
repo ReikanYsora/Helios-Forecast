@@ -220,6 +220,44 @@ Everything runs on your server. No account, no API key, no browser-side maths.
 
 ---
 
+## The public accuracy benchmark
+
+"Accurate" means nothing without proof, and proof is harder to get than it looks.
+A forecast can only be judged against what actually happened, and no provider
+serves its own past emissions: a prediction nobody recorded at the moment it was
+made cannot be recovered afterwards. So the measurement has to start before the
+claim, and it has to run for months.
+
+That recording is now built in, off by default. Switched on in the settings, your
+installation posts once an hour the curve it is currently predicting, together
+with the production it has already measured. A collector scores the two against
+each other once the day is over, alongside the same measurement taken from other
+forecast providers, and the results are published openly at
+[helios-ha.org](https://helios-ha.org). You can watch the benchmark fill up, day
+after day, including the days Helios gets it wrong.
+
+Contributing is opt in twice over: you have to switch it on, and you need a key.
+What leaves your installation is fixed and deliberately small.
+
+- Your panel geometry, the predicted curve, the measured production, the
+  reliability index.
+- Your coordinates rounded to about a kilometre, which no weather model can tell
+  apart from the exact spot, and which is not an address.
+- An opaque hash in place of any identity, so one installation can be followed
+  over time without the collector being told whose it is.
+
+No entity names, no consumption, no other sensor, nothing about the rest of the
+house. The whole payload is assembled in one file, `benchmark.py`, so you can
+read exactly what is sent rather than take our word for it. The upload runs beside
+the forecast and never inside it: a collector that is slow, unreachable or gone
+cannot delay or break anything.
+
+More installations make the benchmark worth more, and shading, odd orientations
+and difficult climates are the interesting cases. If you want to take part, open
+an issue and ask for a key.
+
+---
+
 ## Panel lines
 
 A panel line is a group of co-oriented panels. There are two ways to describe

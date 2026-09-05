@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
           "battery_min_soc": "Rezerva baterie, minimální stav nabití (%, výchozí 10)",
           "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)",
-          "curtailment_entity": "Signál omezení (binární senzor, volitelné)"
+          "curtailment_entity": "Signál omezení (binární senzor, volitelné)",
+          "benchmark_enabled": "Přispět do veřejného srovnávacího testu přesnosti (volitelné)",
+          "benchmark_key": "Klíč srovnávacího testu",
+          "benchmark_url": "Adresa sběrače"
         },
         "data_description": {
           "production_entity": "Kumulativní senzor energie (kWh), např. celková výroba střídače nebo elektroměru. Senzor výkonu (W) nebude fungovat: nemá dlouhodobé statistiky součtu, takže učení a index spolehlivosti by zůstaly vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
-          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
+          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače.",
+          "benchmark_enabled": "Jednou za hodinu odešle, co tato instalace předpovídá, aby to šlo porovnat se skutečnou výrobou. Výsledky jsou zveřejňovány otevřeně. Odesílá se pouze geometrie panelů, předpovězená křivka, naměřená výroba a index spolehlivosti: žádné názvy entit, žádná spotřeba, žádné jiné senzory a souřadnice zaokrouhlené asi na kilometr. Vypnuto, dokud to nezapnete.",
+          "benchmark_key": "Zapisovací klíč, který jste dostali při zapojení do testu. Bez něj se nic neodesílá.",
+          "benchmark_url": "Ponechte beze změny, pokud neprovozujete vlastní sběrač."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
           "battery_min_soc": "Rezerva baterie, minimální stav nabití (%, výchozí 10)",
           "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)",
-          "curtailment_entity": "Signál omezení (binární senzor, volitelné)"
+          "curtailment_entity": "Signál omezení (binární senzor, volitelné)",
+          "benchmark_enabled": "Přispět do veřejného srovnávacího testu přesnosti (volitelné)",
+          "benchmark_key": "Klíč srovnávacího testu",
+          "benchmark_url": "Adresa sběrače"
         },
         "data_description": {
           "production_entity": "Kumulativní senzor energie (kWh), např. celková výroba střídače nebo elektroměru. Senzor výkonu (W) nebude fungovat: nemá dlouhodobé statistiky součtu, takže učení a index spolehlivosti by zůstaly vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
-          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
+          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače.",
+          "benchmark_enabled": "Jednou za hodinu odešle, co tato instalace předpovídá, aby to šlo porovnat se skutečnou výrobou. Výsledky jsou zveřejňovány otevřeně. Odesílá se pouze geometrie panelů, předpovězená křivka, naměřená výroba a index spolehlivosti: žádné názvy entit, žádná spotřeba, žádné jiné senzory a souřadnice zaokrouhlené asi na kilometr. Vypnuto, dokud to nezapnete.",
+          "benchmark_key": "Zapisovací klíč, který jste dostali při zapojení do testu. Bez něj se nic neodesílá.",
+          "benchmark_url": "Ponechte beze změny, pokud neprovozujete vlastní sběrač."
         }
       },
       "lines": {

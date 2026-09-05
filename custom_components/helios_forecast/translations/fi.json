@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Akun suurin purkausteho (kW, valinnainen)",
           "battery_min_soc": "Akun varaus, vähimmäisvaraustila (%, oletus 10)",
           "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)",
-          "curtailment_entity": "Rajoitussignaali (binäärianturi, valinnainen)"
+          "curtailment_entity": "Rajoitussignaali (binäärianturi, valinnainen)",
+          "benchmark_enabled": "Osallistu julkiseen tarkkuusvertailuun (valinnainen)",
+          "benchmark_key": "Vertailun avain",
+          "benchmark_url": "Kerääjän osoite"
         },
         "data_description": {
           "production_entity": "Kumulatiivinen energia-anturi (kWh), esim. invertterin tai energiamittarin kokonaistuotanto. Tehoanturi (W) ei toimi: sillä ei ole pitkän aikavälin summatilastoja, joten oppiminen ja luotettavuusindeksi jäisivät pois päältä.",
           "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
-          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
+          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta.",
+          "benchmark_enabled": "Lähettää kerran tunnissa sen, mitä tämä järjestelmä ennustaa, jotta sitä voidaan verrata todelliseen tuotantoon. Tulokset julkaistaan avoimesti. Lähetetään vain paneelien geometria, ennustettu käyrä, mitattu tuotanto ja luotettavuusindeksi: ei entiteettien nimiä, ei kulutusta, ei muita antureita, ja koordinaatit pyöristettyinä noin kilometriin. Pois päältä, kunnes otat sen käyttöön.",
+          "benchmark_key": "Kirjoitusavain, jonka sait liittyessäsi vertailuun. Ilman sitä mitään ei lähetetä.",
+          "benchmark_url": "Jätä ennalleen, ellet ylläpidä omaa kerääjää."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Akun suurin purkausteho (kW, valinnainen)",
           "battery_min_soc": "Akun varaus, vähimmäisvaraustila (%, oletus 10)",
           "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)",
-          "curtailment_entity": "Rajoitussignaali (binäärianturi, valinnainen)"
+          "curtailment_entity": "Rajoitussignaali (binäärianturi, valinnainen)",
+          "benchmark_enabled": "Osallistu julkiseen tarkkuusvertailuun (valinnainen)",
+          "benchmark_key": "Vertailun avain",
+          "benchmark_url": "Kerääjän osoite"
         },
         "data_description": {
           "production_entity": "Kumulatiivinen energia-anturi (kWh), esim. invertterin tai energiamittarin kokonaistuotanto. Tehoanturi (W) ei toimi: sillä ei ole pitkän aikavälin summatilastoja, joten oppiminen ja luotettavuusindeksi jäisivät pois päältä.",
           "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
-          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
+          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta.",
+          "benchmark_enabled": "Lähettää kerran tunnissa sen, mitä tämä järjestelmä ennustaa, jotta sitä voidaan verrata todelliseen tuotantoon. Tulokset julkaistaan avoimesti. Lähetetään vain paneelien geometria, ennustettu käyrä, mitattu tuotanto ja luotettavuusindeksi: ei entiteettien nimiä, ei kulutusta, ei muita antureita, ja koordinaatit pyöristettyinä noin kilometriin. Pois päältä, kunnes otat sen käyttöön.",
+          "benchmark_key": "Kirjoitusavain, jonka sait liittyessäsi vertailuun. Ilman sitä mitään ei lähetetä.",
+          "benchmark_url": "Jätä ennalleen, ellet ylläpidä omaa kerääjää."
         }
       },
       "lines": {

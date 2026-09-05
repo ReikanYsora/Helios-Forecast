@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
           "battery_min_soc": "Akkumulátor tartalék, minimális töltöttségi szint (%, alapértelmezett 10)",
           "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)",
-          "curtailment_entity": "Korlátozási jel (bináris érzékelő, opcionális)"
+          "curtailment_entity": "Korlátozási jel (bináris érzékelő, opcionális)",
+          "benchmark_enabled": "Részvétel a nyilvános pontossági összehasonlításban (opcionális)",
+          "benchmark_key": "Összehasonlítási kulcs",
+          "benchmark_url": "A gyűjtő címe"
         },
         "data_description": {
           "production_entity": "Kumulatív energiaérzékelő (kWh), pl. az inverter vagy a fogyasztásmérő teljes termelése. Teljesítményérzékelő (W) nem működik: nincs hosszú távú összegstatisztikája, így a tanulás és a megbízhatósági index kikapcsolva maradna.",
           "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre.",
-          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel."
+          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel.",
+          "benchmark_enabled": "Óránként elküldi, amit ez a rendszer előrejelez, hogy összevethető legyen a valóban megtermelt energiával. Az eredmények nyilvánosan megjelennek. Csak a panelek geometriája, az előrejelzett görbe, a mért termelés és a megbízhatósági index kerül elküldésre: semmilyen entitásnév, semmilyen fogyasztás, semmilyen más érzékelő, a koordináták pedig körülbelül egy kilométerre kerekítve. Kikapcsolva, amíg be nem kapcsolja.",
+          "benchmark_key": "Az írási kulcs, amelyet a csatlakozáskor kapott. Nélküle semmi nem kerül elküldésre.",
+          "benchmark_url": "Hagyja változatlanul, hacsak nem üzemeltet saját gyűjtőt."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
           "battery_min_soc": "Akkumulátor tartalék, minimális töltöttségi szint (%, alapértelmezett 10)",
           "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)",
-          "curtailment_entity": "Korlátozási jel (bináris érzékelő, opcionális)"
+          "curtailment_entity": "Korlátozási jel (bináris érzékelő, opcionális)",
+          "benchmark_enabled": "Részvétel a nyilvános pontossági összehasonlításban (opcionális)",
+          "benchmark_key": "Összehasonlítási kulcs",
+          "benchmark_url": "A gyűjtő címe"
         },
         "data_description": {
           "production_entity": "Kumulatív energiaérzékelő (kWh), pl. az inverter vagy a fogyasztásmérő teljes termelése. Teljesítményérzékelő (W) nem működik: nincs hosszú távú összegstatisztikája, így a tanulás és a megbízhatósági index kikapcsolva maradna.",
           "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre.",
-          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel."
+          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel.",
+          "benchmark_enabled": "Óránként elküldi, amit ez a rendszer előrejelez, hogy összevethető legyen a valóban megtermelt energiával. Az eredmények nyilvánosan megjelennek. Csak a panelek geometriája, az előrejelzett görbe, a mért termelés és a megbízhatósági index kerül elküldésre: semmilyen entitásnév, semmilyen fogyasztás, semmilyen más érzékelő, a koordináták pedig körülbelül egy kilométerre kerekítve. Kikapcsolva, amíg be nem kapcsolja.",
+          "benchmark_key": "Az írási kulcs, amelyet a csatlakozáskor kapott. Nélküle semmi nem kerül elküldésre.",
+          "benchmark_url": "Hagyja változatlanul, hacsak nem üzemeltet saját gyűjtőt."
         }
       },
       "lines": {

@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Potencia máx. de descarga de la batería (kW, opcional)",
           "battery_min_soc": "Reserva de la batería, estado de carga mínimo (%, predeterminado 10)",
           "battery_efficiency": "Eficiencia de ciclo completo de la batería (%, predeterminado 90)",
-          "curtailment_entity": "Señal de recorte (sensor binario, opcional)"
+          "curtailment_entity": "Señal de recorte (sensor binario, opcional)",
+          "benchmark_enabled": "Contribuir al banco de pruebas público de precisión (opcional)",
+          "benchmark_key": "Clave del banco de pruebas",
+          "benchmark_url": "Dirección del recolector"
         },
         "data_description": {
           "production_entity": "Un sensor de energía acumulada (kWh), p. ej. la producción total de su inversor o contador. Un sensor de potencia (W) no funcionará: no tiene estadísticas de suma a largo plazo, así que el aprendizaje y el índice de fiabilidad quedarían inactivos.",
           "battery_soc_entity": "Rellena la capacidad y este sensor para activar la proyección del estado de carga. El consumo del hogar se toma de tu panel de Energía, aquí no hace falta ningún sensor.",
-          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor."
+          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor.",
+          "benchmark_enabled": "Envía una vez por hora lo que esta instalación predice, para compararlo con lo que realmente produjo. Los resultados se publican abiertamente. Solo se envían la geometría de sus paneles, la curva prevista, la producción medida y el índice de fiabilidad: ningún nombre de entidad, ningún consumo, ningún otro sensor, y sus coordenadas redondeadas a alrededor de un kilómetro. Desactivado mientras no lo active.",
+          "benchmark_key": "La clave de escritura que recibió al unirse al banco de pruebas. Sin ella no se envía nada.",
+          "benchmark_url": "Déjelo tal cual, salvo que aloje su propio recolector."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Potencia máx. de descarga de la batería (kW, opcional)",
           "battery_min_soc": "Reserva de la batería, estado de carga mínimo (%, predeterminado 10)",
           "battery_efficiency": "Eficiencia de ciclo completo de la batería (%, predeterminado 90)",
-          "curtailment_entity": "Señal de recorte (sensor binario, opcional)"
+          "curtailment_entity": "Señal de recorte (sensor binario, opcional)",
+          "benchmark_enabled": "Contribuir al banco de pruebas público de precisión (opcional)",
+          "benchmark_key": "Clave del banco de pruebas",
+          "benchmark_url": "Dirección del recolector"
         },
         "data_description": {
           "production_entity": "Un sensor de energía acumulada (kWh), p. ej. la producción total de su inversor o contador. Un sensor de potencia (W) no funcionará: no tiene estadísticas de suma a largo plazo, así que el aprendizaje y el índice de fiabilidad quedarían inactivos.",
           "battery_soc_entity": "Rellena la capacidad y este sensor para activar la proyección del estado de carga. El consumo del hogar se toma de tu panel de Energía, aquí no hace falta ningún sensor.",
-          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor."
+          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor.",
+          "benchmark_enabled": "Envía una vez por hora lo que esta instalación predice, para compararlo con lo que realmente produjo. Los resultados se publican abiertamente. Solo se envían la geometría de sus paneles, la curva prevista, la producción medida y el índice de fiabilidad: ningún nombre de entidad, ningún consumo, ningún otro sensor, y sus coordenadas redondeadas a alrededor de un kilómetro. Desactivado mientras no lo active.",
+          "benchmark_key": "La clave de escritura que recibió al unirse al banco de pruebas. Sin ella no se envía nada.",
+          "benchmark_url": "Déjelo tal cual, salvo que aloje su propio recolector."
         }
       },
       "lines": {

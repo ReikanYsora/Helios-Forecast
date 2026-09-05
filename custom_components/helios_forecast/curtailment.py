@@ -57,15 +57,15 @@ def flag_curtailed(
     `cap_w` is the inverter cap in watts (None or non-finite = unknown, the battery signal is then
     unusable, a full battery under a heavy house load is not curtailment); `on_intervals` are the
     curtailment entity's on periods."""
-    cap_known = cap_w is not None and math.isfinite(cap_w) and cap_w > 0
+    cap = cap_w if (cap_w is not None and math.isfinite(cap_w) and cap_w > 0) else None
     out: List[ProductionBucket] = []
     for b in buckets:
         curtailed = False
-        if cap_known and soc_max_by_start_ms:
+        if cap is not None and soc_max_by_start_ms:
             soc_max = soc_max_by_start_ms.get(b.start_ms)
             hours = (b.end_ms - b.start_ms) / 3_600_000.0
             avg_w = b.kwh * 1000.0 / hours if hours > 0 else 0.0
-            if soc_max is not None and soc_max >= FULL_SOC_PCT and avg_w >= CAP_FRACTION * cap_w:
+            if soc_max is not None and soc_max >= FULL_SOC_PCT and avg_w >= CAP_FRACTION * cap:
                 curtailed = True
         if not curtailed and on_intervals and _on_share(b.start_ms, b.end_ms, on_intervals) >= ON_FRACTION:
             curtailed = True

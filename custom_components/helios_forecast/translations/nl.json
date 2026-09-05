@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
           "battery_min_soc": "Batterijreserve, minimale laadtoestand (%, standaard 10)",
           "battery_efficiency": "Retourrendement batterij (%, standaard 90)",
-          "curtailment_entity": "Beperkingssignaal (binaire sensor, optioneel)"
+          "curtailment_entity": "Beperkingssignaal (binaire sensor, optioneel)",
+          "benchmark_enabled": "Bijdragen aan de openbare nauwkeurigheidsbenchmark (optioneel)",
+          "benchmark_key": "Benchmarksleutel",
+          "benchmark_url": "Adres van de benchmarkverzamelaar"
         },
         "data_description": {
           "production_entity": "Een cumulatieve energiesensor (kWh), bijv. de totale productie van uw omvormer of energiemeter. Een vermogenssensor (W) werkt niet: die heeft geen langetermijn-somstatistieken, dus het leren en de betrouwbaarheidsindex blijven uit.",
           "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
-          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
+          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet.",
+          "benchmark_enabled": "Stuurt eenmaal per uur wat deze installatie voorspelt, zodat het vergeleken kan worden met wat ze werkelijk heeft geproduceerd. De resultaten worden openbaar gepubliceerd. Alleen de geometrie van uw panelen, de voorspelde curve, de gemeten productie en de betrouwbaarheidsindex worden verstuurd: geen entiteitsnamen, geen verbruik, geen andere sensoren, en uw coördinaten afgerond op ongeveer een kilometer. Uit tenzij u het inschakelt.",
+          "benchmark_key": "De schrijfsleutel die u kreeg bij deelname aan de benchmark. Zonder sleutel wordt er niets verstuurd.",
+          "benchmark_url": "Laat dit ongewijzigd, tenzij u een eigen verzamelaar draait."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
           "battery_min_soc": "Batterijreserve, minimale laadtoestand (%, standaard 10)",
           "battery_efficiency": "Retourrendement batterij (%, standaard 90)",
-          "curtailment_entity": "Beperkingssignaal (binaire sensor, optioneel)"
+          "curtailment_entity": "Beperkingssignaal (binaire sensor, optioneel)",
+          "benchmark_enabled": "Bijdragen aan de openbare nauwkeurigheidsbenchmark (optioneel)",
+          "benchmark_key": "Benchmarksleutel",
+          "benchmark_url": "Adres van de benchmarkverzamelaar"
         },
         "data_description": {
           "production_entity": "Een cumulatieve energiesensor (kWh), bijv. de totale productie van uw omvormer of energiemeter. Een vermogenssensor (W) werkt niet: die heeft geen langetermijn-somstatistieken, dus het leren en de betrouwbaarheidsindex blijven uit.",
           "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
-          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
+          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet.",
+          "benchmark_enabled": "Stuurt eenmaal per uur wat deze installatie voorspelt, zodat het vergeleken kan worden met wat ze werkelijk heeft geproduceerd. De resultaten worden openbaar gepubliceerd. Alleen de geometrie van uw panelen, de voorspelde curve, de gemeten productie en de betrouwbaarheidsindex worden verstuurd: geen entiteitsnamen, geen verbruik, geen andere sensoren, en uw coördinaten afgerond op ongeveer een kilometer. Uit tenzij u het inschakelt.",
+          "benchmark_key": "De schrijfsleutel die u kreeg bij deelname aan de benchmark. Zonder sleutel wordt er niets verstuurd.",
+          "benchmark_url": "Laat dit ongewijzigd, tenzij u een eigen verzamelaar draait."
         }
       },
       "lines": {

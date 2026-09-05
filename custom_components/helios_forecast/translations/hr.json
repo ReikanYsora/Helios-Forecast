@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Maks. snaga pražnjenja baterije (kW, neobavezno)",
           "battery_min_soc": "Rezerva baterije, minimalno stanje napunjenosti (%, zadano 10)",
           "battery_efficiency": "Učinkovitost punog ciklusa baterije (%, zadano 90)",
-          "curtailment_entity": "Signal ograničenja (binarni senzor, neobavezno)"
+          "curtailment_entity": "Signal ograničenja (binarni senzor, neobavezno)",
+          "benchmark_enabled": "Doprinesi javnoj usporedbi točnosti (neobavezno)",
+          "benchmark_key": "Ključ usporedbe",
+          "benchmark_url": "Adresa sakupljača"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbroja, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Ispunite kapacitet i ovaj senzor da biste uključili projekciju stanja napunjenosti. Potrošnja kuće uzima se s vaše Energetske nadzorne ploče, senzor ovdje nije potreban.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
+          "benchmark_enabled": "Jednom na sat šalje ono što ova instalacija predviđa, kako bi se usporedilo sa stvarnom proizvodnjom. Rezultati se objavljuju otvoreno. Šalju se samo geometrija panela, predviđena krivulja, izmjerena proizvodnja i indeks pouzdanosti: nikakvi nazivi entiteta, nikakva potrošnja, nikakvi drugi senzori, a koordinate zaokružene na otprilike kilometar. Isključeno dok ga ne uključite.",
+          "benchmark_key": "Ključ za pisanje dobiven pri pristupanju usporedbi. Bez njega se ništa ne šalje.",
+          "benchmark_url": "Ostavite nepromijenjeno, osim ako imate vlastiti sakupljač."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Maks. snaga pražnjenja baterije (kW, neobavezno)",
           "battery_min_soc": "Rezerva baterije, minimalno stanje napunjenosti (%, zadano 10)",
           "battery_efficiency": "Učinkovitost punog ciklusa baterije (%, zadano 90)",
-          "curtailment_entity": "Signal ograničenja (binarni senzor, neobavezno)"
+          "curtailment_entity": "Signal ograničenja (binarni senzor, neobavezno)",
+          "benchmark_enabled": "Doprinesi javnoj usporedbi točnosti (neobavezno)",
+          "benchmark_key": "Ključ usporedbe",
+          "benchmark_url": "Adresa sakupljača"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbroja, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Ispunite kapacitet i ovaj senzor da biste uključili projekciju stanja napunjenosti. Potrošnja kuće uzima se s vaše Energetske nadzorne ploče, senzor ovdje nije potreban.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
+          "benchmark_enabled": "Jednom na sat šalje ono što ova instalacija predviđa, kako bi se usporedilo sa stvarnom proizvodnjom. Rezultati se objavljuju otvoreno. Šalju se samo geometrija panela, predviđena krivulja, izmjerena proizvodnja i indeks pouzdanosti: nikakvi nazivi entiteta, nikakva potrošnja, nikakvi drugi senzori, a koordinate zaokružene na otprilike kilometar. Isključeno dok ga ne uključite.",
+          "benchmark_key": "Ključ za pisanje dobiven pri pristupanju usporedbi. Bez njega se ništa ne šalje.",
+          "benchmark_url": "Ostavite nepromijenjeno, osim ako imate vlastiti sakupljač."
         }
       },
       "lines": {

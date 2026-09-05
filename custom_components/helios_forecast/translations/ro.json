@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Putere max. de descărcare a bateriei (kW, opțional)",
           "battery_min_soc": "Rezerva bateriei, stare de încărcare minimă (%, implicit 10)",
           "battery_efficiency": "Randamentul dus-întors al bateriei (%, implicit 90)",
-          "curtailment_entity": "Semnal de limitare (senzor binar, opțional)"
+          "curtailment_entity": "Semnal de limitare (senzor binar, opțional)",
+          "benchmark_enabled": "Contribuie la testul public de precizie (opțional)",
+          "benchmark_key": "Cheia testului",
+          "benchmark_url": "Adresa colectorului"
         },
         "data_description": {
           "production_entity": "Un senzor de energie cumulată (kWh), de ex. producția totală a invertorului sau a contorului. Un senzor de putere (W) nu va funcționa: nu are statistici de sumă pe termen lung, așa că învățarea și indicele de fiabilitate ar rămâne inactive.",
           "battery_soc_entity": "Completați capacitatea și acest senzor pentru a activa proiecția stării de încărcare. Consumul casei este preluat din tabloul de bord Energie, aici nu este nevoie de niciun senzor.",
-          "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului."
+          "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului.",
+          "benchmark_enabled": "Trimite o dată pe oră ceea ce prezice această instalație, pentru a fi comparat cu ce a produs în realitate. Rezultatele sunt publicate deschis. Se trimit doar geometria panourilor, curba prezisă, producția măsurată și indicele de fiabilitate: niciun nume de entitate, niciun consum, niciun alt senzor, iar coordonatele rotunjite la aproximativ un kilometru. Dezactivat până când îl activați.",
+          "benchmark_key": "Cheia de scriere primită la înscrierea în test. Fără ea nu se trimite nimic.",
+          "benchmark_url": "Lăsați neschimbat, cu excepția cazului în care găzduiți propriul colector."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Putere max. de descărcare a bateriei (kW, opțional)",
           "battery_min_soc": "Rezerva bateriei, stare de încărcare minimă (%, implicit 10)",
           "battery_efficiency": "Randamentul dus-întors al bateriei (%, implicit 90)",
-          "curtailment_entity": "Semnal de limitare (senzor binar, opțional)"
+          "curtailment_entity": "Semnal de limitare (senzor binar, opțional)",
+          "benchmark_enabled": "Contribuie la testul public de precizie (opțional)",
+          "benchmark_key": "Cheia testului",
+          "benchmark_url": "Adresa colectorului"
         },
         "data_description": {
           "production_entity": "Un senzor de energie cumulată (kWh), de ex. producția totală a invertorului sau a contorului. Un senzor de putere (W) nu va funcționa: nu are statistici de sumă pe termen lung, așa că învățarea și indicele de fiabilitate ar rămâne inactive.",
           "battery_soc_entity": "Completați capacitatea și acest senzor pentru a activa proiecția stării de încărcare. Consumul casei este preluat din tabloul de bord Energie, aici nu este nevoie de niciun senzor.",
-          "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului."
+          "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului.",
+          "benchmark_enabled": "Trimite o dată pe oră ceea ce prezice această instalație, pentru a fi comparat cu ce a produs în realitate. Rezultatele sunt publicate deschis. Se trimit doar geometria panourilor, curba prezisă, producția măsurată și indicele de fiabilitate: niciun nume de entitate, niciun consum, niciun alt senzor, iar coordonatele rotunjite la aproximativ un kilometru. Dezactivat până când îl activați.",
+          "benchmark_key": "Cheia de scriere primită la înscrierea în test. Fără ea nu se trimite nimic.",
+          "benchmark_url": "Lăsați neschimbat, cu excepția cazului în care găzduiți propriul colector."
         }
       },
       "lines": {

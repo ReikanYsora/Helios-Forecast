@@ -23,12 +23,18 @@
           "battery_max_discharge_kw": "Maks. utladningseffekt for batteri (kW, valgfritt)",
           "battery_min_soc": "Batterireserve, minimalt ladenivå (%, standard 10)",
           "battery_efficiency": "Batteriets rundturs-virkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begrensningssignal (binær sensor, valgfri)"
+          "curtailment_entity": "Begrensningssignal (binær sensor, valgfri)",
+          "benchmark_enabled": "Bidra til den offentlige nøyaktighetstesten (valgfritt)",
+          "benchmark_key": "Testnøkkel",
+          "benchmark_url": "Adresse til innsamleren"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), f.eks. inverterens eller strømmålerens totale produksjon. En effektsensor (W) fungerer ikke: den har ingen langtidsstatistikk for summen, så læringen og pålitelighetsindeksen ville forbli av.",
           "battery_soc_entity": "Fyll inn kapasiteten og denne sensoren for å slå på ladenivåprojeksjonen. Husforbruket hentes fra Energi-dashbordet ditt, så det trengs ingen sensor her.",
-          "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket."
+          "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket.",
+          "benchmark_enabled": "Sender en gang i timen hva dette anlegget forutsier, slik at det kan sammenlignes med hva det faktisk produserte. Resultatene publiseres åpent. Bare panelenes geometri, den forutsagte kurven, den målte produksjonen og påliteligheten sendes: ingen entitetsnavn, intet forbruk, ingen andre sensorer, og koordinatene dine avrundet til omtrent en kilometer. Av til du slår det på.",
+          "benchmark_key": "Skrivenøkkelen du fikk da du ble med i testen. Uten den sendes ingenting.",
+          "benchmark_url": "La den stå, med mindre du kjører din egen innsamler."
         }
       },
       "line": {
@@ -72,12 +78,18 @@
           "battery_max_discharge_kw": "Maks. utladningseffekt for batteri (kW, valgfritt)",
           "battery_min_soc": "Batterireserve, minimalt ladenivå (%, standard 10)",
           "battery_efficiency": "Batteriets rundturs-virkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begrensningssignal (binær sensor, valgfri)"
+          "curtailment_entity": "Begrensningssignal (binær sensor, valgfri)",
+          "benchmark_enabled": "Bidra til den offentlige nøyaktighetstesten (valgfritt)",
+          "benchmark_key": "Testnøkkel",
+          "benchmark_url": "Adresse til innsamleren"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), f.eks. inverterens eller strømmålerens totale produksjon. En effektsensor (W) fungerer ikke: den har ingen langtidsstatistikk for summen, så læringen og pålitelighetsindeksen ville forbli av.",
           "battery_soc_entity": "Fyll inn kapasiteten og denne sensoren for å slå på ladenivåprojeksjonen. Husforbruket hentes fra Energi-dashbordet ditt, så det trengs ingen sensor her.",
-          "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket."
+          "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket.",
+          "benchmark_enabled": "Sender en gang i timen hva dette anlegget forutsier, slik at det kan sammenlignes med hva det faktisk produserte. Resultatene publiseres åpent. Bare panelenes geometri, den forutsagte kurven, den målte produksjonen og påliteligheten sendes: ingen entitetsnavn, intet forbruk, ingen andre sensorer, og koordinatene dine avrundet til omtrent en kilometer. Av til du slår det på.",
+          "benchmark_key": "Skrivenøkkelen du fikk da du ble med i testen. Uten den sendes ingenting.",
+          "benchmark_url": "La den stå, med mindre du kjører din egen innsamler."
         }
       },
       "lines": {
