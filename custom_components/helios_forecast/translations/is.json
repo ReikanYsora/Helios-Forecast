@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Sendir einu sinni á klukkustund það sem þessi uppsetning spáir, svo hægt sé að bera það saman við raunverulega framleiðslu. Niðurstöður eru birtar opinberlega. Aðeins rúmfræði spjaldanna, spáði ferillinn, mæld framleiðsla og áreiðanleikastuðullinn er sent: engin heiti eininga, engin notkun, engir aðrir skynjarar, og hnitin námunduð að um einum kílómetra. Slökkt þar til þú kveikir á því.",
           "benchmark_key": "Skriflykillinn sem þú fékkst við þátttöku í samanburðinum. Án hans er ekkert sent.",
-          "benchmark_url": "Láttu standa óbreytt nema þú rekir þinn eigin safnara."
+          "benchmark_url": "Vistfangið sem mælingarnar eru sendar á, sýnt svo þú vitir nákvæmlega hvert."
         }
       }
     }

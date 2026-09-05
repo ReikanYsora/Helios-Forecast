@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Reizi stundā nosūta to, ko šī iekārta prognozē, lai to varētu salīdzināt ar patieso ražošanu. Rezultāti tiek publicēti atklāti. Tiek nosūtīta tikai paneļu ģeometrija, prognozētā līkne, izmērītā ražošana un uzticamības indekss: nekādu entītiju nosaukumu, nekāda patēriņa, nekādu citu sensoru, un koordinātas noapaļotas līdz aptuveni kilometram. Izslēgts, līdz to ieslēgsiet.",
           "benchmark_key": "Rakstīšanas atslēga, ko saņēmāt, pievienojoties salīdzinājumam. Bez tās nekas netiek nosūtīts.",
-          "benchmark_url": "Atstājiet nemainītu, ja vien neuzturat savu savācēju."
+          "benchmark_url": "Adrese, uz kuru tiek sūtīti mērījumi, parādīta, lai zinātu, kurp tie dodas."
         }
       }
     }

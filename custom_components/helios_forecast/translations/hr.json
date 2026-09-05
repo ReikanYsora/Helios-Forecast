@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Jednom na sat šalje ono što ova instalacija predviđa, kako bi se usporedilo sa stvarnom proizvodnjom. Rezultati se objavljuju otvoreno. Šalju se samo geometrija panela, predviđena krivulja, izmjerena proizvodnja i indeks pouzdanosti: nikakvi nazivi entiteta, nikakva potrošnja, nikakvi drugi senzori, a koordinate zaokružene na otprilike kilometar. Isključeno dok ga ne uključite.",
           "benchmark_key": "Ključ za pisanje dobiven pri pristupanju usporedbi. Bez njega se ništa ne šalje.",
-          "benchmark_url": "Ostavite nepromijenjeno, osim ako imate vlastiti sakupljač."
+          "benchmark_url": "Adresa na koju se šalju mjerenja, prikazana da znate točno kamo idu."
         }
       }
     }

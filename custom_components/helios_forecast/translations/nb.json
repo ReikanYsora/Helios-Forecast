@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Sender en gang i timen hva dette anlegget forutsier, slik at det kan sammenlignes med hva det faktisk produserte. Resultatene publiseres åpent. Bare panelenes geometri, den forutsagte kurven, den målte produksjonen og påliteligheten sendes: ingen entitetsnavn, intet forbruk, ingen andre sensorer, og koordinatene dine avrundet til omtrent en kilometer. Av til du slår det på.",
           "benchmark_key": "Skrivenøkkelen du fikk da du ble med i testen. Uten den sendes ingenting.",
-          "benchmark_url": "La den stå, med mindre du kjører din egen innsamler."
+          "benchmark_url": "Adressen målingene sendes til, vist så du vet nøyaktig hvor."
         }
       }
     }

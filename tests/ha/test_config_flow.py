@@ -20,6 +20,7 @@ from custom_components.helios_forecast.config import (
     CONF_TRACKER,
     layout_from_config,
 )
+from custom_components.helios_forecast.benchmark import DEFAULT_ENDPOINT
 from custom_components.helios_forecast.const import DOMAIN
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -86,7 +87,7 @@ async def test_benchmark_step_joins_without_disturbing_the_installation(
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        {"benchmark_enabled": True, "benchmark_key": "a-key", "benchmark_url": "https://example.test/in"},
+        {"benchmark_enabled": True, "benchmark_key": "a-key", "benchmark_url": DEFAULT_ENDPOINT},
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
     data = result["data"]
@@ -95,6 +96,8 @@ async def test_benchmark_step_joins_without_disturbing_the_installation(
     assert data[CONF_INVERTER_MAX_KW] == 5.0
     assert data["production_entity"] == "sensor.pv"
     assert len(data[CONF_ARRAYS]) == 2
+    # The standard address is never written down, so the day the collector moves everyone follows.
+    assert "benchmark_url" not in data
 
 
 async def test_options_settings_step_keeps_lines_untouched(

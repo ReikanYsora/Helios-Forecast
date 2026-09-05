@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit der tatsächlichen Produktion verglichen werden kann. Die Ergebnisse werden offen veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Produktion und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, keine anderen Sensoren, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Aus, solange Sie es nicht einschalten.",
           "benchmark_key": "Der Schreibschlüssel, den Sie beim Beitritt zum Benchmark erhalten haben. Ohne ihn wird nichts gesendet.",
-          "benchmark_url": "Unverändert lassen, außer Sie betreiben einen eigenen Sammler."
+          "benchmark_url": "Wohin die Messungen gesendet werden, angezeigt, damit Sie genau wissen, wo sie landen."
         }
       }
     }

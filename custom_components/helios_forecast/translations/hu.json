@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Óránként elküldi, amit ez a rendszer előrejelez, hogy összevethető legyen a valóban megtermelt energiával. Az eredmények nyilvánosan megjelennek. Csak a panelek geometriája, az előrejelzett görbe, a mért termelés és a megbízhatósági index kerül elküldésre: semmilyen entitásnév, semmilyen fogyasztás, semmilyen más érzékelő, a koordináták pedig körülbelül egy kilométerre kerekítve. Kikapcsolva, amíg be nem kapcsolja.",
           "benchmark_key": "Az írási kulcs, amelyet a csatlakozáskor kapott. Nélküle semmi nem kerül elküldésre.",
-          "benchmark_url": "Hagyja változatlanul, hacsak nem üzemeltet saját gyűjtőt."
+          "benchmark_url": "A cím, ahová a mérések mennek, megjelenítve, hogy pontosan tudja, hová kerülnek."
         }
       }
     }

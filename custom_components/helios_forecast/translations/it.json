@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Invia una volta all'ora ciò che questo impianto prevede, per confrontarlo con quanto ha realmente prodotto. I risultati sono pubblicati apertamente. Vengono inviati solo la geometria dei pannelli, la curva prevista, la produzione misurata e l'indice di affidabilità: nessun nome di entità, nessun consumo, nessun altro sensore, e le coordinate arrotondate a circa un chilometro. Disattivato finché non lo attivate.",
           "benchmark_key": "La chiave di scrittura ricevuta aderendo al benchmark. Senza di essa non viene inviato nulla.",
-          "benchmark_url": "Lasciare invariato, a meno che non gestiate un raccoglitore vostro."
+          "benchmark_url": "L'indirizzo a cui vengono inviate le misure, mostrato perché sappiate esattamente dove vanno."
         }
       }
     }

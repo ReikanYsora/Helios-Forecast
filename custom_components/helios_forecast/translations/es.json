@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Envía una vez por hora lo que esta instalación predice, para compararlo con lo que realmente produjo. Los resultados se publican abiertamente. Solo se envían la geometría de sus paneles, la curva prevista, la producción medida y el índice de fiabilidad: ningún nombre de entidad, ningún consumo, ningún otro sensor, y sus coordenadas redondeadas a alrededor de un kilómetro. Desactivado mientras no lo active.",
           "benchmark_key": "La clave de escritura que recibió al unirse al banco de pruebas. Sin ella no se envía nada.",
-          "benchmark_url": "Déjelo tal cual, salvo que aloje su propio recolector."
+          "benchmark_url": "La dirección a la que se envían las mediciones, mostrada para que sepa exactamente adónde van."
         }
       }
     }

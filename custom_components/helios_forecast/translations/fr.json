@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Envoie une fois par heure ce que cette installation prévoit, pour le comparer à ce qu'elle a réellement produit. Les résultats sont publiés ouvertement. Seuls la géométrie de vos panneaux, la courbe prévue, la production mesurée et l'indice de fiabilité sont envoyés : aucun nom d'entité, aucune consommation, aucun autre capteur, et vos coordonnées arrondies à environ un kilomètre. Inactif tant que vous ne l'activez pas.",
           "benchmark_key": "La clé d'écriture qui vous a été remise en rejoignant le benchmark. Rien n'est envoyé sans elle.",
-          "benchmark_url": "À laisser telle quelle, sauf si vous hébergez votre propre collecteur."
+          "benchmark_url": "L'adresse à laquelle les mesures sont envoyées, affichée pour que vous sachiez exactement où elles vont."
         }
       }
     }

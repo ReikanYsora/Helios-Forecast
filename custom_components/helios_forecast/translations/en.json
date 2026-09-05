@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Sends what this installation predicts, once an hour, so it can be compared with what it really produced. The results are published openly. Only your panel geometry, the predicted curve, the measured production and the reliability index are sent: no entity names, no consumption, no other sensor, and your coordinates rounded to about a kilometre. Off unless you turn it on.",
           "benchmark_key": "The write key you were given when joining the benchmark. Nothing is sent without it.",
-          "benchmark_url": "Leave this as it is unless you run your own collector."
+          "benchmark_url": "Where the measurements are sent, shown so you know exactly where they go."
         }
       }
     }

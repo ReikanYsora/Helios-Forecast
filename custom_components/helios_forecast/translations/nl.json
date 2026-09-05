@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Stuurt eenmaal per uur wat deze installatie voorspelt, zodat het vergeleken kan worden met wat ze werkelijk heeft geproduceerd. De resultaten worden openbaar gepubliceerd. Alleen de geometrie van uw panelen, de voorspelde curve, de gemeten productie en de betrouwbaarheidsindex worden verstuurd: geen entiteitsnamen, geen verbruik, geen andere sensoren, en uw coördinaten afgerond op ongeveer een kilometer. Uit tenzij u het inschakelt.",
           "benchmark_key": "De schrijfsleutel die u kreeg bij deelname aan de benchmark. Zonder sleutel wordt er niets verstuurd.",
-          "benchmark_url": "Laat dit ongewijzigd, tenzij u een eigen verzamelaar draait."
+          "benchmark_url": "Het adres waar de metingen naartoe gaan, getoond zodat u precies weet waarheen."
         }
       }
     }

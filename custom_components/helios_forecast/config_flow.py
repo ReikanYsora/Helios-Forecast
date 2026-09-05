@@ -103,7 +103,9 @@ _PERCENT = selector.NumberSelector(
 )
 # Benchmark upload: the write key is the only secret this integration holds, so it is typed and
 # redisplayed as a password rather than sitting in clear in the form.
-_TEXT = selector.TextSelector(selector.TextSelectorConfig(type=selector.TextSelectorType.TEXT))
+# Shown, never typed: the address is there so a contributor can see exactly where the measurements
+# go, and a field that can be edited by hand is a broken upload waiting to happen.
+_ENDPOINT = selector.TextSelector(selector.TextSelectorConfig(type=selector.TextSelectorType.TEXT, read_only=True))
 _SECRET = selector.TextSelector(selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD))
 
 
@@ -198,7 +200,7 @@ def _benchmark_fields(settings: dict[str, Any]) -> dict[Any, Any]:
         vol.Optional(CONF_BENCHMARK_ENABLED, default=bool(settings.get(CONF_BENCHMARK_ENABLED, False))): _BOOL
     }
     _optional(fields, CONF_BENCHMARK_KEY, _SECRET, settings.get(CONF_BENCHMARK_KEY))
-    _optional(fields, CONF_BENCHMARK_URL, _TEXT, settings.get(CONF_BENCHMARK_URL, DEFAULT_ENDPOINT))
+    fields[vol.Optional(CONF_BENCHMARK_URL, default=settings.get(CONF_BENCHMARK_URL) or DEFAULT_ENDPOINT)] = _ENDPOINT
     return fields
 
 
@@ -286,6 +288,10 @@ class HeliosForecastOptionsFlow(OptionsFlow):
         current = self._current()
         if user_input is not None:
             settings = {**split_settings(current), **split_settings(user_input)}
+            # The address is only written down when it is not the standard one. Storing the default
+            # would freeze it in every entry, and the day the collector moves nobody could follow.
+            if settings.get(CONF_BENCHMARK_URL) == DEFAULT_ENDPOINT:
+                settings.pop(CONF_BENCHMARK_URL, None)
             return self.async_create_entry(title="", data=merge_entry_data(settings, lines_from_config(current)))
         return self.async_show_form(step_id="benchmark", data_schema=vol.Schema(_benchmark_fields(current)))
 

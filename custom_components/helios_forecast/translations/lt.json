@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tikrąja gamyba. Rezultatai skelbiami viešai. Siunčiama tik plokščių geometrija, prognozuota kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokių kitų jutiklių, o koordinatės suapvalintos maždaug iki kilometro. Išjungta, kol neįjungsite.",
           "benchmark_key": "Rašymo raktas, gautas prisijungiant prie palyginimo. Be jo nieko nesiunčiama.",
-          "benchmark_url": "Palikite kaip yra, nebent turite savo rinktuvą."
+          "benchmark_url": "Adresas, kuriuo siunčiami matavimai, rodomas, kad tiksliai žinotumėte, kur jie keliauja."
         }
       }
     }

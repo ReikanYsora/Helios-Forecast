@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Lähettää kerran tunnissa sen, mitä tämä järjestelmä ennustaa, jotta sitä voidaan verrata todelliseen tuotantoon. Tulokset julkaistaan avoimesti. Lähetetään vain paneelien geometria, ennustettu käyrä, mitattu tuotanto ja luotettavuusindeksi: ei entiteettien nimiä, ei kulutusta, ei muita antureita, ja koordinaatit pyöristettyinä noin kilometriin. Pois päältä, kunnes otat sen käyttöön.",
           "benchmark_key": "Kirjoitusavain, jonka sait liittyessäsi vertailuun. Ilman sitä mitään ei lähetetä.",
-          "benchmark_url": "Jätä ennalleen, ellet ylläpidä omaa kerääjää."
+          "benchmark_url": "Osoite, johon mittaukset lähetetään, näytettynä jotta tiedät tarkalleen minne."
         }
       }
     }

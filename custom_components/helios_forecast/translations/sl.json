@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Enkrat na uro pošlje, kaj ta naprava napoveduje, da se lahko primerja z dejansko proizvodnjo. Rezultati so objavljeni javno. Poslani so le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenih drugih senzorjev, koordinate pa zaokrožene na približno kilometer. Izklopljeno, dokler tega ne vklopite.",
           "benchmark_key": "Ključ za pisanje, ki ste ga prejeli ob pridružitvi primerjavi. Brez njega se nič ne pošlje.",
-          "benchmark_url": "Pustite nespremenjeno, razen če imate lasten zbiralnik."
+          "benchmark_url": "Naslov, na katerega se pošiljajo meritve, prikazan, da veste, kam gredo."
         }
       }
     }

@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Raz za hodinu odošle, čo táto inštalácia predpovedá, aby sa to dalo porovnať so skutočnou výrobou. Výsledky sa zverejňujú otvorene. Odosiela sa len geometria panelov, predpovedaná krivka, nameraná výroba a index spoľahlivosti: žiadne názvy entit, žiadna spotreba, žiadne iné senzory a súradnice zaokrúhlené asi na kilometer. Vypnuté, kým to nezapnete.",
           "benchmark_key": "Zapisovací kľúč, ktorý ste dostali pri zapojení do testu. Bez neho sa nič neodosiela.",
-          "benchmark_url": "Nechajte bez zmeny, ak neprevádzkujete vlastný zberač."
+          "benchmark_url": "Adresa, kam sa merania odosielajú, zobrazená, aby ste presne vedeli, kam smerujú."
         }
       }
     }

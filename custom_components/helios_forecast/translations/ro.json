@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Trimite o dată pe oră ceea ce prezice această instalație, pentru a fi comparat cu ce a produs în realitate. Rezultatele sunt publicate deschis. Se trimit doar geometria panourilor, curba prezisă, producția măsurată și indicele de fiabilitate: niciun nume de entitate, niciun consum, niciun alt senzor, iar coordonatele rotunjite la aproximativ un kilometru. Dezactivat până când îl activați.",
           "benchmark_key": "Cheia de scriere primită la înscrierea în test. Fără ea nu se trimite nimic.",
-          "benchmark_url": "Lăsați neschimbat, cu excepția cazului în care găzduiți propriul colector."
+          "benchmark_url": "Adresa la care sunt trimise măsurătorile, afișată ca să știți exact unde ajung."
         }
       }
     }

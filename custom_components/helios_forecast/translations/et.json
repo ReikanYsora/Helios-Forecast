@@ -107,7 +107,7 @@
         "data_description": {
           "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegeliku toodanguga. Tulemused avaldatakse avalikult. Saadetakse ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: mitte ühtegi olemi nime, mitte mingit tarbimist, mitte ühtegi muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Väljas, kuni selle sisse lülitate.",
           "benchmark_key": "Kirjutusvõti, mille saite võrdlustestiga liitudes. Ilma selleta ei saadeta midagi.",
-          "benchmark_url": "Jätke muutmata, kui te ei majuta oma kogujat."
+          "benchmark_url": "Aadress, kuhu mõõtmised saadetakse, kuvatud nii et tead täpselt kuhu."
         }
       }
     }
