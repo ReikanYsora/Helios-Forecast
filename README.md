@@ -228,21 +228,23 @@ serves its own past emissions: a prediction nobody recorded at the moment it was
 made cannot be recovered afterwards. So the measurement has to start before the
 claim, and it has to run for months.
 
-That recording is now built in, off by default. Switched on in the settings, your
+That recording is built in, off by default. It has its own entry in the options
+menu, next to the settings and the panel lines. Switched on there, your
 installation posts once an hour the curve it is currently predicting, together
 with the production it has already measured. A collector scores the two against
 each other once the day is over, alongside the same measurement taken from other
 forecast providers, and the results are published openly at
-[helios-ha.org](https://helios-ha.org). You can watch the benchmark fill up, day
-after day, including the days Helios gets it wrong.
+[helios-ha.org/benchmark](https://helios-ha.org/benchmark). You can watch the
+benchmark fill up, day after day, including the days the forecast gets it wrong.
 
-Contributing is opt in twice over: you have to switch it on, and you need a key.
-What leaves your installation is fixed and deliberately small.
+Taking part costs a click. There is no account and no name to give: the page hands
+you a key, you paste it into that menu, and that is all. What leaves your
+installation is fixed and deliberately small.
 
-- Your panel geometry, the predicted curve, the measured production, the
-  reliability index.
+- Your panel geometry, the predicted curve with the cloud cover behind it, the
+  production your meter has already recorded, and the reliability index.
 - Your coordinates rounded to about a kilometre, which no weather model can tell
-  apart from the exact spot, and which is not an address.
+  apart from the exact spot and which is not an address, plus the country.
 - An opaque hash in place of any identity, so one installation can be followed
   over time without the collector being told whose it is.
 
@@ -250,11 +252,12 @@ No entity names, no consumption, no other sensor, nothing about the rest of the
 house. The whole payload is assembled in one file, `benchmark.py`, so you can
 read exactly what is sent rather than take our word for it. The upload runs beside
 the forecast and never inside it: a collector that is slow, unreachable or gone
-cannot delay or break anything.
+cannot delay or break anything, and clearing the key stops everything within the
+second.
 
-More installations make the benchmark worth more, and shading, odd orientations
-and difficult climates are the interesting cases. If you want to take part, open
-an issue and ask for a key.
+The benchmark is worth what its diversity is worth. Shaded roofs, unusual
+orientations, split arrays and difficult climates are the interesting cases, far
+more than another clear south facing roof.
 
 ---
 

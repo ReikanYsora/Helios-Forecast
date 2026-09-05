@@ -32,7 +32,7 @@ def _bucket(hours_ago: float, kwh: float, curtailed: bool = False) -> Production
 def _payload(**overrides):
     args = dict(
         entry_id="01KZ0S5BNAQR1H29CYZXVDC9EE",
-        version="2026.10.0",
+        version="2026.9.2",
         emitted_at=_NOW,
         latitude=44.109959823,
         longitude=1.404356360,
@@ -63,7 +63,7 @@ def test_the_payload_carries_the_prediction_the_geometry_and_nothing_else() -> N
     p = _payload()
     assert set(p) == {"schema", "site_id", "emitted_at", "model_version", "site", "reliability", "forecast", "observed"}
     assert p["schema"] == SCHEMA_VERSION
-    assert p["model_version"] == "2026.10.0"
+    assert p["model_version"] == "2026.9.2"
     assert set(p["site"]) == {
         "latitude",
         "longitude",
