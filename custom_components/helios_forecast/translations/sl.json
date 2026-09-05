@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — vrsta panelov",
+        "title": "Helios Forecast: vrsta panelov",
         "description": "Ena napoved za eno vrsto panelov (skupino enako usmerjenih panelov). Za vsako dodatno vrsto znova dodajte integracijo. Pustite lokacijo prazno, da uporabite dom v Home Assistantu.",
         "data": {
           "name": "Ime (npr. Južna streha)",
@@ -21,15 +21,18 @@
           "battery_soc_entity": "Senzor stanja napolnjenosti baterije (%)",
           "battery_max_charge_kw": "Najv. moč polnjenja baterije (kW, izbirno)",
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
-          "battery_min_soc": "Rezerva baterije — najmanjše stanje napolnjenosti (%, privzeto 10)",
-          "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)"
+          "battery_min_soc": "Rezerva baterije, najmanjše stanje napolnjenosti (%, privzeto 10)",
+          "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
+          "curtailment_entity": "Signal omejitve (binarni senzor, neobvezno)"
         },
         "data_description": {
-          "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben."
+          "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
+          "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Naklon (stopinje, 0 = ravno, 90 = navpično)",
@@ -50,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Uredi nastavitve (lokacija, razsmernik, senzor proizvodnje, baterija, signal omejitve)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "title": "Helios Forecast: settings",
+        "description": "Skupna lokacija, omejitev razsmernika, senzor proizvodnje, referenčna ura, baterija in signal omejitve za vsako vrsto panelov v tem vnosu.",
         "data": {
           "latitude": "Zemljepisna širina (neobvezno)",
           "longitude": "Zemljepisna dolžina (neobvezno)",
@@ -67,15 +70,18 @@
           "battery_soc_entity": "Senzor stanja napolnjenosti baterije (%)",
           "battery_max_charge_kw": "Najv. moč polnjenja baterije (kW, izbirno)",
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
-          "battery_min_soc": "Rezerva baterije — najmanjše stanje napolnjenosti (%, privzeto 10)",
-          "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)"
+          "battery_min_soc": "Rezerva baterije, najmanjše stanje napolnjenosti (%, privzeto 10)",
+          "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
+          "curtailment_entity": "Signal omejitve (binarni senzor, neobvezno)"
         },
         "data_description": {
-          "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben."
+          "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
+          "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Naklon (stopinje, 0 = ravno, 90 = navpično)",

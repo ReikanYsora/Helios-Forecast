@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — линија панела",
+        "title": "Helios Forecast: линија панела",
         "description": "Једна прогноза за једну линију панела (групу панела исте оријентације). Додајте интеграцију поново за сваку додатну линију. Оставите локацију празном да бисте користили локацију вашег Home Assistant-а.",
         "data": {
           "name": "Назив (нпр. Јужни кров)",
@@ -21,15 +21,18 @@
           "battery_soc_entity": "Сензор стања напуњености батерије (%)",
           "battery_max_charge_kw": "Макс. снага пуњења батерије (kW, опционо)",
           "battery_max_discharge_kw": "Макс. снага пражњења батерије (kW, опционо)",
-          "battery_min_soc": "Резерва батерије — минимално стање напуњености (%, подразумевано 10)",
-          "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)"
+          "battery_min_soc": "Резерва батерије, минимално стање напуњености (%, подразумевано 10)",
+          "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)",
+          "curtailment_entity": "Signal ograničenja (binarni senzor, opciono)"
         },
         "data_description": {
-          "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан."
+          "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbira, pa bi učenje i indeks pouzdanosti ostali isključeni.",
+          "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Нагиб (степени, 0 = равно, 90 = усправно)",
@@ -50,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Uredi podešavanja (lokacija, pretvarač, senzor proizvodnje, baterija, signal ograničenja)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "title": "Helios Forecast: settings",
+        "description": "Zajednička lokacija, granica pretvarača, senzor proizvodnje, referentni sat, baterija i signal ograničenja za svaki red panela u ovom unosu.",
         "data": {
           "latitude": "Географска ширина (опционо)",
           "longitude": "Географска дужина (опционо)",
@@ -67,15 +70,18 @@
           "battery_soc_entity": "Сензор стања напуњености батерије (%)",
           "battery_max_charge_kw": "Макс. снага пуњења батерије (kW, опционо)",
           "battery_max_discharge_kw": "Макс. снага пражњења батерије (kW, опционо)",
-          "battery_min_soc": "Резерва батерије — минимално стање напуњености (%, подразумевано 10)",
-          "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)"
+          "battery_min_soc": "Резерва батерије, минимално стање напуњености (%, подразумевано 10)",
+          "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)",
+          "curtailment_entity": "Signal ograničenja (binarni senzor, opciono)"
         },
         "data_description": {
-          "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан."
+          "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbira, pa bi učenje i indeks pouzdanosti ostali isključeni.",
+          "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Нагиб (степени, 0 = равно, 90 = усправно)",

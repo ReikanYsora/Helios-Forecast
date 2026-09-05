@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — Modulreihe",
+        "title": "Helios Forecast: Modulreihe",
         "description": "Eine Prognose für eine Modulreihe (eine Gruppe gleich ausgerichteter Module). Füge die Integration für jede weitere Reihe erneut hinzu. Lasse den Standort leer, um den Standort deiner Home-Assistant-Installation zu verwenden.",
         "data": {
           "name": "Name (z. B. Süddach)",
@@ -21,15 +21,18 @@
           "battery_soc_entity": "Batterieladezustand-Sensor (%)",
           "battery_max_charge_kw": "Max. Ladeleistung der Batterie (kW, optional)",
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
-          "battery_min_soc": "Batteriereserve — minimaler Ladezustand (%, Standard 10)",
-          "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)"
+          "battery_min_soc": "Batteriereserve, minimaler Ladezustand (%, Standard 10)",
+          "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
+          "curtailment_entity": "Abregelungssignal (Binärsensor, optional)"
         },
         "data_description": {
-          "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig."
+          "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
+          "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Neigung (Grad, 0 = flach, 90 = senkrecht)",
@@ -50,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Einstellungen bearbeiten (Standort, Wechselrichter, Produktionssensor, Batterie, Abregelungssignal)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "title": "Helios Forecast: settings",
+        "description": "Gemeinsamer Standort, Wechselrichtergrenze, Produktionssensor, Referenzstunde, Batterie und Abregelungssignal für jede Panelreihe dieses Eintrags.",
         "data": {
           "latitude": "Breitengrad (optional)",
           "longitude": "Längengrad (optional)",
@@ -67,15 +70,18 @@
           "battery_soc_entity": "Batterieladezustand-Sensor (%)",
           "battery_max_charge_kw": "Max. Ladeleistung der Batterie (kW, optional)",
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
-          "battery_min_soc": "Batteriereserve — minimaler Ladezustand (%, Standard 10)",
-          "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)"
+          "battery_min_soc": "Batteriereserve, minimaler Ladezustand (%, Standard 10)",
+          "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
+          "curtailment_entity": "Abregelungssignal (Binärsensor, optional)"
         },
         "data_description": {
-          "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig."
+          "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
+          "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Neigung (Grad, 0 = flach, 90 = senkrecht)",

@@ -1,17 +1,14 @@
-"""Irradiance and PV power, faithful port of the card's computePvPower.
+"""Irradiance and PV power.
 
 Pure functions. ``compute_pv_power`` returns 0..100 % of STC for one panel
-orientation, exactly as the card does, built from:
+orientation, built from:
 
   1. Haurwitz clear-sky GHI, attenuated by a Kasten-Czeplak cloud law, OR the
      supplied measured / forecast GHI when present.
-  2. An optional tilt transposition (Liu-Jordan isotropic), or Open-Meteo's
-     anisotropic plane-of-array (GTI) when supplied, with a direct / diffuse
-     split from real irradiance when available else cloud-derived.
+  2. An optional tilt transposition (Liu-Jordan isotropic), or a caller-supplied
+     plane-of-array irradiance, with a direct / diffuse split from real
+     irradiance when available else cloud-derived.
   3. A NOCT-based linear-wind cell-temperature derate when air temperature is known.
-
-Kept identical to the TypeScript so the server-side forecast matches the card
-and can be proven by parity against golden values from the same function.
 """
 
 from __future__ import annotations
@@ -28,7 +25,7 @@ if TYPE_CHECKING:
 
 _D = math.pi / 180.0
 
-# Cell-temperature model (port of pv-thermal.ts).
+# Cell-temperature model (NOCT, linear wind cooling).
 NOCT_CELL_C = 44.0
 NOCT_IRRADIANCE = 800.0
 NOCT_AIR_REF_C = 20.0
@@ -36,7 +33,7 @@ WIND_COOLING_K = 1.5
 GAMMA_PMP_PER_C = -0.0035
 STC_REF_C = 25.0
 
-# Snow-cover derate (port of pv.ts).
+# Snow-cover derate.
 SNOW_COVER_M = 0.01
 SNOW_MELT_LO_C = 0.0
 SNOW_MELT_HI_C = 4.0

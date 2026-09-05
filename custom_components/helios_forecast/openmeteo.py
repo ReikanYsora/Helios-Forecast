@@ -1,13 +1,12 @@
 """Open-Meteo client.
 
-Thin transport, matching the card's own weather request so the forecast is fed
-the same data on ``/v1/forecast``. Hourly cloud layers
+Thin transport over ``/v1/forecast``. Hourly cloud layers
 (``cloud_cover_low/mid/high``, fused into one weighted cover),
 ``shortwave_radiation_instant``, ``direct_radiation_instant``,
 ``diffuse_radiation_instant``, ``temperature_2m``, ``wind_speed_10m``,
 ``snow_depth``. Values are the per-hour median across
 ``pick_models_for_location`` (a regional high-resolution model paired with a
-global one), the same selection the card uses. A second, best-effort call over a
+global one). A second, best-effort call over a
 wider model ensemble adds only the cross-model cloud spread, a
 forecast-uncertainty signal.
 
@@ -72,8 +71,7 @@ WEATHER_MODELS = (
 
 
 # Regional high-resolution model (paired with a global one for the median) and its coverage box, per
-# area, mirroring the card's picker at 'high' precision (the card's only mode). (model, lat_min,
-# lat_max, lon_min, lon_max).
+# area: (model, lat_min, lat_max, lon_min, lon_max).
 _REGIONAL_MODELS: tuple[tuple[str, float, float, float, float], ...] = (
     ("meteofrance_seamless", 41.3, 51.2, -5.5, 8.5),  # France + Corsica (AROME 1.3 km)
     ("ukmo_seamless", 49.5, 61.0, -10.5, 2.0),  # UK & Ireland (UKMO 2 km)
@@ -94,7 +92,7 @@ _REGIONAL_MODELS: tuple[tuple[str, float, float, float, float], ...] = (
 # vast Japan box at the same point), with no reliance on declaration order. Anywhere uncovered falls back
 # to two independent global models, whose median beats either alone.
 def pick_models_for_location(lat: float, lon: float) -> list[str]:
-    """Model set for the weather request, matching the card's picker."""
+    """Model set for the weather request: the most central regional model plus a global one, or two globals."""
     GLOBAL = "ecmwf_ifs025"
     best: str | None = None
     best_score = float("-inf")
@@ -119,7 +117,7 @@ def pick_models_for_location(lat: float, lon: float) -> list[str]:
 @dataclass(frozen=True)
 class WeatherSeries:
     """Parallel hourly arrays, times are UTC-aware datetimes. Values are the
-    per-hour median across pick_models_for_location, matching the card."""
+    per-hour median across pick_models_for_location."""
 
     times: list[datetime]
     cloud: list[float | None]  # weighted cover % (low + 0.6*mid + 0.2*high), 0 where a layer was missing
@@ -127,7 +125,7 @@ class WeatherSeries:
     direct: list[float]  # W/m2 on the horizontal
     diffuse: list[float]  # W/m2 on the horizontal
     temp: list[float]  # degC
-    wind: list[float]  # Open-Meteo default (km/h), passed through as the card does
+    wind: list[float]  # Open-Meteo default (km/h)
     snow: list[float]  # snow depth, metres
     # Per-hour standard deviation of cloud cover across the ensemble models (model disagreement),
     # overlaid from the best-effort ensemble call. Empty when that call yielded nothing. Read as a
@@ -141,7 +139,7 @@ def build_weather_url(
     """URL for the weather (forecast inputs) request.
 
     Default (``ensemble=False``) fetches the full variable set over ``pick_models_for_location``
-    (median-fused), matching the card. ``ensemble=True`` fetches only the aggregate cover over the
+    (median-fused). ``ensemble=True`` fetches only the aggregate cover over the
     wider model set, used to derive the cross-model cloud spread.
     """
     if ensemble:
@@ -163,7 +161,7 @@ def build_weather_url(
 def parse_times(time_strs: list[str]) -> list[datetime]:
     """Open-Meteo ``timezone=UTC`` stamps ('YYYY-MM-DDTHH:MM') to UTC datetimes.
 
-    Mirrors the card appending 'Z' before parsing: the stamps are wall-clock UTC.
+    The stamps carry no offset and are wall-clock UTC, hence the explicit tzinfo.
     """
     return [datetime.fromisoformat(s).replace(tzinfo=timezone.utc) for s in time_strs]
 
@@ -213,8 +211,7 @@ def _clamp_pct(v: Optional[float]) -> float:
 
 
 def cloud_effective(low: Optional[float], mid: Optional[float], high: Optional[float]) -> float:
-    """One weighted cover from the three layers, matching the card: low cloud attenuates far more than
-    high cirrus. Each layer is clamped to [0, 100] first; missing layers count as clear."""
+    """One weighted cover from the three layers: low cloud attenuates far more than high cirrus. Each layer is clamped to [0, 100] first; missing layers count as clear."""
     return min(100.0, _clamp_pct(low) + 0.6 * _clamp_pct(mid) + 0.2 * _clamp_pct(high))
 
 
@@ -233,7 +230,7 @@ def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
         arrays = _model_arrays(hourly, base)
         return [_median(_finite_at(arrays, i)) for i in range(n)]
 
-    # Median each layer across models first, then combine into the weighted cover the card uses.
+    # Median each layer across models first, then combine into the weighted cover.
     # cloud_effective always returns a float, but the field is list[float | None] like the fused layers.
     low, mid, high = fuse("cloud_cover_low"), fuse("cloud_cover_mid"), fuse("cloud_cover_high")
     cloud: list[float | None] = [cloud_effective(low[i], mid[i], high[i]) for i in range(n)]

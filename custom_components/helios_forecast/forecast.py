@@ -1,9 +1,8 @@
 """Forecast assembly: weather interpolation, per-bucket PV watts, daily kWh.
 
-Ports the deterministic core of the card's buildForecast. Walks the horizon at a
-sub-hourly step, interpolates the hourly Open-Meteo weather between samples with
+Walks the horizon at a sub-hourly step, interpolates the hourly Open-Meteo weather between samples with
 a moving cursor (so the magnitude stays smooth at any cadence), computes the
-weighted PV percentage, maps it to watts (x pvCalibK x snow), and clips at the
+weighted PV percentage, maps it to watts (x kWp x 10 x snow), and clips at the
 inverter cap. ``pv_w`` applies the learned per-sky-cell residual ratio when a
 map is given (else it equals ``pv_raw_w``, the pure physical model); the
 analog blend on top of that lives in the sibling ``analog`` module.

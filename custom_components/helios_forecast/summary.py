@@ -66,8 +66,13 @@ def _value_at(points: List[ForecastPoint], t: datetime) -> Optional[float]:
 
 
 def _band_at(points: List[ForecastPoint], t: datetime, attr: str) -> Optional[float]:
-    """Interpolated P10/P90 band value at ``t``, or None when either bracketing
-    bucket has no band (analog support too thin there)."""
+    """P10/P90 band value at ``t``, interpolated when both bracketing buckets
+    have one, or taken from whichever side does when only one does.
+
+    At "now" the lower bracket is a past point, which never carries a band
+    (`enrich_points` only attaches one to the future), so the value is usually
+    the upper bracket's: the band's purpose is future uncertainty. None only when
+    neither side has analog support."""
     if not points or t < points[0].t or t > points[-1].t:
         return None
     lo = 0
@@ -80,8 +85,12 @@ def _band_at(points: List[ForecastPoint], t: datetime, attr: str) -> Optional[fl
             hi = mid
     v0 = getattr(points[lo], attr)
     v1 = getattr(points[hi], attr)
-    if v0 is None or v1 is None:
+    if v0 is None and v1 is None:
         return None
+    if v0 is None:
+        return v1
+    if v1 is None:
+        return v0
     t0, t1 = points[lo].t, points[hi].t
     if t1 <= t0:
         return v0
@@ -90,14 +99,25 @@ def _band_at(points: List[ForecastPoint], t: datetime, attr: str) -> Optional[fl
 
 
 def _energy_kwh(points: List[ForecastPoint], start: datetime, end: datetime, step_h: float) -> Optional[float]:
-    """kWh over [start, end) summing each bucket's pv_w x step hours."""
+    """kWh over [start, end) summing each bucket's pv_w x step hours.
+
+    An empty window is a knowledge gap only outside the forecast horizon; inside
+    it the sum is a genuine 0.0 (no bucket left). Returning None there would
+    publish ``unknown`` for ``energy_today_remaining`` after the day's last point
+    instead of the honest "0 kWh left today".
+    """
     total = 0.0
     any_bucket = False
     for p in points:
         if start <= p.t < end and math.isfinite(p.pv_w):
             total += p.pv_w * step_h / 1000.0
             any_bucket = True
-    return total if any_bucket else None
+    if any_bucket:
+        return total
+    covered = [p.t for p in points if math.isfinite(p.pv_w)]
+    if covered and min(covered) <= start and end <= max(covered) + timedelta(hours=step_h):
+        return 0.0
+    return None
 
 
 def summarize(

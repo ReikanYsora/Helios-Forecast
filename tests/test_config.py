@@ -80,6 +80,8 @@ def test_split_line_keeps_only_geometry_and_drops_empty() -> None:
 def test_split_settings_keeps_only_settings() -> None:
     form = {"tilt": 30, "kwp": 2.61, "latitude": 1.0, "longitude": 2.0, "inverter_max_kw": 5.5}
     assert split_settings(form) == {"latitude": 1.0, "longitude": 2.0, "inverter_max_kw": 5.5}
+    form = {"curtailment_entity": "binary_sensor.export_limited", "tilt": 30}
+    assert split_settings(form) == {"curtailment_entity": "binary_sensor.export_limited"}
 
 
 def test_merge_and_read_back_lines_roundtrip() -> None:

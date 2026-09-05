@@ -20,6 +20,7 @@ from custom_components.helios_forecast.analog import (  # noqa: E402
     _sample_series,
     _weighted_percentiles,
     build_library,
+    enrich_archive_points,
     enrich_points,
     predict,
     series_epochs,
@@ -178,6 +179,30 @@ def test_build_library_drops_night() -> None:
     assert lib[0].watt == 3.0 * 1000.0  # kWh -> W over the hour
 
 
+def test_build_library_drops_curtailed_hours() -> None:
+    lat, lon = 45.0, 0.0
+    noon = _june_noon(12)
+    one = _june_noon(13)
+    prod = [
+        _Bucket(noon.timestamp() * 1000.0, (noon + timedelta(hours=1)).timestamp() * 1000.0, 3.0),
+        _Bucket(one.timestamp() * 1000.0, (one + timedelta(hours=1)).timestamp() * 1000.0, 1.2),
+    ]
+    prod[1].curtailed = True
+    times = [_june_noon(h) for h in range(24)]
+    weather = WeatherSeries(
+        times=times,
+        cloud=[20.0] * 24,
+        shortwave=[0.0] * 24,
+        direct=[0.0] * 24,
+        diffuse=[0.0] * 24,
+        temp=[20.0] * 24,
+        wind=[5.0] * 24,
+        snow=[0.0] * 24,
+    )
+    lib = build_library(prod, weather, lat, lon)
+    assert [s.watt for s in lib] == [3000.0]
+
+
 def test_enrich_points_past_untouched_future_blended() -> None:
     lat, lon = 45.0, 0.0
     now = _june_noon(12)
@@ -208,6 +233,30 @@ def test_enrich_points_past_untouched_future_blended() -> None:
     assert out[1].pv_p10 <= out[1].pv_w <= out[1].pv_p90 + 1e-6
 
 
+def test_enrich_points_future_night_gets_zero_band() -> None:
+    """Below the horizon the output isn't uncertain, it's known: 0 W either side, not unknown."""
+    lat, lon = 45.0, 0.0
+    now = _june_noon(12)
+    night = ForecastPoint(t=_june_noon(1) + timedelta(days=1), pv_w=0.0, pv_raw_w=0.0)
+
+    lib = [AnalogSample(alt=10.0, az=180.0, cloud=30.0, watt=1000.0, temp=20.0)]
+    times = [_june_noon(h) for h in range(24)]
+    weather = WeatherSeries(
+        times=times,
+        cloud=[30.0] * 24,
+        shortwave=[0.0] * 24,
+        direct=[0.0] * 24,
+        diffuse=[0.0] * 24,
+        temp=[20.0] * 24,
+        wind=[5.0] * 24,
+        snow=[0.0] * 24,
+    )
+    out = enrich_points([night], lib, weather, lat, lon, now)
+    assert out[0].pv_p10 == 0.0
+    assert out[0].pv_p90 == 0.0
+    assert out[0].pv_w == night.pv_w  # only the band is set, the physical model's power is untouched
+
+
 def _flat_weather() -> WeatherSeries:
     times = [_june_noon(h) for h in range(24)]
     return WeatherSeries(
@@ -234,6 +283,34 @@ def test_ceiling_caps_overprediction() -> None:
     out = enrich_points([fut], lib, _flat_weather(), lat, lon, now)
     assert out[0].pv_w <= 4500.0 * 1.25 + 1e-6  # capped at p90 * margin, well below the physical 6500
     assert out[0].pv_w < 6500.0
+
+
+def test_enrich_archive_points_caps_a_past_point_enrich_points_would_leave_untouched() -> None:
+    # Same over-prediction as test_ceiling_caps_overprediction, but on a point that is already in
+    # the past relative to any "now" - enrich_points() would leave it as the raw physical model by
+    # design (see test_enrich_points_past_untouched_future_blended). The archive has no future side
+    # to gate on, so every one of its points needs this same ceiling clamp, not just future ones (#52).
+    lat, lon = 45.0, 0.0
+    past = ForecastPoint(t=_june_noon(13), pv_w=6500.0, pv_raw_w=6500.0)  # physical over-predicts
+    sun = sun_position(past.t, lat, lon)
+    lib = [AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=30.0, watt=4500.0, temp=20.0) for _ in range(10)]
+
+    # enrich_points, called with "now" after the point, leaves it exactly as the raw model (the
+    # bug: this is what the archive pipeline used to do for every single one of its points).
+    untouched = enrich_points([past], lib, _flat_weather(), lat, lon, now=_june_noon(23))
+    assert untouched[0].pv_w == 6500.0
+
+    # enrich_archive_points has no "now" to gate on and clamps it like enrich_points does for a
+    # future point.
+    out = enrich_archive_points([past], lib, _flat_weather(), lat, lon)
+    assert out[0].pv_w <= 4500.0 * 1.25 + 1e-6
+    assert out[0].pv_w < 6500.0
+
+
+def test_enrich_archive_points_empty_library_is_a_noop() -> None:
+    past = ForecastPoint(t=_june_noon(13), pv_w=1000.0, pv_raw_w=1000.0)
+    out = enrich_archive_points([past], [], _flat_weather(), 45.0, 0.0)
+    assert out == [past]
 
 
 def test_ceiling_skipped_when_analogs_thin() -> None:

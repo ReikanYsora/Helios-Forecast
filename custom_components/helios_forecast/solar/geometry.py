@@ -1,12 +1,9 @@
 """Solar position math.
 
-Faithful port of the Helios card's ``getSunPosition``. Pure functions, no Home
-Assistant imports. The model is the simplified declination + equation-of-time
-formulation the card validated against the NOAA SPA reference (mean altitude
+Pure functions, no Home Assistant imports. A simplified declination +
+equation-of-time model, validated against the NOAA SPA reference (mean altitude
 error 0.30 deg, mean azimuth error 0.36 deg over 376 samples across a year and
-eight latitudes). It is kept identical here so the server-side forecast matches
-what the card produced, which is what lets us prove parity against the
-TypeScript output rather than just "close enough".
+eight latitudes): accurate enough for hourly PV and cheap enough to call per point.
 """
 
 from __future__ import annotations
@@ -41,9 +38,7 @@ def sun_position(moment: datetime, lat: float, lon: float) -> SunPosition:
 
     hour = when.hour + when.minute / 60.0 + when.second / 3600.0
 
-    # Day of year, 1-based. Mirrors the card's floor(ms / 86_400_000) over a
-    # reference of Dec 31 00:00 UTC of the previous year (JS Date.UTC(year, 0, 0)),
-    # so a partial day inside the current date is truncated exactly as it is there.
+    # Day of year, 1-based.
     ref = datetime(when.year, 1, 1, tzinfo=timezone.utc) - timedelta(days=1)
     doy = math.floor((when - ref).total_seconds() / 86_400.0)
 

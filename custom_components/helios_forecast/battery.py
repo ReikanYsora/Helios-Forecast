@@ -80,8 +80,6 @@ def project_battery_soc(
         if point.t < now or point.t >= end:
             continue
         if prev_t is not None:
-            # dt_h above is derived from step_minutes alone; if the real spacing between the points
-            # being integrated does not match it, every energy delta from here on is silently wrong.
             gap_min = (point.t - prev_t).total_seconds() / 60.0
             if abs(gap_min - step_minutes) > _STEP_TOLERANCE_MIN:
                 raise StepCadenceError(

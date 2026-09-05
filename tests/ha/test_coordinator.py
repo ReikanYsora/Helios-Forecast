@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock
 
 import pytest
@@ -107,18 +107,22 @@ async def test_fetch_exception_becomes_update_failed(hass, monkeypatch) -> None:
 # --- battery SoC projection: the "off" reasons ------------------------------------------------
 
 
-async def test_battery_off_missing_config_logs_once(hass, caplog) -> None:
+async def test_battery_off_missing_config_logs_once_at_info(hass, caplog) -> None:
+    """#50: no battery configured is a normal PV-only setup, not a misconfiguration -
+    it belongs at INFO, not WARNING, and every restart otherwise nags for nothing."""
     entry = _entry(hass)
     coordinator = HeliosForecastCoordinator(hass, entry)
     now = dt_util.now()
 
-    with caplog.at_level(logging.WARNING, logger=coordinator_mod._LOGGER.name):
+    with caplog.at_level(logging.INFO, logger=coordinator_mod._LOGGER.name):
         result1 = await coordinator._project_battery_soc({}, [], now)
         result2 = await coordinator._project_battery_soc({}, [], now)
 
     assert result1 == [] and result2 == []
     matching = [r for r in caplog.records if "battery SoC projection is off" in r.message]
     assert len(matching) == 1, "the second identical reason must not re-log"
+    assert matching[0].levelno == logging.INFO
+    assert "transient" not in matching[0].message, "not a retry - there is simply no battery to project"
 
 
 async def test_battery_off_soc_entity_missing_state(hass) -> None:
@@ -398,3 +402,38 @@ async def test_write_weather_statistics_advances_marker_once_entity_exists(hass)
     coordinator.write_weather_statistics(now_utc, full=True)
 
     assert coordinator._last_weather_stat_hour == now_utc.replace(minute=0, second=0, microsecond=0)
+
+
+# --- curtailment flagging ------------------------------------------------------------------
+
+
+async def test_flag_curtailed_marks_full_battery_hours_at_the_cap(hass, monkeypatch) -> None:
+    from custom_components.helios_forecast.solar.residual import ProductionBucket
+
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    hour = 3_600_000.0
+    buckets = [ProductionBucket(start_ms=h * hour, end_ms=(h + 1) * hour, kwh=1.15) for h in (10, 11)]
+
+    async def _statistics(stat_id, start, end, types, units):
+        assert stat_id == "sensor.soc" and types == {"max"}
+        return [
+            {"start": 10 * 3600.0, "end": 11 * 3600.0, "max": 100.0},
+            {"start": 11 * 3600.0, "end": 12 * 3600.0, "max": 80.0},
+        ]
+
+    monkeypatch.setattr(coordinator, "_statistics", _statistics)
+    data = {"battery_soc_entity": "sensor.soc", "inverter_max_kw": 1.2}
+    start = datetime.fromtimestamp(0, tz=timezone.utc)
+    out = await coordinator._flag_curtailed(data, buckets, start, start + timedelta(hours=24))
+    assert [b.curtailed for b in out] == [True, False]
+
+    # No cap configured: the battery signal is unusable, nothing is flagged and the history is not read.
+    async def _no_call(*_a, **_k):
+        raise AssertionError("statistics must not be read without a cap")
+
+    monkeypatch.setattr(coordinator, "_statistics", _no_call)
+    out = await coordinator._flag_curtailed(
+        {"battery_soc_entity": "sensor.soc"}, buckets, start, start + timedelta(hours=24)
+    )
+    assert [b.curtailed for b in out] == [False, False]

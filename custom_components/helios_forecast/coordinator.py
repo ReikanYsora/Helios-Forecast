@@ -10,13 +10,14 @@ residual map is built from the recorder's own production / SoC history.
 from __future__ import annotations
 
 import asyncio
+import math
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import partial
 from typing import Any, Dict, List, Optional
 
-from homeassistant.components.recorder import get_instance
+from homeassistant.components.recorder import get_instance, history
 from homeassistant.components.recorder.models import StatisticMetaData
 from homeassistant.components.recorder.statistics import (
     async_import_statistics,
@@ -38,8 +39,11 @@ from .config import (
     learning_from_config,
     location_from_config,
     trend_anchor_hour_from_config,
+    curtailment_entity_from_config,
+    CONF_BATTERY_SOC_ENTITY,
 )
-from .analog import build_library, enrich_points
+from .analog import build_library, enrich_archive_points, enrich_points
+from .curtailment import flag_curtailed, on_intervals_from_states
 from .battery import BatterySocPoint, project_battery_soc
 from .consumption import ConsumptionProfile, build_consumption_profile, consumption_sources
 from .trend import TodayTrend, TrendReference, compute_trend, should_capture
@@ -64,9 +68,8 @@ from .solar.residual import (
 )
 from .summary import ForecastSummary, summarize
 
-# HA-version compat, both mandatory in StatisticMetaData from HA 2026.11 and imported defensively so
-# the integration still loads on older cores that lack them.
-# `mean_type` replaces the deprecated `has_mean`.
+# Compat: `mean_type` and `unit_class` are mandatory in newer StatisticMetaData and absent from older
+# cores, so they are imported defensively.
 try:
     from homeassistant.components.recorder.models import StatisticMeanType
 
@@ -159,16 +162,16 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # the detail websocket can serve the past forecast curve the live `points` (today onward) do
         # not cover.
         self.archive_points: List[ForecastPoint] = []
+        # Today's already-elapsed live points with the archive's analog clamp applied, for the card's series:
+        # the stretch between the archive's last hour and now, which the live series deliberately leaves raw.
+        self.elapsed_points: List[ForecastPoint] = []
         # The UTC hour the archive was last recomputed. The 60-day past curve only changes at its
         # trailing hour, so it is rebuilt once an hour rather than on every 30-minute refresh.
         self._last_archive_hour: Optional[datetime] = None
         # The UTC hour up to which the weather statistics have been written. A refresh then imports only
         # the new hours; the full 60-day backfill (self-heal) runs once at startup.
         self._last_weather_stat_hour: Optional[datetime] = None
-        # Home consumption profile for the battery SoC projection, rebuilt at most once an hour. Its
-        # multi-sensor 60-day recorder fetch is the expensive part, so it runs on the same hourly cadence
-        # as the prediction archive rather than on every 30-minute refresh; a 60-day average barely moves
-        # within an hour. Reused in between.
+        # Home consumption profile for the SoC projection; rebuilt hourly by _consumption_profile_for.
         self._consumption_profile: Optional[ConsumptionProfile] = None
         self._last_consumption_hour: Optional[datetime] = None
         # Production history (recorder change buckets) from the most recent refresh, kept so the
@@ -212,9 +215,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + timedelta(days=FORECAST_DAYS)
-        # The forecast pipeline is CPU-bound pure Python (the sub-hourly walk, the analog scan, the
-        # 60-day archive). Each heavy stage runs in the executor so it never blocks the event loop: on a
-        # small box a 30-minute refresh used to spike a core to 100% and starve the network for seconds.
+        # The pipeline is CPU-bound pure Python (sub-hourly walk, analog scan, 60-day archive); each heavy
+        # stage runs in the executor so a refresh never blocks the event loop.
         points = await self.hass.async_add_executor_job(
             partial(
                 build_forecast_series,
@@ -236,6 +238,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             build_library, self._production_buckets, weather, lat, lon
         )
         points = await self.hass.async_add_executor_job(enrich_points, points, analog_library, weather, lat, lon, now)
+        # The live series keeps its elapsed points raw on purpose (what the forecast said at the time), but the
+        # card draws them next to the archive's clamped hours, where a raw point hugs the nameplate ceiling for
+        # up to an hour before the archive catches up. Serve the card a clamped copy of that stretch instead.
+        self.elapsed_points = await self.hass.async_add_executor_job(
+            enrich_archive_points, [p for p in points if p.t < now], analog_library, weather, lat, lon
+        )
 
         summary = await self.hass.async_add_executor_job(
             partial(summarize, points, now=now, tz=dt_util.DEFAULT_TIME_ZONE, step_minutes=STEP_MINUTES)
@@ -255,7 +263,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         archive_hour = now_utc.replace(minute=0, second=0, microsecond=0)
         if self._last_archive_hour != archive_hour:
             self.archive_points = await self.hass.async_add_executor_job(
-                self._compute_archive_points, now_utc, weather, layout, lat, lon, cap, residual_map
+                self._compute_archive_points, now_utc, weather, layout, lat, lon, cap, residual_map, analog_library
             )
             self._forecast_stat_rows = await self.hass.async_add_executor_job(forecast_statistics, self.archive_points)
             self.write_forecast_statistics()
@@ -292,14 +300,15 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         if battery is None:
             return self._battery_off(
                 "no battery is configured in the integration options (set the battery capacity and the "
-                "live SoC entity to enable it)"
+                "live SoC entity to enable it)",
+                not_applicable=True,
             )
 
         soc_state = self.hass.states.get(battery.soc_entity)
         if soc_state is None or soc_state.state in ("unknown", "unavailable"):
-            # Transient at startup or while the battery integration warms up (a modbus link can take a
-            # few seconds to open). A state listener re-projects the moment the entity comes back (see
-            # async_setup_entry), so this is logged gently rather than as a misconfiguration.
+            # Transient at startup or while the battery integration warms up. A state listener re-projects
+            # the moment the entity comes back (see async_setup_entry), so this is logged gently rather
+            # than as a misconfiguration.
             return self._battery_off(f"the SoC entity {battery.soc_entity} is unavailable", transient=True)
         try:
             start_soc_frac = float(soc_state.state) / 100.0
@@ -330,18 +339,18 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             )
         )
 
-    def _battery_off(self, reason: str, *, transient: bool = False) -> List[BatterySocPoint]:
-        """Return an empty SoC projection, logging why the first time a given reason occurs.
-
-        The projection is deliberately skipped when an input is missing rather than guessed; without
-        this the sensor just read ``unknown`` with no hint, which made it impossible to tell a
-        misconfiguration from a transient gap. Logged once per distinct reason (re-armed when the
-        projection recovers) so a steady-state 'off' does not spam the log every refresh. A
-        ``transient`` reason (the SoC entity briefly unavailable at startup, which the state listener
-        recovers from within seconds) logs at INFO; an actionable misconfiguration logs at WARNING."""
+    def _battery_off(
+        self, reason: str, *, transient: bool = False, not_applicable: bool = False
+    ) -> List[BatterySocPoint]:
+        """Empty SoC projection, logging the reason once per distinct reason (re-armed on recovery) so a
+        steady 'off' does not spam the log. ``transient`` (SoC entity briefly unavailable; the state
+        listener retries) and ``not_applicable`` (no battery configured) log at INFO; anything else is an
+        actionable misconfiguration and logs at WARNING."""
         if self._battery_off_logged != reason:
             if transient:
                 _LOGGER.info("Helios battery SoC projection is off (transient, will retry): %s", reason)
+            elif not_applicable:
+                _LOGGER.info("Helios battery SoC projection is off: %s", reason)
             else:
                 _LOGGER.warning("Helios battery SoC projection is off: %s", reason)
             self._battery_off_logged = reason
@@ -459,8 +468,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             if not rows:
                 continue
             # mean_type + unit_class are declared statically (not added after the literal) so both the
-            # runtime and static API scanners see them. has_mean stays for cores older than mean_type
-            # (HA 2025.1), where the extra mean_type key is simply ignored and has_mean is read instead.
+            # runtime and static API scanners see them. has_mean stays for cores that predate mean_type,
+            # where the extra key is ignored.
             metadata: StatisticMetaData = {
                 "has_mean": True,
                 "mean_type": _MEAN_TYPE_ARITHMETIC,
@@ -478,16 +487,17 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         if wrote_any:
             self._last_weather_stat_hour = cutoff
 
-    def _compute_archive_points(self, now, weather, layout, lat, lon, cap, residual_map):
+    def _compute_archive_points(self, now, weather, layout, lat, lon, cap, residual_map, analog_library):
         """Hourly predicted points over the past window [now - LEARN_DAYS, current hour).
 
-        Runs the same model used for the live forecast across the past at an hourly step (the cadence
-        HA statistics keep), residual-corrected. Feeds both the statistics backfill and the detail
-        websocket's past curve.
+        Runs the live model across the past at an hourly step (the cadence HA statistics keep),
+        residual-corrected and analog-enriched like the live future points, so the archived curve carries
+        the same learned ceiling as the live one. Feeds the statistics backfill and the detail websocket's
+        past curve.
         """
         cutoff = now.replace(minute=0, second=0, microsecond=0)
         arch_start = cutoff - timedelta(days=LEARN_DAYS)
-        return build_forecast_series(
+        points = build_forecast_series(
             weather,
             layout,
             lat,
@@ -498,6 +508,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             step_minutes=60,
             residual_map=residual_map,
         )
+        return enrich_archive_points(points, analog_library, weather, lat, lon)
 
     @callback
     def write_forecast_statistics(self) -> None:
@@ -546,6 +557,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             _LOGGER.warning("Helios learning history fetch failed, forecast stays uncorrected: %s", err)
             return None
 
+        # Mark the hours the inverter was held back before anything learns from them (curtailment.py).
+        production = await self._flag_curtailed(data, production, learn_start, now)
         self._production_buckets = production
         if not production:
             _LOGGER.warning(
@@ -576,6 +589,44 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 now_ms=now.timestamp() * 1000.0,
             ),
         )
+
+    async def _flag_curtailed(self, data, production, start, end) -> List[ProductionBucket]:
+        """Flag the curtailed hours from what the config makes visible: the battery's hourly maximum state of
+        charge against the inverter cap, and the optional curtailment entity's on periods. Best-effort: a
+        history that cannot be read leaves the buckets unflagged rather than failing the learning."""
+        if not production:
+            return production
+        soc_max_by_start_ms = None
+        soc_entity = data.get(CONF_BATTERY_SOC_ENTITY) or None
+        cap = inverter_max_w_from_config(data)
+        if soc_entity and math.isfinite(cap):
+            try:
+                rows = await self._statistics(soc_entity, start, end, {"max"}, None)
+                soc_max_by_start_ms = {r["start"] * 1000.0: float(r["max"]) for r in rows if r.get("max") is not None}
+            except Exception as err:  # noqa: BLE001 - best-effort
+                _LOGGER.debug("Battery state-of-charge history unavailable for curtailment detection: %s", err)
+        on_intervals = None
+        curtail_entity = curtailment_entity_from_config(data)
+        if curtail_entity:
+            try:
+                changes = await get_instance(self.hass).async_add_executor_job(
+                    partial(
+                        history.state_changes_during_period,
+                        self.hass,
+                        start,
+                        end,
+                        curtail_entity,
+                        no_attributes=True,
+                        include_start_time_state=True,
+                    )
+                )
+                states = [(st.last_updated.timestamp() * 1000.0, st.state) for st in changes.get(curtail_entity, [])]
+                on_intervals = on_intervals_from_states(states, start.timestamp() * 1000.0, end.timestamp() * 1000.0)
+            except Exception as err:  # noqa: BLE001 - best-effort
+                _LOGGER.debug("Curtailment entity history unavailable: %s", err)
+        if soc_max_by_start_ms is None and not on_intervals:
+            return production
+        return flag_curtailed(production, soc_max_by_start_ms=soc_max_by_start_ms, cap_w=cap, on_intervals=on_intervals)
 
     async def _statistics(self, stat_id, start, end, types, units):
         result = await get_instance(self.hass).async_add_executor_job(

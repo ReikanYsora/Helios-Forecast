@@ -285,3 +285,38 @@ if __name__ == "__main__":
             fn()
             print(f"ok  {name}")
     print("all residual tests passed")
+
+
+# --- curtailed hours are censored, not learned as low ---------------------------
+
+
+def test_curtailed_hours_below_the_model_are_left_out_of_the_learning() -> None:
+    """A flagged hour whose measurement sits under the model carries no sky information: without the
+    censor, a run of full-battery afternoons dragged the learned ratio well below 1."""
+    buckets = _midday_buckets()
+    inp0 = _input(buckets)
+    matched = [ProductionBucket(b.start_ms, b.end_ms, _model_kwh(b, inp0)) for b in buckets]
+    # Half the hours clipped to a fifth of the model and flagged as curtailed.
+    clipped = [
+        ProductionBucket(b.start_ms, b.end_ms, 0.2 * _model_kwh(b, inp0), curtailed=(i % 2 == 0))
+        for i, b in enumerate(buckets)
+    ]
+    mixed = [c if c.curtailed else m for c, m in zip(clipped, matched)]
+    sky = build_sky_residual_map(_input(mixed))
+    assert sky is not None
+    assert abs(sky.global_ratio - 1.0) < 0.05
+    # The same clipped hours unflagged pull the ratio down: the censor is what kept it at 1.
+    unflagged = [ProductionBucket(b.start_ms, b.end_ms, b.kwh) for b in mixed]
+    sky_raw = build_sky_residual_map(_input(unflagged))
+    assert sky_raw is not None
+    assert sky_raw.global_ratio < 0.7
+
+
+def test_curtailed_hours_at_or_above_the_model_still_count() -> None:
+    """The bound is not binding when the measurement reaches the model: the sample is kept as is."""
+    buckets = _midday_buckets()
+    inp0 = _input(buckets)
+    over = [ProductionBucket(b.start_ms, b.end_ms, 1.5 * _model_kwh(b, inp0), curtailed=True) for b in buckets]
+    sky = build_sky_residual_map(_input(over))
+    assert sky is not None
+    assert abs(sky.global_ratio - 1.5) < 0.05

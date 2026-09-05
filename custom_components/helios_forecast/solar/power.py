@@ -1,9 +1,7 @@
-"""Weighted multi-orientation PV power, port of the card's computePvPowerWeighted.
+"""Weighted multi-orientation PV power.
 
 Sums ``compute_pv_power`` across every configured array, weighted by its share of
-the total kWp. The card's LiDAR raycast shading path is intentionally not ported
-yet: with no raster, every array is unshaded, which is exactly the branch this
-covers. Pure, no Home Assistant imports.
+the total kWp. Pure, no Home Assistant imports.
 """
 
 from __future__ import annotations
@@ -37,9 +35,9 @@ class PvLayout:
     shares: List[float]  # pre-normalised, sum to 1.0
     coords: List[Optional[Tuple[float, float]]]  # per-array (lat, lon) override or None
     total_kwp: float
-    # Per-array inverter cap in watts (INF when that array has none). Empty = no per-array caps at all, so the
-    # forecast clips only the combined total at the entry-level cap, exactly as before. When present, each array is
-    # clipped at its own cap BEFORE the arrays are summed, for micro-inverter strings that saturate independently.
+    # Per-array inverter cap in watts (INF when that array has none). Empty = no per-array caps, only the combined
+    # total is clipped at the entry-level cap. When present, each array is clipped at its own cap BEFORE the arrays
+    # are summed, for micro-inverter strings that saturate independently.
     caps: List[float] = field(default_factory=list)
 
 
@@ -73,8 +71,8 @@ def compute_pv_power_per_array(
     )
 
     orientations = layout.orientations
-    # Defensive: keep the per-array arrays in lockstep, else fall back to the horizontal path so the curve still
-    # renders (matches the card's guard). A single-element list signals "one array over the whole layout".
+    # Out-of-lockstep layout: fall back to the horizontal path so the curve still renders. A single-element list
+    # signals "one array over the whole layout".
     if not orientations or len(layout.shares) != len(orientations) or len(layout.coords) != len(orientations):
         return [compute_pv_power(moment, home_lat, home_lon, sample.cloud, None, base_ctx)]
 

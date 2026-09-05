@@ -73,6 +73,17 @@ def test_hourly_buckets_and_wh_hours() -> None:
     assert abs(s.energy_today_remaining_kwh - remaining) < 1e-9
 
 
+def test_energy_today_remaining_is_zero_not_none_after_the_last_bucket_of_the_day() -> None:
+    # 15-minute step, points covering all of today; `now` sits 5 minutes after the day's
+    # last bucket (23:45) starts, so [now, midnight) holds zero buckets. That's a genuine
+    # 0 kWh left, not a gap: the horizon still covers all the way to midnight.
+    base = datetime(2026, 6, 21, tzinfo=_UTC)
+    pts = [ForecastPoint(t=base + timedelta(minutes=15 * i), pv_w=50.0, pv_raw_w=50.0) for i in range(96)]
+    now = base + timedelta(hours=23, minutes=50)
+    s = summarize(pts, now=now, tz=_UTC, step_minutes=15)
+    assert s.energy_today_remaining_kwh == 0.0
+
+
 def test_empty_points() -> None:
     now = datetime(2026, 6, 21, 10, tzinfo=_UTC)
     s = summarize([], now=now, tz=_UTC, step_minutes=60)
@@ -97,11 +108,30 @@ def test_power_now_band_interpolates_when_both_buckets_have_one() -> None:
     assert abs(s.power_now_high_w - 850.0) < 1e-9
 
 
-def test_power_now_band_none_when_either_bracketing_bucket_lacks_one() -> None:
+def test_power_now_band_falls_back_to_the_future_side_when_the_past_side_lacks_one() -> None:
+    """The realistic shape at "now": the lower bracket is always at or before
+    ``now``, and past points never carry a band (enrich_points only attaches
+    one to the future). #421/#51: this used to return None here, permanently,
+    on any install with a solid enough analog library for the future side to
+    actually have a band - which is exactly when it should stop being None."""
     base = datetime(2026, 6, 21, tzinfo=_UTC)
     pts = [
         ForecastPoint(t=base + timedelta(hours=10), pv_w=700.0, pv_raw_w=700.0, pv_p10=None, pv_p90=None),
         ForecastPoint(t=base + timedelta(hours=11), pv_w=800.0, pv_raw_w=800.0, pv_p10=650.0, pv_p90=900.0),
+    ]
+    now = base + timedelta(hours=10, minutes=30)
+    s = summarize(pts, now=now, tz=_UTC, step_minutes=60)
+    assert s.power_now_low_w == 650.0
+    assert s.power_now_high_w == 900.0
+
+
+def test_power_now_band_none_when_neither_bucket_has_one() -> None:
+    """Genuinely no analog support yet on either side: still None, not a
+    fallback to some unrelated value."""
+    base = datetime(2026, 6, 21, tzinfo=_UTC)
+    pts = [
+        ForecastPoint(t=base + timedelta(hours=10), pv_w=700.0, pv_raw_w=700.0, pv_p10=None, pv_p90=None),
+        ForecastPoint(t=base + timedelta(hours=11), pv_w=800.0, pv_raw_w=800.0, pv_p10=None, pv_p90=None),
     ]
     now = base + timedelta(hours=10, minutes=30)
     s = summarize(pts, now=now, tz=_UTC, step_minutes=60)

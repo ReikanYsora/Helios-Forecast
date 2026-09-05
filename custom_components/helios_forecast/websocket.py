@@ -15,10 +15,13 @@ from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.util import dt as dt_util
 
+from .config import layout_from_config, location_from_config
 from .const import DOMAIN
 from .forecast import ForecastPoint
 
 _WS_REGISTERED = f"{DOMAIN}_ws_registered"
+# The archive is hourly by construction: its last point stands for the whole hour that starts there.
+_ARCHIVE_STEP = timedelta(hours=1)
 
 
 @callback
@@ -28,6 +31,7 @@ def async_register(hass: HomeAssistant) -> None:
         return
     hass.data[_WS_REGISTERED] = True
     websocket_api.async_register_command(hass, ws_series)
+    websocket_api.async_register_command(hass, ws_layout)
 
 
 def _point_dict(p: ForecastPoint) -> dict[str, Any]:
@@ -104,13 +108,22 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
             connection.send_error(msg["id"], "invalid_format", f"'{label}' must include a UTC offset")
             return
 
-    # Full curve = the hourly past archive (before the live series starts) followed by the live
-    # sub-hourly points (today onward). The live points are higher resolution, so the past archive is
-    # only used for the hours the live series does not cover.
+    # Full curve = the hourly past archive, then today's elapsed stretch the archive does not cover yet
+    # (clamped like the archive, see coordinator.elapsed_points), then the live points from now on. The
+    # archive's last point stands for its whole hour, so live points inside that hour are dropped too: the
+    # live series deliberately leaves its already-elapsed points unclamped (a past point there means
+    # "what the forecast said at the time"), and drawn next to the archive one would hug the nameplate
+    # ceiling for up to an hour.
     live = coordinator.data.points
-    live_start = live[0].t if live else None
-    series = [p for p in coordinator.archive_points if live_start is None or p.t < live_start]
-    series.extend(live)
+    archive = coordinator.archive_points
+    elapsed = getattr(coordinator, "elapsed_points", [])
+    covered_until = archive[-1].t + _ARCHIVE_STEP if archive else None
+    series = list(archive)
+    series.extend(p for p in elapsed if covered_until is None or p.t >= covered_until)
+    live_after = series[-1].t if series else None
+    series.extend(
+        p for p in live if (covered_until is None or p.t >= covered_until) and (live_after is None or p.t > live_after)
+    )
 
     in_range = []
     for p in series:
@@ -129,3 +142,44 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
 
     daily = [{"date": d.date, "kwh": d.energy_kwh, "kwh_raw": d.energy_raw_kwh} for d in coordinator.data.summary.days]
     connection.send_result(msg["id"], {"points": points, "daily": daily})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "helios_forecast/layout",
+        vol.Required("entry_id"): str,
+    }
+)
+@callback
+def ws_layout(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """Return the panel lines of one config entry, for the card's array markers.
+
+    One item per configured line: its orientation (azimuth clockwise from north, tilt from horizontal, degrees),
+    its kWp share, its tracker kind (None = fixed) and its own coordinates when the line carries some (None
+    otherwise; consumers fall back to `home`). `home` is the entry's resolved location, the same fallback the
+    forecast itself uses. Geometry only, nothing about production."""
+    coordinator = hass.data.get(DOMAIN, {}).get(msg["entry_id"])
+    if coordinator is None:
+        connection.send_error(msg["id"], "not_found", "no forecast for that entry")
+        return
+    data = {**coordinator.entry.data, **coordinator.entry.options}
+    layout = layout_from_config(data)
+    home_lat, home_lon = location_from_config(data, hass.config.latitude, hass.config.longitude)
+    lines = []
+    for i, orientation in enumerate(layout.orientations):
+        coords = layout.coords[i] if i < len(layout.coords) else None
+        lines.append(
+            {
+                "index": i,
+                "azimuth": orientation.azimuth_deg,
+                "tilt": orientation.tilt_deg,
+                "tracker": orientation.tracker,
+                "share": layout.shares[i] if i < len(layout.shares) else None,
+                "kwp": (layout.shares[i] * layout.total_kwp)
+                if (i < len(layout.shares) and layout.total_kwp > 0)
+                else None,
+                "lat": coords[0] if coords else None,
+                "lon": coords[1] if coords else None,
+            }
+        )
+    connection.send_result(msg["id"], {"lines": lines, "home": {"lat": home_lat, "lon": home_lon}})

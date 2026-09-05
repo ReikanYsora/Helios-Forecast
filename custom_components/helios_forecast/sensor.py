@@ -2,7 +2,8 @@
 
 Thin readers over the coordinator's summary: power now / next hour, per-day peak
 power + peak time and daily energy over the 7-day horizon, plus today-remaining
-and this/next hour. All values are produced in summary.py.
+and this/next hour. The forecast values come from summary.py; the weather, reliability,
+trend and battery sensors read their own ForecastData fields.
 """
 
 from __future__ import annotations
@@ -254,6 +255,7 @@ async def async_setup_entry(
     # battery don't carry a perpetually-unknown entity. An options change reloads the entry and rebuilds this.
     if battery_from_config({**entry.data, **entry.options}) is not None:
         entities.append(HeliosBatterySocSensor(coordinator, entry))
+        entities.extend(HeliosBatteryExtremeSensor(coordinator, entry, kind) for kind in _BATTERY_EXTREMES)
     async_add_entities(entities)
 
 
@@ -405,6 +407,47 @@ class HeliosBatterySocSensor(CoordinatorEntity[HeliosForecastCoordinator], Senso
             "max_soc_time": high.t.isoformat(),
             "reliability": self.coordinator.data.reliability.overall,
         }
+
+
+# The projection's low and high points as entities of their own (a tile can show them, an automation can
+# trigger on them), off by default like the day peaks. Same values the SoC sensor carries as attributes.
+# key -> (name, device_class, unit, which extreme, value or time)
+_BATTERY_EXTREMES: dict[str, tuple[str, SensorDeviceClass, Optional[str], str, str]] = {
+    "battery_min_soc": ("Battery minimum state of charge", SensorDeviceClass.BATTERY, PERCENTAGE, "min", "soc"),
+    "battery_min_soc_time": ("Battery minimum state of charge time", SensorDeviceClass.TIMESTAMP, None, "min", "time"),
+    "battery_max_soc": ("Battery maximum state of charge", SensorDeviceClass.BATTERY, PERCENTAGE, "max", "soc"),
+    "battery_max_soc_time": ("Battery maximum state of charge time", SensorDeviceClass.TIMESTAMP, None, "max", "time"),
+}
+
+
+class HeliosBatteryExtremeSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEntity):
+    """One of the four extremes of the battery SoC projection: the lowest or highest projected level,
+    or the instant it is reached. Unknown while there is no projection."""
+
+    _attr_has_entity_name = True
+    _attr_suggested_display_precision = 0
+    _attr_entity_registry_enabled_default = False
+
+    def __init__(self, coordinator: HeliosForecastCoordinator, entry: ConfigEntry, kind: str) -> None:
+        super().__init__(coordinator)
+        name, device_class, unit, extreme, field = _BATTERY_EXTREMES[kind]
+        self._extreme = extreme
+        self._field = field
+        self._attr_name = name
+        self._attr_device_class = device_class
+        self._attr_native_unit_of_measurement = unit
+        if field == "soc":
+            self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_unique_id = f"{entry.entry_id}_{kind}"
+        self._attr_device_info = _device_info(entry)
+
+    @property
+    def native_value(self) -> Optional[float | datetime]:
+        if self.coordinator.data is None or not self.coordinator.data.battery_soc:
+            return None
+        soc = self.coordinator.data.battery_soc
+        point = min(soc, key=lambda p: p.soc) if self._extreme == "min" else max(soc, key=lambda p: p.soc)
+        return point.soc if self._field == "soc" else point.t
 
 
 class HeliosTodayTrendSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEntity):

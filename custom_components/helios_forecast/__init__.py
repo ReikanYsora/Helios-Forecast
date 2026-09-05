@@ -1,9 +1,9 @@
 """The Helios Solar Forecast integration.
 
 Computes a PV production forecast server-side from Open-Meteo irradiance and the
-installation geometry, and publishes it three ways: a first-class entity set for
-automations, the Energy dashboard's solar-forecast provider, and a websocket
-detail series for the Helios card. A learned residual, built from the recorder's
+installation geometry, and publishes it as a first-class entity set, the Energy
+dashboard's solar-forecast provider, response services for automations, and a
+websocket detail series for the Helios card. A learned residual, built from the recorder's
 own production history, corrects the model against the site's real output.
 
 Home Assistant imports stay inside the setup / unload functions so importing this
@@ -38,12 +38,47 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     from .config import CONF_BATTERY_SOC_ENTITY
     from .coordinator import HeliosForecastCoordinator
 
-    # Several panel lines in one entry are supported again (they share one production
-    # sensor and one inverter cap; the model sums them by kWp share). Clear any repair
-    # issue an older version raised against a multi-line entry.
+    # Clear the legacy multi-line repair issue if one is still registered against this entry.
     ir.async_delete_issue(hass, DOMAIN, _legacy_issue_id(entry))
 
     coordinator = HeliosForecastCoordinator(hass, entry)
+
+    # Refresh right after each hour boundary: the archive only rebuilds inside a refresh (once an
+    # hour, see coordinator._last_archive_hour), so without this nudge the just-elapsed hour stays
+    # served from the unclamped live series for up to 30 minutes.
+    from homeassistant.core import callback
+    from homeassistant.helpers.event import async_track_time_change
+
+    @callback
+    def _hour_rolled_over(_now) -> None:
+        hass.async_create_task(coordinator.async_request_refresh())
+
+    entry.async_on_unload(async_track_time_change(hass, _hour_rolled_over, minute=0, second=5))
+
+    # Re-project the battery SoC the moment its source entity comes back from unavailable/unknown
+    # rather than waiting for the 30-minute tick: battery integrations are often briefly unavailable
+    # at startup. Armed before the first refresh: that refresh routinely runs before the entity
+    # exists, and its arrival right afterwards is the transition this listener catches.
+    soc_entity = {**entry.data, **entry.options}.get(CONF_BATTERY_SOC_ENTITY)
+    if soc_entity:
+        from homeassistant.core import callback
+        from homeassistant.helpers.event import async_track_state_change_event
+
+        _UNAVAILABLE = ("unavailable", "unknown")
+
+        @callback
+        def _soc_recovered(event) -> None:
+            new_state = event.data.get("new_state")
+            if new_state is None or new_state.state in _UNAVAILABLE:
+                return
+            # Only on the transition TO available (first appearance or recovery), so ordinary SoC %
+            # changes don't force off-cycle refreshes; the 30-minute cadence handles those.
+            old_state = event.data.get("old_state")
+            if old_state is None or old_state.state in _UNAVAILABLE:
+                hass.async_create_task(coordinator.async_request_refresh())
+
+        entry.async_on_unload(async_track_state_change_event(hass, [soc_entity], _soc_recovered))
+
     await coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
@@ -65,30 +100,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_create_background_task(hass, _initial_statistics_archive(), "helios_forecast_initial_statistics")
 
     entry.async_on_unload(entry.add_update_listener(_async_reload_entry))
-
-    # Re-project the battery SoC the moment its source entity comes back from unavailable/unknown,
-    # instead of waiting up to the 30-minute refresh. A battery integration is often briefly
-    # unavailable at startup (a modbus link opening can take ~10 s), which would otherwise leave the
-    # projection off until the next cycle.
-    soc_entity = {**entry.data, **entry.options}.get(CONF_BATTERY_SOC_ENTITY)
-    if soc_entity:
-        from homeassistant.core import callback
-        from homeassistant.helpers.event import async_track_state_change_event
-
-        _UNAVAILABLE = ("unavailable", "unknown")
-
-        @callback
-        def _soc_recovered(event) -> None:
-            new_state = event.data.get("new_state")
-            if new_state is None or new_state.state in _UNAVAILABLE:
-                return
-            # Only on the transition TO available (first appearance or recovery), so ordinary SoC %
-            # changes don't force off-cycle refreshes; the 30-minute cadence handles those.
-            old_state = event.data.get("old_state")
-            if old_state is None or old_state.state in _UNAVAILABLE:
-                hass.async_create_task(coordinator.async_request_refresh())
-
-        entry.async_on_unload(async_track_state_change_event(hass, [soc_entity], _soc_recovered))
 
     websocket.async_register(hass)
     services.async_register_services(hass)

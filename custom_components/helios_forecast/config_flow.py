@@ -4,7 +4,7 @@ One config entry describes a photovoltaic installation feeding a single producti
 sensor. It holds one or more panel lines (each a group of co-oriented panels); the
 model sums the lines by kWp share and the entry-level inverter cap applies to their
 combined output. This is what lets two strings on one inverter (only a combined
-production sensor available) share a single entry — add a line per orientation.
+production sensor available) share a single entry: add a line per orientation.
 
 Adding the integration walks the first line + the entry-level settings, then loops
 "add another line?" for as many lines as needed. The options flow (Configure button)
@@ -28,6 +28,7 @@ from .config import (
     CONF_BATTERY_MAX_DISCHARGE_KW,
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_SOC_ENTITY,
+    CONF_CURTAILMENT_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
     CONF_LATITUDE,
@@ -57,11 +58,15 @@ _ADD_ANOTHER = "add_another"
 _REMOVE = "remove_this_line"
 
 _BOX = selector.NumberSelectorMode.BOX
-# Energy sensors only: the learning reads hourly "sum" statistics (change in kWh),
-# which a power (W) sensor does not have — picking one silently disabled the
-# learning and capped the reliability index (it only records a mean).
+# Energy sensors only: the learning reads hourly "sum" statistics (change in kWh), which a
+# power (W) sensor lacks; picking one would silently disable the learning and cap the
+# reliability index (a power sensor only records a mean).
 _SENSOR = selector.EntitySelector(selector.EntitySelectorConfig(domain="sensor", device_class="energy"))
 _BOOL = selector.BooleanSelector()
+# The curtailment signal: anything that reads on/off.
+_CURTAIL_ENTITY = selector.EntitySelector(
+    selector.EntitySelectorConfig(domain=["binary_sensor", "input_boolean", "switch"])
+)
 _HOUR = selector.NumberSelector(selector.NumberSelectorConfig(min=0, max=23, step=1, mode=_BOX))
 # Numeric geometry / power fields as explicit NumberSelectors: a proper numeric input
 # with a defined decimal step, so decimals (e.g. 2.61 kWp) are entered and stored as
@@ -123,7 +128,7 @@ def _line_fields(
     kwp_key = vol.Required(CONF_KWP, default=arr[CONF_KWP]) if CONF_KWP in arr else vol.Required(CONF_KWP)
     fields[kwp_key] = _KWP
     # Optional per-line inverter cap: a micro-inverter string that saturates on its own, distinct from the
-    # entry-level cap that bounds the combined total. Left empty, the line is uncapped and behaves exactly as before.
+    # entry-level cap that bounds the combined total. Left empty, the line is uncapped.
     _optional(fields, CONF_LINE_INVERTER_MAX_KW, _INVERTER, arr.get(CONF_LINE_INVERTER_MAX_KW))
     fields[vol.Required(CONF_TRACKER, default=arr.get(CONF_TRACKER, TRACKER_NONE))] = _TRACKER
     # Optional per-line location override, for a line far enough from the entry's home coordinates
@@ -169,6 +174,9 @@ def _settings_fields(
     fields[
         vol.Optional(CONF_BATTERY_EFFICIENCY, default=s.get(CONF_BATTERY_EFFICIENCY, DEFAULT_BATTERY_EFFICIENCY))
     ] = _PERCENT
+    # Curtailment signal: on while the inverter is held back for a reason the sky cannot explain, so those
+    # hours are not learned as low production (zero export, grid limits; a full battery is detected without it).
+    _optional(fields, CONF_CURTAILMENT_ENTITY, _CURTAIL_ENTITY, s.get(CONF_CURTAILMENT_ENTITY))
     return fields
 
 

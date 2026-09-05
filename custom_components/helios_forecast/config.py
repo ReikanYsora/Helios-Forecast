@@ -1,9 +1,8 @@
 """Map a config entry's data into the resolved model inputs.
 
 Pure translation from the flat dict the config flow stores into the layout,
-location and inverter cap the model consumes. Shares are normalised by kWp,
-mirroring the card's pvArrays. Kept separate from the flow + coordinator so the
-mapping is testable on its own.
+location and inverter cap the model consumes. Shares are normalised by kWp.
+Kept separate from the flow + coordinator so the mapping is testable on its own.
 """
 
 from __future__ import annotations
@@ -31,6 +30,8 @@ DEFAULT_TREND_ANCHOR_HOUR = 6
 # from the Home Assistant Energy dashboard.
 CONF_BATTERY_CAPACITY_KWH = "battery_capacity_kwh"
 CONF_BATTERY_SOC_ENTITY = "battery_soc_entity"
+# Optional binary signal, on while the inverter is held back (zero export, grid limit): its hours are not learned.
+CONF_CURTAILMENT_ENTITY = "curtailment_entity"
 CONF_BATTERY_MAX_CHARGE_KW = "battery_max_charge_kw"
 CONF_BATTERY_MAX_DISCHARGE_KW = "battery_max_discharge_kw"
 CONF_BATTERY_MIN_SOC = "battery_min_soc"
@@ -78,6 +79,7 @@ SETTINGS_KEYS: Tuple[str, ...] = (
     CONF_BATTERY_MAX_DISCHARGE_KW,
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_EFFICIENCY,
+    CONF_CURTAILMENT_ENTITY,
 )
 
 
@@ -145,10 +147,10 @@ def layout_from_config(data: Dict[str, Any]) -> PvLayout:
         shares = [k / total_kwp for k in kwps]
     else:
         # No usable kWp: equal split keeps the arrays in lockstep; total_kwp 0
-        # makes pvCalibK 0, so the forecast is flat until a peak power is set.
+        # zeroes every watt figure, so the forecast is flat until a peak power is set.
         shares = [1.0 / len(kwps) for _ in kwps] if kwps else []
 
-    # Empty caps list when no line carries one, so the model keeps clipping only the combined total (unchanged).
+    # Empty caps list when no line carries one: the model then clips only the combined total.
     line_caps = caps if any(c != INF for c in caps) else []
     return PvLayout(orientations=orientations, shares=shares, coords=coords, total_kwp=total_kwp, caps=line_caps)
 
@@ -167,7 +169,7 @@ def location_from_config(
 
 
 def inverter_max_w_from_config(data: Dict[str, Any]) -> float:
-    """Inverter clip in watts, INF when unset, matching the card's pvInverterMaxW."""
+    """Inverter clip in watts, INF when unset."""
     kw = _as_float(data.get(CONF_INVERTER_MAX_KW))
     return _kw_to_w_or_inf(kw)
 
@@ -175,11 +177,15 @@ def inverter_max_w_from_config(data: Dict[str, Any]) -> float:
 def learning_from_config(data: Dict[str, Any]) -> Optional[str]:
     """The PV production entity that drives the learned correction, or None.
 
-    The learning reads this entity's real production (curtailment included), so the
-    forecast tracks what the home actually harvests; without it the forecast stays
-    uncorrected.
+    The learning reads this entity's real production; without it the forecast stays
+    uncorrected. Hours the inverter was held back are left out (see curtailment.py).
     """
     return data.get(CONF_PRODUCTION_ENTITY) or None
+
+
+def curtailment_entity_from_config(data: Dict[str, Any]) -> Optional[str]:
+    """The optional curtailment signal entity, or None."""
+    return data.get(CONF_CURTAILMENT_ENTITY) or None
 
 
 def trend_anchor_hour_from_config(data: Dict[str, Any]) -> int:

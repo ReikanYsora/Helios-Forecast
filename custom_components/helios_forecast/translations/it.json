@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — stringa di pannelli",
+        "title": "Helios Forecast: stringa di pannelli",
         "description": "Una previsione per una stringa di pannelli (un gruppo di pannelli con lo stesso orientamento). Aggiungi di nuovo l'integrazione per ogni stringa aggiuntiva. Lascia vuota la posizione per usare quella di casa in Home Assistant.",
         "data": {
           "name": "Nome (es. Tetto sud)",
@@ -21,15 +21,18 @@
           "battery_soc_entity": "Sensore di stato di carica della batteria (%)",
           "battery_max_charge_kw": "Potenza massima di carica della batteria (kW, opzionale)",
           "battery_max_discharge_kw": "Potenza massima di scarica della batteria (kW, opzionale)",
-          "battery_min_soc": "Riserva della batteria — stato di carica minimo (%, predefinito 10)",
-          "battery_efficiency": "Efficienza di andata e ritorno della batteria (%, predefinito 90)"
+          "battery_min_soc": "Riserva della batteria, stato di carica minimo (%, predefinito 10)",
+          "battery_efficiency": "Efficienza di andata e ritorno della batteria (%, predefinito 90)",
+          "curtailment_entity": "Segnale di limitazione (sensore binario, opzionale)"
         },
         "data_description": {
-          "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore."
+          "production_entity": "Un sensore di energia cumulativa (kWh), ad es. la produzione totale dell'inverter o del contatore. Un sensore di potenza (W) non funzionerà: non ha statistiche di somma a lungo termine, quindi l'apprendimento e l'indice di affidabilità resterebbero inattivi.",
+          "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore.",
+          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",
@@ -50,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Modifica impostazioni (posizione, inverter, sensore di produzione, batteria, segnale di limitazione)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "title": "Helios Forecast: settings",
+        "description": "Posizione, tetto dell'inverter, sensore di produzione, ora di riferimento, batteria e segnale di limitazione condivisi da tutte le linee di pannelli di questa voce.",
         "data": {
           "latitude": "Latitudine (opzionale)",
           "longitude": "Longitudine (opzionale)",
@@ -67,15 +70,18 @@
           "battery_soc_entity": "Sensore di stato di carica della batteria (%)",
           "battery_max_charge_kw": "Potenza massima di carica della batteria (kW, opzionale)",
           "battery_max_discharge_kw": "Potenza massima di scarica della batteria (kW, opzionale)",
-          "battery_min_soc": "Riserva della batteria — stato di carica minimo (%, predefinito 10)",
-          "battery_efficiency": "Efficienza di andata e ritorno della batteria (%, predefinito 90)"
+          "battery_min_soc": "Riserva della batteria, stato di carica minimo (%, predefinito 10)",
+          "battery_efficiency": "Efficienza di andata e ritorno della batteria (%, predefinito 90)",
+          "curtailment_entity": "Segnale di limitazione (sensore binario, opzionale)"
         },
         "data_description": {
-          "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore."
+          "production_entity": "Un sensore di energia cumulativa (kWh), ad es. la produzione totale dell'inverter o del contatore. Un sensore di potenza (W) non funzionerà: non ha statistiche di somma a lungo termine, quindi l'apprendimento e l'indice di affidabilità resterebbero inattivi.",
+          "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore.",
+          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Inclinazione (gradi, 0 = piano, 90 = verticale)",

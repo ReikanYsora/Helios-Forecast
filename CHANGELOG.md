@@ -5,6 +5,143 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.9.1
+
+A corrective release on top of 2026.9.0, plus the battery projection's extremes as
+entities, a learning that leaves curtailed hours out, and one addition for the card.
+
+### Changed: the learning no longer counts your inverter's limits twice
+
+The learned sky correction kept every produced hour, curtailed ones included, on
+the reasoning that curtailment is part of what the home really harvests. It is,
+but the cap was then counted twice: once burned into the learned ratio (a run of
+full-battery afternoons pulled the ratio for those sun positions well below one),
+and once more at forecast time, where the inverter cap is already applied. The
+depressed ratio then hit the days nothing was clipped, an empty battery after a
+cloudy day, and the forecast landed below the cap for the whole afternoon. A
+curtailed hour is now treated for what it is, a lower bound: it is left out of the
+sky-residual map when it sits under the model (when it reaches the model it counts
+as before) and out of the analog library altogether. The battery case needs nothing
+new, a full battery (state of charge sensor) at the entry-level inverter cap is
+enough; for
+zero-export and grid-limited installs a new optional **curtailment signal**
+(binary sensor, input boolean or switch, on while the inverter is held back)
+marks the hours. Thanks to @Manama2011 for the analysis and the proposal, and to
+@Legotechniker for the case that started it (#46).
+
+### Added: the battery projection's low and high points as entities
+
+`battery_min_soc`, `battery_min_soc_time`, `battery_max_soc` and `battery_max_soc_time`
+join the predicted battery state of charge as entities of their own (disabled by
+default, like the day peaks), so a tile can show when the battery bottoms out and an
+automation can trigger on the projected low without a template sensor in between. The
+attributes on the SoC sensor stay as they were. Thanks to @Manama2011 for the
+proposal (#57).
+
+### Fixed: a nameplate-high plateau right before "now" on the card's forecast curve
+
+Third round of #52. The card's series switched from the hourly archive to the live
+points at the archive's last point, but that point stands for its whole hour, so the
+sub-hourly live points inside that hour, plus the stretch up to "now", came through raw:
+the live series deliberately leaves its already-elapsed points unclamped (what the
+forecast said at the time), and next to the archive's clamped hours they drew a plateau
+at the panels' nameplate for up to an hour before "now". The series now takes the
+archive through the end of its last hour, then a clamped copy of the elapsed stretch,
+then the live points from "now" on. Thanks to @ruteclrp for the screenshots that showed
+exactly where the plateau sat (#52).
+
+### Added: the card can read where your arrays are
+
+A new `helios_forecast/layout` websocket command hands the Helios card the lines of
+a config entry: each line's azimuth, tilt, tracker kind, share and, when the line
+carries its own coordinates, where it stands. The card (from 2026.9.4) uses it to
+mark every array in the scene and point its own ray at the sun. Geometry only,
+nothing about production, and nothing changes for an install without the card.
+
+### Fixed: `power_now_low` / `power_now_high` stayed unknown forever
+
+These two sensors interpolate the analog P10/P90 band around the current instant, but
+the bucket immediately before "now" never carries a band (past points are left as the
+plain physical-model output, by design), so the interpolation always had a missing
+side and gave up. Every install hit this from the first refresh, though it only became
+visible once the analog library had enough history for the band to actually exist on
+the future side. Both sensors now fall back to whichever side of "now" does have a
+band. Thanks to @Manama2011 for the detailed report and root-cause diagnosis (#51,
+filed as Helios#421).
+
+### Fixed: "no battery configured" logged as a WARNING on every restart
+
+A PV-only install with no battery would log "Helios battery SoC projection is off:
+no battery is configured..." as a WARNING on every restart, even though there is
+nothing to act on: the projection simply doesn't apply without a battery. It now
+logs at INFO instead. Thanks to @huma-meng for pointing it out (#50).
+
+### Fixed: battery SoC projection off for a full cycle after every restart
+
+The listener that re-projects the SoC the moment its source entity comes back was
+registered after the coordinator's first refresh, so it always missed the entity's
+own first appearance at startup: the projection stayed `unknown` for a full 30-minute
+cycle before recovering on its own. The listener now arms before that first refresh
+runs. Thanks to @Manama2011 for the detailed report and root-cause diagnosis (#53).
+
+### Improved: `power_now_low` / `power_now_high` report 0 W at night instead of unknown
+
+Night points carried no P10/P90 band at all (nothing to draw an analog ensemble from
+with the sun below the horizon), so both sensors went `unknown` from dusk to dawn every
+day, punching a nightly hole into their history and long-term statistics. The output
+there isn't uncertain though, it's known exactly: 0 W, and so are its 10th and 90th
+percentiles. Night points now carry that zero band, keeping both sensors continuous
+across the night. Thanks to @Manama2011 for the report, root-cause diagnosis and patch
+(#54).
+
+### Fixed: `energy_today_remaining` went `unknown` for the last 15-30 minutes of every day
+
+Once the day's last forecast bucket had passed (23:45 local, at the default 15-minute
+step), the `[now, midnight)` window used to compute the sensor held no bucket at all, so
+it published `unknown` instead of the honest answer: 0 kWh left today. `energy_this_hour`
+/ `energy_next_hour` never showed this since their hour-aligned windows still contain a
+bucket. An empty window now reports 0.0 kWh whenever it still falls inside the forecast
+horizon, and only stays `unknown` for a genuine gap outside it. Thanks to @Manama2011 for
+the report, root-cause diagnosis and patch (#55).
+
+### Fixed: the past-forecast archive could hug the panels' nameplate ceiling on a clear day
+
+The hourly archive that backs HA's long-term statistics and the card's past-forecast curve
+was residual-corrected, but never analog-enriched: unlike the live forecast's future points,
+it never got the ceiling that reins the physical model back down to what the site has
+actually produced under similar sun and cloud conditions. A well-learned install (weeks of
+history, properly sized inverter) could still see its archived curve flatten at the array's
+DC nameplate for hours around midday, right where the live forecast next to it, which does
+get the clamp, looked accurate. The archive now goes through the same analog enrichment as
+the live forecast. Thanks to @ruteclrp for the report and for ruling out the simpler
+explanations (#52).
+
+### Fixed: today's own elapsed hours still weren't corrected on the card's past curve
+
+Superseded by the plateau fix above, which moves the split to the end of the
+archive's last hour. The previous fix corrected the archive itself, but the card reads its past-forecast curve
+through a separate websocket command that was splitting archive vs. live at today's
+midnight, not at the archive's own last point. Today's already-elapsed hours came from the
+live series instead, which deliberately leaves past points unclamped (a past point there
+means "what the forecast said at the time"), so they kept the same nameplate-hugging
+behaviour the first half of this fix was meant to remove. The split now happens at the
+archive's own last point regardless of the calendar day, so today's elapsed hours get the
+same analog-clamped values yesterday's already did. Thanks to @ruteclrp again for confirming
+the first fix only got halfway there (#52).
+
+### Fixed: the just-elapsed hour could stay unclamped for up to 30 minutes
+
+The archive rebuilds at most once an hour by design, a deliberate CPU saving, but that
+check only ran inside the regular 30-minute refresh, not right when the hour actually
+rolled over. Depending on where in that 30-minute cycle the boundary fell, the hour that
+had just finished could sit unclamped (hugging the nameplate ceiling again) for up to half
+an hour before the next refresh caught up, which is exactly what made the previous fix look
+like it was working, then not, then working again. A dedicated hourly trigger now forces
+the refresh the moment the hour changes, instead of waiting on the next tick. Thanks to
+@ruteclrp for the patience through three rounds of this (#52).
+
+---
+
 ## 2026.9.0
 
 A release about putting the forecast to work: the full curve now reaches your
@@ -26,8 +163,8 @@ write-up on #35.
 
 If you have a battery, Helios Forecast can now project its **state of charge over
 the next 48 hours**. It runs the production forecast against your home's own
-consumption — derived straight from your **Home Assistant Energy dashboard**, so
-there's no extra sensor to wire — and integrates the battery's charge from your
+consumption, derived straight from your **Home Assistant Energy dashboard**, so
+there's no extra sensor to wire, and integrates the battery's charge from your
 current level, within your capacity, reserve and charge/discharge limits. Turn it
 on by filling in your battery capacity and state-of-charge sensor in the
 integration settings; a **Predicted battery state of charge** sensor then appears,
@@ -67,7 +204,7 @@ installations with a per-line inverter cap configured.
 ### Fixed: a gap in temperature history no longer inflates forecast confidence
 
 The forecast picks its closest historical matches partly on outdoor temperature,
-and a match missing that reading used to count as a perfect one — tying with, or
+and a match missing that reading used to count as a perfect one, tying with, or
 even beating, a match with a real but tiny temperature difference. If your
 temperature source has gaps (added partway through the learning window, or
 occasional dropouts), those gaps no longer masquerade as ideal matches: reported
@@ -258,8 +395,8 @@ A corrective release on top of 2026.8.1.
   is still fully supported for installs that do have a sensor per line. The Configure
   button opens a menu to edit the shared settings or the lines (edit, add or remove).
   (#18)
-- **`forecast` attribute on the weather sensors.** Every archived Open-Meteo sensor —
-  cloud cover, irradiance, temperature, wind, snow — now carries a forward-looking hourly
+- **`forecast` attribute on the weather sensors.** Every archived Open-Meteo sensor -
+  cloud cover, irradiance, temperature, wind, snow, now carries a forward-looking hourly
   `forecast` list (today plus the 7-day horizon), the same shape the power sensor exposes,
   so you can plot the upcoming sky next to the predicted power in ApexCharts. (#21)
 
