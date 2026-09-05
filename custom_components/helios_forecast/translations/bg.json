@@ -53,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Редактиране на настройките (местоположение, инвертор, сензор за производство, батерия, сигнал за ограничение)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
         "title": "Helios Forecast: settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "description": "Общи местоположение, таван на инвертора, сензор за производство, референтен час, батерия и сигнал за ограничение за всеки ред панели в този запис.",
         "data": {
           "latitude": "Географска ширина (по избор)",
           "longitude": "Географска дължина (по избор)",

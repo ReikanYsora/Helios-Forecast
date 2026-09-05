@@ -53,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Editați setările (locație, invertor, senzor de producție, baterie, semnal de limitare)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
         "title": "Helios Forecast: settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "description": "Locație, plafon al invertorului, senzor de producție, oră de referință, baterie și semnal de limitare partajate de toate liniile de panouri din această intrare.",
         "data": {
           "latitude": "Latitudine (opțional)",
           "longitude": "Longitudine (opțional)",

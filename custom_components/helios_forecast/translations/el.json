@@ -53,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Επεξεργασία ρυθμίσεων (τοποθεσία, αντιστροφέας, αισθητήρας παραγωγής, μπαταρία, σήμα περιορισμού)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
         "title": "Helios Forecast: settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "description": "Κοινή τοποθεσία, όριο αντιστροφέα, αισθητήρας παραγωγής, ώρα αναφοράς, μπαταρία και σήμα περιορισμού για κάθε σειρά πάνελ αυτής της καταχώρησης.",
         "data": {
           "latitude": "Γεωγραφικό πλάτος (προαιρετικό)",
           "longitude": "Γεωγραφικό μήκος (προαιρετικό)",

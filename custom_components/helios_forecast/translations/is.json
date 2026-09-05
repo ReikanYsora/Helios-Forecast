@@ -53,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Breyta stillingum (staðsetning, áriðill, framleiðsluskynjari, rafhlaða, skerðingarmerki)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
         "title": "Helios Forecast: settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "description": "Sameiginleg staðsetning, hámark áriðils, framleiðsluskynjari, viðmiðunartími, rafhlaða og skerðingarmerki fyrir hverja panelröð í þessari færslu.",
         "data": {
           "latitude": "Breiddargráða (valfrjálst)",
           "longitude": "Lengdargráða (valfrjálst)",

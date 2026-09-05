@@ -53,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Rediģēt iestatījumus (atrašanās vieta, invertors, ražošanas sensors, baterija, ierobežojuma signāls)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
         "title": "Helios Forecast: settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "description": "Kopīga atrašanās vieta, invertora limits, ražošanas sensors, atsauces stunda, baterija un ierobežojuma signāls katrai šī ieraksta paneļu rindai.",
         "data": {
           "latitude": "Platums (neobligāti)",
           "longitude": "Garums (neobligāti)",

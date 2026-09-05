@@ -53,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Redaguoti nustatymus (vieta, inverteris, gamybos jutiklis, baterija, ribojimo signalas)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
         "title": "Helios Forecast: settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "description": "Bendra vieta, inverterio riba, gamybos jutiklis, atskaitos valanda, baterija ir ribojimo signalas kiekvienai šio įrašo plokščių eilei.",
         "data": {
           "latitude": "Platuma (nebūtina)",
           "longitude": "Ilguma (nebūtina)",

@@ -53,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Rediger indstillinger (placering, inverter, produktionssensor, batteri, begrænsningssignal)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
         "title": "Helios Forecast: settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "description": "Fælles placering, inverterloft, produktionssensor, referencetime, batteri og begrænsningssignal for hver panelrække i denne post.",
         "data": {
           "latitude": "Breddegrad (valgfrit)",
           "longitude": "Længdegrad (valgfrit)",

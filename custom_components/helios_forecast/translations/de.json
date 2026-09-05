@@ -53,13 +53,13 @@
         "title": "Helios Forecast",
         "description": "Choose what to edit.",
         "menu_options": {
-          "settings": "Edit settings (location, inverter, production sensor)",
+          "settings": "Einstellungen bearbeiten (Standort, Wechselrichter, Produktionssensor, Batterie, Abregelungssignal)",
           "lines": "Edit panel lines"
         }
       },
       "settings": {
         "title": "Helios Forecast: settings",
-        "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
+        "description": "Gemeinsamer Standort, Wechselrichtergrenze, Produktionssensor, Referenzstunde, Batterie und Abregelungssignal für jede Panelreihe dieses Eintrags.",
         "data": {
           "latitude": "Breitengrad (optional)",
           "longitude": "Längengrad (optional)",
