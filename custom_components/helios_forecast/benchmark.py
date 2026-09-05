@@ -35,7 +35,7 @@ _LOGGER = logging.getLogger(__name__)
 SCHEMA_VERSION = 1
 
 # Where an upload goes when the entry does not name its own collector.
-DEFAULT_ENDPOINT = "https://helios-ha.org/api/bench/v1/emissions"
+DEFAULT_ENDPOINT = "https://helios-ha.org/bench/v1/emissions"
 
 # One emission an hour. The forecast refreshes twice as often, but the weather behind it does
 # not, and the extra origins would only add rows the scoring cannot use.
