@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — linia paneli",
+        "title": "Helios Forecast: linia paneli",
         "description": "Jedna prognoza dla jednej linii paneli (grupy paneli o tej samej orientacji). Dodaj integrację ponownie dla każdej kolejnej linii. Pozostaw lokalizację pustą, aby użyć adresu domowego Home Assistant.",
         "data": {
           "name": "Nazwa (np. Dach południowy)",
@@ -21,17 +21,18 @@
           "battery_soc_entity": "Czujnik stanu naładowania akumulatora (%)",
           "battery_max_charge_kw": "Maks. moc ładowania akumulatora (kW, opcjonalnie)",
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
-          "battery_min_soc": "Rezerwa akumulatora — minimalny stan naładowania (%, domyślnie 10)",
+          "battery_min_soc": "Rezerwa akumulatora, minimalny stan naładowania (%, domyślnie 10)",
           "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
           "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, opcjonalny)"
         },
         "data_description": {
+          "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
           "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
           "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Nachylenie (stopnie, 0 = poziomo, 90 = pionowo)",
@@ -57,7 +58,7 @@
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
+        "title": "Helios Forecast: settings",
         "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
           "latitude": "Szerokość geograficzna (opcjonalnie)",
@@ -69,17 +70,18 @@
           "battery_soc_entity": "Czujnik stanu naładowania akumulatora (%)",
           "battery_max_charge_kw": "Maks. moc ładowania akumulatora (kW, opcjonalnie)",
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
-          "battery_min_soc": "Rezerwa akumulatora — minimalny stan naładowania (%, domyślnie 10)",
+          "battery_min_soc": "Rezerwa akumulatora, minimalny stan naładowania (%, domyślnie 10)",
           "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
           "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, opcjonalny)"
         },
         "data_description": {
+          "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
           "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
           "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Nachylenie (stopnie, 0 = poziomo, 90 = pionowo)",

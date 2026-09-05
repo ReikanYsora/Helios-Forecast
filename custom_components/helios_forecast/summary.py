@@ -69,13 +69,10 @@ def _band_at(points: List[ForecastPoint], t: datetime, attr: str) -> Optional[fl
     """P10/P90 band value at ``t``, interpolated when both bracketing buckets
     have one, or taken from whichever side does when only one does.
 
-    The lower bracket is, by construction, always at or before ``t`` - for a
-    lookup at "now" that's always a past point, and past points never carry a
-    band (`enrich_points` only attaches one to the future). So at "now" this
-    almost always falls back to the upper (future) bracket rather than
-    interpolating; that's the intended behaviour, not a compromise, since the
-    band's whole purpose is future uncertainty. None only means the analog
-    ensemble genuinely has no support this close to ``t`` on either side."""
+    At "now" the lower bracket is a past point, which never carries a band
+    (`enrich_points` only attaches one to the future), so the value is usually
+    the upper bracket's: the band's purpose is future uncertainty. None only when
+    neither side has analog support."""
     if not points or t < points[0].t or t > points[-1].t:
         return None
     lo = 0
@@ -104,13 +101,10 @@ def _band_at(points: List[ForecastPoint], t: datetime, attr: str) -> Optional[fl
 def _energy_kwh(points: List[ForecastPoint], start: datetime, end: datetime, step_h: float) -> Optional[float]:
     """kWh over [start, end) summing each bucket's pv_w x step hours.
 
-    An empty window is only a knowledge gap when it falls outside the forecast
-    horizon. Inside the horizon the sum is a genuine 0.0: the series simply has
-    no bucket left there. This matters for ``energy_today_remaining`` every
-    night -- after the day's last point (23:45 local at a 15 min step) the
-    window [now, local midnight) holds no bucket at all, so returning None
-    published ``unknown`` until the next coordinator refresh, when the honest
-    answer is "0 kWh left today".
+    An empty window is a knowledge gap only outside the forecast horizon; inside
+    it the sum is a genuine 0.0 (no bucket left). Returning None there would
+    publish ``unknown`` for ``energy_today_remaining`` after the day's last point
+    instead of the honest "0 kWh left today".
     """
     total = 0.0
     any_bucket = False

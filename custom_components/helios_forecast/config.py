@@ -1,9 +1,8 @@
 """Map a config entry's data into the resolved model inputs.
 
 Pure translation from the flat dict the config flow stores into the layout,
-location and inverter cap the model consumes. Shares are normalised by kWp,
-mirroring the card's pvArrays. Kept separate from the flow + coordinator so the
-mapping is testable on its own.
+location and inverter cap the model consumes. Shares are normalised by kWp.
+Kept separate from the flow + coordinator so the mapping is testable on its own.
 """
 
 from __future__ import annotations
@@ -148,10 +147,10 @@ def layout_from_config(data: Dict[str, Any]) -> PvLayout:
         shares = [k / total_kwp for k in kwps]
     else:
         # No usable kWp: equal split keeps the arrays in lockstep; total_kwp 0
-        # makes pvCalibK 0, so the forecast is flat until a peak power is set.
+        # zeroes every watt figure, so the forecast is flat until a peak power is set.
         shares = [1.0 / len(kwps) for _ in kwps] if kwps else []
 
-    # Empty caps list when no line carries one, so the model keeps clipping only the combined total (unchanged).
+    # Empty caps list when no line carries one: the model then clips only the combined total.
     line_caps = caps if any(c != INF for c in caps) else []
     return PvLayout(orientations=orientations, shares=shares, coords=coords, total_kwp=total_kwp, caps=line_caps)
 
@@ -170,7 +169,7 @@ def location_from_config(
 
 
 def inverter_max_w_from_config(data: Dict[str, Any]) -> float:
-    """Inverter clip in watts, INF when unset, matching the card's pvInverterMaxW."""
+    """Inverter clip in watts, INF when unset."""
     kw = _as_float(data.get(CONF_INVERTER_MAX_KW))
     return _kw_to_w_or_inf(kw)
 

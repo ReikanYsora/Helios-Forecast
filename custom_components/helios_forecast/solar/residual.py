@@ -1,4 +1,4 @@
-"""Learned sky-residual correction, port of the card's forecast-sky.ts.
+"""Learned sky-residual correction.
 
 Per (sun-azimuth, sun-altitude) cell, learns the ratio between what the home
 actually produced and what the model predicted, over a rolling 60-day window,
@@ -13,8 +13,7 @@ at least the measurement) and is left out, so the limits stay where the forecast
 already applies them, forward, instead of being learned a second time as a low
 ratio and applied on the days nothing is clipped.
 
-Pure, no Home Assistant imports. The map is stored as plain float lists (the card
-uses Float32Array; the values agree to single-precision).
+Pure, no Home Assistant imports.
 """
 
 from __future__ import annotations
@@ -277,7 +276,7 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
 
 
 def _nearest_cloud_idx(times: List[float], t_ms: float) -> int:
-    """Index of the nearest sample by time, with the card's early break."""
+    """Index of the nearest sample by time; ``times`` is ascending, so the scan stops once past ``t_ms`` and diverging."""
     if not times:
         return -1
     best = 0

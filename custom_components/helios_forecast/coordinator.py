@@ -68,9 +68,8 @@ from .solar.residual import (
 )
 from .summary import ForecastSummary, summarize
 
-# HA-version compat, both mandatory in StatisticMetaData from HA 2026.11 and imported defensively so
-# the integration still loads on older cores that lack them.
-# `mean_type` replaces the deprecated `has_mean`.
+# Compat: `mean_type` and `unit_class` are mandatory in newer StatisticMetaData and absent from older
+# cores, so they are imported defensively.
 try:
     from homeassistant.components.recorder.models import StatisticMeanType
 
@@ -172,10 +171,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # The UTC hour up to which the weather statistics have been written. A refresh then imports only
         # the new hours; the full 60-day backfill (self-heal) runs once at startup.
         self._last_weather_stat_hour: Optional[datetime] = None
-        # Home consumption profile for the battery SoC projection, rebuilt at most once an hour. Its
-        # multi-sensor 60-day recorder fetch is the expensive part, so it runs on the same hourly cadence
-        # as the prediction archive rather than on every 30-minute refresh; a 60-day average barely moves
-        # within an hour. Reused in between.
+        # Home consumption profile for the SoC projection; rebuilt hourly by _consumption_profile_for.
         self._consumption_profile: Optional[ConsumptionProfile] = None
         self._last_consumption_hour: Optional[datetime] = None
         # Production history (recorder change buckets) from the most recent refresh, kept so the
@@ -219,9 +215,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + timedelta(days=FORECAST_DAYS)
-        # The forecast pipeline is CPU-bound pure Python (the sub-hourly walk, the analog scan, the
-        # 60-day archive). Each heavy stage runs in the executor so it never blocks the event loop: on a
-        # small box a 30-minute refresh used to spike a core to 100% and starve the network for seconds.
+        # The pipeline is CPU-bound pure Python (sub-hourly walk, analog scan, 60-day archive); each heavy
+        # stage runs in the executor so a refresh never blocks the event loop.
         points = await self.hass.async_add_executor_job(
             partial(
                 build_forecast_series,
@@ -311,9 +306,9 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         soc_state = self.hass.states.get(battery.soc_entity)
         if soc_state is None or soc_state.state in ("unknown", "unavailable"):
-            # Transient at startup or while the battery integration warms up (a modbus link can take a
-            # few seconds to open). A state listener re-projects the moment the entity comes back (see
-            # async_setup_entry), so this is logged gently rather than as a misconfiguration.
+            # Transient at startup or while the battery integration warms up. A state listener re-projects
+            # the moment the entity comes back (see async_setup_entry), so this is logged gently rather
+            # than as a misconfiguration.
             return self._battery_off(f"the SoC entity {battery.soc_entity} is unavailable", transient=True)
         try:
             start_soc_frac = float(soc_state.state) / 100.0
@@ -347,17 +342,10 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
     def _battery_off(
         self, reason: str, *, transient: bool = False, not_applicable: bool = False
     ) -> List[BatterySocPoint]:
-        """Return an empty SoC projection, logging why the first time a given reason occurs.
-
-        The projection is deliberately skipped when an input is missing rather than guessed; without
-        this the sensor just read ``unknown`` with no hint, which made it impossible to tell a
-        misconfiguration from a transient gap. Logged once per distinct reason (re-armed when the
-        projection recovers) so a steady-state 'off' does not spam the log every refresh. Three
-        levels: a ``transient`` reason (the SoC entity briefly unavailable at startup, which the state
-        listener recovers from within seconds) logs at INFO with "will retry"; ``not_applicable`` (no
-        battery configured at all, a perfectly normal PV-only setup with nothing to act on) logs at
-        INFO too, but without implying anything will change on its own; anything else is an actionable
-        misconfiguration and logs at WARNING."""
+        """Empty SoC projection, logging the reason once per distinct reason (re-armed on recovery) so a
+        steady 'off' does not spam the log. ``transient`` (SoC entity briefly unavailable; the state
+        listener retries) and ``not_applicable`` (no battery configured) log at INFO; anything else is an
+        actionable misconfiguration and logs at WARNING."""
         if self._battery_off_logged != reason:
             if transient:
                 _LOGGER.info("Helios battery SoC projection is off (transient, will retry): %s", reason)
@@ -480,8 +468,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             if not rows:
                 continue
             # mean_type + unit_class are declared statically (not added after the literal) so both the
-            # runtime and static API scanners see them. has_mean stays for cores older than mean_type
-            # (HA 2025.1), where the extra mean_type key is simply ignored and has_mean is read instead.
+            # runtime and static API scanners see them. has_mean stays for cores that predate mean_type,
+            # where the extra key is ignored.
             metadata: StatisticMetaData = {
                 "has_mean": True,
                 "mean_type": _MEAN_TYPE_ARITHMETIC,
@@ -502,14 +490,10 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
     def _compute_archive_points(self, now, weather, layout, lat, lon, cap, residual_map, analog_library):
         """Hourly predicted points over the past window [now - LEARN_DAYS, current hour).
 
-        Runs the same model used for the live forecast across the past at an hourly step (the cadence
-        HA statistics keep), residual-corrected, then analog-enriched exactly like the live forecast's
-        future points: without that second pass, this archive only ever got the residual's sky-position
-        bias correction, never the analog ceiling that reins the physical model back down to what the
-        site has actually produced under similar conditions - so a well-learned install could still see
-        its archived curve hug the panels' nameplate ceiling on a clear day while the live forecast right
-        next to it, which does get the clamp, looked accurate. Feeds both the statistics backfill and the
-        detail websocket's past curve.
+        Runs the live model across the past at an hourly step (the cadence HA statistics keep),
+        residual-corrected and analog-enriched like the live future points, so the archived curve carries
+        the same learned ceiling as the live one. Feeds the statistics backfill and the detail websocket's
+        past curve.
         """
         cutoff = now.replace(minute=0, second=0, microsecond=0)
         arch_start = cutoff - timedelta(days=LEARN_DAYS)

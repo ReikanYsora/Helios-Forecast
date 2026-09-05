@@ -1,9 +1,9 @@
 """The Helios Solar Forecast integration.
 
 Computes a PV production forecast server-side from Open-Meteo irradiance and the
-installation geometry, and publishes it three ways: a first-class entity set for
-automations, the Energy dashboard's solar-forecast provider, and a websocket
-detail series for the Helios card. A learned residual, built from the recorder's
+installation geometry, and publishes it as a first-class entity set, the Energy
+dashboard's solar-forecast provider, response services for automations, and a
+websocket detail series for the Helios card. A learned residual, built from the recorder's
 own production history, corrects the model against the site's real output.
 
 Home Assistant imports stay inside the setup / unload functions so importing this
@@ -38,19 +38,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     from .config import CONF_BATTERY_SOC_ENTITY
     from .coordinator import HeliosForecastCoordinator
 
-    # Several panel lines in one entry are supported again (they share one production
-    # sensor and one inverter cap; the model sums them by kWp share). Clear any repair
-    # issue an older version raised against a multi-line entry.
+    # Clear the legacy multi-line repair issue if one is still registered against this entry.
     ir.async_delete_issue(hass, DOMAIN, _legacy_issue_id(entry))
 
     coordinator = HeliosForecastCoordinator(hass, entry)
 
-    # Force an off-cycle refresh right when an hour rolls over, instead of waiting for the next
-    # 30-minute tick to notice. The archive (the card's past-forecast curve) only rebuilds once an
-    # hour by design (see coordinator._last_archive_hour, a deliberate CPU saving), but that check
-    # only runs inside a refresh: without this nudge, the hour that just elapsed could sit up to
-    # 30 minutes past its own boundary still served from the unclamped live series, hugging the
-    # panels' nameplate ceiling right where the archive's analog clamp should already apply. #52
+    # Refresh right after each hour boundary: the archive only rebuilds inside a refresh (once an
+    # hour, see coordinator._last_archive_hour), so without this nudge the just-elapsed hour stays
+    # served from the unclamped live series for up to 30 minutes.
     from homeassistant.core import callback
     from homeassistant.helpers.event import async_track_time_change
 
@@ -60,12 +55,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     entry.async_on_unload(async_track_time_change(hass, _hour_rolled_over, minute=0, second=5))
 
-    # Re-project the battery SoC the moment its source entity comes back from unavailable/unknown,
-    # instead of waiting up to the 30-minute refresh. A battery integration is often briefly
-    # unavailable at startup (a modbus link opening can take ~10 s), which would otherwise leave the
-    # projection off until the next cycle. Armed before the first refresh below, not after: that
-    # first refresh routinely runs before the entity exists at all, and its arrival right afterwards
-    # is exactly the None -> value transition this listener is meant to catch.
+    # Re-project the battery SoC the moment its source entity comes back from unavailable/unknown
+    # rather than waiting for the 30-minute tick: battery integrations are often briefly unavailable
+    # at startup. Armed before the first refresh: that refresh routinely runs before the entity
+    # exists, and its arrival right afterwards is the transition this listener catches.
     soc_entity = {**entry.data, **entry.options}.get(CONF_BATTERY_SOC_ENTITY)
     if soc_entity:
         from homeassistant.core import callback

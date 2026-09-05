@@ -144,11 +144,14 @@ extra sensor to wire), and integrates the battery's charge from your current SoC
 Turn it on in the integration settings by filling in your **battery capacity** and
 your **state-of-charge sensor**; the reserve, efficiency and charge/discharge
 limits are optional. A **Predicted battery state of charge** sensor then appears,
-carrying the full curve as its `forecast` attribute (plus the day's projected low
-and high, and the forecast reliability so you know how far to trust it).
+carrying the full curve as its `forecast` attribute (plus the projected low and
+high over those 48 hours, when each is reached, and the forecast reliability so you
+know how far to trust it). Four companion entities, disabled by default, carry the
+same low and high with their times (`battery_min_soc`, `battery_min_soc_time`,
+`battery_max_soc`, `battery_max_soc_time`) for a tile or an automation.
 
 It predicts, it never commands. Sending the charge order stays with your own
-automation, which knows your inverter — Helios just tells it what's coming:
+automation, which knows your inverter; Helios just tells it what's coming:
 
 ```yaml
 # Top the battery up from the grid tonight only if it's predicted to run low
@@ -175,14 +178,14 @@ forecast:
 ```
 
 One honest note: home consumption is a **learned average**, so the projection is a
-good steer, not a guarantee — read it alongside the reliability figure, and it gets
+good steer, not a guarantee: read it alongside the reliability figure, and it gets
 better as it sees more of your history.
 
 ---
 
 ## How it learns
 
-It starts from physics: Open-Meteo irradiance, global tilted irradiance per panel
+It starts from physics: Open-Meteo horizontal irradiance transposed onto each panel
 orientation, the direct and diffuse split, snow cover, combined with your
 installation geometry and a cell-temperature derate so hot days are not
 over-predicted.
@@ -194,10 +197,12 @@ know about your site: shading, soiling, an orientation that is a few degrees off
 
 What it does not learn is your hardware's limits. An hour where the inverter was
 held back, by a full battery, a zero-export rule or a grid limit, says nothing
-about the sky, so it is left out of the learning and the limits stay where the
-forecast already applies them: forward, at forecast time. A full battery is
-recognised on its own from the state of charge sensor and the inverter cap you
-configured; for what the integration cannot see (zero export, a grid limit), point
+about the sky, so it is left out of the learning (out of the sky correction when it
+falls short of the model, out of the analog library altogether) and the limits stay
+where the forecast already applies them: forward, at forecast time. A full battery
+is recognised on its own from the state of charge sensor and the entry-level
+inverter cap you configured; for what the integration cannot see (zero export, a
+grid limit), point
 the optional **curtailment signal** at a binary sensor, input boolean or switch
 that is on while the inverter is being held back.
 
@@ -240,7 +245,9 @@ its own or a line mounted somewhere other than the entry's home location.
 into a live 2.5D scene: the sun crossing its arc over your home, your production,
 grid and battery flowing in real time. It draws this integration's prediction as
 the dashed curve your measured production tracks against, so you see the forecast
-and the reality on the same picture.
+and the reality on the same picture. From card 2026.9.4 it also reads each panel
+line's orientation and position from this integration to mark your arrays in the
+scene.
 
 Neither needs the other. Together they are the whole story.
 

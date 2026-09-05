@@ -2,7 +2,8 @@
 
 Thin readers over the coordinator's summary: power now / next hour, per-day peak
 power + peak time and daily energy over the 7-day horizon, plus today-remaining
-and this/next hour. All values are produced in summary.py.
+and this/next hour. The forecast values come from summary.py; the weather, reliability,
+trend and battery sensors read their own ForecastData fields.
 """
 
 from __future__ import annotations

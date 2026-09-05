@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — linie panelů",
+        "title": "Helios Forecast: linie panelů",
         "description": "Jedna předpověď pro jednu linii panelů (skupina shodně orientovaných panelů). Pro každou další linii přidejte integraci znovu. Ponechte pole polohy prázdné pro použití domácí polohy z Home Assistant.",
         "data": {
           "name": "Název (např. Jižní střecha)",
@@ -21,17 +21,18 @@
           "battery_soc_entity": "Senzor stavu nabití baterie (%)",
           "battery_max_charge_kw": "Max. nabíjecí výkon baterie (kW, volitelné)",
           "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
-          "battery_min_soc": "Rezerva baterie — minimální stav nabití (%, výchozí 10)",
+          "battery_min_soc": "Rezerva baterie, minimální stav nabití (%, výchozí 10)",
           "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)",
           "curtailment_entity": "Signál omezení (binární senzor, volitelné)"
         },
         "data_description": {
+          "production_entity": "Kumulativní senzor energie (kWh), např. celková výroba střídače nebo elektroměru. Senzor výkonu (W) nebude fungovat: nemá dlouhodobé statistiky součtu, takže učení a index spolehlivosti by zůstaly vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
           "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Sklon (stupně, 0 = vodorovně, 90 = svisle)",
@@ -57,7 +58,7 @@
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
+        "title": "Helios Forecast: settings",
         "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
           "latitude": "Zeměpisná šířka (volitelné)",
@@ -69,17 +70,18 @@
           "battery_soc_entity": "Senzor stavu nabití baterie (%)",
           "battery_max_charge_kw": "Max. nabíjecí výkon baterie (kW, volitelné)",
           "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
-          "battery_min_soc": "Rezerva baterie — minimální stav nabití (%, výchozí 10)",
+          "battery_min_soc": "Rezerva baterie, minimální stav nabití (%, výchozí 10)",
           "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)",
           "curtailment_entity": "Signál omezení (binární senzor, volitelné)"
         },
         "data_description": {
+          "production_entity": "Kumulativní senzor energie (kWh), např. celková výroba střídače nebo elektroměru. Senzor výkonu (W) nebude fungovat: nemá dlouhodobé statistiky součtu, takže učení a index spolehlivosti by zůstaly vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
           "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Sklon (stupně, 0 = vodorovně, 90 = svisle)",

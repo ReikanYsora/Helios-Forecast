@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — panelsor",
+        "title": "Helios Forecast: panelsor",
         "description": "Egy előrejelzés egy panelsorhoz (azonos tájolású panelek csoportja). Minden további sorhoz add hozzá újra az integrációt. Hagyd üresen a helyet a Home Assistant otthoni helyének használatához.",
         "data": {
           "name": "Név (pl. Déli tető)",
@@ -21,17 +21,18 @@
           "battery_soc_entity": "Akkumulátor töltöttségi szint érzékelő (%)",
           "battery_max_charge_kw": "Max. akkumulátor töltési teljesítmény (kW, opcionális)",
           "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
-          "battery_min_soc": "Akkumulátor tartalék — minimális töltöttségi szint (%, alapértelmezett 10)",
+          "battery_min_soc": "Akkumulátor tartalék, minimális töltöttségi szint (%, alapértelmezett 10)",
           "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)",
           "curtailment_entity": "Korlátozási jel (bináris érzékelő, opcionális)"
         },
         "data_description": {
+          "production_entity": "Kumulatív energiaérzékelő (kWh), pl. az inverter vagy a fogyasztásmérő teljes termelése. Teljesítményérzékelő (W) nem működik: nincs hosszú távú összegstatisztikája, így a tanulás és a megbízhatósági index kikapcsolva maradna.",
           "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre.",
           "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Dőlésszög (fok, 0 = vízszintes, 90 = függőleges)",
@@ -57,7 +58,7 @@
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
+        "title": "Helios Forecast: settings",
         "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
           "latitude": "Szélességi fok (opcionális)",
@@ -69,17 +70,18 @@
           "battery_soc_entity": "Akkumulátor töltöttségi szint érzékelő (%)",
           "battery_max_charge_kw": "Max. akkumulátor töltési teljesítmény (kW, opcionális)",
           "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
-          "battery_min_soc": "Akkumulátor tartalék — minimális töltöttségi szint (%, alapértelmezett 10)",
+          "battery_min_soc": "Akkumulátor tartalék, minimális töltöttségi szint (%, alapértelmezett 10)",
           "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)",
           "curtailment_entity": "Korlátozási jel (bináris érzékelő, opcionális)"
         },
         "data_description": {
+          "production_entity": "Kumulatív energiaérzékelő (kWh), pl. az inverter vagy a fogyasztásmérő teljes termelése. Teljesítményérzékelő (W) nem működik: nincs hosszú távú összegstatisztikája, így a tanulás és a megbízhatósági index kikapcsolva maradna.",
           "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre.",
           "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Dőlésszög (fok, 0 = vízszintes, 90 = függőleges)",

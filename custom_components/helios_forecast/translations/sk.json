@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — línia panelov",
+        "title": "Helios Forecast: línia panelov",
         "description": "Jedna predpoveď pre jednu líniu panelov (skupinu rovnako orientovaných panelov). Pre každú ďalšiu líniu pridajte integráciu znova. Ak chcete použiť domov v Home Assistant, nechajte polohu prázdnu.",
         "data": {
           "name": "Názov (napr. Južná strecha)",
@@ -21,17 +21,18 @@
           "battery_soc_entity": "Senzor stavu nabitia batérie (%)",
           "battery_max_charge_kw": "Max. nabíjací výkon batérie (kW, voliteľné)",
           "battery_max_discharge_kw": "Max. vybíjací výkon batérie (kW, voliteľné)",
-          "battery_min_soc": "Rezerva batérie — minimálny stav nabitia (%, predvolené 10)",
+          "battery_min_soc": "Rezerva batérie, minimálny stav nabitia (%, predvolené 10)",
           "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)",
           "curtailment_entity": "Signál obmedzenia (binárny senzor, voliteľné)"
         },
         "data_description": {
+          "production_entity": "Kumulatívny senzor energie (kWh), napr. celková výroba striedača alebo elektromera. Senzor výkonu (W) nebude fungovať: nemá dlhodobé štatistiky súčtu, takže učenie a index spoľahlivosti by zostali vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor.",
           "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Sklon (stupne, 0 = naplocho, 90 = zvislo)",
@@ -57,7 +58,7 @@
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
+        "title": "Helios Forecast: settings",
         "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
           "latitude": "Zemepisná šírka (voliteľné)",
@@ -69,17 +70,18 @@
           "battery_soc_entity": "Senzor stavu nabitia batérie (%)",
           "battery_max_charge_kw": "Max. nabíjací výkon batérie (kW, voliteľné)",
           "battery_max_discharge_kw": "Max. vybíjací výkon batérie (kW, voliteľné)",
-          "battery_min_soc": "Rezerva batérie — minimálny stav nabitia (%, predvolené 10)",
+          "battery_min_soc": "Rezerva batérie, minimálny stav nabitia (%, predvolené 10)",
           "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)",
           "curtailment_entity": "Signál obmedzenia (binárny senzor, voliteľné)"
         },
         "data_description": {
+          "production_entity": "Kumulatívny senzor energie (kWh), napr. celková výroba striedača alebo elektromera. Senzor výkonu (W) nebude fungovať: nemá dlhodobé štatistiky súčtu, takže učenie a index spoľahlivosti by zostali vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor.",
           "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Sklon (stupne, 0 = naplocho, 90 = zvislo)",

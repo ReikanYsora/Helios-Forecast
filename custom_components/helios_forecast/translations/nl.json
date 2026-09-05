@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — paneellijn",
+        "title": "Helios Forecast: paneellijn",
         "description": "Eén prognose voor één paneellijn (een groep panelen met dezelfde oriëntatie). Voeg de integratie opnieuw toe voor elke extra lijn. Laat de locatie leeg om je Home Assistant-thuislocatie te gebruiken.",
         "data": {
           "name": "Naam (bijv. Zuiddak)",
@@ -21,17 +21,18 @@
           "battery_soc_entity": "Batterijladingssensor (%)",
           "battery_max_charge_kw": "Max. laadvermogen batterij (kW, optioneel)",
           "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
-          "battery_min_soc": "Batterijreserve — minimale laadtoestand (%, standaard 10)",
+          "battery_min_soc": "Batterijreserve, minimale laadtoestand (%, standaard 10)",
           "battery_efficiency": "Retourrendement batterij (%, standaard 90)",
           "curtailment_entity": "Beperkingssignaal (binaire sensor, optioneel)"
         },
         "data_description": {
+          "production_entity": "Een cumulatieve energiesensor (kWh), bijv. de totale productie van uw omvormer of energiemeter. Een vermogenssensor (W) werkt niet: die heeft geen langetermijn-somstatistieken, dus het leren en de betrouwbaarheidsindex blijven uit.",
           "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
           "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Hellingshoek (graden, 0 = plat, 90 = verticaal)",
@@ -57,7 +58,7 @@
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
+        "title": "Helios Forecast: settings",
         "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
           "latitude": "Breedtegraad (optioneel)",
@@ -69,17 +70,18 @@
           "battery_soc_entity": "Batterijladingssensor (%)",
           "battery_max_charge_kw": "Max. laadvermogen batterij (kW, optioneel)",
           "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
-          "battery_min_soc": "Batterijreserve — minimale laadtoestand (%, standaard 10)",
+          "battery_min_soc": "Batterijreserve, minimale laadtoestand (%, standaard 10)",
           "battery_efficiency": "Retourrendement batterij (%, standaard 90)",
           "curtailment_entity": "Beperkingssignaal (binaire sensor, optioneel)"
         },
         "data_description": {
+          "production_entity": "Een cumulatieve energiesensor (kWh), bijv. de totale productie van uw omvormer of energiemeter. Een vermogenssensor (W) werkt niet: die heeft geen langetermijn-somstatistieken, dus het leren en de betrouwbaarheidsindex blijven uit.",
           "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
           "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Hellingshoek (graden, 0 = plat, 90 = verticaal)",

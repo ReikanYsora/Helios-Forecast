@@ -112,8 +112,8 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
     # (clamped like the archive, see coordinator.elapsed_points), then the live points from now on. The
     # archive's last point stands for its whole hour, so live points inside that hour are dropped too: the
     # live series deliberately leaves its already-elapsed points unclamped (a past point there means
-    # "what the forecast said at the time"), and any of them drawn next to the archive hugged the panels'
-    # nameplate ceiling for up to an hour.
+    # "what the forecast said at the time"), and drawn next to the archive one would hug the nameplate
+    # ceiling for up to an hour.
     live = coordinator.data.points
     archive = coordinator.archive_points
     elapsed = getattr(coordinator, "elapsed_points", [])
@@ -156,8 +156,8 @@ def ws_layout(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
 
     One item per configured line: its orientation (azimuth clockwise from north, tilt from horizontal, degrees),
     its kWp share, its tracker kind (None = fixed) and its own coordinates when the line carries some (None
-    otherwise: the card then places the marker on the home). `home` is the entry's resolved location, the same
-    fallback the forecast itself uses. Geometry only, nothing about production."""
+    otherwise; consumers fall back to `home`). `home` is the entry's resolved location, the same fallback the
+    forecast itself uses. Geometry only, nothing about production."""
     coordinator = hass.data.get(DOMAIN, {}).get(msg["entry_id"])
     if coordinator is None:
         connection.send_error(msg["id"], "not_found", "no forecast for that entry")

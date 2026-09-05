@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — panelrad",
+        "title": "Helios Forecast: panelrad",
         "description": "En prognos för en panelrad (en grupp paneler med samma orientering). Lägg till integrationen igen för varje ytterligare rad. Lämna platsen tom för att använda din Home Assistant-hemposition.",
         "data": {
           "name": "Namn (t.ex. Söderfasad)",
@@ -21,17 +21,18 @@
           "battery_soc_entity": "Sensor för batteriets laddningsnivå (%)",
           "battery_max_charge_kw": "Max. laddningseffekt för batteri (kW, valfritt)",
           "battery_max_discharge_kw": "Max. urladdningseffekt för batteri (kW, valfritt)",
-          "battery_min_soc": "Batterireserv — minimal laddningsnivå (%, standard 10)",
+          "battery_min_soc": "Batterireserv, minimal laddningsnivå (%, standard 10)",
           "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)",
           "curtailment_entity": "Begränsningssignal (binär sensor, valfri)"
         },
         "data_description": {
+          "production_entity": "En kumulativ energisensor (kWh), t.ex. växelriktarens eller elmätarens totala produktion. En effektsensor (W) fungerar inte: den saknar långtidsstatistik för summan, så inlärningen och tillförlitlighetsindexet skulle förbli avstängda.",
           "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här.",
           "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Lutning (grader, 0 = platt, 90 = lodrät)",
@@ -57,7 +58,7 @@
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
+        "title": "Helios Forecast: settings",
         "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
           "latitude": "Latitud (valfritt)",
@@ -69,17 +70,18 @@
           "battery_soc_entity": "Sensor för batteriets laddningsnivå (%)",
           "battery_max_charge_kw": "Max. laddningseffekt för batteri (kW, valfritt)",
           "battery_max_discharge_kw": "Max. urladdningseffekt för batteri (kW, valfritt)",
-          "battery_min_soc": "Batterireserv — minimal laddningsnivå (%, standard 10)",
+          "battery_min_soc": "Batterireserv, minimal laddningsnivå (%, standard 10)",
           "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)",
           "curtailment_entity": "Begränsningssignal (binär sensor, valfri)"
         },
         "data_description": {
+          "production_entity": "En kumulativ energisensor (kWh), t.ex. växelriktarens eller elmätarens totala produktion. En effektsensor (W) fungerar inte: den saknar långtidsstatistik för summan, så inlärningen och tillförlitlighetsindexet skulle förbli avstängda.",
           "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här.",
           "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Lutning (grader, 0 = platt, 90 = lodrät)",

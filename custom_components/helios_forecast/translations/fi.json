@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — paneelilinja",
+        "title": "Helios Forecast: paneelilinja",
         "description": "Yksi ennuste yhdelle paneelilinjalle (samaan suuntaan asennettujen paneelien ryhmä). Lisää integraatio uudelleen jokaiselle lisälinjalle. Jätä sijainti tyhjäksi käyttääksesi Home Assistant -kotisi sijaintia.",
         "data": {
           "name": "Nimi (esim. Eteläkatto)",
@@ -21,17 +21,18 @@
           "battery_soc_entity": "Akun varaustilan anturi (%)",
           "battery_max_charge_kw": "Akun suurin latausteho (kW, valinnainen)",
           "battery_max_discharge_kw": "Akun suurin purkausteho (kW, valinnainen)",
-          "battery_min_soc": "Akun varaus — vähimmäisvaraustila (%, oletus 10)",
+          "battery_min_soc": "Akun varaus, vähimmäisvaraustila (%, oletus 10)",
           "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)",
           "curtailment_entity": "Rajoitussignaali (binäärianturi, valinnainen)"
         },
         "data_description": {
+          "production_entity": "Kumulatiivinen energia-anturi (kWh), esim. invertterin tai energiamittarin kokonaistuotanto. Tehoanturi (W) ei toimi: sillä ei ole pitkän aikavälin summatilastoja, joten oppiminen ja luotettavuusindeksi jäisivät pois päältä.",
           "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
           "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",
@@ -57,7 +58,7 @@
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
+        "title": "Helios Forecast: settings",
         "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
           "latitude": "Leveysaste (valinnainen)",
@@ -69,17 +70,18 @@
           "battery_soc_entity": "Akun varaustilan anturi (%)",
           "battery_max_charge_kw": "Akun suurin latausteho (kW, valinnainen)",
           "battery_max_discharge_kw": "Akun suurin purkausteho (kW, valinnainen)",
-          "battery_min_soc": "Akun varaus — vähimmäisvaraustila (%, oletus 10)",
+          "battery_min_soc": "Akun varaus, vähimmäisvaraustila (%, oletus 10)",
           "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)",
           "curtailment_entity": "Rajoitussignaali (binäärianturi, valinnainen)"
         },
         "data_description": {
+          "production_entity": "Kumulatiivinen energia-anturi (kWh), esim. invertterin tai energiamittarin kokonaistuotanto. Tehoanturi (W) ei toimi: sillä ei ole pitkän aikavälin summatilastoja, joten oppiminen ja luotettavuusindeksi jäisivät pois päältä.",
           "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
           "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Kallistus (astetta, 0 = vaaka, 90 = pysty)",

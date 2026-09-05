@@ -284,15 +284,9 @@ def enrich_archive_points(
     lat: float,
     lon: float,
 ) -> List[ForecastPoint]:
-    """Same blend and ceiling clamp as `enrich_points`, applied to every point unconditionally.
-
-    The archive (HA's long-term statistics, the card's past-forecast curve) has no "future" side
-    to gate on: every point in it is already in the past by construction. Without this, archived
-    points only ever got the residual's sky-position bias correction, never the analog ceiling
-    that reins the physical model back down to what the site has actually produced under similar
-    conditions - so a well-learned install could still see its archived curve hug the panels'
-    nameplate ceiling on a clear day while the live forecast, which does get the clamp, looked
-    accurate right next to it."""
+    """Same blend and ceiling clamp as `enrich_points`, applied to every point: the archive is past by
+    construction, so there is no "future" side to gate on, and it needs the analog ceiling as much as
+    the live forecast does."""
     if not library:
         return points
     w_epochs = series_epochs(weather.times) if weather.times else None

@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — panelrekke",
+        "title": "Helios Forecast: panelrekke",
         "description": "Én prognose for én panelrekke (en gruppe paneler med samme orientering). Legg til integrasjonen på nytt for hver ekstra rekke. La plasseringen stå tom for å bruke hjemmet ditt i Home Assistant.",
         "data": {
           "name": "Navn (f.eks. Sørtak)",
@@ -21,17 +21,18 @@
           "battery_soc_entity": "Sensor for batteriets ladenivå (%)",
           "battery_max_charge_kw": "Maks. ladeeffekt for batteri (kW, valgfritt)",
           "battery_max_discharge_kw": "Maks. utladningseffekt for batteri (kW, valgfritt)",
-          "battery_min_soc": "Batterireserve — minimalt ladenivå (%, standard 10)",
+          "battery_min_soc": "Batterireserve, minimalt ladenivå (%, standard 10)",
           "battery_efficiency": "Batteriets rundturs-virkningsgrad (%, standard 90)",
           "curtailment_entity": "Begrensningssignal (binær sensor, valgfri)"
         },
         "data_description": {
+          "production_entity": "En kumulativ energisensor (kWh), f.eks. inverterens eller strømmålerens totale produksjon. En effektsensor (W) fungerer ikke: den har ingen langtidsstatistikk for summen, så læringen og pålitelighetsindeksen ville forbli av.",
           "battery_soc_entity": "Fyll inn kapasiteten og denne sensoren for å slå på ladenivåprojeksjonen. Husforbruket hentes fra Energi-dashbordet ditt, så det trengs ingen sensor her.",
           "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Helning (grader, 0 = flatt, 90 = loddrett)",
@@ -57,7 +58,7 @@
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
+        "title": "Helios Forecast: settings",
         "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
           "latitude": "Breddegrad (valgfritt)",
@@ -69,17 +70,18 @@
           "battery_soc_entity": "Sensor for batteriets ladenivå (%)",
           "battery_max_charge_kw": "Maks. ladeeffekt for batteri (kW, valgfritt)",
           "battery_max_discharge_kw": "Maks. utladningseffekt for batteri (kW, valgfritt)",
-          "battery_min_soc": "Batterireserve — minimalt ladenivå (%, standard 10)",
+          "battery_min_soc": "Batterireserve, minimalt ladenivå (%, standard 10)",
           "battery_efficiency": "Batteriets rundturs-virkningsgrad (%, standard 90)",
           "curtailment_entity": "Begrensningssignal (binær sensor, valgfri)"
         },
         "data_description": {
+          "production_entity": "En kumulativ energisensor (kWh), f.eks. inverterens eller strømmålerens totale produksjon. En effektsensor (W) fungerer ikke: den har ingen langtidsstatistikk for summen, så læringen og pålitelighetsindeksen ville forbli av.",
           "battery_soc_entity": "Fyll inn kapasiteten og denne sensoren for å slå på ladenivåprojeksjonen. Husforbruket hentes fra Energi-dashbordet ditt, så det trengs ingen sensor her.",
           "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Helning (grader, 0 = flatt, 90 = loddrett)",

@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — spjaldalína",
+        "title": "Helios Forecast: spjaldalína",
         "description": "Ein spá fyrir eina spjaldalínu (hóp samstilltra spjalda). Bættu samþættingunni við aftur fyrir hverja viðbótarlínu. Skildu staðsetninguna eftir auða til að nota heimili Home Assistant.",
         "data": {
           "name": "Nafn (t.d. Suðurþak)",
@@ -21,17 +21,18 @@
           "battery_soc_entity": "Skynjari fyrir hleðslustöðu rafhlöðu (%)",
           "battery_max_charge_kw": "Hámarks hleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_max_discharge_kw": "Hámarks afhleðsluafl rafhlöðu (kW, valfrjálst)",
-          "battery_min_soc": "Varaforði rafhlöðu — lágmarks hleðslustaða (%, sjálfgefið 10)",
+          "battery_min_soc": "Varaforði rafhlöðu, lágmarks hleðslustaða (%, sjálfgefið 10)",
           "battery_efficiency": "Heildarnýtni rafhlöðu (%, sjálfgefið 90)",
           "curtailment_entity": "Skerðingarmerki (tvíundarskynjari, valfrjálst)"
         },
         "data_description": {
+          "production_entity": "Uppsafnaður orkuskynjari (kWh), t.d. heildarframleiðsla áriðils eða orkumælis. Aflskynjari (W) virkar ekki: hann hefur enga langtímasummutölfræði, svo lærdómurinn og áreiðanleikavísitalan yrðu áfram óvirk.",
           "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér.",
           "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",
@@ -57,7 +58,7 @@
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
+        "title": "Helios Forecast: settings",
         "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
           "latitude": "Breiddargráða (valfrjálst)",
@@ -69,17 +70,18 @@
           "battery_soc_entity": "Skynjari fyrir hleðslustöðu rafhlöðu (%)",
           "battery_max_charge_kw": "Hámarks hleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_max_discharge_kw": "Hámarks afhleðsluafl rafhlöðu (kW, valfrjálst)",
-          "battery_min_soc": "Varaforði rafhlöðu — lágmarks hleðslustaða (%, sjálfgefið 10)",
+          "battery_min_soc": "Varaforði rafhlöðu, lágmarks hleðslustaða (%, sjálfgefið 10)",
           "battery_efficiency": "Heildarnýtni rafhlöðu (%, sjálfgefið 90)",
           "curtailment_entity": "Skerðingarmerki (tvíundarskynjari, valfrjálst)"
         },
         "data_description": {
+          "production_entity": "Uppsafnaður orkuskynjari (kWh), t.d. heildarframleiðsla áriðils eða orkumælis. Aflskynjari (W) virkar ekki: hann hefur enga langtímasummutölfræði, svo lærdómurinn og áreiðanleikavísitalan yrðu áfram óvirk.",
           "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér.",
           "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",

@@ -7,7 +7,8 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ## 2026.9.1
 
-A corrective release on top of 2026.9.0, plus one addition for the card.
+A corrective release on top of 2026.9.0, plus the battery projection's extremes as
+entities, a learning that leaves curtailed hours out, and one addition for the card.
 
 ### Changed: the learning no longer counts your inverter's limits twice
 
@@ -18,10 +19,11 @@ full-battery afternoons pulled the ratio for those sun positions well below one)
 and once more at forecast time, where the inverter cap is already applied. The
 depressed ratio then hit the days nothing was clipped, an empty battery after a
 cloudy day, and the forecast landed below the cap for the whole afternoon. A
-curtailed hour is now treated for what it is, a lower bound: when it sits under
-the model it is left out of both the sky-residual map and the analog library,
-when it reaches the model it counts as before. The battery case needs nothing
-new, a full battery (state of charge sensor) at the inverter cap is enough; for
+curtailed hour is now treated for what it is, a lower bound: it is left out of the
+sky-residual map when it sits under the model (when it reaches the model it counts
+as before) and out of the analog library altogether. The battery case needs nothing
+new, a full battery (state of charge sensor) at the entry-level inverter cap is
+enough; for
 zero-export and grid-limited installs a new optional **curtailment signal**
 (binary sensor, input boolean or switch, on while the inverter is held back)
 marks the hours. Thanks to @Manama2011 for the analysis and the proposal, and to
@@ -116,7 +118,8 @@ explanations (#52).
 
 ### Fixed: today's own elapsed hours still weren't corrected on the card's past curve
 
-The previous fix corrected the archive itself, but the card reads its past-forecast curve
+Superseded by the plateau fix above, which moves the split to the end of the
+archive's last hour. The previous fix corrected the archive itself, but the card reads its past-forecast curve
 through a separate websocket command that was splitting archive vs. live at today's
 midnight, not at the archive's own last point. Today's already-elapsed hours came from the
 live series instead, which deliberately leaves past points unclamped (a past point there
@@ -160,8 +163,8 @@ write-up on #35.
 
 If you have a battery, Helios Forecast can now project its **state of charge over
 the next 48 hours**. It runs the production forecast against your home's own
-consumption — derived straight from your **Home Assistant Energy dashboard**, so
-there's no extra sensor to wire — and integrates the battery's charge from your
+consumption, derived straight from your **Home Assistant Energy dashboard**, so
+there's no extra sensor to wire, and integrates the battery's charge from your
 current level, within your capacity, reserve and charge/discharge limits. Turn it
 on by filling in your battery capacity and state-of-charge sensor in the
 integration settings; a **Predicted battery state of charge** sensor then appears,
@@ -201,7 +204,7 @@ installations with a per-line inverter cap configured.
 ### Fixed: a gap in temperature history no longer inflates forecast confidence
 
 The forecast picks its closest historical matches partly on outdoor temperature,
-and a match missing that reading used to count as a perfect one — tying with, or
+and a match missing that reading used to count as a perfect one, tying with, or
 even beating, a match with a real but tiny temperature difference. If your
 temperature source has gaps (added partway through the learning window, or
 occasional dropouts), those gaps no longer masquerade as ideal matches: reported
@@ -392,8 +395,8 @@ A corrective release on top of 2026.8.1.
   is still fully supported for installs that do have a sensor per line. The Configure
   button opens a menu to edit the shared settings or the lines (edit, add or remove).
   (#18)
-- **`forecast` attribute on the weather sensors.** Every archived Open-Meteo sensor —
-  cloud cover, irradiance, temperature, wind, snow — now carries a forward-looking hourly
+- **`forecast` attribute on the weather sensors.** Every archived Open-Meteo sensor -
+  cloud cover, irradiance, temperature, wind, snow, now carries a forward-looking hourly
   `forecast` list (today plus the 7-day horizon), the same shape the power sensor exposes,
   so you can plot the upcoming sky next to the predicted power in ApexCharts. (#21)
 

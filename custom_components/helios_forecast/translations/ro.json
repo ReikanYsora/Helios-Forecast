@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — linie de panouri",
+        "title": "Helios Forecast: linie de panouri",
         "description": "O prognoză pentru o linie de panouri (un grup de panouri cu aceeași orientare). Adăugați integrarea din nou pentru fiecare linie suplimentară. Lăsați locația necompletată pentru a folosi domiciliul din Home Assistant.",
         "data": {
           "name": "Nume (de ex. Acoperiș sud)",
@@ -21,17 +21,18 @@
           "battery_soc_entity": "Senzor pentru starea de încărcare a bateriei (%)",
           "battery_max_charge_kw": "Putere max. de încărcare a bateriei (kW, opțional)",
           "battery_max_discharge_kw": "Putere max. de descărcare a bateriei (kW, opțional)",
-          "battery_min_soc": "Rezerva bateriei — stare de încărcare minimă (%, implicit 10)",
+          "battery_min_soc": "Rezerva bateriei, stare de încărcare minimă (%, implicit 10)",
           "battery_efficiency": "Randamentul dus-întors al bateriei (%, implicit 90)",
           "curtailment_entity": "Semnal de limitare (senzor binar, opțional)"
         },
         "data_description": {
+          "production_entity": "Un senzor de energie cumulată (kWh), de ex. producția totală a invertorului sau a contorului. Un senzor de putere (W) nu va funcționa: nu are statistici de sumă pe termen lung, așa că învățarea și indicele de fiabilitate ar rămâne inactive.",
           "battery_soc_entity": "Completați capacitatea și acest senzor pentru a activa proiecția stării de încărcare. Consumul casei este preluat din tabloul de bord Energie, aici nu este nevoie de niciun senzor.",
           "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Înclinare (grade, 0 = orizontal, 90 = vertical)",
@@ -57,7 +58,7 @@
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
+        "title": "Helios Forecast: settings",
         "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
           "latitude": "Latitudine (opțional)",
@@ -69,17 +70,18 @@
           "battery_soc_entity": "Senzor pentru starea de încărcare a bateriei (%)",
           "battery_max_charge_kw": "Putere max. de încărcare a bateriei (kW, opțional)",
           "battery_max_discharge_kw": "Putere max. de descărcare a bateriei (kW, opțional)",
-          "battery_min_soc": "Rezerva bateriei — stare de încărcare minimă (%, implicit 10)",
+          "battery_min_soc": "Rezerva bateriei, stare de încărcare minimă (%, implicit 10)",
           "battery_efficiency": "Randamentul dus-întors al bateriei (%, implicit 90)",
           "curtailment_entity": "Semnal de limitare (senzor binar, opțional)"
         },
         "data_description": {
+          "production_entity": "Un senzor de energie cumulată (kWh), de ex. producția totală a invertorului sau a contorului. Un senzor de putere (W) nu va funcționa: nu are statistici de sumă pe termen lung, așa că învățarea și indicele de fiabilitate ar rămâne inactive.",
           "battery_soc_entity": "Completați capacitatea și acest senzor pentru a activa proiecția stării de încărcare. Consumul casei este preluat din tabloul de bord Energie, aici nu este nevoie de niciun senzor.",
           "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Înclinare (grade, 0 = orizontal, 90 = vertical)",

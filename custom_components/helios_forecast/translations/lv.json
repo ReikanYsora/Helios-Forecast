@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Helios Forecast — paneļu līnija",
+        "title": "Helios Forecast: paneļu līnija",
         "description": "Viena prognoze vienai paneļu līnijai (vienādi orientētu paneļu grupai). Katrai papildu līnijai pievienojiet integrāciju vēlreiz. Atstājiet atrašanās vietu tukšu, lai izmantotu jūsu Home Assistant mājas atrašanās vietu.",
         "data": {
           "name": "Nosaukums (piem., Dienvidu jumts)",
@@ -21,17 +21,18 @@
           "battery_soc_entity": "Akumulatora uzlādes līmeņa sensors (%)",
           "battery_max_charge_kw": "Maks. akumulatora uzlādes jauda (kW, neobligāti)",
           "battery_max_discharge_kw": "Maks. akumulatora izlādes jauda (kW, neobligāti)",
-          "battery_min_soc": "Akumulatora rezerve — minimālais uzlādes līmenis (%, noklusējums 10)",
+          "battery_min_soc": "Akumulatora rezerve, minimālais uzlādes līmenis (%, noklusējums 10)",
           "battery_efficiency": "Akumulatora cikla lietderības koeficients (%, noklusējums 90)",
           "curtailment_entity": "Ierobežojuma signāls (binārais sensors, pēc izvēles)"
         },
         "data_description": {
+          "production_entity": "Kumulatīvs enerģijas sensors (kWh), piem., invertora vai skaitītāja kopējā ražošana. Jaudas sensors (W) nedarbosies: tam nav ilgtermiņa summas statistikas, tāpēc mācīšanās un uzticamības indekss paliktu izslēgti.",
           "battery_soc_entity": "Aizpildiet ietilpību un šo sensoru, lai ieslēgtu uzlādes līmeņa prognozi. Mājas patēriņš tiek ņemts no Enerģijas paneļa, sensors šeit nav vajadzīgs.",
           "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita."
         }
       },
       "line": {
-        "title": "Helios Forecast — additional panel line",
+        "title": "Helios Forecast: additional panel line",
         "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
         "data": {
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
@@ -57,7 +58,7 @@
         }
       },
       "settings": {
-        "title": "Helios Forecast — settings",
+        "title": "Helios Forecast: settings",
         "description": "Shared location, inverter cap, production sensor and trend anchor for every panel line in this entry.",
         "data": {
           "latitude": "Platums (neobligāti)",
@@ -69,17 +70,18 @@
           "battery_soc_entity": "Akumulatora uzlādes līmeņa sensors (%)",
           "battery_max_charge_kw": "Maks. akumulatora uzlādes jauda (kW, neobligāti)",
           "battery_max_discharge_kw": "Maks. akumulatora izlādes jauda (kW, neobligāti)",
-          "battery_min_soc": "Akumulatora rezerve — minimālais uzlādes līmenis (%, noklusējums 10)",
+          "battery_min_soc": "Akumulatora rezerve, minimālais uzlādes līmenis (%, noklusējums 10)",
           "battery_efficiency": "Akumulatora cikla lietderības koeficients (%, noklusējums 90)",
           "curtailment_entity": "Ierobežojuma signāls (binārais sensors, pēc izvēles)"
         },
         "data_description": {
+          "production_entity": "Kumulatīvs enerģijas sensors (kWh), piem., invertora vai skaitītāja kopējā ražošana. Jaudas sensors (W) nedarbosies: tam nav ilgtermiņa summas statistikas, tāpēc mācīšanās un uzticamības indekss paliktu izslēgti.",
           "battery_soc_entity": "Aizpildiet ietilpību un šo sensoru, lai ieslēgtu uzlādes līmeņa prognozi. Mājas patēriņš tiek ņemts no Enerģijas paneļa, sensors šeit nav vajadzīgs.",
           "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita."
         }
       },
       "lines": {
-        "title": "Helios Forecast — panel line {index}/{total}",
+        "title": "Helios Forecast: panel line {index}/{total}",
         "description": "Edit panel line {index} of {total}, or tick to add another.",
         "data": {
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
