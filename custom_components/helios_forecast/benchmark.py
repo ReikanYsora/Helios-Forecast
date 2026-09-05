@@ -8,7 +8,8 @@ hour it posts the curve this entry currently predicts, together with the product
 measured, and an external collector scores the two against each other once the day is over.
 
 Off unless switched on. What it sends is fixed and deliberately small: the geometry of the
-installation, the predicted curve, the measured production and the reliability index. No
+installation, the predicted curve with the cloud cover behind it, the measured production and the
+reliability index. No
 entity names, no consumption, no other sensor, nothing about the rest of the house.
 Coordinates are rounded to two decimals, roughly a kilometre, which no weather model can
 tell apart and which keeps a street address out of the upload. The site is identified by a
@@ -139,6 +140,7 @@ def build_payload(
                 "raw_w": _round(p.pv_raw_w, 2),
                 "p10": _round(p.pv_p10, 2),
                 "p90": _round(p.pv_p90, 2),
+                "cloud": _round(p.cloud, 1),
             }
             for p in points
         ],

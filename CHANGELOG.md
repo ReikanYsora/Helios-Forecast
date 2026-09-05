@@ -5,7 +5,7 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
-## 2026.10.0
+## 2026.9.2
 
 ### Added: contribute to the public accuracy benchmark
 

@@ -39,7 +39,7 @@ def _payload(**overrides):
         lines=[{"azimuth": 188.0, "tilt": 13.0, "kwp": 3.0, "tracker": None}],
         country="FR",
         inverter_max_kw=3.0,
-        points=[ForecastPoint(t=_NOW, pv_w=1781.8247, pv_raw_w=1900.5, pv_p10=1548.7, pv_p90=2143.27)],
+        points=[ForecastPoint(t=_NOW, pv_w=1781.8247, pv_raw_w=1900.5, pv_p10=1548.7, pv_p90=2143.27, cloud=42.0)],
         reliability=Reliability(
             overall=87.4, data_maturity=0.5, recent_skill=0.9, today_predictability=0.6, days_learned=30, per_day=[]
         ),
@@ -77,7 +77,14 @@ def test_the_payload_carries_the_prediction_the_geometry_and_nothing_else() -> N
     assert set(p["site"]["lines"][0]) == {"azimuth", "tilt", "kwp", "tracker"}
     # The blended value, the pure physical model beside it, and the band: enough to score an ablation
     # without asking the installation to run one.
-    assert p["forecast"][0] == {"t": _NOW.isoformat(), "w": 1781.82, "raw_w": 1900.5, "p10": 1548.7, "p90": 2143.27}
+    assert p["forecast"][0] == {
+        "t": _NOW.isoformat(),
+        "w": 1781.82,
+        "raw_w": 1900.5,
+        "p10": 1548.7,
+        "p90": 2143.27,
+        "cloud": 42.0,
+    }
     assert p["observed"][0]["kwh"] == 1.9
     assert p["observed"][1]["curtailed"] is True
 
