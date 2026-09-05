@@ -77,6 +77,7 @@ def build_payload(
     latitude: float,
     longitude: float,
     lines: List[Dict[str, Any]],
+    country: Optional[str],
     inverter_max_kw: Optional[float],
     points: List[Any],
     reliability: Any,
@@ -107,6 +108,9 @@ def build_payload(
         "site": {
             "latitude": round(latitude, COORD_DECIMALS),
             "longitude": round(longitude, COORD_DECIMALS),
+            # The country the installation sits in. Far coarser than the coordinates already sent,
+            # and what lets the benchmark say which climates it actually covers.
+            "country": (country or None),
             "inverter_max_kw": _round(inverter_max_kw, 3),
             "has_battery": has_battery,
             "has_curtailment_signal": has_curtailment_signal,

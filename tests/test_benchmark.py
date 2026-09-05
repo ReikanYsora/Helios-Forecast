@@ -37,6 +37,7 @@ def _payload(**overrides):
         latitude=44.109959823,
         longitude=1.404356360,
         lines=[{"azimuth": 188.0, "tilt": 13.0, "kwp": 3.0, "tracker": None}],
+        country="FR",
         inverter_max_kw=3.0,
         points=[ForecastPoint(t=_NOW, pv_w=1781.8247, pv_raw_w=1900.5, pv_p10=1548.7, pv_p90=2143.27)],
         reliability=Reliability(
@@ -66,11 +67,13 @@ def test_the_payload_carries_the_prediction_the_geometry_and_nothing_else() -> N
     assert set(p["site"]) == {
         "latitude",
         "longitude",
+        "country",
         "inverter_max_kw",
         "has_battery",
         "has_curtailment_signal",
         "lines",
     }
+    assert p["site"]["country"] == "FR"
     assert set(p["site"]["lines"][0]) == {"azimuth", "tilt", "kwp", "tracker"}
     # The blended value, the pure physical model beside it, and the band: enough to score an ablation
     # without asking the installation to run one.

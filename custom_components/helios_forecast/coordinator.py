@@ -336,6 +336,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             latitude=lat,
             longitude=lon,
             lines=lines_from_config(data),
+            country=self.hass.config.country,
             inverter_max_kw=data.get(CONF_INVERTER_MAX_KW),
             points=points,
             reliability=reliability,
