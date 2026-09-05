@@ -23,18 +23,12 @@
           "battery_max_discharge_kw": "Max. urladdningseffekt för batteri (kW, valfritt)",
           "battery_min_soc": "Batterireserv, minimal laddningsnivå (%, standard 10)",
           "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begränsningssignal (binär sensor, valfri)",
-          "benchmark_enabled": "Bidra till den offentliga noggrannhetsjämförelsen (valfritt)",
-          "benchmark_key": "Jämförelsenyckel",
-          "benchmark_url": "Adress till insamlaren"
+          "curtailment_entity": "Begränsningssignal (binär sensor, valfri)"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), t.ex. växelriktarens eller elmätarens totala produktion. En effektsensor (W) fungerar inte: den saknar långtidsstatistik för summan, så inlärningen och tillförlitlighetsindexet skulle förbli avstängda.",
           "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här.",
-          "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket.",
-          "benchmark_enabled": "Skickar en gång i timmen vad den här anläggningen förutser, så att det kan jämföras med vad den faktiskt producerade. Resultaten publiceras öppet. Endast panelernas geometri, den förutsagda kurvan, den uppmätta produktionen och tillförlitlighetsindexet skickas: inga entitetsnamn, ingen förbrukning, inga andra sensorer, och dina koordinater avrundade till ungefär en kilometer. Av tills du slår på det.",
-          "benchmark_key": "Skrivnyckeln du fick när du gick med i jämförelsen. Utan den skickas ingenting.",
-          "benchmark_url": "Lämna som den är om du inte kör en egen insamlare."
+          "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket."
         }
       },
       "line": {
@@ -60,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Redigera inställningar (plats, växelriktare, produktionssensor, batteri, begränsningssignal)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Delta i gemenskapens jämförelse"
         }
       },
       "settings": {
@@ -78,18 +73,12 @@
           "battery_max_discharge_kw": "Max. urladdningseffekt för batteri (kW, valfritt)",
           "battery_min_soc": "Batterireserv, minimal laddningsnivå (%, standard 10)",
           "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begränsningssignal (binär sensor, valfri)",
-          "benchmark_enabled": "Bidra till den offentliga noggrannhetsjämförelsen (valfritt)",
-          "benchmark_key": "Jämförelsenyckel",
-          "benchmark_url": "Adress till insamlaren"
+          "curtailment_entity": "Begränsningssignal (binär sensor, valfri)"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), t.ex. växelriktarens eller elmätarens totala produktion. En effektsensor (W) fungerar inte: den saknar långtidsstatistik för summan, så inlärningen och tillförlitlighetsindexet skulle förbli avstängda.",
           "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här.",
-          "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket.",
-          "benchmark_enabled": "Skickar en gång i timmen vad den här anläggningen förutser, så att det kan jämföras med vad den faktiskt producerade. Resultaten publiceras öppet. Endast panelernas geometri, den förutsagda kurvan, den uppmätta produktionen och tillförlitlighetsindexet skickas: inga entitetsnamn, ingen förbrukning, inga andra sensorer, och dina koordinater avrundade till ungefär en kilometer. Av tills du slår på det.",
-          "benchmark_key": "Skrivnyckeln du fick när du gick med i jämförelsen. Utan den skickas ingenting.",
-          "benchmark_url": "Lämna som den är om du inte kör en egen insamlare."
+          "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket."
         }
       },
       "lines": {
@@ -105,6 +94,20 @@
           "longitude": "Longitud för denna rad (valfritt)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: gemenskapens jämförelse",
+        "description": "En öppen mätning av hur noggrann Helios Forecast verkligen är, på riktiga anläggningar, publicerad efter hand. Vill du vara med? Det sker här: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHämta en nyckel med ett klick, utan konto och utan namn, och klistra in den nedan. Radera den för att stoppa allt.",
+        "data": {
+          "benchmark_enabled": "Bidra till den offentliga noggrannhetsjämförelsen (valfritt)",
+          "benchmark_key": "Jämförelsenyckel",
+          "benchmark_url": "Adress till insamlaren"
+        },
+        "data_description": {
+          "benchmark_enabled": "Skickar en gång i timmen vad den här anläggningen förutser, så att det kan jämföras med vad den faktiskt producerade. Resultaten publiceras öppet. Endast panelernas geometri, den förutsagda kurvan, den uppmätta produktionen och tillförlitlighetsindexet skickas: inga entitetsnamn, ingen förbrukning, inga andra sensorer, och dina koordinater avrundade till ungefär en kilometer. Av tills du slår på det.",
+          "benchmark_key": "Skrivnyckeln du fick när du gick med i jämförelsen. Utan den skickas ingenting.",
+          "benchmark_url": "Lämna som den är om du inte kör en egen insamlare."
         }
       }
     }

@@ -23,18 +23,12 @@
           "battery_max_discharge_kw": "Max. vybíjací výkon batérie (kW, voliteľné)",
           "battery_min_soc": "Rezerva batérie, minimálny stav nabitia (%, predvolené 10)",
           "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)",
-          "curtailment_entity": "Signál obmedzenia (binárny senzor, voliteľné)",
-          "benchmark_enabled": "Prispieť do verejného porovnávacieho testu presnosti (voliteľné)",
-          "benchmark_key": "Kľúč porovnávacieho testu",
-          "benchmark_url": "Adresa zberača"
+          "curtailment_entity": "Signál obmedzenia (binárny senzor, voliteľné)"
         },
         "data_description": {
           "production_entity": "Kumulatívny senzor energie (kWh), napr. celková výroba striedača alebo elektromera. Senzor výkonu (W) nebude fungovať: nemá dlhodobé štatistiky súčtu, takže učenie a index spoľahlivosti by zostali vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor.",
-          "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača.",
-          "benchmark_enabled": "Raz za hodinu odošle, čo táto inštalácia predpovedá, aby sa to dalo porovnať so skutočnou výrobou. Výsledky sa zverejňujú otvorene. Odosiela sa len geometria panelov, predpovedaná krivka, nameraná výroba a index spoľahlivosti: žiadne názvy entit, žiadna spotreba, žiadne iné senzory a súradnice zaokrúhlené asi na kilometer. Vypnuté, kým to nezapnete.",
-          "benchmark_key": "Zapisovací kľúč, ktorý ste dostali pri zapojení do testu. Bez neho sa nič neodosiela.",
-          "benchmark_url": "Nechajte bez zmeny, ak neprevádzkujete vlastný zberač."
+          "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača."
         }
       },
       "line": {
@@ -60,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Upraviť nastavenia (poloha, striedač, senzor výroby, batéria, signál obmedzenia)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Zapojiť sa do komunitného porovnania"
         }
       },
       "settings": {
@@ -78,18 +73,12 @@
           "battery_max_discharge_kw": "Max. vybíjací výkon batérie (kW, voliteľné)",
           "battery_min_soc": "Rezerva batérie, minimálny stav nabitia (%, predvolené 10)",
           "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)",
-          "curtailment_entity": "Signál obmedzenia (binárny senzor, voliteľné)",
-          "benchmark_enabled": "Prispieť do verejného porovnávacieho testu presnosti (voliteľné)",
-          "benchmark_key": "Kľúč porovnávacieho testu",
-          "benchmark_url": "Adresa zberača"
+          "curtailment_entity": "Signál obmedzenia (binárny senzor, voliteľné)"
         },
         "data_description": {
           "production_entity": "Kumulatívny senzor energie (kWh), napr. celková výroba striedača alebo elektromera. Senzor výkonu (W) nebude fungovať: nemá dlhodobé štatistiky súčtu, takže učenie a index spoľahlivosti by zostali vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor.",
-          "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača.",
-          "benchmark_enabled": "Raz za hodinu odošle, čo táto inštalácia predpovedá, aby sa to dalo porovnať so skutočnou výrobou. Výsledky sa zverejňujú otvorene. Odosiela sa len geometria panelov, predpovedaná krivka, nameraná výroba a index spoľahlivosti: žiadne názvy entit, žiadna spotreba, žiadne iné senzory a súradnice zaokrúhlené asi na kilometer. Vypnuté, kým to nezapnete.",
-          "benchmark_key": "Zapisovací kľúč, ktorý ste dostali pri zapojení do testu. Bez neho sa nič neodosiela.",
-          "benchmark_url": "Nechajte bez zmeny, ak neprevádzkujete vlastný zberač."
+          "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača."
         }
       },
       "lines": {
@@ -105,6 +94,20 @@
           "longitude": "Zemepisná dĺžka pre túto líniu (voliteľné)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: komunitné porovnanie",
+        "description": "Otvorené meranie skutočnej presnosti Helios Forecast na reálnych inštaláciách, priebežne zverejňované. Chcete sa zapojiť? Tadiaľto: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nZískajte kľúč jedným kliknutím, bez účtu a bez mena, a vložte ho nižšie. Ak chcete všetko zastaviť, zmažte ho.",
+        "data": {
+          "benchmark_enabled": "Prispieť do verejného porovnávacieho testu presnosti (voliteľné)",
+          "benchmark_key": "Kľúč porovnávacieho testu",
+          "benchmark_url": "Adresa zberača"
+        },
+        "data_description": {
+          "benchmark_enabled": "Raz za hodinu odošle, čo táto inštalácia predpovedá, aby sa to dalo porovnať so skutočnou výrobou. Výsledky sa zverejňujú otvorene. Odosiela sa len geometria panelov, predpovedaná krivka, nameraná výroba a index spoľahlivosti: žiadne názvy entit, žiadna spotreba, žiadne iné senzory a súradnice zaokrúhlené asi na kilometer. Vypnuté, kým to nezapnete.",
+          "benchmark_key": "Zapisovací kľúč, ktorý ste dostali pri zapojení do testu. Bez neho sa nič neodosiela.",
+          "benchmark_url": "Nechajte bez zmeny, ak neprevádzkujete vlastný zberač."
         }
       }
     }

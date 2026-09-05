@@ -23,18 +23,12 @@
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
           "battery_min_soc": "Rezerva baterije, najmanjše stanje napolnjenosti (%, privzeto 10)",
           "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
-          "curtailment_entity": "Signal omejitve (binarni senzor, neobvezno)",
-          "benchmark_enabled": "Prispevaj k javni primerjavi natančnosti (izbirno)",
-          "benchmark_key": "Ključ primerjave",
-          "benchmark_url": "Naslov zbiralnika"
+          "curtailment_entity": "Signal omejitve (binarni senzor, neobvezno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
           "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
-          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika.",
-          "benchmark_enabled": "Enkrat na uro pošlje, kaj ta naprava napoveduje, da se lahko primerja z dejansko proizvodnjo. Rezultati so objavljeni javno. Poslani so le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenih drugih senzorjev, koordinate pa zaokrožene na približno kilometer. Izklopljeno, dokler tega ne vklopite.",
-          "benchmark_key": "Ključ za pisanje, ki ste ga prejeli ob pridružitvi primerjavi. Brez njega se nič ne pošlje.",
-          "benchmark_url": "Pustite nespremenjeno, razen če imate lasten zbiralnik."
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
         }
       },
       "line": {
@@ -60,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Uredi nastavitve (lokacija, razsmernik, senzor proizvodnje, baterija, signal omejitve)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Sodeluj v primerjavi skupnosti"
         }
       },
       "settings": {
@@ -78,18 +73,12 @@
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
           "battery_min_soc": "Rezerva baterije, najmanjše stanje napolnjenosti (%, privzeto 10)",
           "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
-          "curtailment_entity": "Signal omejitve (binarni senzor, neobvezno)",
-          "benchmark_enabled": "Prispevaj k javni primerjavi natančnosti (izbirno)",
-          "benchmark_key": "Ključ primerjave",
-          "benchmark_url": "Naslov zbiralnika"
+          "curtailment_entity": "Signal omejitve (binarni senzor, neobvezno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
           "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
-          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika.",
-          "benchmark_enabled": "Enkrat na uro pošlje, kaj ta naprava napoveduje, da se lahko primerja z dejansko proizvodnjo. Rezultati so objavljeni javno. Poslani so le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenih drugih senzorjev, koordinate pa zaokrožene na približno kilometer. Izklopljeno, dokler tega ne vklopite.",
-          "benchmark_key": "Ključ za pisanje, ki ste ga prejeli ob pridružitvi primerjavi. Brez njega se nič ne pošlje.",
-          "benchmark_url": "Pustite nespremenjeno, razen če imate lasten zbiralnik."
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
         }
       },
       "lines": {
@@ -105,6 +94,20 @@
           "longitude": "Zemljepisna dolžina za to linijo (izbirno)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: primerjava skupnosti",
+        "description": "Odprto merjenje dejanske natančnosti Helios Forecasta na resničnih napravah, objavljeno sproti. Želite sodelovati? Tukaj: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nPridobite ključ z enim klikom, brez računa in brez imena, in ga prilepite spodaj. Za ustavitev vsega ga izbrišite.",
+        "data": {
+          "benchmark_enabled": "Prispevaj k javni primerjavi natančnosti (izbirno)",
+          "benchmark_key": "Ključ primerjave",
+          "benchmark_url": "Naslov zbiralnika"
+        },
+        "data_description": {
+          "benchmark_enabled": "Enkrat na uro pošlje, kaj ta naprava napoveduje, da se lahko primerja z dejansko proizvodnjo. Rezultati so objavljeni javno. Poslani so le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenih drugih senzorjev, koordinate pa zaokrožene na približno kilometer. Izklopljeno, dokler tega ne vklopite.",
+          "benchmark_key": "Ključ za pisanje, ki ste ga prejeli ob pridružitvi primerjavi. Brez njega se nič ne pošlje.",
+          "benchmark_url": "Pustite nespremenjeno, razen če imate lasten zbiralnik."
         }
       }
     }

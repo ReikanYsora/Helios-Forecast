@@ -23,18 +23,12 @@
           "battery_max_discharge_kw": "Puissance de décharge max de la batterie (kW, optionnel)",
           "battery_min_soc": "Réserve batterie, état de charge minimum (%, défaut 10)",
           "battery_efficiency": "Rendement aller-retour de la batterie (%, défaut 90)",
-          "curtailment_entity": "Signal de bridage (capteur binaire, input boolean ou interrupteur, optionnel)",
-          "benchmark_enabled": "Contribuer au benchmark public de précision (optionnel)",
-          "benchmark_key": "Clé du benchmark",
-          "benchmark_url": "Adresse du collecteur de benchmark"
+          "curtailment_entity": "Signal de bridage (capteur binaire, input boolean ou interrupteur, optionnel)"
         },
         "data_description": {
           "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs.",
           "battery_soc_entity": "Renseignez la capacité et ce capteur pour activer la projection d'état de charge. La consommation de la maison vient de votre tableau de bord Énergie, aucun capteur n'est requis ici.",
-          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur.",
-          "benchmark_enabled": "Envoie une fois par heure ce que cette installation prévoit, pour le comparer à ce qu'elle a réellement produit. Les résultats sont publiés ouvertement. Seuls la géométrie de vos panneaux, la courbe prévue, la production mesurée et l'indice de fiabilité sont envoyés : aucun nom d'entité, aucune consommation, aucun autre capteur, et vos coordonnées arrondies à environ un kilomètre. Inactif tant que vous ne l'activez pas.",
-          "benchmark_key": "La clé d'écriture qui vous a été remise en rejoignant le benchmark. Rien n'est envoyé sans elle.",
-          "benchmark_url": "À laisser telle quelle, sauf si vous hébergez votre propre collecteur."
+          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur."
         }
       },
       "line": {
@@ -60,7 +54,8 @@
         "description": "Choisissez ce que vous voulez modifier.",
         "menu_options": {
           "settings": "Modifier les réglages (position, onduleur, capteur de production, batterie, signal de bridage)",
-          "lines": "Modifier les lignes de panneaux"
+          "lines": "Modifier les lignes de panneaux",
+          "benchmark": "Participer au benchmark communautaire"
         }
       },
       "settings": {
@@ -78,18 +73,12 @@
           "battery_max_discharge_kw": "Puissance de décharge max de la batterie (kW, optionnel)",
           "battery_min_soc": "Réserve batterie, état de charge minimum (%, défaut 10)",
           "battery_efficiency": "Rendement aller-retour de la batterie (%, défaut 90)",
-          "curtailment_entity": "Signal de bridage (capteur binaire, input boolean ou interrupteur, optionnel)",
-          "benchmark_enabled": "Contribuer au benchmark public de précision (optionnel)",
-          "benchmark_key": "Clé du benchmark",
-          "benchmark_url": "Adresse du collecteur de benchmark"
+          "curtailment_entity": "Signal de bridage (capteur binaire, input boolean ou interrupteur, optionnel)"
         },
         "data_description": {
           "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs.",
           "battery_soc_entity": "Renseignez la capacité et ce capteur pour activer la projection d'état de charge. La consommation de la maison vient de votre tableau de bord Énergie, aucun capteur n'est requis ici.",
-          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur.",
-          "benchmark_enabled": "Envoie une fois par heure ce que cette installation prévoit, pour le comparer à ce qu'elle a réellement produit. Les résultats sont publiés ouvertement. Seuls la géométrie de vos panneaux, la courbe prévue, la production mesurée et l'indice de fiabilité sont envoyés : aucun nom d'entité, aucune consommation, aucun autre capteur, et vos coordonnées arrondies à environ un kilomètre. Inactif tant que vous ne l'activez pas.",
-          "benchmark_key": "La clé d'écriture qui vous a été remise en rejoignant le benchmark. Rien n'est envoyé sans elle.",
-          "benchmark_url": "À laisser telle quelle, sauf si vous hébergez votre propre collecteur."
+          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur."
         }
       },
       "lines": {
@@ -105,6 +94,20 @@
           "longitude": "Longitude pour cette ligne (optionnel)",
           "remove_this_line": "Supprimer cette ligne de panneaux",
           "add_another": "Ajouter une autre ligne de panneaux"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast : benchmark communautaire",
+        "description": "Une mesure ouverte de la précision réelle d'Helios Forecast, sur de vraies installations, publiée au fur et à mesure. Vous souhaitez y participer ? Ça se passe ici : [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nRécupérez une clé en un clic, sans compte et sans nom, puis collez-la ci-dessous. Pour tout arrêter, effacez-la.",
+        "data": {
+          "benchmark_enabled": "Contribuer au benchmark public de précision (optionnel)",
+          "benchmark_key": "Clé du benchmark",
+          "benchmark_url": "Adresse du collecteur de benchmark"
+        },
+        "data_description": {
+          "benchmark_enabled": "Envoie une fois par heure ce que cette installation prévoit, pour le comparer à ce qu'elle a réellement produit. Les résultats sont publiés ouvertement. Seuls la géométrie de vos panneaux, la courbe prévue, la production mesurée et l'indice de fiabilité sont envoyés : aucun nom d'entité, aucune consommation, aucun autre capteur, et vos coordonnées arrondies à environ un kilomètre. Inactif tant que vous ne l'activez pas.",
+          "benchmark_key": "La clé d'écriture qui vous a été remise en rejoignant le benchmark. Rien n'est envoyé sans elle.",
+          "benchmark_url": "À laisser telle quelle, sauf si vous hébergez votre propre collecteur."
         }
       }
     }

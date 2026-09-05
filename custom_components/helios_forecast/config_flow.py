@@ -185,11 +185,20 @@ def _settings_fields(
     # Curtailment signal: on while the inverter is held back for a reason the sky cannot explain, so those
     # hours are not learned as low production (zero export, grid limits; a full battery is detected without it).
     _optional(fields, CONF_CURTAILMENT_ENTITY, _CURTAIL_ENTITY, s.get(CONF_CURTAILMENT_ENTITY))
-    # Benchmark upload, off unless deliberately switched on and given a key. What it sends, and why it
-    # has to be sent at the moment it is predicted rather than reconstructed later, is in benchmark.py.
-    fields[vol.Optional(CONF_BENCHMARK_ENABLED, default=bool(s.get(CONF_BENCHMARK_ENABLED, False)))] = _BOOL
-    _optional(fields, CONF_BENCHMARK_KEY, _SECRET, s.get(CONF_BENCHMARK_KEY))
-    _optional(fields, CONF_BENCHMARK_URL, _TEXT, s.get(CONF_BENCHMARK_URL, DEFAULT_ENDPOINT))
+    return fields
+
+
+def _benchmark_fields(settings: dict[str, Any]) -> dict[Any, Any]:
+    """Taking part in the public benchmark: the switch, the key, and where to send it.
+
+    Off unless deliberately switched on and given a key. What it sends, and why it has to be sent at
+    the moment it is predicted rather than reconstructed later, is in benchmark.py.
+    """
+    fields: dict[Any, Any] = {
+        vol.Optional(CONF_BENCHMARK_ENABLED, default=bool(settings.get(CONF_BENCHMARK_ENABLED, False))): _BOOL
+    }
+    _optional(fields, CONF_BENCHMARK_KEY, _SECRET, settings.get(CONF_BENCHMARK_KEY))
+    _optional(fields, CONF_BENCHMARK_URL, _TEXT, settings.get(CONF_BENCHMARK_URL, DEFAULT_ENDPOINT))
     return fields
 
 
@@ -256,7 +265,7 @@ class HeliosForecastOptionsFlow(OptionsFlow):
         return {**self.config_entry.data, **self.config_entry.options}
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        return self.async_show_menu(step_id="init", menu_options=["settings", "lines"])
+        return self.async_show_menu(step_id="init", menu_options=["settings", "lines", "benchmark"])
 
     async def async_step_settings(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Edit the entry-level settings, keeping the existing panel lines untouched."""
@@ -266,6 +275,19 @@ class HeliosForecastOptionsFlow(OptionsFlow):
             return self.async_create_entry(title="", data=data)
         schema = vol.Schema(_settings_fields(self.hass.config.latitude, self.hass.config.longitude, settings=current))
         return self.async_show_form(step_id="settings", data_schema=schema)
+
+    async def async_step_benchmark(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Join the community benchmark, or leave it.
+
+        A menu of its own rather than a few fields at the bottom of the settings: taking part is a
+        decision, not a setting, and someone who has never heard of it should be able to find out
+        what it is without reading a form.
+        """
+        current = self._current()
+        if user_input is not None:
+            settings = {**split_settings(current), **split_settings(user_input)}
+            return self.async_create_entry(title="", data=merge_entry_data(settings, lines_from_config(current)))
+        return self.async_show_form(step_id="benchmark", data_schema=vol.Schema(_benchmark_fields(current)))
 
     async def async_step_lines(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Walk the existing lines (edit / remove each), then optionally append new ones."""

@@ -23,18 +23,12 @@
           "battery_max_discharge_kw": "Maks. akumuliatoriaus iškrovimo galia (kW, neprivaloma)",
           "battery_min_soc": "Akumuliatoriaus rezervas, minimali įkrova (%, numatytoji 10)",
           "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)",
-          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, neprivaloma)",
-          "benchmark_enabled": "Prisidėti prie viešojo tikslumo palyginimo (neprivaloma)",
-          "benchmark_key": "Palyginimo raktas",
-          "benchmark_url": "Rinktuvo adresas"
+          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, neprivaloma)"
         },
         "data_description": {
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
           "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
-          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą.",
-          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tikrąja gamyba. Rezultatai skelbiami viešai. Siunčiama tik plokščių geometrija, prognozuota kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokių kitų jutiklių, o koordinatės suapvalintos maždaug iki kilometro. Išjungta, kol neįjungsite.",
-          "benchmark_key": "Rašymo raktas, gautas prisijungiant prie palyginimo. Be jo nieko nesiunčiama.",
-          "benchmark_url": "Palikite kaip yra, nebent turite savo rinktuvą."
+          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą."
         }
       },
       "line": {
@@ -60,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Redaguoti nustatymus (vieta, inverteris, gamybos jutiklis, baterija, ribojimo signalas)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Dalyvauti bendruomenės palyginime"
         }
       },
       "settings": {
@@ -78,18 +73,12 @@
           "battery_max_discharge_kw": "Maks. akumuliatoriaus iškrovimo galia (kW, neprivaloma)",
           "battery_min_soc": "Akumuliatoriaus rezervas, minimali įkrova (%, numatytoji 10)",
           "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)",
-          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, neprivaloma)",
-          "benchmark_enabled": "Prisidėti prie viešojo tikslumo palyginimo (neprivaloma)",
-          "benchmark_key": "Palyginimo raktas",
-          "benchmark_url": "Rinktuvo adresas"
+          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, neprivaloma)"
         },
         "data_description": {
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
           "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
-          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą.",
-          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tikrąja gamyba. Rezultatai skelbiami viešai. Siunčiama tik plokščių geometrija, prognozuota kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokių kitų jutiklių, o koordinatės suapvalintos maždaug iki kilometro. Išjungta, kol neįjungsite.",
-          "benchmark_key": "Rašymo raktas, gautas prisijungiant prie palyginimo. Be jo nieko nesiunčiama.",
-          "benchmark_url": "Palikite kaip yra, nebent turite savo rinktuvą."
+          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą."
         }
       },
       "lines": {
@@ -105,6 +94,20 @@
           "longitude": "Ilguma šiai linijai (neprivaloma)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: bendruomenės palyginimas",
+        "description": "Atviras matavimas, kiek Helios Forecast iš tikrųjų tikslus, tikrose sistemose, skelbiamas nuolat. Norite dalyvauti? Štai čia: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nGaukite raktą vienu paspaudimu, be paskyros ir be vardo, ir įklijuokite jį žemiau. Norėdami viską sustabdyti, jį ištrinkite.",
+        "data": {
+          "benchmark_enabled": "Prisidėti prie viešojo tikslumo palyginimo (neprivaloma)",
+          "benchmark_key": "Palyginimo raktas",
+          "benchmark_url": "Rinktuvo adresas"
+        },
+        "data_description": {
+          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tikrąja gamyba. Rezultatai skelbiami viešai. Siunčiama tik plokščių geometrija, prognozuota kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokių kitų jutiklių, o koordinatės suapvalintos maždaug iki kilometro. Išjungta, kol neįjungsite.",
+          "benchmark_key": "Rašymo raktas, gautas prisijungiant prie palyginimo. Be jo nieko nesiunčiama.",
+          "benchmark_url": "Palikite kaip yra, nebent turite savo rinktuvą."
         }
       }
     }

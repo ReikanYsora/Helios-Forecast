@@ -23,18 +23,12 @@
           "battery_max_discharge_kw": "Potenza massima di scarica della batteria (kW, opzionale)",
           "battery_min_soc": "Riserva della batteria, stato di carica minimo (%, predefinito 10)",
           "battery_efficiency": "Efficienza di andata e ritorno della batteria (%, predefinito 90)",
-          "curtailment_entity": "Segnale di limitazione (sensore binario, opzionale)",
-          "benchmark_enabled": "Contribuire al benchmark pubblico di precisione (facoltativo)",
-          "benchmark_key": "Chiave del benchmark",
-          "benchmark_url": "Indirizzo del raccoglitore"
+          "curtailment_entity": "Segnale di limitazione (sensore binario, opzionale)"
         },
         "data_description": {
           "production_entity": "Un sensore di energia cumulativa (kWh), ad es. la produzione totale dell'inverter o del contatore. Un sensore di potenza (W) non funzionerà: non ha statistiche di somma a lungo termine, quindi l'apprendimento e l'indice di affidabilità resterebbero inattivi.",
           "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore.",
-          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter.",
-          "benchmark_enabled": "Invia una volta all'ora ciò che questo impianto prevede, per confrontarlo con quanto ha realmente prodotto. I risultati sono pubblicati apertamente. Vengono inviati solo la geometria dei pannelli, la curva prevista, la produzione misurata e l'indice di affidabilità: nessun nome di entità, nessun consumo, nessun altro sensore, e le coordinate arrotondate a circa un chilometro. Disattivato finché non lo attivate.",
-          "benchmark_key": "La chiave di scrittura ricevuta aderendo al benchmark. Senza di essa non viene inviato nulla.",
-          "benchmark_url": "Lasciare invariato, a meno che non gestiate un raccoglitore vostro."
+          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter."
         }
       },
       "line": {
@@ -60,7 +54,8 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Modifica impostazioni (posizione, inverter, sensore di produzione, batteria, segnale di limitazione)",
-          "lines": "Edit panel lines"
+          "lines": "Edit panel lines",
+          "benchmark": "Partecipare al benchmark della comunità"
         }
       },
       "settings": {
@@ -78,18 +73,12 @@
           "battery_max_discharge_kw": "Potenza massima di scarica della batteria (kW, opzionale)",
           "battery_min_soc": "Riserva della batteria, stato di carica minimo (%, predefinito 10)",
           "battery_efficiency": "Efficienza di andata e ritorno della batteria (%, predefinito 90)",
-          "curtailment_entity": "Segnale di limitazione (sensore binario, opzionale)",
-          "benchmark_enabled": "Contribuire al benchmark pubblico di precisione (facoltativo)",
-          "benchmark_key": "Chiave del benchmark",
-          "benchmark_url": "Indirizzo del raccoglitore"
+          "curtailment_entity": "Segnale di limitazione (sensore binario, opzionale)"
         },
         "data_description": {
           "production_entity": "Un sensore di energia cumulativa (kWh), ad es. la produzione totale dell'inverter o del contatore. Un sensore di potenza (W) non funzionerà: non ha statistiche di somma a lungo termine, quindi l'apprendimento e l'indice di affidabilità resterebbero inattivi.",
           "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore.",
-          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter.",
-          "benchmark_enabled": "Invia una volta all'ora ciò che questo impianto prevede, per confrontarlo con quanto ha realmente prodotto. I risultati sono pubblicati apertamente. Vengono inviati solo la geometria dei pannelli, la curva prevista, la produzione misurata e l'indice di affidabilità: nessun nome di entità, nessun consumo, nessun altro sensore, e le coordinate arrotondate a circa un chilometro. Disattivato finché non lo attivate.",
-          "benchmark_key": "La chiave di scrittura ricevuta aderendo al benchmark. Senza di essa non viene inviato nulla.",
-          "benchmark_url": "Lasciare invariato, a meno che non gestiate un raccoglitore vostro."
+          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter."
         }
       },
       "lines": {
@@ -105,6 +94,20 @@
           "longitude": "Longitudine per questa linea (opzionale)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: benchmark della comunità",
+        "description": "Una misura aperta della precisione reale di Helios Forecast, su impianti veri, pubblicata via via. Volete partecipare? Si passa di qui: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nOttenete una chiave con un clic, senza account e senza nome, poi incollatela qui sotto. Per fermare tutto, cancellatela.",
+        "data": {
+          "benchmark_enabled": "Contribuire al benchmark pubblico di precisione (facoltativo)",
+          "benchmark_key": "Chiave del benchmark",
+          "benchmark_url": "Indirizzo del raccoglitore"
+        },
+        "data_description": {
+          "benchmark_enabled": "Invia una volta all'ora ciò che questo impianto prevede, per confrontarlo con quanto ha realmente prodotto. I risultati sono pubblicati apertamente. Vengono inviati solo la geometria dei pannelli, la curva prevista, la produzione misurata e l'indice di affidabilità: nessun nome di entità, nessun consumo, nessun altro sensore, e le coordinate arrotondate a circa un chilometro. Disattivato finché non lo attivate.",
+          "benchmark_key": "La chiave di scrittura ricevuta aderendo al benchmark. Senza di essa non viene inviato nulla.",
+          "benchmark_url": "Lasciare invariato, a meno che non gestiate un raccoglitore vostro."
         }
       }
     }
