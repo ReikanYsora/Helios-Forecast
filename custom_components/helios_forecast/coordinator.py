@@ -323,7 +323,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # conditions into the future points and attach the P10/P90 uncertainty band. Reuses the same
         # production history fetched for the residual map.
         analog_library = await self.hass.async_add_executor_job(
-            build_library, self._production_buckets, weather, lat, lon
+            build_library, self._production_buckets, weather, lat, lon, layout, cap
         )
         points = await self.hass.async_add_executor_job(enrich_points, points, analog_library, weather, lat, lon, now)
         # The live series keeps its elapsed points raw on purpose (what the forecast said at the time), but the

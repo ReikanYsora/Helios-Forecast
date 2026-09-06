@@ -34,6 +34,25 @@ The community benchmark answers each upload with its verdict on the installation
 and an installation it keeps out of the published figures now learns why from a
 repair of its own instead of from the website.
 
+### Changed: the analog ensemble reads ratios, not watts
+
+The second stage of the learning looks up past hours whose sun position and cloud
+cover resemble the hour being forecast, and until now took the median of what the
+installation produced in those hours, in watts. The public benchmark's first two
+days showed the flaw across the fleet: on clear mornings the forecast ran half
+below the meter, because the nearest analogs of a September morning, at the same
+sun altitude, are July hours at a more northerly azimuth where a south roof made
+less. The ensemble now stores each analog as the ratio of what the site produced
+to what the physical model said for that same hour, and applies the median ratio
+to today's physics: the geometry difference is the physics' business, the analog
+only says how the site departs from it (shading, soiling, an orientation a few
+degrees off). The learned ceiling and the P10/P90 band follow the same rule.
+
+Replayed on thirty days of one installation with the archived weather, the hourly
+error falls from 53 to 46 W per kWp, the error on the day's energy from 11.1 % to
+7.3 %, and the band still holds 91 % of the hours for a target of 80. A library
+without a physical model for its hours (no layout yet) keeps reading watts.
+
 ### Fixed: a consumption source with gaps no longer dilutes the learned profile
 
 The home consumption profile behind the battery projection summed every Energy

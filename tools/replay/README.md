@@ -11,3 +11,5 @@ weather error is out of the picture on purpose. What this measures is the learni
 `replay.py` carries the installation's layout as constants; edit them for another roof. `data/`
 stays out of git. Variants of the analog step live in `replay.py` so a change to the learning is
 measured on sixty days before it is written into the integration.
+
+`pipeline actuel` is the integration's own path (ratio analogs since 2026.9.3); `pipeline 2026.9.2 (watts)` keeps the previous watts library for comparison.

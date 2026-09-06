@@ -192,8 +192,11 @@ over-predicted.
 
 Then it stops trusting the physics alone. It learns a correction from your home's
 own recorded production, matching past hours on cloud cover, sun geometry and
-outdoor temperature. Over time the prediction absorbs what no generic model can
-know about your site: shading, soiling, an orientation that is a few degrees off.
+outdoor temperature, and reading each of them as the ratio between what your
+installation made and what the physics said it would, so that today's geometry
+stays the physics' business and the history only says how your site departs from
+it. Over time the prediction absorbs what no generic model can know about your
+site: shading, soiling, an orientation that is a few degrees off.
 
 What it does not learn is your hardware's limits. An hour where the inverter was
 held back, by a full battery, a zero-export rule or a grid limit, says nothing
