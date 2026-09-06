@@ -143,5 +143,139 @@
         }
       }
     }
+  },
+  "issues": {
+    "location_invalid": {
+      "title": "Atrašanās vieta ārpus pieļaujamā diapazona",
+      "description": "{entry} atrašanās vieta ({latitude}, {longitude}) nav derīgs platums un garums. Platums ir no -90 līdz 90, garums no -180 līdz 180; atstājiet abus laukus tukšus, lai izmantotu Home Assistant mājas."
+    },
+    "location_far": {
+      "title": "Atrašanās vieta tālu no jūsu Home Assistant mājām",
+      "description": "{entry} atrašanās vieta ir {km} km no Home Assistant mājām. Ja iekārta tiešām ir tur, ignorējiet to; citādi pārbaudiet platuma vai garuma decimālciparu."
+    },
+    "no_lines": {
+      "title": "Nav paneļu rindas",
+      "description": "{entry} nav nevienas paneļu rindas, tāpēc nav ko prognozēt. Pievienojiet vismaz vienu rindu ar slīpumu, azimutu un maksimālo jaudu."
+    },
+    "line_kwp_missing": {
+      "title": "Rinda {line}: trūkst maksimālās jaudas",
+      "description": "{entry} rindai {line} nav maksimālās jaudas vai tā ir nulle. Bez tās visi skaitļi paliek nulle. Ievadiet rindas maksimālo jaudu kWp (piemēram, 3,6 3600 Wp vietā)."
+    },
+    "line_kwp_unit": {
+      "title": "Rinda {line}: maksimālā jauda izskatās kā vati",
+      "description": "{entry} rinda {line} norāda {kwp} kWp, kas ir tālu pāri mājas iekārtai. Vērtība, visticamāk, ievadīta vatos. Ievadiet to kilovatos maksimālās jaudas (piemēram, 4,05, nevis 4050)."
+    },
+    "line_tilt": {
+      "title": "Rinda {line}: slīpums ārpus diapazona",
+      "description": "{entry} rindas {line} slīpums ir {tilt} grādi. Slīpums ir no 0 (horizontāli) līdz 90 (vertikāli)."
+    },
+    "line_azimuth": {
+      "title": "Rinda {line}: azimuts ārpus diapazona",
+      "description": "{entry} rindas {line} azimuts ir {azimuth} grādi. Azimuts ir no 0 līdz 360 pulksteņrādītāja virzienā no ziemeļiem: 90 ir austrumi, 180 dienvidi, 270 rietumi."
+    },
+    "line_tracker": {
+      "title": "Rinda {line}: nezināms izsekotāja tips",
+      "description": "{entry} rinda {line} norāda {tracker} tipa izsekotāju, kuru šī integrācija nepazīst. Izvēlieties vienu no piedāvātajiem tipiem vai nevienu fiksētiem paneļiem."
+    },
+    "line_location_invalid": {
+      "title": "Rinda {line}: koordinātas ārpus diapazona",
+      "description": "{entry} rindas {line} koordinātas nav derīgs platums un garums. Izlabojiet tās vai atstājiet abus laukus tukšus, lai rinda būtu iekārtas atrašanās vietā."
+    },
+    "line_location_far": {
+      "title": "Rinda {line}: koordinātas tālu no iekārtas",
+      "description": "{entry} rinda {line} atrodas {km} km no iekārtas. Paneļi tālā laukā ir iespējami, nepareizs decimālcipars ir ticamāks; pārbaudiet rindas platumu un garumu."
+    },
+    "line_cap_unit": {
+      "title": "Rinda {line}: invertora robeža izskatās kā vati",
+      "description": "{entry} rindas {line} invertora robeža ir {cap} kW {kwp} kWp paneļiem. Robeža, visticamāk, ievadīta vatos. Ievadiet to kilovatos."
+    },
+    "inverter_cap_unit": {
+      "title": "Invertora robeža izskatās kā vati",
+      "description": "{entry} invertora robeža ir {cap} kW {kwp} kWp paneļiem. Robeža, visticamāk, ievadīta vatos. Ievadiet to kilovatos (piemēram, 5, nevis 5000)."
+    },
+    "inverter_cap_low": {
+      "title": "Invertora robeža krietni zem paneļiem",
+      "description": "{entry} invertora robeža ir {cap} kW {kwp} kWp paneļiem, tāpēc prognoze tiks apcirpta lielāko dienas daļu. Ja robeža ir pareiza, ignorējiet to; citādi pārbaudiet vērtību vai tās vienību."
+    },
+    "production_entity_unset": {
+      "title": "Nav ražošanas sensora: prognoze nevar mācīties",
+      "description": "{entry} nav ražošanas sensora. Prognoze darbojas pēc fizikas un laikapstākļiem, bet nekas to nekoriģē pēc tā, ko jūsu paneļi patiešām dod. Iestatījumos izvēlieties invertora vai skaitītāja uzkrātās enerģijas sensoru (kWh)."
+    },
+    "trend_anchor_hour": {
+      "title": "Tendences atskaites stunda ārpus diapazona",
+      "description": "{entry} tendences atskaites stunda ir {hour}. Ievadiet vietējo stundu no 0 līdz 23."
+    },
+    "battery_soc_entity_unset": {
+      "title": "Akumulators: ietilpība iestatīta, bet nav uzlādes līmeņa sensora",
+      "description": "{entry} norāda {capacity} kWh akumulatoru, bet nevienu uzlādes līmeņa sensoru, tāpēc projekcija paliek izslēgta. Izvēlieties akumulatora uzlādes līmeņa sensoru (%) vai dzēsiet ietilpību."
+    },
+    "battery_capacity_unset": {
+      "title": "Akumulators: uzlādes līmeņa sensors iestatīts, bet nav ietilpības",
+      "description": "{entry} norāda uzlādes līmeņa sensoru, bet ne lietderīgo ietilpību, tāpēc projekcija paliek izslēgta. Ievadiet akumulatora lietderīgo ietilpību kWh vai dzēsiet sensoru."
+    },
+    "battery_capacity": {
+      "title": "Akumulatora ietilpība ārpus diapazona",
+      "description": "{entry} norāda {capacity} kWh akumulatoru, kas nav mājas akumulators. Ievadiet lietderīgo ietilpību kilovatstundās (piemēram, 10, nevis 10000)."
+    },
+    "battery_power": {
+      "title": "Neticama akumulatora uzlādes vai izlādes jauda",
+      "description": "{entry} norāda {power} kW akumulatora jaudu {capacity} kWh ietilpībai, vairāk nekā trīs reizes ietilpība stundā. Pārbaudiet vērtību un tās vienību (kW, nevis W)."
+    },
+    "battery_min_soc": {
+      "title": "Akumulatora rezerve ārpus diapazona",
+      "description": "{entry} minimālais uzlādes līmenis ir {value}. Ievadiet procentus no 0 līdz 100."
+    },
+    "battery_efficiency": {
+      "title": "Akumulatora lietderības koeficients ārpus diapazona",
+      "description": "{entry} pilna cikla lietderības koeficients ir {value}. Ievadiet procentus no 50 līdz 100 (lielākā daļa mājas akumulatoru ir ap 90)."
+    },
+    "benchmark_key": {
+      "title": "Salīdzinošās novērtēšanas atslēga neizskatās pēc atslēgas",
+      "description": "{entry} piedalās kopienas salīdzinošajā novērtēšanā, bet tā atslēga nav savācēja izdota atslēga. Ielīmējiet visu atslēgu no helios-ha.org/benchmark vai izslēdziet salīdzinošo novērtēšanu."
+    },
+    "production_entity_missing": {
+      "title": "Ražošanas sensors nav atrasts",
+      "description": "{entry} ražošanas sensors {entity} neeksistē. Prognoze darbojas bez korekcijas, līdz tas parādās. Pārbaudiet entītijas ID vai vēlreiz izvēlieties sensoru iestatījumos."
+    },
+    "production_entity_kind": {
+      "title": "Ražošanas sensors nav uzkrātās enerģijas sensors",
+      "description": "{entry} ražošanas sensors {entity} ziņo {unit} ar stāvokļa klasi {state_class}. Mācībām nepieciešams uzkrātās enerģijas sensors kWh (stāvokļa klase total vai total_increasing), nevis jaudas sensors. Izvēlieties invertora vai skaitītāja enerģijas summu; palīgs Integrālis no jaudas sensora izveido šādu sensoru."
+    },
+    "battery_soc_entity_missing": {
+      "title": "Akumulatora uzlādes līmeņa sensors nav atrasts",
+      "description": "{entry} akumulatora sensors {entity} neeksistē, tāpēc projekcija paliek izslēgta. Pārbaudiet entītijas ID vai vēlreiz izvēlieties sensoru."
+    },
+    "battery_soc_entity_unit": {
+      "title": "Akumulatora sensors nav procenti",
+      "description": "{entry} akumulatora sensors {entity} ziņo {unit}. Projekcijai nepieciešams uzlādes līmenis procentos."
+    },
+    "curtailment_entity_missing": {
+      "title": "Ierobežojuma signāls nav atrasts",
+      "description": "{entry} ierobežojuma signāls {entity} neeksistē. Stundas, kad invertors tiek ierobežots, tad tiek apgūtas kā sliktas debesis. Pārbaudiet entītijas ID vai iztukšojiet lauku."
+    },
+    "production_history_empty": {
+      "title": "Ražošanas sensoram vēl nav vēstures",
+      "description": "{entity}, {entry} ražošanas sensoram, vēl nav ilgtermiņa statistikas. Mācības sākas, tiklīdz ierakstītājam ir dažas stundas; ja tas turpinās pēc dienas, sensors nav uzkrātās enerģijas sensors."
+    },
+    "production_at_night": {
+      "title": "Ražošanas sensors skaita naktī",
+      "description": "{entity}, {entry} ražošanas sensors, reģistrēja {kwh} kWh, kad saule bija dziļi zem horizonta. Paneļi naktī neko neražo, tāpēc šis sensors mēra vairāk nekā paneļus (tīkla vai mājas skaitītājs). Izvēlieties sensoru, kas skaita tikai invertora izeju."
+    },
+    "production_above_panels": {
+      "title": "Ražošana pārsniedz to, ko norādītie paneļi var dot",
+      "description": "{entity}, {entry} ražošanas sensors, vairākas reizes sasniedza {kw} kW ar {kwp} kWp norādītajiem paneļiem. Vai nu maksimālā jauda ir par mazu, vai sensors skaita vairāk nekā paneļus. Pārbaudiet abus."
+    },
+    "production_stale": {
+      "title": "Ražošana nav reģistrēta {days} dienas",
+      "description": "{entity}, {entry} ražošanas sensors, nav pieaudzis {days} dienas. Sniegs vai bojājums to var izskaidrot; ja paneļi ražo, sensors ir pārstājis ziņot un mācības badojas."
+    },
+    "consumption_source_sparse": {
+      "title": "Patēriņa avots {source} ziņo ar pārtraukumiem",
+      "description": "Enerģijas panelī {source} ir dati par {pct} % stundu, kuras aptver labākais avots ({best} %). Patēriņa profils tiek veidots tikai no stundām, kuras tas aptver, tāpēc paliek pareizs, bet balstās uz mazāku vēsturi. Uzticamāks šīs plūsmas sensors padara akumulatora projekciju precīzāku."
+    },
+    "benchmark_excluded": {
+      "title": "Izslēgta no salīdzinošās novērtēšanas skaitļiem ({reason})",
+      "description": "Kopienas salīdzinošā novērtēšana saņem {entry} sūtījumus, bet tur tos ārpus publicētajiem skaitļiem. Iemesls {reason}: kwp nozīmē, ka norādītā maksimālā jauda trūkst, ir nulle vai ievadīta vatos; night nozīmē, ka ražošanas sensors reģistrē enerģiju naktī, tātad mēra vairāk nekā paneļus. Izlabojiet konfigurāciju, un iekārta dienas laikā tiks skaitīta atkal."
+    }
   }
 }

@@ -148,11 +148,13 @@ def build_payload(
     }
 
 
-async def async_upload(session: Any, url: str, key: str, payload: Dict[str, Any]) -> bool:
-    """Post one emission. True when the collector accepted it.
+async def async_upload(session: Any, url: str, key: str, payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Post one emission. The collector's answer (a dict) when it accepted it, None otherwise.
 
-    Swallows everything: an upload is never a reason for a forecast to fail, and the caller
-    has nothing useful to do with the error beyond leaving it in the debug log.
+    The answer carries `quality`, the collector's verdict on this installation (excluded from the
+    public figures, and why), which the check-up turns into a repair issue. Swallows everything
+    else: an upload is never a reason for a forecast to fail, and the caller has nothing useful to
+    do with the error beyond leaving it in the debug log.
     """
     try:
         async with asyncio.timeout(_TIMEOUT_S):
@@ -163,8 +165,12 @@ async def async_upload(session: Any, url: str, key: str, payload: Dict[str, Any]
             ) as response:
                 if response.status >= 400:
                     _LOGGER.debug("Benchmark upload refused with status %s", response.status)
-                    return False
-                return True
+                    return None
+                try:
+                    answer = await response.json(content_type=None)
+                except Exception:  # noqa: BLE001 - an empty or odd body is still an accepted upload
+                    answer = {}
+                return answer if isinstance(answer, dict) else {}
     except Exception as err:  # noqa: BLE001 - best effort by design, see the module docstring
         _LOGGER.debug("Benchmark upload failed: %s", err)
-        return False
+        return None

@@ -143,5 +143,139 @@
         }
       }
     }
+  },
+  "issues": {
+    "location_invalid": {
+      "title": "A helyzet a megengedett tartományon kívül esik",
+      "description": "A(z) {entry} helyzete ({latitude}, {longitude}) nem érvényes szélesség és hosszúság. A szélesség -90 és 90, a hosszúság -180 és 180 között van; hagyja üresen mindkét mezőt a Home Assistant otthonának használatához."
+    },
+    "location_far": {
+      "title": "A helyzet messze van a Home Assistant otthonától",
+      "description": "A(z) {entry} helyzete {km} km-re van a Home Assistant otthonától. Ha a rendszer valóban ott van, hagyja figyelmen kívül; ellenkező esetben ellenőrizze a szélesség vagy a hosszúság egy tizedesjegyét."
+    },
+    "no_lines": {
+      "title": "Nincs panelsor",
+      "description": "A(z) {entry} nem tartalmaz panelsort, így nincs mit előrejelezni. Adjon hozzá legalább egy sort dőlésszöggel, azimuttal és csúcsteljesítménnyel."
+    },
+    "line_kwp_missing": {
+      "title": "{line}. sor: hiányzik a csúcsteljesítmény",
+      "description": "A(z) {entry} {line}. sorának nincs csúcsteljesítménye, vagy nulla. Nélküle minden szám nulla marad. Adja meg a sor csúcsteljesítményét kWp-ben (például 3,6 a 3600 Wp-hez)."
+    },
+    "line_kwp_unit": {
+      "title": "{line}. sor: a csúcsteljesítmény wattnak tűnik",
+      "description": "A(z) {entry} {line}. sora {kwp} kWp-t ad meg, ami messze meghaladja egy otthoni rendszerét. Az értéket nagy valószínűséggel wattban adták meg. Adja meg kilowatt-csúcsban (például 4,05 a 4050 helyett)."
+    },
+    "line_tilt": {
+      "title": "{line}. sor: a dőlésszög tartományon kívül",
+      "description": "A(z) {entry} {line}. sorának dőlésszöge {tilt} fok. A dőlésszög 0 (vízszintes) és 90 (függőleges) között van."
+    },
+    "line_azimuth": {
+      "title": "{line}. sor: az azimut tartományon kívül",
+      "description": "A(z) {entry} {line}. sorának azimutja {azimuth} fok. Az azimut 0 és 360 között van, északtól az óramutató járásával megegyezően: 90 a kelet, 180 a dél, 270 a nyugat."
+    },
+    "line_tracker": {
+      "title": "{line}. sor: ismeretlen napkövető típus",
+      "description": "A(z) {entry} {line}. sora {tracker} típusú napkövetőt ad meg, amelyet ez az integráció nem ismer. Válasszon a felkínált típusok közül, vagy egyet sem rögzített panelekhez."
+    },
+    "line_location_invalid": {
+      "title": "{line}. sor: a koordináták tartományon kívül",
+      "description": "A(z) {entry} {line}. sorának koordinátái nem érvényes szélesség és hosszúság. Javítsa őket, vagy hagyja üresen mindkét mezőt, hogy a sor a rendszer helyére kerüljön."
+    },
+    "line_location_far": {
+      "title": "{line}. sor: a koordináták messze vannak a rendszertől",
+      "description": "A(z) {entry} {line}. sora {km} km-re van a rendszertől. Panelek egy távoli mezőn lehetségesek, egy rossz tizedesjegy valószínűbb; ellenőrizze a sor szélességét és hosszúságát."
+    },
+    "line_cap_unit": {
+      "title": "{line}. sor: az inverterkorlát wattnak tűnik",
+      "description": "A(z) {entry} {line}. sorának inverterkorlátja {cap} kW {kwp} kWp panelhez. A korlátot nagy valószínűséggel wattban adták meg. Adja meg kilowattban."
+    },
+    "inverter_cap_unit": {
+      "title": "Az inverterkorlát wattnak tűnik",
+      "description": "A(z) {entry} inverterkorlátja {cap} kW {kwp} kWp panelhez. A korlátot nagy valószínűséggel wattban adták meg. Adja meg kilowattban (például 5 az 5000 helyett)."
+    },
+    "inverter_cap_low": {
+      "title": "Az inverterkorlát jóval a panelek alatt van",
+      "description": "A(z) {entry} inverterkorlátja {cap} kW {kwp} kWp panelhez, így az előrejelzést a nap nagy részében levágja. Ha a korlát helyes, hagyja figyelmen kívül; ellenkező esetben ellenőrizze az értéket vagy a mértékegységét."
+    },
+    "production_entity_unset": {
+      "title": "Nincs termelésérzékelő: az előrejelzés nem tud tanulni",
+      "description": "A(z) {entry} nem rendelkezik termelésérzékelővel. Az előrejelzés fizikán és időjáráson fut, de semmi sem igazítja ahhoz, amit a panelek valóban termelnek. Válassza ki a beállításokban az inverter vagy a mérő halmozott energiaérzékelőjét (kWh)."
+    },
+    "trend_anchor_hour": {
+      "title": "A trend referenciaórája tartományon kívül",
+      "description": "A(z) {entry} trend-referenciaórája {hour}. Adjon meg 0 és 23 közötti helyi órát."
+    },
+    "battery_soc_entity_unset": {
+      "title": "Akkumulátor: kapacitás megadva, de nincs töltöttségérzékelő",
+      "description": "A(z) {entry} {capacity} kWh-s akkumulátort ad meg, de töltöttségérzékelőt nem, így a vetítés kikapcsolva marad. Válassza ki az akkumulátor töltöttségérzékelőjét (%-ban), vagy törölje a kapacitást."
+    },
+    "battery_capacity_unset": {
+      "title": "Akkumulátor: töltöttségérzékelő megadva, de nincs kapacitás",
+      "description": "A(z) {entry} töltöttségérzékelőt nevez meg, de hasznos kapacitást nem, így a vetítés kikapcsolva marad. Adja meg az akkumulátor hasznos kapacitását kWh-ban, vagy törölje az érzékelőt."
+    },
+    "battery_capacity": {
+      "title": "Az akkumulátor kapacitása tartományon kívül",
+      "description": "A(z) {entry} {capacity} kWh-s akkumulátort ad meg, ami nem otthoni akkumulátor. Adja meg a hasznos kapacitást kilowattórában (például 10 a 10000 helyett)."
+    },
+    "battery_power": {
+      "title": "Valószínűtlen akkumulátor-töltési vagy -kisütési teljesítmény",
+      "description": "A(z) {entry} {power} kW akkumulátor-teljesítményt ad meg {capacity} kWh kapacitáshoz, ami óránként a kapacitás több mint háromszorosa. Ellenőrizze az értéket és a mértékegységét (kW, nem W)."
+    },
+    "battery_min_soc": {
+      "title": "Az akkumulátortartalék tartományon kívül",
+      "description": "A(z) {entry} minimális töltöttsége {value}. Adjon meg 0 és 100 közötti százalékot."
+    },
+    "battery_efficiency": {
+      "title": "Az akkumulátor hatásfoka tartományon kívül",
+      "description": "A(z) {entry} oda-vissza hatásfoka {value}. Adjon meg 50 és 100 közötti százalékot (a legtöbb otthoni akkumulátor 90 körül van)."
+    },
+    "benchmark_key": {
+      "title": "A benchmark kulcsa nem tűnik kulcsnak",
+      "description": "A(z) {entry} részt vesz a közösségi benchmarkban, de a kulcsa nem a gyűjtő által kiadott kulcs. Illessze be a teljes kulcsot a helios-ha.org/benchmark oldalról, vagy kapcsolja ki a benchmarkot."
+    },
+    "production_entity_missing": {
+      "title": "A termelésérzékelő nem található",
+      "description": "A(z) {entry} termelésérzékelője, {entity}, nem létezik. Az előrejelzés korrekció nélkül fut, amíg meg nem jelenik. Ellenőrizze az entitásazonosítót, vagy válassza ki újra az érzékelőt a beállításokban."
+    },
+    "production_entity_kind": {
+      "title": "A termelésérzékelő nem halmozott energiaérzékelő",
+      "description": "A(z) {entry} termelésérzékelője, {entity}, {unit} egységben jelent {state_class} állapotosztállyal. A tanuláshoz halmozott energiaérzékelő kell kWh-ban (total vagy total_increasing állapotosztály), nem teljesítményérzékelő. Válassza az inverter vagy a mérő energiaösszegét; az Integrál segéd egy teljesítményérzékelőből ilyet készít."
+    },
+    "battery_soc_entity_missing": {
+      "title": "Az akkumulátor töltöttségérzékelője nem található",
+      "description": "A(z) {entry} akkumulátorérzékelője, {entity}, nem létezik, így a vetítés kikapcsolva marad. Ellenőrizze az entitásazonosítót, vagy válassza ki újra az érzékelőt."
+    },
+    "battery_soc_entity_unit": {
+      "title": "Az akkumulátorérzékelő nem százalék",
+      "description": "A(z) {entry} akkumulátorérzékelője, {entity}, {unit} egységben jelent. A vetítésnek százalékban kell a töltöttség."
+    },
+    "curtailment_entity_missing": {
+      "title": "A korlátozási jel nem található",
+      "description": "A(z) {entry} korlátozási jele, {entity}, nem létezik. Azok az órák, amikor az inverter korlátozva van, ekkor rossz égként tanulódnak meg. Ellenőrizze az entitásazonosítót, vagy ürítse a mezőt."
+    },
+    "production_history_empty": {
+      "title": "A termelésérzékelőnek még nincs előzménye",
+      "description": "{entity}, a(z) {entry} termelésérzékelője, még nem rendelkezik hosszú távú statisztikával. A tanulás megkezdődik, amint a rögzítőnek van néhány órája; ha ez egy nap után is fennáll, az érzékelő nem halmozott energiaérzékelő."
+    },
+    "production_at_night": {
+      "title": "A termelésérzékelő éjszaka is számol",
+      "description": "{entity}, a(z) {entry} termelésérzékelője, {kwh} kWh-t rögzített, miközben a nap jóval a horizont alatt volt. A panelek éjszaka semmit sem termelnek, tehát ez az érzékelő többet mér a paneleknél (hálózati vagy házi mérő). Válassza azt az érzékelőt, amely csak az inverter kimenetét számolja."
+    },
+    "production_above_panels": {
+      "title": "A termelés meghaladja, amit a megadott panelek adhatnak",
+      "description": "{entity}, a(z) {entry} termelésérzékelője, többször elérte a(z) {kw} kW-ot {kwp} kWp megadott panel mellett. Vagy a csúcsteljesítmény túl kicsi, vagy az érzékelő többet számol a paneleknél. Ellenőrizze mindkettőt."
+    },
+    "production_stale": {
+      "title": "{days} napja nincs rögzített termelés",
+      "description": "{entity}, a(z) {entry} termelésérzékelője, {days} napja nem nőtt. Hó vagy meghibásodás magyarázhatja; ha a panelek termelnek, az érzékelő nem jelent többé, és a tanulás kiéhezik."
+    },
+    "consumption_source_sparse": {
+      "title": "A(z) {source} fogyasztási forrás szakaszosan jelent",
+      "description": "Az Energia irányítópulton a(z) {source} az órák {pct}%-ára rendelkezik adattal, amelyeket a legjobb forrás lefed ({best}%). A fogyasztási profil csak az általa lefedett órákból épül, így helyes marad, de kevesebb előzményre támaszkodik. Egy megbízhatóbb érzékelő ehhez az áramláshoz élesebbé teszi az akkumulátor-vetítést."
+    },
+    "benchmark_excluded": {
+      "title": "Kizárva a benchmark számaiból ({reason})",
+      "description": "A közösségi benchmark megkapja a(z) {entry} kibocsátásait, de kívül tartja őket a közzétett számokon. Ok {reason}: a kwp azt jelenti, hogy a megadott csúcsteljesítmény hiányzik, nulla vagy wattban van megadva; a night azt jelenti, hogy a termelésérzékelő éjszaka energiát rögzít, tehát többet mér a paneleknél. Javítsa a beállítást, és a rendszer egy napon belül újra beszámít."
+    }
   }
 }

@@ -143,5 +143,139 @@
         }
       }
     }
+  },
+  "issues": {
+    "location_invalid": {
+      "title": "Plats utanför giltigt område",
+      "description": "Platsen för {entry} ({latitude}, {longitude}) är inte en giltig latitud och longitud. Latituden går från -90 till 90 och longituden från -180 till 180; lämna båda fälten tomma för att använda Home Assistants hem."
+    },
+    "location_far": {
+      "title": "Plats långt från ditt Home Assistant-hem",
+      "description": "Platsen för {entry} ligger {km} km från Home Assistant-hemmet. Om anläggningen verkligen står där kan du bortse från detta; kontrollera annars en decimal i latituden eller longituden."
+    },
+    "no_lines": {
+      "title": "Ingen panelrad",
+      "description": "{entry} har ingen panelrad, så det finns inget att prognostisera. Lägg till minst en rad med lutning, azimut och toppeffekt."
+    },
+    "line_kwp_missing": {
+      "title": "Panelrad {line}: toppeffekt saknas",
+      "description": "Rad {line} i {entry} har ingen toppeffekt, eller noll. Utan den blir alla siffror platta. Ange radens toppeffekt i kWp (till exempel 3,6 för 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Panelrad {line}: toppeffekten ser ut som watt",
+      "description": "Rad {line} i {entry} anger {kwp} kWp, långt över en hemanläggning. Värdet skrevs troligen i watt. Ange det i kilowatt-peak (till exempel 4,05 i stället för 4050)."
+    },
+    "line_tilt": {
+      "title": "Panelrad {line}: lutning utanför området",
+      "description": "Rad {line} i {entry} har en lutning på {tilt} grader. Lutningen går från 0 (platt) till 90 (lodrät)."
+    },
+    "line_azimuth": {
+      "title": "Panelrad {line}: azimut utanför området",
+      "description": "Rad {line} i {entry} har en azimut på {azimuth} grader. Azimut går från 0 till 360 medurs från norr: 90 är öster, 180 söder, 270 väster."
+    },
+    "line_tracker": {
+      "title": "Panelrad {line}: okänd trackertyp",
+      "description": "Rad {line} i {entry} anger en tracker av typen {tracker}, som den här integrationen inte känner till. Välj en av de erbjudna typerna, eller ingen för fasta paneler."
+    },
+    "line_location_invalid": {
+      "title": "Panelrad {line}: koordinater utanför området",
+      "description": "Rad {line} i {entry} har koordinater som inte är en giltig latitud och longitud. Rätta dem eller lämna båda fälten tomma för att placera raden på anläggningens plats."
+    },
+    "line_location_far": {
+      "title": "Panelrad {line}: koordinater långt från anläggningen",
+      "description": "Rad {line} i {entry} är placerad {km} km från anläggningen. Paneler på ett avlägset fält är möjligt, en felaktig decimal är troligare; kontrollera radens latitud och longitud."
+    },
+    "line_cap_unit": {
+      "title": "Panelrad {line}: växelriktargränsen ser ut som watt",
+      "description": "Rad {line} i {entry} har en växelriktargräns på {cap} kW för {kwp} kWp paneler. Gränsen skrevs troligen i watt. Ange den i kilowatt."
+    },
+    "inverter_cap_unit": {
+      "title": "Växelriktargränsen ser ut som watt",
+      "description": "{entry} har en växelriktargräns på {cap} kW för {kwp} kWp paneler. Gränsen skrevs troligen i watt. Ange den i kilowatt (till exempel 5 i stället för 5000)."
+    },
+    "inverter_cap_low": {
+      "title": "Växelriktargräns långt under panelerna",
+      "description": "{entry} har en växelriktargräns på {cap} kW för {kwp} kWp paneler, så prognosen klipps större delen av dagen. Om gränsen stämmer kan du bortse från detta; kontrollera annars värdet eller enheten."
+    },
+    "production_entity_unset": {
+      "title": "Ingen produktionssensor: prognosen kan inte lära sig",
+      "description": "{entry} har ingen produktionssensor. Prognosen körs på fysik och väder, men inget rättar den mot vad dina paneler verkligen levererar. Välj den ackumulerade energisensorn (kWh) från din växelriktare eller mätare i inställningarna."
+    },
+    "trend_anchor_hour": {
+      "title": "Trendens referenstimme utanför området",
+      "description": "{entry} har en referenstimme för trenden på {hour}. Ange en lokal timme från 0 till 23."
+    },
+    "battery_soc_entity_unset": {
+      "title": "Batteri: kapacitet satt men ingen laddningsnivåsensor",
+      "description": "{entry} anger ett batteri på {capacity} kWh men ingen laddningsnivåsensor, så prognosen förblir avstängd. Välj batteriets laddningsnivåsensor (i %) eller rensa kapaciteten."
+    },
+    "battery_capacity_unset": {
+      "title": "Batteri: laddningsnivåsensor satt men ingen kapacitet",
+      "description": "{entry} anger en laddningsnivåsensor men ingen användbar kapacitet, så prognosen förblir avstängd. Ange batteriets användbara kapacitet i kWh eller rensa sensorn."
+    },
+    "battery_capacity": {
+      "title": "Batterikapacitet utanför området",
+      "description": "{entry} anger ett batteri på {capacity} kWh, vilket inte är ett hembatteri. Ange den användbara kapaciteten i kilowattimmar (till exempel 10 i stället för 10000)."
+    },
+    "battery_power": {
+      "title": "Batteriets laddnings- eller urladdningseffekt är orimlig",
+      "description": "{entry} anger en batterieffekt på {power} kW för en kapacitet på {capacity} kWh, mer än tre gånger kapaciteten per timme. Kontrollera värdet och enheten (kW, inte W)."
+    },
+    "battery_min_soc": {
+      "title": "Batterireserv utanför området",
+      "description": "{entry} har en lägsta laddningsnivå på {value}. Ange en procent från 0 till 100."
+    },
+    "battery_efficiency": {
+      "title": "Batteriverkningsgrad utanför området",
+      "description": "{entry} har en tur-och-retur-verkningsgrad på {value}. Ange en procent från 50 till 100 (de flesta hembatterier ligger runt 90)."
+    },
+    "benchmark_key": {
+      "title": "Benchmark-nyckeln ser inte ut som en nyckel",
+      "description": "{entry} deltar i gemenskapens benchmark men nyckeln är inte en som insamlaren utfärdar. Klistra in hela nyckeln från helios-ha.org/benchmark, eller stäng av benchmarken."
+    },
+    "production_entity_missing": {
+      "title": "Produktionssensor hittades inte",
+      "description": "Produktionssensorn för {entry}, {entity}, finns inte. Prognosen körs okorrigerad tills den gör det. Kontrollera entitets-id:t, eller välj sensorn igen i inställningarna."
+    },
+    "production_entity_kind": {
+      "title": "Produktionssensorn är inte en ackumulerad energisensor",
+      "description": "Produktionssensorn för {entry}, {entity}, rapporterar {unit} med tillståndsklassen {state_class}. Inlärningen behöver en ackumulerad energisensor i kWh (tillståndsklass total eller total_increasing), inte en effektsensor. Välj energitotalen från din växelriktare eller mätare; hjälparen Integral gör en effektsensor till en sådan."
+    },
+    "battery_soc_entity_missing": {
+      "title": "Batteriets laddningsnivåsensor hittades inte",
+      "description": "Batterisensorn för {entry}, {entity}, finns inte, så prognosen förblir avstängd. Kontrollera entitets-id:t eller välj sensorn igen."
+    },
+    "battery_soc_entity_unit": {
+      "title": "Batterisensorn är inte en procent",
+      "description": "Batterisensorn för {entry}, {entity}, rapporterar {unit}. Prognosen behöver laddningsnivån i procent."
+    },
+    "curtailment_entity_missing": {
+      "title": "Begränsningssignal hittades inte",
+      "description": "Begränsningssignalen för {entry}, {entity}, finns inte. Timmar när växelriktaren hålls tillbaka lärs då in som dålig himmel. Kontrollera entitets-id:t eller töm fältet."
+    },
+    "production_history_empty": {
+      "title": "Produktionssensorn har ingen historik än",
+      "description": "{entity}, produktionssensorn för {entry}, har ännu ingen långtidsstatistik. Inlärningen börjar så snart recordern har några timmar; kvarstår det efter en dag är sensorn inte en ackumulerad energisensor."
+    },
+    "production_at_night": {
+      "title": "Produktionssensorn räknar på natten",
+      "description": "{entity}, produktionssensorn för {entry}, registrerade {kwh} kWh medan solen stod långt under horisonten. Paneler gör inget på natten, så den här sensorn mäter mer än panelerna (en nät- eller husmätare). Välj den sensor som bara räknar växelriktarens utgång."
+    },
+    "production_above_panels": {
+      "title": "Produktion över vad de angivna panelerna kan leverera",
+      "description": "{entity}, produktionssensorn för {entry}, nådde {kw} kW flera gånger med {kwp} kWp angivna paneler. Antingen är toppeffekten för låg, eller så räknar sensorn mer än panelerna. Kontrollera båda."
+    },
+    "production_stale": {
+      "title": "Ingen produktion registrerad på {days} dagar",
+      "description": "{entity}, produktionssensorn för {entry}, har inte ökat på {days} dagar. Snö eller ett avbrott kan förklara det; producerar panelerna har sensorn slutat rapportera och inlärningen svälter."
+    },
+    "consumption_source_sparse": {
+      "title": "Förbrukningskällan {source} rapporterar bara ibland",
+      "description": "I energipanelen har {source} data för {pct} % av de timmar den bästa källan täcker ({best} %). Förbrukningsprofilen byggs bara av de timmar den täcker, så den förblir rätt men vilar på mindre historik. En pålitligare sensor för det flödet gör batteriprognosen skarpare."
+    },
+    "benchmark_excluded": {
+      "title": "Utesluten ur benchmarkens siffror ({reason})",
+      "description": "Gemenskapens benchmark tar emot sändningarna från {entry} men håller dem utanför de publicerade siffrorna. Orsak {reason}: kwp betyder att den angivna toppeffekten saknas, är noll eller skrevs i watt; night betyder att produktionssensorn registrerar energi på natten och alltså mäter mer än panelerna. Rätta konfigurationen så räknas anläggningen med igen inom en dag."
+    }
   }
 }

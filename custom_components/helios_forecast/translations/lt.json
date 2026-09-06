@@ -143,5 +143,139 @@
         }
       }
     }
+  },
+  "issues": {
+    "location_invalid": {
+      "title": "Vieta už leistino diapazono",
+      "description": "{entry} vieta ({latitude}, {longitude}) nėra galiojanti platuma ir ilguma. Platuma yra nuo -90 iki 90, ilguma nuo -180 iki 180; palikite abu laukus tuščius, kad būtų naudojami Home Assistant namai."
+    },
+    "location_far": {
+      "title": "Vieta toli nuo jūsų Home Assistant namų",
+      "description": "{entry} vieta yra už {km} km nuo Home Assistant namų. Jei įrenginys tikrai ten, nekreipkite dėmesio; kitaip patikrinkite platumos arba ilgumos dešimtainį skaitmenį."
+    },
+    "no_lines": {
+      "title": "Nėra modulių eilės",
+      "description": "{entry} neturi nė vienos modulių eilės, todėl nėra ko prognozuoti. Pridėkite bent vieną eilę su posvyriu, azimutu ir pikine galia."
+    },
+    "line_kwp_missing": {
+      "title": "Eilė {line}: trūksta pikinės galios",
+      "description": "{entry} eilė {line} neturi pikinės galios arba ji lygi nuliui. Be jos visi skaičiai lieka nuliniai. Įveskite eilės pikinę galią kWp (pavyzdžiui, 3,6 vietoj 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Eilė {line}: pikinė galia atrodo kaip vatai",
+      "description": "{entry} eilė {line} nurodo {kwp} kWp, gerokai daugiau nei namų įrenginys. Reikšmė greičiausiai įvesta vatais. Įveskite ją kilovatais pikinės galios (pavyzdžiui, 4,05 vietoj 4050)."
+    },
+    "line_tilt": {
+      "title": "Eilė {line}: posvyris už diapazono",
+      "description": "{entry} eilės {line} posvyris yra {tilt} laipsnių. Posvyris yra nuo 0 (horizontaliai) iki 90 (vertikaliai)."
+    },
+    "line_azimuth": {
+      "title": "Eilė {line}: azimutas už diapazono",
+      "description": "{entry} eilės {line} azimutas yra {azimuth} laipsnių. Azimutas yra nuo 0 iki 360 pagal laikrodžio rodyklę nuo šiaurės: 90 yra rytai, 180 pietūs, 270 vakarai."
+    },
+    "line_tracker": {
+      "title": "Eilė {line}: nežinomas sekiklio tipas",
+      "description": "{entry} eilė {line} nurodo {tracker} tipo sekiklį, kurio ši integracija nežino. Pasirinkite vieną iš siūlomų tipų arba jokio fiksuotiems moduliams."
+    },
+    "line_location_invalid": {
+      "title": "Eilė {line}: koordinatės už diapazono",
+      "description": "{entry} eilės {line} koordinatės nėra galiojanti platuma ir ilguma. Pataisykite jas arba palikite abu laukus tuščius, kad eilė būtų įrenginio vietoje."
+    },
+    "line_location_far": {
+      "title": "Eilė {line}: koordinatės toli nuo įrenginio",
+      "description": "{entry} eilė {line} yra už {km} km nuo įrenginio. Moduliai tolimame lauke galimi, klaidingas dešimtainis skaitmuo labiau tikėtinas; patikrinkite eilės platumą ir ilgumą."
+    },
+    "line_cap_unit": {
+      "title": "Eilė {line}: inverterio riba atrodo kaip vatai",
+      "description": "{entry} eilės {line} inverterio riba yra {cap} kW {kwp} kWp moduliams. Riba greičiausiai įvesta vatais. Įveskite ją kilovatais."
+    },
+    "inverter_cap_unit": {
+      "title": "Inverterio riba atrodo kaip vatai",
+      "description": "{entry} inverterio riba yra {cap} kW {kwp} kWp moduliams. Riba greičiausiai įvesta vatais. Įveskite ją kilovatais (pavyzdžiui, 5 vietoj 5000)."
+    },
+    "inverter_cap_low": {
+      "title": "Inverterio riba gerokai žemiau modulių",
+      "description": "{entry} inverterio riba yra {cap} kW {kwp} kWp moduliams, todėl prognozė bus apkarpoma didžiąją dienos dalį. Jei riba teisinga, nekreipkite dėmesio; kitaip patikrinkite reikšmę arba jos vienetą."
+    },
+    "production_entity_unset": {
+      "title": "Nėra gamybos jutiklio: prognozė negali mokytis",
+      "description": "{entry} neturi gamybos jutiklio. Prognozė veikia pagal fiziką ir orą, bet niekas jos netaiso pagal tai, ką jūsų moduliai iš tikrųjų duoda. Nustatymuose pasirinkite inverterio arba skaitiklio sukauptos energijos jutiklį (kWh)."
+    },
+    "trend_anchor_hour": {
+      "title": "Tendencijos atskaitos valanda už diapazono",
+      "description": "{entry} tendencijos atskaitos valanda yra {hour}. Įveskite vietinę valandą nuo 0 iki 23."
+    },
+    "battery_soc_entity_unset": {
+      "title": "Baterija: talpa nustatyta, bet nėra įkrovos lygio jutiklio",
+      "description": "{entry} nurodo {capacity} kWh bateriją, bet nė vieno įkrovos lygio jutiklio, todėl projekcija lieka išjungta. Pasirinkite baterijos įkrovos lygio jutiklį (%) arba ištrinkite talpą."
+    },
+    "battery_capacity_unset": {
+      "title": "Baterija: įkrovos lygio jutiklis nustatytas, bet nėra talpos",
+      "description": "{entry} nurodo įkrovos lygio jutiklį, bet ne naudingą talpą, todėl projekcija lieka išjungta. Įveskite naudingą baterijos talpą kWh arba ištrinkite jutiklį."
+    },
+    "battery_capacity": {
+      "title": "Baterijos talpa už diapazono",
+      "description": "{entry} nurodo {capacity} kWh bateriją, o tai nėra namų baterija. Įveskite naudingą talpą kilovatvalandėmis (pavyzdžiui, 10 vietoj 10000)."
+    },
+    "battery_power": {
+      "title": "Neįtikėtina baterijos įkrovimo arba iškrovimo galia",
+      "description": "{entry} nurodo {power} kW baterijos galią {capacity} kWh talpai, daugiau nei tris kartus talpos per valandą. Patikrinkite reikšmę ir jos vienetą (kW, ne W)."
+    },
+    "battery_min_soc": {
+      "title": "Baterijos rezervas už diapazono",
+      "description": "{entry} minimalus įkrovos lygis yra {value}. Įveskite procentą nuo 0 iki 100."
+    },
+    "battery_efficiency": {
+      "title": "Baterijos naudingumo koeficientas už diapazono",
+      "description": "{entry} viso ciklo naudingumo koeficientas yra {value}. Įveskite procentą nuo 50 iki 100 (dauguma namų baterijų yra apie 90)."
+    },
+    "benchmark_key": {
+      "title": "Lyginamosios analizės raktas neatrodo kaip raktas",
+      "description": "{entry} dalyvauja bendruomenės lyginamojoje analizėje, bet jo raktas nėra rinktuvo išduotas raktas. Įklijuokite visą raktą iš helios-ha.org/benchmark arba išjunkite lyginamąją analizę."
+    },
+    "production_entity_missing": {
+      "title": "Gamybos jutiklis nerastas",
+      "description": "{entry} gamybos jutiklio {entity} nėra. Prognozė veikia be pataisos, kol jis atsiras. Patikrinkite objekto ID arba iš naujo pasirinkite jutiklį nustatymuose."
+    },
+    "production_entity_kind": {
+      "title": "Gamybos jutiklis nėra sukauptos energijos jutiklis",
+      "description": "{entry} gamybos jutiklis {entity} praneša {unit} su būsenos klase {state_class}. Mokymuisi reikia sukauptos energijos jutiklio kWh (būsenos klasė total arba total_increasing), o ne galios jutiklio. Pasirinkite inverterio arba skaitiklio energijos sumą; pagalbininkas Integralas galios jutiklį paverčia tokiu jutikliu."
+    },
+    "battery_soc_entity_missing": {
+      "title": "Baterijos įkrovos lygio jutiklis nerastas",
+      "description": "{entry} baterijos jutiklio {entity} nėra, todėl projekcija lieka išjungta. Patikrinkite objekto ID arba iš naujo pasirinkite jutiklį."
+    },
+    "battery_soc_entity_unit": {
+      "title": "Baterijos jutiklis nėra procentas",
+      "description": "{entry} baterijos jutiklis {entity} praneša {unit}. Projekcijai reikia įkrovos lygio procentais."
+    },
+    "curtailment_entity_missing": {
+      "title": "Ribojimo signalas nerastas",
+      "description": "{entry} ribojimo signalo {entity} nėra. Valandos, kai inverteris ribojamas, tada išmokstamos kaip blogas dangus. Patikrinkite objekto ID arba ištuštinkite lauką."
+    },
+    "production_history_empty": {
+      "title": "Gamybos jutiklis dar neturi istorijos",
+      "description": "{entity}, {entry} gamybos jutiklis, dar neturi ilgalaikės statistikos. Mokymasis prasideda, kai tik įrašymo įrenginys turi kelias valandas; jei tai tęsiasi po dienos, jutiklis nėra sukauptos energijos jutiklis."
+    },
+    "production_at_night": {
+      "title": "Gamybos jutiklis skaičiuoja naktį",
+      "description": "{entity}, {entry} gamybos jutiklis, užfiksavo {kwh} kWh, kai saulė buvo giliai po horizontu. Moduliai naktį nieko negamina, taigi šis jutiklis matuoja daugiau nei modulius (tinklo arba namo skaitiklis). Pasirinkite jutiklį, kuris skaičiuoja tik inverterio išvestį."
+    },
+    "production_above_panels": {
+      "title": "Gamyba viršija tai, ką gali duoti nurodyti moduliai",
+      "description": "{entity}, {entry} gamybos jutiklis, kelis kartus pasiekė {kw} kW esant {kwp} kWp nurodytų modulių. Arba pikinė galia per maža, arba jutiklis skaičiuoja daugiau nei modulius. Patikrinkite abu."
+    },
+    "production_stale": {
+      "title": "Gamyba neužfiksuota {days} dienas",
+      "description": "{entity}, {entry} gamybos jutiklis, nedidėjo {days} dienas. Sniegas arba gedimas gali tai paaiškinti; jei moduliai gamina, jutiklis nustojo pranešti ir mokymasis badauja."
+    },
+    "consumption_source_sparse": {
+      "title": "Vartojimo šaltinis {source} praneša su pertrūkiais",
+      "description": "Energijos skydelyje {source} turi duomenis {pct} % valandų, kurias apima geriausias šaltinis ({best} %). Vartojimo profilis sudaromas tik iš valandų, kurias jis apima, todėl lieka teisingas, bet remiasi mažesne istorija. Patikimesnis šio srauto jutiklis patikslina baterijos projekciją."
+    },
+    "benchmark_excluded": {
+      "title": "Pašalinta iš lyginamosios analizės skaičių ({reason})",
+      "description": "Bendruomenės lyginamoji analizė gauna {entry} siuntas, bet laiko jas už skelbiamų skaičių. Priežastis {reason}: kwp reiškia, kad nurodyta pikinė galia trūksta, lygi nuliui arba įvesta vatais; night reiškia, kad gamybos jutiklis fiksuoja energiją naktį, taigi matuoja daugiau nei modulius. Pataisykite konfigūraciją ir įrenginys vėl bus skaičiuojamas per dieną."
+    }
   }
 }

@@ -143,5 +143,139 @@
         }
       }
     }
+  },
+  "issues": {
+    "location_invalid": {
+      "title": "Standort außerhalb des gültigen Bereichs",
+      "description": "Der Standort von {entry} ({latitude}, {longitude}) ist keine gültige Breite und Länge. Die Breite reicht von -90 bis 90, die Länge von -180 bis 180; lassen Sie beide Felder leer, um den Home-Assistant-Standort zu verwenden."
+    },
+    "location_far": {
+      "title": "Standort weit von Ihrem Home-Assistant-Zuhause entfernt",
+      "description": "Der Standort von {entry} liegt {km} km vom Home-Assistant-Zuhause entfernt. Steht die Anlage wirklich dort, ignorieren Sie diesen Hinweis; andernfalls prüfen Sie eine Dezimalstelle von Breite oder Länge."
+    },
+    "no_lines": {
+      "title": "Keine Modulreihe",
+      "description": "{entry} hat keine Modulreihe, es gibt also nichts vorherzusagen. Fügen Sie mindestens eine Reihe mit Neigung, Azimut und Spitzenleistung hinzu."
+    },
+    "line_kwp_missing": {
+      "title": "Modulreihe {line}: Spitzenleistung fehlt",
+      "description": "Reihe {line} von {entry} hat keine Spitzenleistung oder null. Ohne sie bleibt jede Zahl bei null. Geben Sie die Spitzenleistung der Reihe in kWp ein (zum Beispiel 3,6 für 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Modulreihe {line}: Spitzenleistung sieht nach Watt aus",
+      "description": "Reihe {line} von {entry} gibt {kwp} kWp an, weit jenseits einer Hausanlage. Der Wert wurde sehr wahrscheinlich in Watt eingegeben. Geben Sie ihn in Kilowatt-Peak ein (zum Beispiel 4,05 statt 4050)."
+    },
+    "line_tilt": {
+      "title": "Modulreihe {line}: Neigung außerhalb des Bereichs",
+      "description": "Reihe {line} von {entry} hat eine Neigung von {tilt} Grad. Die Neigung reicht von 0 (flach) bis 90 (senkrecht)."
+    },
+    "line_azimuth": {
+      "title": "Modulreihe {line}: Azimut außerhalb des Bereichs",
+      "description": "Reihe {line} von {entry} hat einen Azimut von {azimuth} Grad. Der Azimut reicht von 0 bis 360 im Uhrzeigersinn ab Norden: 90 ist Osten, 180 Süden, 270 Westen."
+    },
+    "line_tracker": {
+      "title": "Modulreihe {line}: unbekannter Tracker-Typ",
+      "description": "Reihe {line} von {entry} gibt einen Tracker vom Typ {tracker} an, den diese Integration nicht kennt. Wählen Sie einen der angebotenen Typen oder keinen für eine feste Anlage."
+    },
+    "line_location_invalid": {
+      "title": "Modulreihe {line}: Koordinaten außerhalb des Bereichs",
+      "description": "Reihe {line} von {entry} hat Koordinaten, die keine gültige Breite und Länge sind. Korrigieren Sie sie oder lassen Sie beide Felder leer, um die Reihe am Standort der Anlage zu platzieren."
+    },
+    "line_location_far": {
+      "title": "Modulreihe {line}: Koordinaten weit von der Anlage entfernt",
+      "description": "Reihe {line} von {entry} liegt {km} km von der Anlage entfernt. Module auf einem fernen Feld sind möglich, eine falsche Dezimalstelle ist wahrscheinlicher; prüfen Sie Breite und Länge der Reihe."
+    },
+    "line_cap_unit": {
+      "title": "Modulreihe {line}: Wechselrichtergrenze sieht nach Watt aus",
+      "description": "Reihe {line} von {entry} hat eine Wechselrichtergrenze von {cap} kW für {kwp} kWp Module. Die Grenze wurde sehr wahrscheinlich in Watt eingegeben. Geben Sie sie in Kilowatt ein."
+    },
+    "inverter_cap_unit": {
+      "title": "Wechselrichtergrenze sieht nach Watt aus",
+      "description": "{entry} hat eine Wechselrichtergrenze von {cap} kW für {kwp} kWp Module. Die Grenze wurde sehr wahrscheinlich in Watt eingegeben. Geben Sie sie in Kilowatt ein (zum Beispiel 5 statt 5000)."
+    },
+    "inverter_cap_low": {
+      "title": "Wechselrichtergrenze deutlich unter den Modulen",
+      "description": "{entry} hat eine Wechselrichtergrenze von {cap} kW für {kwp} kWp Module, die Prognose wird also fast den ganzen Tag gekappt. Ist die Grenze richtig, ignorieren Sie diesen Hinweis; andernfalls prüfen Sie den Wert oder seine Einheit."
+    },
+    "production_entity_unset": {
+      "title": "Kein Erzeugungssensor: die Prognose kann nicht lernen",
+      "description": "{entry} hat keinen Erzeugungssensor. Die Prognose läuft mit Physik und Wetter, aber nichts korrigiert sie an dem, was Ihre Module wirklich liefern. Wählen Sie in den Einstellungen den kumulierten Energiesensor (kWh) Ihres Wechselrichters oder Zählers."
+    },
+    "trend_anchor_hour": {
+      "title": "Referenzstunde des Trends außerhalb des Bereichs",
+      "description": "{entry} hat eine Trend-Referenzstunde von {hour}. Geben Sie eine Ortsstunde von 0 bis 23 ein."
+    },
+    "battery_soc_entity_unset": {
+      "title": "Batterie: Kapazität gesetzt, aber kein Ladestandssensor",
+      "description": "{entry} gibt eine Batterie von {capacity} kWh an, aber keinen Ladestandssensor, die Projektion bleibt also aus. Wählen Sie den Ladestandssensor der Batterie (in %) oder löschen Sie die Kapazität."
+    },
+    "battery_capacity_unset": {
+      "title": "Batterie: Ladestandssensor gesetzt, aber keine Kapazität",
+      "description": "{entry} nennt einen Ladestandssensor, aber keine nutzbare Kapazität, die Projektion bleibt also aus. Geben Sie die nutzbare Kapazität der Batterie in kWh ein oder löschen Sie den Sensor."
+    },
+    "battery_capacity": {
+      "title": "Batteriekapazität außerhalb des Bereichs",
+      "description": "{entry} gibt eine Batterie von {capacity} kWh an, das ist keine Hausbatterie. Geben Sie die nutzbare Kapazität in Kilowattstunden ein (zum Beispiel 10 statt 10000)."
+    },
+    "battery_power": {
+      "title": "Lade- oder Entladeleistung der Batterie unplausibel",
+      "description": "{entry} gibt eine Batterieleistung von {power} kW bei einer Kapazität von {capacity} kWh an, mehr als das Dreifache der Kapazität pro Stunde. Prüfen Sie den Wert und seine Einheit (kW, nicht W)."
+    },
+    "battery_min_soc": {
+      "title": "Batteriereserve außerhalb des Bereichs",
+      "description": "{entry} hat einen minimalen Ladestand von {value}. Geben Sie einen Prozentwert von 0 bis 100 ein."
+    },
+    "battery_efficiency": {
+      "title": "Batteriewirkungsgrad außerhalb des Bereichs",
+      "description": "{entry} hat einen Round-Trip-Wirkungsgrad von {value}. Geben Sie einen Prozentwert von 50 bis 100 ein (die meisten Hausbatterien liegen um 90)."
+    },
+    "benchmark_key": {
+      "title": "Der Benchmark-Schlüssel sieht nicht wie ein Schlüssel aus",
+      "description": "{entry} nimmt am Community-Benchmark teil, aber sein Schlüssel ist keiner, den der Collector ausgibt. Fügen Sie den ganzen Schlüssel von helios-ha.org/benchmark ein oder schalten Sie den Benchmark aus."
+    },
+    "production_entity_missing": {
+      "title": "Erzeugungssensor nicht gefunden",
+      "description": "Der Erzeugungssensor von {entry}, {entity}, existiert nicht. Die Prognose läuft unkorrigiert, bis es ihn gibt. Prüfen Sie die Entitäts-ID oder wählen Sie den Sensor in den Einstellungen neu."
+    },
+    "production_entity_kind": {
+      "title": "Der Erzeugungssensor ist kein kumulierter Energiesensor",
+      "description": "Der Erzeugungssensor von {entry}, {entity}, meldet {unit} mit der Zustandsklasse {state_class}. Das Lernen braucht einen kumulierten Energiesensor in kWh (Zustandsklasse total oder total_increasing), keinen Leistungssensor. Wählen Sie die Energiesumme Ihres Wechselrichters oder Zählers; der Helfer Integral macht aus einem Leistungssensor einen solchen."
+    },
+    "battery_soc_entity_missing": {
+      "title": "Ladestandssensor der Batterie nicht gefunden",
+      "description": "Der Batteriesensor von {entry}, {entity}, existiert nicht, die Projektion bleibt also aus. Prüfen Sie die Entitäts-ID oder wählen Sie den Sensor neu."
+    },
+    "battery_soc_entity_unit": {
+      "title": "Der Batteriesensor ist kein Prozentwert",
+      "description": "Der Batteriesensor von {entry}, {entity}, meldet {unit}. Die Projektion braucht den Ladestand in Prozent."
+    },
+    "curtailment_entity_missing": {
+      "title": "Abregelungssignal nicht gefunden",
+      "description": "Das Abregelungssignal von {entry}, {entity}, existiert nicht. Stunden, in denen der Wechselrichter gedrosselt ist, werden dann als schlechter Himmel gelernt. Prüfen Sie die Entitäts-ID oder leeren Sie das Feld."
+    },
+    "production_history_empty": {
+      "title": "Der Erzeugungssensor hat noch keine Historie",
+      "description": "{entity}, der Erzeugungssensor von {entry}, hat noch keine Langzeitstatistik. Das Lernen beginnt, sobald der Recorder ein paar Stunden hat; bleibt es nach einem Tag so, ist der Sensor kein kumulierter Energiesensor."
+    },
+    "production_at_night": {
+      "title": "Der Erzeugungssensor zählt nachts",
+      "description": "{entity}, der Erzeugungssensor von {entry}, hat {kwh} kWh aufgezeichnet, während die Sonne deutlich unter dem Horizont stand. Module erzeugen nachts nichts, dieser Sensor misst also mehr als die Module (ein Netz- oder Hauszähler). Wählen Sie den Sensor, der nur den Ausgang des Wechselrichters zählt."
+    },
+    "production_above_panels": {
+      "title": "Erzeugung über dem, was die angegebenen Module liefern können",
+      "description": "{entity}, der Erzeugungssensor von {entry}, erreichte mehrmals {kw} kW bei {kwp} kWp angegebenen Modulen. Entweder ist die Spitzenleistung zu klein, oder der Sensor zählt mehr als die Module. Prüfen Sie beides."
+    },
+    "production_stale": {
+      "title": "Seit {days} Tagen keine Erzeugung aufgezeichnet",
+      "description": "{entity}, der Erzeugungssensor von {entry}, ist seit {days} Tagen nicht gestiegen. Schnee oder ein Ausfall können das erklären; erzeugen die Module, hat der Sensor aufgehört zu melden und das Lernen hungert."
+    },
+    "consumption_source_sparse": {
+      "title": "Die Verbrauchsquelle {source} meldet nur zeitweise",
+      "description": "Im Energie-Dashboard hat {source} Daten für {pct} % der Stunden, die die beste Quelle abdeckt ({best} %). Das Verbrauchsprofil wird nur aus den Stunden gebaut, die sie abdeckt, bleibt also richtig, stützt sich aber auf weniger Historie. Ein zuverlässigerer Sensor für diesen Fluss macht die Batterieprojektion schärfer."
+    },
+    "benchmark_excluded": {
+      "title": "Aus den Benchmark-Zahlen ausgeschlossen ({reason})",
+      "description": "Der Community-Benchmark empfängt die Emissionen von {entry}, hält sie aber aus den veröffentlichten Zahlen heraus. Grund {reason}: kwp bedeutet, dass die angegebene Spitzenleistung fehlt, null ist oder in Watt eingegeben wurde; night bedeutet, dass der Erzeugungssensor nachts Energie aufzeichnet, also mehr als die Module misst. Korrigieren Sie die Konfiguration, und die Anlage wird innerhalb eines Tages wieder gezählt."
+    }
   }
 }
