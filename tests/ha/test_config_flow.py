@@ -120,6 +120,55 @@ async def test_options_settings_step_keeps_lines_untouched(
     assert result["data"][CONF_ARRAYS] == [_LINE_A, _LINE_B]
 
 
+async def test_options_settings_step_keeps_the_benchmark_opt_in_and_key(
+    recorder_mock, hass: HomeAssistant, enable_custom_integrations
+) -> None:
+    """The settings form does not show the benchmark block, so saving it must carry the block over:
+    2026.9.2 and 2026.9.3 dropped the opt-in and the key on every settings save."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={CONF_ARRAYS: [_LINE_A], CONF_INVERTER_MAX_KW: 5.0},
+        options={"benchmark_enabled": True, "benchmark_key": "k" * 43},
+    )
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "settings"})
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {"inverter_max_kw": 6.0, "trend_anchor_hour": 6, "battery_min_soc": 10, "battery_efficiency": 90},
+    )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    data = result["data"]
+    assert data["benchmark_enabled"] is True
+    assert data["benchmark_key"] == "k" * 43
+    assert data[CONF_INVERTER_MAX_KW] == 6.0
+    # A field left empty on the settings form is really cleared, as before.
+    assert "production_entity" not in data
+
+
+async def test_benchmark_step_clearing_the_key_really_clears_it(
+    recorder_mock, hass: HomeAssistant, enable_custom_integrations
+) -> None:
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={CONF_ARRAYS: [_LINE_A], "production_entity": "sensor.pv"},
+        options={"benchmark_enabled": True, "benchmark_key": "k" * 43},
+    )
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "benchmark"})
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"benchmark_enabled": False, "benchmark_url": DEFAULT_ENDPOINT}
+    )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    data = result["data"]
+    assert data["benchmark_enabled"] is False
+    assert "benchmark_key" not in data
+    assert data["production_entity"] == "sensor.pv"
+
+
 async def test_options_lines_step_edits_and_removes(
     recorder_mock, hass: HomeAssistant, enable_custom_integrations
 ) -> None:
