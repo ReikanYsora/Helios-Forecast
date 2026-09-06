@@ -29,6 +29,7 @@ from .config import (
     CONF_BATTERY_MAX_DISCHARGE_KW,
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_SOC_ENTITY,
+    BENCHMARK_KEYS,
     CONF_BENCHMARK_ENABLED,
     CONF_BENCHMARK_KEY,
     CONF_BENCHMARK_URL,
@@ -273,7 +274,10 @@ class HeliosForecastOptionsFlow(OptionsFlow):
         """Edit the entry-level settings, keeping the existing panel lines untouched."""
         current = self._current()
         if user_input is not None:
-            data = merge_entry_data(split_settings(user_input), lines_from_config(current))
+            # This form shows the installation settings only: a field left empty here is cleared, while the
+            # benchmark block, edited on its own step, is carried over untouched.
+            kept = {k: v for k, v in split_settings(current).items() if k in BENCHMARK_KEYS}
+            data = merge_entry_data({**kept, **split_settings(user_input)}, lines_from_config(current))
             return self.async_create_entry(title="", data=data)
         schema = vol.Schema(_settings_fields(self.hass.config.latitude, self.hass.config.longitude, settings=current))
         return self.async_show_form(step_id="settings", data_schema=schema)
@@ -287,7 +291,10 @@ class HeliosForecastOptionsFlow(OptionsFlow):
         """
         current = self._current()
         if user_input is not None:
-            settings = {**split_settings(current), **split_settings(user_input)}
+            # The mirror of the settings step: the installation settings are carried over, the benchmark
+            # block is exactly what this form says, so a key cleared here is really gone.
+            kept = {k: v for k, v in split_settings(current).items() if k not in BENCHMARK_KEYS}
+            settings = {**kept, **split_settings(user_input)}
             # The address is only written down when it is not the standard one. Storing the default
             # would freeze it in every entry, and the day the collector moves nobody could follow.
             if settings.get(CONF_BENCHMARK_URL) == DEFAULT_ENDPOINT:
