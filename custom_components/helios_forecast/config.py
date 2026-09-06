@@ -91,6 +91,11 @@ SETTINGS_KEYS: Tuple[str, ...] = (
     CONF_BENCHMARK_KEY,
 )
 
+# The benchmark block is edited on a step of its own, so each options step must only rewrite the keys
+# its form shows and carry the others over: saving the installation settings used to drop the
+# benchmark opt-in and key on the floor.
+BENCHMARK_KEYS: Tuple[str, ...] = (CONF_BENCHMARK_ENABLED, CONF_BENCHMARK_URL, CONF_BENCHMARK_KEY)
+
 
 def split_line(user_input: Dict[str, Any]) -> Dict[str, Any]:
     """The per-line geometry fields of a submitted form (drops empty values)."""

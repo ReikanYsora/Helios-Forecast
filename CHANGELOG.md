@@ -5,6 +5,22 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.9.4
+
+### Fixed: saving the settings no longer drops the benchmark opt-in and key
+
+Since the benchmark got a step of its own in 2026.9.2, the settings step rewrote
+the entry with only the fields its own form shows, and the benchmark block was not
+among them: saving the installation settings switched the benchmark off and blanked
+the key. 2026.9.3 made it visible, because a repair is exactly what sends people to
+that form. Each step now rewrites only the keys it shows and carries the others
+over. If it happened to you, switching the benchmark back on with the same key, or
+a fresh one, puts you right where you were: the collector follows the installation,
+not the key, so nothing measured is lost. Clearing the key on the benchmark step now
+really clears it, as the documentation always said.
+
+---
+
 ## 2026.9.3
 
 The release that checks its own configuration. The first two days of the public
