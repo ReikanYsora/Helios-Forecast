@@ -5,6 +5,57 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.9.3
+
+### Added: a systematic check-up of the configuration, shown as repairs
+
+A forecast running on a wrong configuration produces wrong numbers with a straight
+face. The first two days of the public benchmark showed how common that is: one
+installation in seven had typed its peak power in watts instead of kilowatts, one
+had an inverter limit in watts, one a meter that counts the whole house. None of
+it crashes, all of it makes the forecast look bad for a reason that is not the
+forecast.
+
+So every field is now checked, at startup and after every refresh, and each
+problem found becomes a repair in Home Assistant (Settings, then Repairs, and the
+integration's own page), naming the value at fault and what to do about it. The
+configuration first: peak power, tilt, azimuth and tracker of each line, its
+coordinates against the installation's, the inverter limits against the panels,
+the location against the Home Assistant home, the battery block, the trend hour,
+the benchmark key. Then the entities it names: the production sensor must exist
+and be a cumulative energy sensor, not a power one; the battery sensor must exist
+and report a percentage; the curtailment signal must exist. Then the data itself:
+a production sensor with no history yet, one that has not moved for days, one that
+records energy in the middle of the night (it measures more than the panels), one
+that exceeds what the declared panels can deliver. A repair clears itself the
+moment the configuration is corrected.
+
+The community benchmark answers each upload with its verdict on the installation,
+and an installation it keeps out of the published figures now learns why from a
+repair of its own instead of from the website.
+
+### Fixed: a consumption source with gaps no longer dilutes the learned profile
+
+The home consumption profile behind the battery projection summed every Energy
+dashboard source hour by hour, and an hour with no bucket for one source still
+counted, with that term missing. A battery whose discharge meter reported a
+quarter of the time carried the night load a quarter of the time, so the profile
+learned a house that barely consumes after dark and the projection never reached
+the reserve (reported in #61). The recorder writes an hourly row as soon as a
+sensor had a valid state in that hour, so a missing row means no data, not zero:
+the profile is now built only from the hours every sparse source covers, the
+per-source coverage is exposed on the predicted state of charge sensor and in the
+diagnostics, and a source far behind the others gets a repair naming it.
+
+### Added: diagnostics
+
+The integration's page now offers a diagnostics download: the configuration with
+its benchmark key blanked, the problem list, how much history the learning stands
+on and the consumption coverage. Enough for an issue, nothing that names a person
+or an address.
+
+---
+
 ## 2026.9.2
 
 ### Added: contribute to the public accuracy benchmark

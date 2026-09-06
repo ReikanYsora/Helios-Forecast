@@ -143,5 +143,139 @@
         }
       }
     }
+  },
+  "issues": {
+    "location_invalid": {
+      "title": "Lokacija zunaj veljavnega območja",
+      "description": "Lokacija {entry} ({latitude}, {longitude}) ni veljavna zemljepisna širina in dolžina. Širina je med -90 in 90, dolžina med -180 in 180; pustite obe polji prazni, da se uporabi dom Home Assistanta."
+    },
+    "location_far": {
+      "title": "Lokacija daleč od vašega doma v Home Assistantu",
+      "description": "Lokacija {entry} je {km} km od doma Home Assistanta. Če je naprava res tam, to prezrite; sicer preverite decimalko širine ali dolžine."
+    },
+    "no_lines": {
+      "title": "Ni vrste panelov",
+      "description": "{entry} nima nobene vrste panelov, zato ni česa napovedovati. Dodajte vsaj eno vrsto z naklonom, azimutom in vršno močjo."
+    },
+    "line_kwp_missing": {
+      "title": "Vrsta {line}: manjka vršna moč",
+      "description": "Vrsta {line} v {entry} nima vršne moči ali je ta nič. Brez nje vse številke ostanejo na ničli. Vnesite vršno moč vrste v kWp (na primer 3,6 za 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Vrsta {line}: vršna moč je videti kot vati",
+      "description": "Vrsta {line} v {entry} navaja {kwp} kWp, daleč nad domačo napravo. Vrednost je bila najverjetneje vnesena v vatih. Vnesite jo v kilovatih vršne moči (na primer 4,05 namesto 4050)."
+    },
+    "line_tilt": {
+      "title": "Vrsta {line}: naklon zunaj območja",
+      "description": "Vrsta {line} v {entry} ima naklon {tilt} stopinj. Naklon je med 0 (vodoravno) in 90 (navpično)."
+    },
+    "line_azimuth": {
+      "title": "Vrsta {line}: azimut zunaj območja",
+      "description": "Vrsta {line} v {entry} ima azimut {azimuth} stopinj. Azimut je med 0 in 360 v smeri urinega kazalca od severa: 90 je vzhod, 180 jug, 270 zahod."
+    },
+    "line_tracker": {
+      "title": "Vrsta {line}: neznana vrsta sledilnika",
+      "description": "Vrsta {line} v {entry} navaja sledilnik vrste {tracker}, ki ga ta integracija ne pozna. Izberite eno od ponujenih vrst ali nobene za fiksne panele."
+    },
+    "line_location_invalid": {
+      "title": "Vrsta {line}: koordinate zunaj območja",
+      "description": "Vrsta {line} v {entry} ima koordinate, ki niso veljavna zemljepisna širina in dolžina. Popravite jih ali pustite obe polji prazni, da se vrsta postavi na lokacijo naprave."
+    },
+    "line_location_far": {
+      "title": "Vrsta {line}: koordinate daleč od naprave",
+      "description": "Vrsta {line} v {entry} je postavljena {km} km od naprave. Paneli na oddaljenem polju so mogoči, napačna decimalka je verjetnejša; preverite širino in dolžino vrste."
+    },
+    "line_cap_unit": {
+      "title": "Vrsta {line}: omejitev razsmernika je videti kot vati",
+      "description": "Vrsta {line} v {entry} ima omejitev razsmernika {cap} kW za {kwp} kWp panelov. Omejitev je bila najverjetneje vnesena v vatih. Vnesite jo v kilovatih."
+    },
+    "inverter_cap_unit": {
+      "title": "Omejitev razsmernika je videti kot vati",
+      "description": "{entry} ima omejitev razsmernika {cap} kW za {kwp} kWp panelov. Omejitev je bila najverjetneje vnesena v vatih. Vnesite jo v kilovatih (na primer 5 namesto 5000)."
+    },
+    "inverter_cap_low": {
+      "title": "Omejitev razsmernika precej pod paneli",
+      "description": "{entry} ima omejitev razsmernika {cap} kW za {kwp} kWp panelov, zato bo napoved večino dneva odrezana. Če je omejitev pravilna, to prezrite; sicer preverite vrednost ali njeno enoto."
+    },
+    "production_entity_unset": {
+      "title": "Ni senzorja proizvodnje: napoved se ne more učiti",
+      "description": "{entry} nima senzorja proizvodnje. Napoved teče na fiziki in vremenu, a je nič ne popravlja glede na to, kar vaši paneli res dajejo. V nastavitvah izberite senzor kumulativne energije (kWh) razsmernika ali števca."
+    },
+    "trend_anchor_hour": {
+      "title": "Referenčna ura trenda zunaj območja",
+      "description": "{entry} ima referenčno uro trenda {hour}. Vnesite lokalno uro od 0 do 23."
+    },
+    "battery_soc_entity_unset": {
+      "title": "Baterija: kapaciteta nastavljena, a ni senzorja stanja napolnjenosti",
+      "description": "{entry} navaja baterijo {capacity} kWh, a nobenega senzorja stanja napolnjenosti, zato projekcija ostaja izklopljena. Izberite senzor stanja napolnjenosti baterije (v %) ali izbrišite kapaciteto."
+    },
+    "battery_capacity_unset": {
+      "title": "Baterija: senzor stanja napolnjenosti nastavljen, a ni kapacitete",
+      "description": "{entry} navaja senzor stanja napolnjenosti, a nobene uporabne kapacitete, zato projekcija ostaja izklopljena. Vnesite uporabno kapaciteto baterije v kWh ali izbrišite senzor."
+    },
+    "battery_capacity": {
+      "title": "Kapaciteta baterije zunaj območja",
+      "description": "{entry} navaja baterijo {capacity} kWh, kar ni domača baterija. Vnesite uporabno kapaciteto v kilovatnih urah (na primer 10 namesto 10000)."
+    },
+    "battery_power": {
+      "title": "Neverjetna moč polnjenja ali praznjenja baterije",
+      "description": "{entry} navaja moč baterije {power} kW pri kapaciteti {capacity} kWh, več kot trikratnik kapacitete na uro. Preverite vrednost in njeno enoto (kW, ne W)."
+    },
+    "battery_min_soc": {
+      "title": "Rezerva baterije zunaj območja",
+      "description": "{entry} ima najmanjše stanje napolnjenosti {value}. Vnesite odstotek od 0 do 100."
+    },
+    "battery_efficiency": {
+      "title": "Izkoristek baterije zunaj območja",
+      "description": "{entry} ima skupni izkoristek {value}. Vnesite odstotek od 50 do 100 (večina domačih baterij je okoli 90)."
+    },
+    "benchmark_key": {
+      "title": "Ključ primerjave ni videti kot ključ",
+      "description": "{entry} sodeluje v primerjavi skupnosti, a njegov ključ ni ključ, ki ga izda zbiralnik. Prilepite celoten ključ s helios-ha.org/benchmark ali primerjavo izklopite."
+    },
+    "production_entity_missing": {
+      "title": "Senzor proizvodnje ni najden",
+      "description": "Senzor proizvodnje {entry}, {entity}, ne obstaja. Napoved teče brez popravka, dokler se ne pojavi. Preverite ID entitete ali senzor znova izberite v nastavitvah."
+    },
+    "production_entity_kind": {
+      "title": "Senzor proizvodnje ni senzor kumulativne energije",
+      "description": "Senzor proizvodnje {entry}, {entity}, poroča {unit} z razredom stanja {state_class}. Učenje potrebuje senzor kumulativne energije v kWh (razred stanja total ali total_increasing), ne senzorja moči. Izberite vsoto energije razsmernika ali števca; pomočnik Integral iz senzorja moči naredi tak senzor."
+    },
+    "battery_soc_entity_missing": {
+      "title": "Senzor stanja napolnjenosti baterije ni najden",
+      "description": "Senzor baterije {entry}, {entity}, ne obstaja, zato projekcija ostaja izklopljena. Preverite ID entitete ali senzor znova izberite."
+    },
+    "battery_soc_entity_unit": {
+      "title": "Senzor baterije ni odstotek",
+      "description": "Senzor baterije {entry}, {entity}, poroča {unit}. Projekcija potrebuje stanje napolnjenosti v odstotkih."
+    },
+    "curtailment_entity_missing": {
+      "title": "Signal omejevanja ni najden",
+      "description": "Signal omejevanja {entry}, {entity}, ne obstaja. Ure, ko je razsmernik omejen, se potem naučijo kot slabo nebo. Preverite ID entitete ali polje izpraznite."
+    },
+    "production_history_empty": {
+      "title": "Senzor proizvodnje še nima zgodovine",
+      "description": "{entity}, senzor proizvodnje {entry}, še nima dolgoročne statistike. Učenje se začne, takoj ko ima snemalnik nekaj ur; če to vztraja po enem dnevu, senzor ni senzor kumulativne energije."
+    },
+    "production_at_night": {
+      "title": "Senzor proizvodnje šteje ponoči",
+      "description": "{entity}, senzor proizvodnje {entry}, je zabeležil {kwh} kWh, ko je bilo sonce globoko pod obzorjem. Paneli ponoči ne proizvedejo nič, zato ta senzor meri več kot paneli (števec omrežja ali hiše). Izberite senzor, ki šteje samo izhod razsmernika."
+    },
+    "production_above_panels": {
+      "title": "Proizvodnja nad tem, kar lahko dajo navedeni paneli",
+      "description": "{entity}, senzor proizvodnje {entry}, je večkrat dosegel {kw} kW pri {kwp} kWp navedenih panelov. Ali je vršna moč premajhna ali senzor šteje več kot paneli. Preverite oboje."
+    },
+    "production_stale": {
+      "title": "Ni zabeležene proizvodnje že {days} dni",
+      "description": "{entity}, senzor proizvodnje {entry}, se ni povečal že {days} dni. Sneg ali izpad to lahko pojasnita; če paneli proizvajajo, je senzor nehal poročati in učenje strada."
+    },
+    "consumption_source_sparse": {
+      "title": "Vir porabe {source} poroča s prekinitvami",
+      "description": "V nadzorni plošči Energija ima {source} podatke za {pct} % ur, ki jih pokriva najboljši vir ({best} %). Profil porabe se gradi samo iz ur, ki jih pokriva, zato ostaja pravilen, a sloni na manj zgodovine. Zanesljivejši senzor za ta tok izostri projekcijo baterije."
+    },
+    "benchmark_excluded": {
+      "title": "Izključena iz številk primerjave ({reason})",
+      "description": "Primerjava skupnosti prejema oddaje {entry}, a jih drži zunaj objavljenih številk. Razlog {reason}: kwp pomeni, da navedena vršna moč manjka, je nič ali vnesena v vatih; night pomeni, da senzor proizvodnje beleži energijo ponoči, torej meri več kot paneli. Popravite konfiguracijo in naprava bo v enem dnevu spet upoštevana."
+    }
   }
 }

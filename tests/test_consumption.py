@@ -113,3 +113,53 @@ def test_profile_partial_source_missing_from_buckets() -> None:
 def test_profile_none_without_history() -> None:
     sources = ConsumptionSources(signed={"load": 1})
     assert build_consumption_profile(sources, {}, _UTC) is None
+
+
+# --- per-source coverage and the sparse-source correction ---------------------------------------
+
+
+def _hours(day: int, n: int) -> list:
+    base = datetime(2026, 6, day, 0, tzinfo=_UTC)
+    return [datetime.fromtimestamp(base.timestamp() + h * 3600, _UTC) for h in range(n)]
+
+
+def test_coverage_names_each_source_share_of_the_hours() -> None:
+    from custom_components.helios_forecast.consumption import source_coverage
+
+    hours = _hours(1, 48)
+    sources = ConsumptionSources(signed={"sensor.import": 1, "sensor.bat_out": 1})
+    buckets = {
+        "sensor.import": [_bucket(h, 0.5) for h in hours],
+        "sensor.bat_out": [_bucket(h, 0.3) for h in hours[:12]],
+    }
+    cov = source_coverage(sources, buckets)
+    assert cov["sensor.import"] == 1.0
+    assert abs(cov["sensor.bat_out"] - 0.25) < 1e-9
+
+
+def test_sparse_source_restricts_the_profile_to_the_hours_it_covers() -> None:
+    # Grid import every hour at 0.24 kWh; battery discharge 0.5 kWh but only for the first 6 hours of
+    # each day (a quarter coverage). Diluted, the night load looks like 240 + 125 W; corrected, 740 W.
+    hours = _hours(1, 96)
+    sources = ConsumptionSources(signed={"sensor.import": 1, "sensor.bat_out": 1})
+    buckets = {
+        "sensor.import": [_bucket(h, 0.24) for h in hours],
+        "sensor.bat_out": [_bucket(h, 0.5) for h in hours if h.hour < 6],
+    }
+    profile = build_consumption_profile(sources, buckets, _UTC)
+    assert profile is not None
+    assert profile.samples == 24  # 4 days x 6 covered hours
+    assert abs(profile.overall_w - 740.0) < 1e-6
+    assert abs(profile.coverage["sensor.bat_out"] - 0.25) < 1e-9
+
+
+def test_well_covered_sources_keep_every_hour() -> None:
+    hours = _hours(1, 48)
+    sources = ConsumptionSources(signed={"sensor.import": 1, "sensor.export": -1})
+    buckets = {
+        "sensor.import": [_bucket(h, 0.4) for h in hours],
+        "sensor.export": [_bucket(h, 0.1) for h in hours[:40]],  # 83 %: not sparse
+    }
+    profile = build_consumption_profile(sources, buckets, _UTC)
+    assert profile is not None
+    assert profile.samples == 48

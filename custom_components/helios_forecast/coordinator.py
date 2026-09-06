@@ -15,7 +15,7 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import partial
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 from homeassistant.components.recorder import get_instance, history
 from homeassistant.components.recorder.models import StatisticMetaData
@@ -25,7 +25,7 @@ from homeassistant.components.recorder.statistics import (
 )
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import CoreState, HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
@@ -50,6 +50,16 @@ from .config import (
     CONF_INVERTER_MAX_KW,
 )
 from .benchmark import DEFAULT_ENDPOINT, async_upload, build_payload
+from .checkup import (
+    EntitySnapshot,
+    Problem,
+    check_benchmark_quality,
+    check_config,
+    check_consumption_coverage,
+    check_entities,
+    check_production_history,
+)
+from . import repairs
 from .analog import build_library, enrich_archive_points, enrich_points
 from .curtailment import flag_curtailed, on_intervals_from_states
 from .battery import BatterySocPoint, project_battery_soc
@@ -196,9 +206,65 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # version, read once from the manifest so every emission says which model produced it.
         self._last_upload_hour: Optional[datetime] = None
         self._version: Optional[str] = None
+        # The check-up (checkup.py): the problems found by the latest pass, the repair issues published for
+        # them, whether the production history could be read this refresh (a fetch that failed is not a
+        # silent meter), and the collector's latest verdict on this installation.
+        self.problems: List[Problem] = []
+        self._issue_ids: Set[str] = set()
+        self._production_history_read = False
+        self._benchmark_quality: Optional[Dict[str, Any]] = None
 
     def _config(self) -> Dict[str, Any]:
         return {**self.entry.data, **self.entry.options}
+
+    @property
+    def consumption_coverage(self) -> Dict[str, float]:
+        """Per-source coverage of the consumption profile in use, empty when there is none."""
+        return dict(self._consumption_profile.coverage) if self._consumption_profile is not None else {}
+
+    # --- check-up -------------------------------------------------------------------------------
+
+    def _snapshot(self, entity_id: Optional[str]) -> Optional[EntitySnapshot]:
+        """What the check-up needs to know of an entity right now."""
+        if not entity_id:
+            return None
+        state = self.hass.states.get(entity_id)
+        if state is None:
+            return EntitySnapshot(entity_id, exists=False)
+        attrs = state.attributes
+        return EntitySnapshot(
+            entity_id,
+            exists=True,
+            state=state.state,
+            unit=attrs.get("unit_of_measurement"),
+            device_class=attrs.get("device_class"),
+            state_class=attrs.get("state_class"),
+        )
+
+    def _check_configuration(self, data: Dict[str, Any]) -> List[Problem]:
+        """The configuration and the entities it names. Entities are only judged once Home Assistant is
+        running: during startup they routinely do not exist yet, and a false alarm that clears itself
+        half an hour later is worse than none."""
+        problems = check_config(data, self.hass.config.latitude, self.hass.config.longitude)
+        if self.hass.state is CoreState.running:
+            problems += check_entities(
+                data,
+                self._snapshot(learning_from_config(data)),
+                self._snapshot(data.get(CONF_BATTERY_SOC_ENTITY) or None),
+                self._snapshot(curtailment_entity_from_config(data)),
+            )
+        return problems
+
+    @callback
+    def _publish_problems(self, problems: List[Problem]) -> None:
+        self.problems = list(problems)
+        self._issue_ids = repairs.sync(self.hass, self.entry, self.problems, self._issue_ids)
+
+    @callback
+    def clear_problems(self) -> None:
+        repairs.clear(self.hass, self.entry)
+        self._issue_ids = set()
+        self.problems = []
 
     async def _async_update_data(self) -> ForecastData:
         data = self._config()
@@ -206,6 +272,11 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         layout = layout_from_config(data)
         cap = inverter_max_w_from_config(data)
         session = async_get_clientsession(self.hass)
+
+        # The configuration is judged before anything is fetched, so a wrong field shows up even when the
+        # weather service is down; the data checks join the list as the refresh reads each source.
+        problems = self._check_configuration(data)
+        self._publish_problems(problems)
 
         # One combined window: 60 past days feed the learning, 7 future the forecast.
         try:
@@ -224,6 +295,11 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         now = dt_util.now()  # local-aware, drives the local-day boundaries
         residual_map = await self._build_residual_map(data, lat, lon, layout, weather, now)
+        production_entity = learning_from_config(data)
+        if production_entity and self._production_history_read:
+            problems += check_production_history(
+                self._production_buckets, production_entity, lat, lon, layout.total_kwp, now, LEARN_DAYS
+            )
 
         start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + timedelta(days=FORECAST_DAYS)
@@ -290,6 +366,10 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         trend = await self._today_trend(data, now, summary)
         battery_soc = await self._project_battery_soc(data, points, now)
+        if self._consumption_profile is not None:
+            problems += check_consumption_coverage(self._consumption_profile.coverage)
+        problems += check_benchmark_quality(self._benchmark_quality)
+        self._publish_problems(problems)
         await self._maybe_upload_benchmark(data, lat, lon, points, reliability, now_utc)
 
         return ForecastData(
@@ -347,8 +427,21 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         url = str(data.get(CONF_BENCHMARK_URL) or "").strip() or DEFAULT_ENDPOINT
         session = async_get_clientsession(self.hass)
         self.entry.async_create_background_task(
-            self.hass, async_upload(session, url, key, payload), name=f"{DOMAIN}-benchmark-upload"
+            self.hass, self._upload_and_note(session, url, key, payload), name=f"{DOMAIN}-benchmark-upload"
         )
+
+    async def _upload_and_note(self, session, url, key, payload) -> None:
+        """Send the emission and keep what the collector said of this installation: an exclusion from the
+        public figures is a configuration problem the owner should hear about from here, not from the site."""
+        answer = await async_upload(session, url, key, payload)
+        if not isinstance(answer, dict) or "quality" not in answer:
+            return
+        quality = answer.get("quality") if isinstance(answer.get("quality"), dict) else {}
+        if quality == self._benchmark_quality:
+            return
+        self._benchmark_quality = quality
+        kept = [p for p in self.problems if p.key != "benchmark_excluded"]
+        self._publish_problems(kept + check_benchmark_quality(quality))
 
     async def _project_battery_soc(self, data, points, now) -> List[BatterySocPoint]:
         """Project the battery SoC over the next BATTERY_SOC_HORIZON_HOURS, or [] when the feature can't run.
@@ -607,6 +700,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
     async def _build_residual_map(self, data, lat, lon, layout, weather, now):
         """Learn the actual/model residual from the recorder's production history."""
         self._production_buckets = []
+        self._production_history_read = False
         production_entity = learning_from_config(data)
         if not production_entity:
             return None
@@ -617,6 +711,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         except Exception as err:  # noqa: BLE001 - learning is best-effort, forecast still renders
             _LOGGER.warning("Helios learning history fetch failed, forecast stays uncorrected: %s", err)
             return None
+        self._production_history_read = True
 
         # Mark the hours the inverter was held back before anything learns from them (curtailment.py).
         production = await self._flag_curtailed(data, production, learn_start, now)

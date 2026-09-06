@@ -143,5 +143,139 @@
         }
       }
     }
+  },
+  "issues": {
+    "location_invalid": {
+      "title": "Sijainti sallitun alueen ulkopuolella",
+      "description": "Kohteen {entry} sijainti ({latitude}, {longitude}) ei ole kelvollinen leveys- ja pituusaste. Leveysaste on väliltä -90...90 ja pituusaste väliltä -180...180; jätä molemmat kentät tyhjiksi käyttääksesi Home Assistantin kotia."
+    },
+    "location_far": {
+      "title": "Sijainti kaukana Home Assistant -kodistasi",
+      "description": "Kohteen {entry} sijainti on {km} km Home Assistant -kodista. Jos laitteisto todella on siellä, jätä tämä huomiotta; muuten tarkista leveys- tai pituusasteen desimaali."
+    },
+    "no_lines": {
+      "title": "Ei paneeliriviä",
+      "description": "Kohteella {entry} ei ole yhtään paneeliriviä, joten ennustettavaa ei ole. Lisää vähintään yksi rivi kallistuksineen, atsimuutteineen ja huipputehoineen."
+    },
+    "line_kwp_missing": {
+      "title": "Paneelirivi {line}: huipputeho puuttuu",
+      "description": "Kohteen {entry} rivillä {line} ei ole huipputehoa, tai se on nolla. Ilman sitä kaikki luvut jäävät nollaan. Anna rivin huipputeho kWp:nä (esimerkiksi 3,6 kun teho on 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Paneelirivi {line}: huipputeho näyttää wateilta",
+      "description": "Kohteen {entry} rivi {line} ilmoittaa {kwp} kWp, mikä on kaukana kotitalouden laitteistosta. Arvo on mitä todennäköisimmin syötetty watteina. Anna se kilowattipiikkeinä (esimerkiksi 4,05 eikä 4050)."
+    },
+    "line_tilt": {
+      "title": "Paneelirivi {line}: kallistus alueen ulkopuolella",
+      "description": "Kohteen {entry} rivin {line} kallistus on {tilt} astetta. Kallistus on väliltä 0 (vaakasuora) ... 90 (pystysuora)."
+    },
+    "line_azimuth": {
+      "title": "Paneelirivi {line}: atsimuutti alueen ulkopuolella",
+      "description": "Kohteen {entry} rivin {line} atsimuutti on {azimuth} astetta. Atsimuutti on väliltä 0...360 myötäpäivään pohjoisesta: 90 on itä, 180 etelä, 270 länsi."
+    },
+    "line_tracker": {
+      "title": "Paneelirivi {line}: tuntematon seurantatyyppi",
+      "description": "Kohteen {entry} rivi {line} ilmoittaa seurantalaitteen tyyppiä {tracker}, jota tämä integraatio ei tunne. Valitse jokin tarjotuista tyypeistä tai ei mitään kiinteille paneeleille."
+    },
+    "line_location_invalid": {
+      "title": "Paneelirivi {line}: koordinaatit alueen ulkopuolella",
+      "description": "Kohteen {entry} rivin {line} koordinaatit eivät ole kelvollinen leveys- ja pituusaste. Korjaa ne tai jätä molemmat kentät tyhjiksi sijoittaaksesi rivin laitteiston sijaintiin."
+    },
+    "line_location_far": {
+      "title": "Paneelirivi {line}: koordinaatit kaukana laitteistosta",
+      "description": "Kohteen {entry} rivi {line} on sijoitettu {km} km:n päähän laitteistosta. Paneelit kaukaisella pellolla ovat mahdollisia, väärä desimaali on todennäköisempi; tarkista rivin leveys- ja pituusaste."
+    },
+    "line_cap_unit": {
+      "title": "Paneelirivi {line}: invertterin raja näyttää wateilta",
+      "description": "Kohteen {entry} rivillä {line} on invertterin raja {cap} kW {kwp} kWp:n paneeleille. Raja on mitä todennäköisimmin syötetty watteina. Anna se kilowatteina."
+    },
+    "inverter_cap_unit": {
+      "title": "Invertterin raja näyttää wateilta",
+      "description": "Kohteella {entry} on invertterin raja {cap} kW {kwp} kWp:n paneeleille. Raja on mitä todennäköisimmin syötetty watteina. Anna se kilowatteina (esimerkiksi 5 eikä 5000)."
+    },
+    "inverter_cap_low": {
+      "title": "Invertterin raja selvästi paneeleja pienempi",
+      "description": "Kohteella {entry} on invertterin raja {cap} kW {kwp} kWp:n paneeleille, joten ennuste leikkautuu lähes koko päivän. Jos raja on oikea, jätä tämä huomiotta; muuten tarkista arvo tai sen yksikkö."
+    },
+    "production_entity_unset": {
+      "title": "Ei tuotantoanturia: ennuste ei voi oppia",
+      "description": "Kohteella {entry} ei ole tuotantoanturia. Ennuste toimii fysiikan ja sään varassa, mutta mikään ei korjaa sitä sen mukaan, mitä paneelisi todella tuottavat. Valitse asetuksista invertterisi tai mittarisi kumulatiivinen energia-anturi (kWh)."
+    },
+    "trend_anchor_hour": {
+      "title": "Trendin viitetunti alueen ulkopuolella",
+      "description": "Kohteen {entry} trendin viitetunti on {hour}. Anna paikallinen tunti väliltä 0...23."
+    },
+    "battery_soc_entity_unset": {
+      "title": "Akku: kapasiteetti asetettu, mutta ei varaustila-anturia",
+      "description": "{entry} ilmoittaa {capacity} kWh:n akun, mutta ei varaustila-anturia, joten ennuste pysyy pois päältä. Valitse akun varaustila-anturi (%) tai tyhjennä kapasiteetti."
+    },
+    "battery_capacity_unset": {
+      "title": "Akku: varaustila-anturi asetettu, mutta ei kapasiteettia",
+      "description": "{entry} nimeää varaustila-anturin, mutta ei käyttökelpoista kapasiteettia, joten ennuste pysyy pois päältä. Anna akun käyttökelpoinen kapasiteetti kWh:na tai tyhjennä anturi."
+    },
+    "battery_capacity": {
+      "title": "Akun kapasiteetti alueen ulkopuolella",
+      "description": "{entry} ilmoittaa {capacity} kWh:n akun, mikä ei ole kotiakku. Anna käyttökelpoinen kapasiteetti kilowattitunteina (esimerkiksi 10 eikä 10000)."
+    },
+    "battery_power": {
+      "title": "Akun lataus- tai purkuteho epäuskottava",
+      "description": "{entry} ilmoittaa akun tehoksi {power} kW {capacity} kWh:n kapasiteetille, yli kolme kertaa kapasiteetin tunnissa. Tarkista arvo ja sen yksikkö (kW, ei W)."
+    },
+    "battery_min_soc": {
+      "title": "Akun varareservi alueen ulkopuolella",
+      "description": "Kohteen {entry} vähimmäisvaraustila on {value}. Anna prosenttiluku väliltä 0...100."
+    },
+    "battery_efficiency": {
+      "title": "Akun hyötysuhde alueen ulkopuolella",
+      "description": "Kohteen {entry} kokonaishyötysuhde on {value}. Anna prosenttiluku väliltä 50...100 (useimmat kotiakut ovat noin 90)."
+    },
+    "benchmark_key": {
+      "title": "Vertailun avain ei näytä avaimelta",
+      "description": "{entry} osallistuu yhteisön vertailuun, mutta sen avain ei ole kerääjän myöntämä. Liitä koko avain osoitteesta helios-ha.org/benchmark tai kytke vertailu pois."
+    },
+    "production_entity_missing": {
+      "title": "Tuotantoanturia ei löydy",
+      "description": "Kohteen {entry} tuotantoanturia {entity} ei ole olemassa. Ennuste toimii korjaamattomana, kunnes se on. Tarkista entiteetin tunnus tai valitse anturi uudelleen asetuksista."
+    },
+    "production_entity_kind": {
+      "title": "Tuotantoanturi ei ole kumulatiivinen energia-anturi",
+      "description": "Kohteen {entry} tuotantoanturi {entity} raportoi yksikössä {unit} tilaluokalla {state_class}. Oppiminen tarvitsee kumulatiivisen energia-anturin kWh:na (tilaluokka total tai total_increasing), ei tehoanturia. Valitse invertterisi tai mittarisi energiasumma; Integraali-apuri tekee tehoanturista sellaisen."
+    },
+    "battery_soc_entity_missing": {
+      "title": "Akun varaustila-anturia ei löydy",
+      "description": "Kohteen {entry} akkuanturia {entity} ei ole olemassa, joten ennuste pysyy pois päältä. Tarkista entiteetin tunnus tai valitse anturi uudelleen."
+    },
+    "battery_soc_entity_unit": {
+      "title": "Akkuanturi ei ole prosenttiluku",
+      "description": "Kohteen {entry} akkuanturi {entity} raportoi yksikössä {unit}. Ennuste tarvitsee varaustilan prosentteina."
+    },
+    "curtailment_entity_missing": {
+      "title": "Rajoitussignaalia ei löydy",
+      "description": "Kohteen {entry} rajoitussignaalia {entity} ei ole olemassa. Tunnit, joina invertteriä rajoitetaan, opitaan silloin huonona taivaana. Tarkista entiteetin tunnus tai tyhjennä kenttä."
+    },
+    "production_history_empty": {
+      "title": "Tuotantoanturilla ei ole vielä historiaa",
+      "description": "Kohteen {entry} tuotantoanturilla {entity} ei ole vielä pitkän aikavälin tilastoja. Oppiminen alkaa heti, kun tallentimella on muutama tunti; jos tilanne jatkuu päivän jälkeen, anturi ei ole kumulatiivinen energia-anturi."
+    },
+    "production_at_night": {
+      "title": "Tuotantoanturi laskee yöllä",
+      "description": "Kohteen {entry} tuotantoanturi {entity} kirjasi {kwh} kWh auringon ollessa selvästi horisontin alapuolella. Paneelit eivät tuota yöllä mitään, joten tämä anturi mittaa enemmän kuin paneelit (verkko- tai talomittari). Valitse anturi, joka laskee vain invertterin ulostulon."
+    },
+    "production_above_panels": {
+      "title": "Tuotanto ylittää ilmoitettujen paneelien kyvyn",
+      "description": "Kohteen {entry} tuotantoanturi {entity} saavutti {kw} kW useita kertoja, vaikka paneeleja on ilmoitettu {kwp} kWp. Joko huipputeho on liian pieni tai anturi laskee enemmän kuin paneelit. Tarkista molemmat."
+    },
+    "production_stale": {
+      "title": "Tuotantoa ei ole kirjattu {days} päivään",
+      "description": "Kohteen {entry} tuotantoanturi {entity} ei ole kasvanut {days} päivään. Lumi tai vika voi selittää sen; jos paneelit tuottavat, anturi on lakannut raportoimasta ja oppiminen näkee nälkää."
+    },
+    "consumption_source_sparse": {
+      "title": "Kulutuslähde {source} raportoi katkonaisesti",
+      "description": "Energiakojelaudassa lähteellä {source} on tietoa {pct} %:lle tunneista, jotka paras lähde kattaa ({best} %). Kulutusprofiili rakennetaan vain sen kattamista tunneista, joten se pysyy oikeana mutta nojaa pienempään historiaan. Luotettavampi anturi tälle virralle tarkentaa akkuennustetta."
+    },
+    "benchmark_excluded": {
+      "title": "Jätetty vertailun lukujen ulkopuolelle ({reason})",
+      "description": "Yhteisön vertailu vastaanottaa kohteen {entry} lähetykset, mutta pitää ne julkaistujen lukujen ulkopuolella. Syy {reason}: kwp tarkoittaa, että ilmoitettu huipputeho puuttuu, on nolla tai on syötetty watteina; night tarkoittaa, että tuotantoanturi kirjaa energiaa yöllä eli mittaa enemmän kuin paneelit. Korjaa määritys, niin laitteisto lasketaan taas mukaan päivän kuluessa."
+    }
   }
 }

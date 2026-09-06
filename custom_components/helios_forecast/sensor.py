@@ -406,6 +406,11 @@ class HeliosBatterySocSensor(CoordinatorEntity[HeliosForecastCoordinator], Senso
             "max_soc": high.soc,
             "max_soc_time": high.t.isoformat(),
             "reliability": self.coordinator.data.reliability.overall,
+            # Share of the learn window each Energy-dashboard source covered (see consumption.py): a source
+            # far below the others is why a projection can run too optimistic.
+            "consumption_coverage": {
+                sid: round(share, 3) for sid, share in sorted(self.coordinator.consumption_coverage.items())
+            },
         }
 
 

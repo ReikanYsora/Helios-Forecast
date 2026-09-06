@@ -143,5 +143,139 @@
         }
       }
     }
+  },
+  "issues": {
+    "location_invalid": {
+      "title": "Plassering utenfor gyldig område",
+      "description": "Plasseringen for {entry} ({latitude}, {longitude}) er ikke en gyldig breddegrad og lengdegrad. Breddegraden går fra -90 til 90 og lengdegraden fra -180 til 180; la begge feltene stå tomme for å bruke Home Assistant-hjemmet."
+    },
+    "location_far": {
+      "title": "Plassering langt fra Home Assistant-hjemmet ditt",
+      "description": "Plasseringen for {entry} ligger {km} km fra Home Assistant-hjemmet. Står anlegget virkelig der, kan du se bort fra dette; ellers bør du sjekke en desimal i bredde- eller lengdegraden."
+    },
+    "no_lines": {
+      "title": "Ingen panelrekke",
+      "description": "{entry} har ingen panelrekke, så det er ingenting å varsle. Legg til minst én rekke med helning, asimut og toppeffekt."
+    },
+    "line_kwp_missing": {
+      "title": "Panelrekke {line}: toppeffekt mangler",
+      "description": "Rekke {line} i {entry} har ingen toppeffekt, eller null. Uten den blir alle tall flate. Oppgi rekkens toppeffekt i kWp (for eksempel 3,6 for 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Panelrekke {line}: toppeffekten ser ut som watt",
+      "description": "Rekke {line} i {entry} oppgir {kwp} kWp, langt over et husanlegg. Verdien ble mest sannsynlig tastet i watt. Oppgi den i kilowatt-peak (for eksempel 4,05 i stedet for 4050)."
+    },
+    "line_tilt": {
+      "title": "Panelrekke {line}: helning utenfor området",
+      "description": "Rekke {line} i {entry} har en helning på {tilt} grader. Helningen går fra 0 (flatt) til 90 (loddrett)."
+    },
+    "line_azimuth": {
+      "title": "Panelrekke {line}: asimut utenfor området",
+      "description": "Rekke {line} i {entry} har en asimut på {azimuth} grader. Asimut går fra 0 til 360 med klokken fra nord: 90 er øst, 180 sør, 270 vest."
+    },
+    "line_tracker": {
+      "title": "Panelrekke {line}: ukjent trackertype",
+      "description": "Rekke {line} i {entry} oppgir en tracker av typen {tracker}, som denne integrasjonen ikke kjenner. Velg en av de tilbudte typene, eller ingen for faste paneler."
+    },
+    "line_location_invalid": {
+      "title": "Panelrekke {line}: koordinater utenfor området",
+      "description": "Rekke {line} i {entry} har koordinater som ikke er en gyldig breddegrad og lengdegrad. Rett dem, eller la begge feltene stå tomme for å plassere rekken på anleggets plassering."
+    },
+    "line_location_far": {
+      "title": "Panelrekke {line}: koordinater langt fra anlegget",
+      "description": "Rekke {line} i {entry} er plassert {km} km fra anlegget. Paneler på et fjernt jorde er mulig, en feil desimal er mer sannsynlig; sjekk rekkens bredde- og lengdegrad."
+    },
+    "line_cap_unit": {
+      "title": "Panelrekke {line}: invertergrensen ser ut som watt",
+      "description": "Rekke {line} i {entry} har en invertergrense på {cap} kW for {kwp} kWp paneler. Grensen ble mest sannsynlig tastet i watt. Oppgi den i kilowatt."
+    },
+    "inverter_cap_unit": {
+      "title": "Invertergrensen ser ut som watt",
+      "description": "{entry} har en invertergrense på {cap} kW for {kwp} kWp paneler. Grensen ble mest sannsynlig tastet i watt. Oppgi den i kilowatt (for eksempel 5 i stedet for 5000)."
+    },
+    "inverter_cap_low": {
+      "title": "Invertergrense langt under panelene",
+      "description": "{entry} har en invertergrense på {cap} kW for {kwp} kWp paneler, så varselet blir klippet mesteparten av dagen. Er grensen riktig, kan du se bort fra dette; ellers bør du sjekke verdien eller enheten."
+    },
+    "production_entity_unset": {
+      "title": "Ingen produksjonssensor: varselet kan ikke lære",
+      "description": "{entry} har ingen produksjonssensor. Varselet kjører på fysikk og vær, men ingenting retter det etter hva panelene dine faktisk leverer. Velg den akkumulerte energisensoren (kWh) fra inverteren eller måleren din i innstillingene."
+    },
+    "trend_anchor_hour": {
+      "title": "Trendens referansetime utenfor området",
+      "description": "{entry} har en referansetime for trenden på {hour}. Oppgi en lokal time fra 0 til 23."
+    },
+    "battery_soc_entity_unset": {
+      "title": "Batteri: kapasitet satt, men ingen ladetilstandssensor",
+      "description": "{entry} oppgir et batteri på {capacity} kWh, men ingen ladetilstandssensor, så framskrivingen forblir av. Velg batteriets ladetilstandssensor (i %) eller fjern kapasiteten."
+    },
+    "battery_capacity_unset": {
+      "title": "Batteri: ladetilstandssensor satt, men ingen kapasitet",
+      "description": "{entry} nevner en ladetilstandssensor, men ingen brukbar kapasitet, så framskrivingen forblir av. Oppgi batteriets brukbare kapasitet i kWh eller fjern sensoren."
+    },
+    "battery_capacity": {
+      "title": "Batterikapasitet utenfor området",
+      "description": "{entry} oppgir et batteri på {capacity} kWh, som ikke er et husbatteri. Oppgi den brukbare kapasiteten i kilowattimer (for eksempel 10 i stedet for 10000)."
+    },
+    "battery_power": {
+      "title": "Batteriets lade- eller utladingseffekt er urimelig",
+      "description": "{entry} oppgir en batterieffekt på {power} kW for en kapasitet på {capacity} kWh, mer enn tre ganger kapasiteten per time. Sjekk verdien og enheten (kW, ikke W)."
+    },
+    "battery_min_soc": {
+      "title": "Batterireserve utenfor området",
+      "description": "{entry} har en minste ladetilstand på {value}. Oppgi en prosent fra 0 til 100."
+    },
+    "battery_efficiency": {
+      "title": "Batterivirkningsgrad utenfor området",
+      "description": "{entry} har en rundturvirkningsgrad på {value}. Oppgi en prosent fra 50 til 100 (de fleste husbatterier ligger rundt 90)."
+    },
+    "benchmark_key": {
+      "title": "Benchmark-nøkkelen ser ikke ut som en nøkkel",
+      "description": "{entry} deltar i fellesskapets benchmark, men nøkkelen er ikke en som innsamleren utsteder. Lim inn hele nøkkelen fra helios-ha.org/benchmark, eller slå av benchmarken."
+    },
+    "production_entity_missing": {
+      "title": "Produksjonssensor ikke funnet",
+      "description": "Produksjonssensoren for {entry}, {entity}, finnes ikke. Varselet kjører ukorrigert til den gjør det. Sjekk entitets-id-en, eller velg sensoren på nytt i innstillingene."
+    },
+    "production_entity_kind": {
+      "title": "Produksjonssensoren er ikke en akkumulert energisensor",
+      "description": "Produksjonssensoren for {entry}, {entity}, rapporterer {unit} med tilstandsklassen {state_class}. Læringen trenger en akkumulert energisensor i kWh (tilstandsklasse total eller total_increasing), ikke en effektsensor. Velg energitotalen fra inverteren eller måleren din; hjelperen Integral gjør en effektsensor om til en slik."
+    },
+    "battery_soc_entity_missing": {
+      "title": "Batteriets ladetilstandssensor ikke funnet",
+      "description": "Batterisensoren for {entry}, {entity}, finnes ikke, så framskrivingen forblir av. Sjekk entitets-id-en eller velg sensoren på nytt."
+    },
+    "battery_soc_entity_unit": {
+      "title": "Batterisensoren er ikke en prosent",
+      "description": "Batterisensoren for {entry}, {entity}, rapporterer {unit}. Framskrivingen trenger ladetilstanden i prosent."
+    },
+    "curtailment_entity_missing": {
+      "title": "Begrensningssignal ikke funnet",
+      "description": "Begrensningssignalet for {entry}, {entity}, finnes ikke. Timer der inverteren holdes tilbake, læres da som dårlig himmel. Sjekk entitets-id-en eller tøm feltet."
+    },
+    "production_history_empty": {
+      "title": "Produksjonssensoren har ingen historikk ennå",
+      "description": "{entity}, produksjonssensoren for {entry}, har ennå ingen langtidsstatistikk. Læringen starter så snart recorderen har noen timer; vedvarer det etter en dag, er sensoren ikke en akkumulert energisensor."
+    },
+    "production_at_night": {
+      "title": "Produksjonssensoren teller om natten",
+      "description": "{entity}, produksjonssensoren for {entry}, registrerte {kwh} kWh mens solen sto langt under horisonten. Paneler lager ingenting om natten, så denne sensoren måler mer enn panelene (en nett- eller husmåler). Velg sensoren som bare teller inverterens utgang."
+    },
+    "production_above_panels": {
+      "title": "Produksjon over det de oppgitte panelene kan levere",
+      "description": "{entity}, produksjonssensoren for {entry}, nådde {kw} kW flere ganger med {kwp} kWp oppgitte paneler. Enten er toppeffekten for lav, eller sensoren teller mer enn panelene. Sjekk begge deler."
+    },
+    "production_stale": {
+      "title": "Ingen produksjon registrert på {days} dager",
+      "description": "{entity}, produksjonssensoren for {entry}, har ikke økt på {days} dager. Snø eller et brudd kan forklare det; produserer panelene, har sensoren sluttet å rapportere, og læringen sulter."
+    },
+    "consumption_source_sparse": {
+      "title": "Forbrukskilden {source} rapporterer bare av og til",
+      "description": "I energidashbordet har {source} data for {pct} % av timene den beste kilden dekker ({best} %). Forbruksprofilen bygges bare av timene den dekker, så den forblir riktig, men hviler på mindre historikk. En mer pålitelig sensor for den strømmen gjør batteriframskrivingen skarpere."
+    },
+    "benchmark_excluded": {
+      "title": "Holdt utenfor benchmarkens tall ({reason})",
+      "description": "Fellesskapets benchmark mottar sendingene fra {entry}, men holder dem utenfor de publiserte tallene. Årsak {reason}: kwp betyr at den oppgitte toppeffekten mangler, er null eller ble tastet i watt; night betyr at produksjonssensoren registrerer energi om natten og altså måler mer enn panelene. Rett konfigurasjonen, så telles anlegget med igjen innen en dag."
+    }
   }
 }

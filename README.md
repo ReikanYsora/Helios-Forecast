@@ -218,6 +218,18 @@ not.
 
 Everything runs on your server. No account, no API key, no browser-side maths.
 
+### It checks its own configuration
+
+A forecast on a wrong configuration is wrong with a straight face, so every field
+is checked at startup and after every refresh: a peak power typed in watts, an
+inverter limit in watts, coordinates far from the home, a production sensor that
+is a power sensor or that counts energy at night, a battery whose charge power is
+ten times its capacity, a consumption source that reports intermittently. Each
+problem becomes a repair in Home Assistant (Settings, then Repairs, and the
+integration's own page), naming the value at fault and what to do about it, and it
+clears itself the moment the configuration is corrected. The integration's page
+also offers a diagnostics download for issue reports.
+
 ---
 
 ## The public accuracy benchmark
