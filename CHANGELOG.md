@@ -7,6 +7,16 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ## 2026.9.3
 
+The release that checks its own configuration. The first two days of the public
+benchmark showed one installation in seven running on a peak power typed in watts,
+and a forecast on a wrong configuration is wrong with a straight face: every field,
+entity and data source is now verified and each problem becomes a repair the owner
+sees. The same two days located a systematic under-forecast on clear mornings and
+its cause in the analog ensemble, which now reads ratios to the physics rather than
+watts; replayed on thirty days, the error on the day's energy falls by a third. Plus
+the consumption profile that a sparse source no longer dilutes, and a diagnostics
+download.
+
 ### Added: a systematic check-up of the configuration, shown as repairs
 
 A forecast running on a wrong configuration produces wrong numbers with a straight

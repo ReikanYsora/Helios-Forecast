@@ -145,8 +145,10 @@ Turn it on in the integration settings by filling in your **battery capacity** a
 your **state-of-charge sensor**; the reserve, efficiency and charge/discharge
 limits are optional. A **Predicted battery state of charge** sensor then appears,
 carrying the full curve as its `forecast` attribute (plus the projected low and
-high over those 48 hours, when each is reached, and the forecast reliability so you
-know how far to trust it). Four companion entities, disabled by default, carry the
+high over those 48 hours, when each is reached, the forecast reliability so you
+know how far to trust it, and `consumption_coverage`, how much of the learn window
+each Energy dashboard source had data for, since a source with gaps is the usual
+reason a projection runs optimistic). Four companion entities, disabled by default, carry the
 same low and high with their times (`battery_min_soc`, `battery_min_soc_time`,
 `battery_max_soc`, `battery_max_soc_time`) for a tile or an automation.
 

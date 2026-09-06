@@ -49,6 +49,17 @@
 > benchmark** (section 5). It changes nothing the card sees: no new entity, no new
 > command, no change to any series. The upload runs beside the refresh and its
 > failure is invisible to every other surface.
+>
+> Revision (2026-09-06): (a) the integration **checks its own configuration**
+> (section 5) and publishes each problem as a Home Assistant repair issue; no
+> output surface changes, a wrong configuration simply says so where the user can
+> see it. (b) `predicted_battery_soc` gains a `consumption_coverage` attribute
+> (section 2), and the consumption profile behind the projection is built only from
+> the hours every sparse Energy-dashboard source covers (section 5). (c) The analog
+> stage of the learning reads ratios to the physical model rather than watts
+> (section 5); same surfaces, same shapes. (d) A diagnostics download is offered on
+> the integration's page. (e) The benchmark collector answers each upload with its
+> verdict on the installation, which becomes a repair; still nothing the card sees.
 
 The integration owns one **config entry per installation**, holding one or more
 **panel lines** (a group of co-oriented panels each). Every surface below is scoped
@@ -171,7 +182,7 @@ Battery state of charge (2026.9.0, only when the battery block in section 5 is c
 
 | Entity | State | Notes |
 |---|---|---|
-| `sensor.helios_forecast_predicted_battery_soc` | near-term projected SoC, **0..100 %** | `device_class: battery`, `state_class: measurement`. The whole 48 h curve rides as a `forecast` attribute (`[{datetime, soc}]`, kept off the recorder), with the low and high over that window (`min_soc` / `max_soc` + times) and the forecast `reliability`. Created only when the battery feature is on. |
+| `sensor.helios_forecast_predicted_battery_soc` | near-term projected SoC, **0..100 %** | `device_class: battery`, `state_class: measurement`. The whole 48 h curve rides as a `forecast` attribute (`[{datetime, soc}]`, kept off the recorder), with the low and high over that window (`min_soc` / `max_soc` + times), the forecast `reliability`, and `consumption_coverage` (`{statistic_id: share 0..1}`, the share of the learn window each Energy-dashboard source had data for). Created only when the battery feature is on. |
 | `sensor.helios_forecast_battery_min_soc` / `_battery_max_soc` | the projection's lowest / highest SoC over the 48 h window, **%** | `device_class: battery`, `state_class: measurement`, disabled by default, created with the SoC sensor; `unknown` while there is no projection |
 | `sensor.helios_forecast_battery_min_soc_time` / `_battery_max_soc_time` | when that low / high is reached | `device_class: timestamp`, disabled by default, same lifecycle |
 
@@ -321,7 +332,12 @@ orientation.
 - The PV production sensor that drives the learned correction. It must be a
   cumulative energy sensor (kWh) carrying long-term sum statistics: the learning
   reads hourly `change` rows from the recorder, which a power (W) sensor does not
-  have. Curtailed hours are excluded from the learning as right-censored (their
+  have. The learning has two stages: a sky-residual map (the actual/model ratio per
+  sun position, over 60 days, recency-weighted) and an analog ensemble, which since
+  2026.9.3 stores each past hour as the ratio of its production to the physical
+  model of that hour and applies the median ratio of the nearest analogs to today's
+  physics, so that the geometry difference between an analog and the hour being
+  forecast stays the physics' business. Curtailed hours are excluded from the learning as right-censored (their
   kWh is a lower bound, not what the sky allowed): from the sky-residual map when
   they fall short of the model, from the analog library altogether. An hour counts
   as curtailed when the battery's hourly maximum state of charge is at 98 % or more
@@ -339,9 +355,21 @@ orientation.
   entry posts once an hour what it currently predicts, the cloud cover behind it,
   the production already measured over the last 72 hours, its panel geometry, its
   country and its coordinates rounded to two decimals, under a hash of the entry.
-  Nothing else leaves the installation, and clearing the key stops it. This is a
-  contract with the collector, not with the card: no output surface above is
-  affected, and an upload that fails never reaches a forecast.
+  Nothing else leaves the installation, and clearing the key stops it. The
+  collector answers each upload with `quality.excluded` (a reason code, or null),
+  its verdict on whether the installation's figures are plausible enough to be
+  published; a reason becomes a repair issue (below). This is a contract with the
+  collector, not with the card: no output surface above is affected, and an upload
+  that fails never reaches a forecast.
+- **Check-up (2026.9.3).** Every field above, every entity it names and the data
+  they yield are verified at startup and after every refresh (`checkup.py`), and
+  each problem is published as a Home Assistant repair issue under the
+  `helios_forecast` domain, keyed `{entry_id}_{problem}`, with the value at fault
+  as translation placeholders; it is retired the moment the problem is gone.
+  Repairs are the only surface: the entry stays loaded, the forecast keeps running,
+  and no entity changes state or shape because of a finding. A diagnostics download
+  (config with the benchmark key blanked, the problem list, learning and consumption
+  counts, the reliability index) is offered on the integration's page.
 - **Battery SoC projection (2026.9.0, optional).** A separate block, off unless
   both the usable **capacity (kWh)** and a live **state-of-charge sensor (%)** are
   set; the reserve (min SoC %), round-trip efficiency (%) and charge / discharge
