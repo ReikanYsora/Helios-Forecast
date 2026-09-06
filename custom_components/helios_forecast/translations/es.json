@@ -143,5 +143,139 @@
         }
       }
     }
+  },
+  "issues": {
+    "location_invalid": {
+      "title": "Ubicación fuera de rango",
+      "description": "La ubicación de {entry} ({latitude}, {longitude}) no es una latitud y una longitud válidas. La latitud va de -90 a 90 y la longitud de -180 a 180; deje ambos campos vacíos para usar la ubicación de Home Assistant."
+    },
+    "location_far": {
+      "title": "Ubicación lejos de su hogar de Home Assistant",
+      "description": "La ubicación de {entry} está a {km} km del hogar de Home Assistant. Si la instalación está realmente allí, ignore este aviso; si no, compruebe un decimal de la latitud o la longitud."
+    },
+    "no_lines": {
+      "title": "Ninguna línea de paneles",
+      "description": "{entry} no tiene ninguna línea de paneles, así que no hay nada que prever. Añada al menos una línea con su inclinación, su azimut y su potencia pico."
+    },
+    "line_kwp_missing": {
+      "title": "Línea {line}: falta la potencia pico",
+      "description": "La línea {line} de {entry} no tiene potencia pico, o es cero. Sin ella todas las cifras se quedan planas. Introduzca la potencia pico de la línea en kWp (por ejemplo 3,6 para 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Línea {line}: la potencia pico parece estar en vatios",
+      "description": "La línea {line} de {entry} declara {kwp} kWp, mucho más que una instalación doméstica. Lo más probable es que el valor se haya escrito en vatios. Introdúzcalo en kilovatios pico (por ejemplo 4,05 en vez de 4050)."
+    },
+    "line_tilt": {
+      "title": "Línea {line}: inclinación fuera de rango",
+      "description": "La línea {line} de {entry} tiene una inclinación de {tilt} grados. La inclinación va de 0 (plana) a 90 (vertical)."
+    },
+    "line_azimuth": {
+      "title": "Línea {line}: azimut fuera de rango",
+      "description": "La línea {line} de {entry} tiene un azimut de {azimuth} grados. El azimut va de 0 a 360 en sentido horario desde el norte: 90 es el este, 180 el sur, 270 el oeste."
+    },
+    "line_tracker": {
+      "title": "Línea {line}: tipo de seguidor desconocido",
+      "description": "La línea {line} de {entry} declara un seguidor de tipo {tracker}, que esta integración no conoce. Elija uno de los tipos propuestos, o ninguno para paneles fijos."
+    },
+    "line_location_invalid": {
+      "title": "Línea {line}: coordenadas fuera de rango",
+      "description": "La línea {line} de {entry} tiene coordenadas que no son una latitud y una longitud válidas. Corríjalas o deje ambos campos vacíos para situar la línea en la ubicación de la instalación."
+    },
+    "line_location_far": {
+      "title": "Línea {line}: coordenadas lejos de la instalación",
+      "description": "La línea {line} de {entry} está situada a {km} km de la instalación. Unos paneles en un campo lejano son posibles, un decimal equivocado es más probable; compruebe la latitud y la longitud de la línea."
+    },
+    "line_cap_unit": {
+      "title": "Línea {line}: el límite del inversor parece estar en vatios",
+      "description": "La línea {line} de {entry} tiene un límite de inversor de {cap} kW para {kwp} kWp de paneles. Lo más probable es que el límite se haya escrito en vatios. Introdúzcalo en kilovatios."
+    },
+    "inverter_cap_unit": {
+      "title": "El límite del inversor parece estar en vatios",
+      "description": "{entry} tiene un límite de inversor de {cap} kW para {kwp} kWp de paneles. Lo más probable es que el límite se haya escrito en vatios. Introdúzcalo en kilovatios (por ejemplo 5 en vez de 5000)."
+    },
+    "inverter_cap_low": {
+      "title": "Límite del inversor muy por debajo de los paneles",
+      "description": "{entry} tiene un límite de inversor de {cap} kW para {kwp} kWp de paneles, así que la previsión quedará recortada casi todo el día. Si el límite es correcto, ignore este aviso; si no, compruebe el valor o su unidad."
+    },
+    "production_entity_unset": {
+      "title": "Sin sensor de producción: la previsión no puede aprender",
+      "description": "{entry} no tiene sensor de producción. La previsión funciona con la física y el tiempo, pero nada la corrige frente a lo que sus paneles producen de verdad. Elija en los ajustes el sensor de energía acumulada (kWh) de su inversor o de su contador."
+    },
+    "trend_anchor_hour": {
+      "title": "Hora de referencia de la tendencia fuera de rango",
+      "description": "{entry} tiene una hora de referencia de tendencia de {hour}. Introduzca una hora local de 0 a 23."
+    },
+    "battery_soc_entity_unset": {
+      "title": "Batería: capacidad indicada pero sin sensor de estado de carga",
+      "description": "{entry} declara una batería de {capacity} kWh pero ningún sensor de estado de carga, así que la proyección sigue desactivada. Elija el sensor de estado de carga de la batería (en %) o borre la capacidad."
+    },
+    "battery_capacity_unset": {
+      "title": "Batería: sensor de estado de carga indicado pero sin capacidad",
+      "description": "{entry} nombra un sensor de estado de carga pero ninguna capacidad útil, así que la proyección sigue desactivada. Introduzca la capacidad útil de la batería en kWh o borre el sensor."
+    },
+    "battery_capacity": {
+      "title": "Capacidad de la batería fuera de rango",
+      "description": "{entry} declara una batería de {capacity} kWh, que no es una batería doméstica. Introduzca la capacidad útil en kilovatios hora (por ejemplo 10 en vez de 10000)."
+    },
+    "battery_power": {
+      "title": "Potencia de carga o descarga de la batería inverosímil",
+      "description": "{entry} declara una potencia de batería de {power} kW para una capacidad de {capacity} kWh, más de tres veces su capacidad por hora. Compruebe el valor y su unidad (kW, no W)."
+    },
+    "battery_min_soc": {
+      "title": "Reserva de la batería fuera de rango",
+      "description": "{entry} tiene un estado de carga mínimo de {value}. Introduzca un porcentaje de 0 a 100."
+    },
+    "battery_efficiency": {
+      "title": "Rendimiento de la batería fuera de rango",
+      "description": "{entry} tiene un rendimiento de ida y vuelta de {value}. Introduzca un porcentaje de 50 a 100 (la mayoría de las baterías domésticas rondan el 90)."
+    },
+    "benchmark_key": {
+      "title": "La clave del benchmark no parece una clave",
+      "description": "{entry} participa en el benchmark comunitario pero su clave no es una de las que emite el colector. Pegue la clave entera obtenida en helios-ha.org/benchmark, o desactive el benchmark."
+    },
+    "production_entity_missing": {
+      "title": "Sensor de producción no encontrado",
+      "description": "El sensor de producción de {entry}, {entity}, no existe. La previsión funciona sin corrección hasta que exista. Compruebe el identificador de la entidad, o vuelva a elegir el sensor en los ajustes."
+    },
+    "production_entity_kind": {
+      "title": "El sensor de producción no es un sensor de energía acumulada",
+      "description": "El sensor de producción de {entry}, {entity}, informa en {unit} con la clase de estado {state_class}. El aprendizaje necesita un sensor de energía acumulada en kWh (clase de estado total o total_increasing), no un sensor de potencia. Elija el total de energía de su inversor o de su contador; el ayudante Integral convierte un sensor de potencia en uno así."
+    },
+    "battery_soc_entity_missing": {
+      "title": "Sensor de estado de carga de la batería no encontrado",
+      "description": "El sensor de batería de {entry}, {entity}, no existe, así que la proyección sigue desactivada. Compruebe el identificador de la entidad o vuelva a elegir el sensor."
+    },
+    "battery_soc_entity_unit": {
+      "title": "El sensor de batería no es un porcentaje",
+      "description": "El sensor de batería de {entry}, {entity}, informa en {unit}. La proyección necesita el estado de carga en porcentaje."
+    },
+    "curtailment_entity_missing": {
+      "title": "Señal de limitación no encontrada",
+      "description": "La señal de limitación de {entry}, {entity}, no existe. Las horas en que el inversor está limitado se aprenden entonces como un mal cielo. Compruebe el identificador de la entidad o vacíe el campo."
+    },
+    "production_history_empty": {
+      "title": "El sensor de producción aún no tiene historial",
+      "description": "{entity}, el sensor de producción de {entry}, aún no tiene estadísticas a largo plazo. El aprendizaje empieza en cuanto el grabador tiene unas horas; si persiste tras un día, el sensor no es un sensor de energía acumulada."
+    },
+    "production_at_night": {
+      "title": "El sensor de producción cuenta de noche",
+      "description": "{entity}, el sensor de producción de {entry}, registró {kwh} kWh con el sol bien por debajo del horizonte. Los paneles no producen nada de noche, así que este sensor mide más que los paneles (un contador de red o de la casa). Elija el sensor que solo cuenta la salida del inversor."
+    },
+    "production_above_panels": {
+      "title": "Producción superior a lo que pueden dar los paneles declarados",
+      "description": "{entity}, el sensor de producción de {entry}, alcanzó {kw} kW varias veces con {kwp} kWp de paneles declarados. O la potencia pico es demasiado baja, o el sensor cuenta más que los paneles. Compruebe ambas cosas."
+    },
+    "production_stale": {
+      "title": "Ninguna producción registrada desde hace {days} días",
+      "description": "{entity}, el sensor de producción de {entry}, no ha aumentado desde hace {days} días. La nieve o una avería pueden explicarlo; si los paneles producen, el sensor ha dejado de informar y el aprendizaje se queda sin datos."
+    },
+    "consumption_source_sparse": {
+      "title": "La fuente de consumo {source} informa de forma intermitente",
+      "description": "En el panel de Energía, {source} tiene datos para el {pct} % de las horas que cubre la mejor fuente ({best} %). El perfil de consumo se construye solo con las horas que cubre, así que sigue siendo correcto pero se apoya en menos historial. Un sensor más fiable para ese flujo afina la proyección de la batería."
+    },
+    "benchmark_excluded": {
+      "title": "Excluida de las cifras del benchmark ({reason})",
+      "description": "El benchmark comunitario recibe las emisiones de {entry} pero las mantiene fuera de las cifras publicadas. Motivo {reason}: kwp significa que la potencia pico declarada falta, es cero o está en vatios; night significa que el sensor de producción registra energía de noche, así que mide más que los paneles. Corrija la configuración y la instalación volverá a contarse en un día."
+    }
   }
 }

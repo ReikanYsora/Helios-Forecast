@@ -13,7 +13,7 @@ fetched buckets, so the derivation and the profile can be unit-tested on their o
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, tzinfo
 from typing import Dict, List, Optional
 
@@ -73,6 +73,9 @@ class ConsumptionProfile:
     hour_w: Dict[int, float]
     overall_w: float
     samples: int  # hours of history that fed the profile, for the caller to gauge confidence
+    # Share of the profile's hours each source had a bucket for (0..1), by statistic id. A source far
+    # below the others is the sign of a meter that reports intermittently (see checkup.py).
+    coverage: Dict[str, float] = field(default_factory=dict)
 
     def at(self, moment_local: datetime) -> float:
         slot = moment_local.weekday() * _HOURS + moment_local.hour
@@ -81,6 +84,24 @@ class ConsumptionProfile:
         if moment_local.hour in self.hour_w:
             return self.hour_w[moment_local.hour]
         return self.overall_w
+
+
+# A source with a bucket for fewer than this share of the hours the best-covered source has is
+# sparse: the profile is then built only from the hours it does cover. The recorder writes an hourly
+# row as soon as a sensor had a valid state in that hour, even unchanged, so a missing row means no
+# data, not zero; summing the other sources in those hours would silently pull the profile down.
+SPARSE_COVERAGE_RATIO = 0.5
+
+
+def source_coverage(sources: ConsumptionSources, buckets_by_id: Dict[str, List[ProductionBucket]]) -> Dict[str, float]:
+    """Share of the union of hours each source has a bucket for, by statistic id (0..1)."""
+    hours_by_id = {sid: {int(b.start_ms) for b in buckets_by_id.get(sid, [])} for sid in sources.signed}
+    union: set = set()
+    for hours in hours_by_id.values():
+        union |= hours
+    if not union:
+        return {sid: 0.0 for sid in sources.signed}
+    return {sid: len(hours) / len(union) for sid, hours in hours_by_id.items()}
 
 
 def build_consumption_profile(
@@ -93,11 +114,25 @@ def build_consumption_profile(
     All ids share the recorder's hourly grid, so their buckets sum per hour by start. A kWh over
     one hour is that many mean watts; net consumption is floored at 0 (a derivation that dips
     slightly negative is meter noise, never real). None when no history backs any source.
+
+    An hour only counts when every sparse source (see SPARSE_COVERAGE_RATIO) has a bucket for it:
+    a battery whose discharge meter reports a quarter of the time would otherwise carry the night
+    load a quarter of the time and the profile would learn a house that barely consumes after dark.
     """
+    coverage = source_coverage(sources, buckets_by_id)
+    best = max(coverage.values(), default=0.0)
+    sparse = [sid for sid, share in coverage.items() if 0 < share < SPARSE_COVERAGE_RATIO * best]
+    required: Optional[set] = None
+    for sid in sparse:
+        hours = {int(b.start_ms) for b in buckets_by_id.get(sid, [])}
+        required = hours if required is None else required & hours
+
     per_hour_kwh: Dict[int, float] = {}
     for stat_id, sign in sources.signed.items():
         for bucket in buckets_by_id.get(stat_id, []):
             key = int(bucket.start_ms)
+            if required is not None and key not in required:
+                continue
             per_hour_kwh[key] = per_hour_kwh.get(key, 0.0) + sign * bucket.kwh
     if not per_hour_kwh:
         return None
@@ -122,4 +157,4 @@ def build_consumption_profile(
     slot_w = {slot: slot_sum[slot] / slot_n[slot] for slot in slot_sum}
     hour_w = {hour: hour_sum[hour] / hour_n[hour] for hour in hour_sum}
     overall_w = total_w / n if n else 0.0
-    return ConsumptionProfile(slot_w=slot_w, hour_w=hour_w, overall_w=overall_w, samples=n)
+    return ConsumptionProfile(slot_w=slot_w, hour_w=hour_w, overall_w=overall_w, samples=n, coverage=coverage)

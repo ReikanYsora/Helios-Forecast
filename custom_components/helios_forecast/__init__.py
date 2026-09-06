@@ -146,10 +146,13 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Clear any legacy repair issue when the entry is deleted."""
+    """Clear the entry's repair issues (the check-up's and the legacy one) when it is deleted."""
     from homeassistant.helpers import issue_registry as ir
 
+    from . import repairs
+
     ir.async_delete_issue(hass, DOMAIN, _legacy_issue_id(entry))
+    repairs.clear(hass, entry)
 
 
 async def _async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:

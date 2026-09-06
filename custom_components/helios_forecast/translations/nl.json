@@ -143,5 +143,139 @@
         }
       }
     }
+  },
+  "issues": {
+    "location_invalid": {
+      "title": "Locatie buiten bereik",
+      "description": "De locatie van {entry} ({latitude}, {longitude}) is geen geldige breedte- en lengtegraad. De breedtegraad loopt van -90 tot 90 en de lengtegraad van -180 tot 180; laat beide velden leeg om de locatie van Home Assistant te gebruiken."
+    },
+    "location_far": {
+      "title": "Locatie ver van uw Home Assistant-thuis",
+      "description": "De locatie van {entry} ligt {km} km van het Home Assistant-thuis. Staat de installatie daar echt, negeer dit dan; controleer anders een decimaal van de breedte- of lengtegraad."
+    },
+    "no_lines": {
+      "title": "Geen paneelrij",
+      "description": "{entry} heeft geen paneelrij, dus er valt niets te voorspellen. Voeg minstens één rij toe met hellingshoek, azimut en piekvermogen."
+    },
+    "line_kwp_missing": {
+      "title": "Paneelrij {line}: piekvermogen ontbreekt",
+      "description": "Rij {line} van {entry} heeft geen piekvermogen, of nul. Zonder blijft elk cijfer vlak. Voer het piekvermogen van de rij in kWp in (bijvoorbeeld 3,6 voor 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Paneelrij {line}: piekvermogen lijkt in watt",
+      "description": "Rij {line} van {entry} geeft {kwp} kWp op, ver boven een thuisinstallatie. De waarde is hoogstwaarschijnlijk in watt ingevoerd. Voer hem in kilowattpiek in (bijvoorbeeld 4,05 in plaats van 4050)."
+    },
+    "line_tilt": {
+      "title": "Paneelrij {line}: hellingshoek buiten bereik",
+      "description": "Rij {line} van {entry} heeft een hellingshoek van {tilt} graden. De hellingshoek loopt van 0 (plat) tot 90 (verticaal)."
+    },
+    "line_azimuth": {
+      "title": "Paneelrij {line}: azimut buiten bereik",
+      "description": "Rij {line} van {entry} heeft een azimut van {azimuth} graden. Het azimut loopt van 0 tot 360 met de klok mee vanaf het noorden: 90 is oost, 180 zuid, 270 west."
+    },
+    "line_tracker": {
+      "title": "Paneelrij {line}: onbekend trackertype",
+      "description": "Rij {line} van {entry} geeft een tracker van het type {tracker} op, dat deze integratie niet kent. Kies een van de aangeboden types, of geen voor vaste panelen."
+    },
+    "line_location_invalid": {
+      "title": "Paneelrij {line}: coördinaten buiten bereik",
+      "description": "Rij {line} van {entry} heeft coördinaten die geen geldige breedte- en lengtegraad zijn. Corrigeer ze of laat beide velden leeg om de rij op de locatie van de installatie te plaatsen."
+    },
+    "line_location_far": {
+      "title": "Paneelrij {line}: coördinaten ver van de installatie",
+      "description": "Rij {line} van {entry} staat {km} km van de installatie. Panelen in een ver veld kunnen, een verkeerde decimaal is waarschijnlijker; controleer de breedte- en lengtegraad van de rij."
+    },
+    "line_cap_unit": {
+      "title": "Paneelrij {line}: omvormerlimiet lijkt in watt",
+      "description": "Rij {line} van {entry} heeft een omvormerlimiet van {cap} kW voor {kwp} kWp aan panelen. De limiet is hoogstwaarschijnlijk in watt ingevoerd. Voer hem in kilowatt in."
+    },
+    "inverter_cap_unit": {
+      "title": "Omvormerlimiet lijkt in watt",
+      "description": "{entry} heeft een omvormerlimiet van {cap} kW voor {kwp} kWp aan panelen. De limiet is hoogstwaarschijnlijk in watt ingevoerd. Voer hem in kilowatt in (bijvoorbeeld 5 in plaats van 5000)."
+    },
+    "inverter_cap_low": {
+      "title": "Omvormerlimiet ver onder de panelen",
+      "description": "{entry} heeft een omvormerlimiet van {cap} kW voor {kwp} kWp aan panelen, dus de voorspelling wordt bijna de hele dag afgetopt. Klopt de limiet, negeer dit dan; controleer anders de waarde of de eenheid."
+    },
+    "production_entity_unset": {
+      "title": "Geen productiesensor: de voorspelling kan niet leren",
+      "description": "{entry} heeft geen productiesensor. De voorspelling draait op natuurkunde en weer, maar niets corrigeert haar aan wat uw panelen echt leveren. Kies in de instellingen de cumulatieve energiesensor (kWh) van uw omvormer of meter."
+    },
+    "trend_anchor_hour": {
+      "title": "Referentie-uur van de trend buiten bereik",
+      "description": "{entry} heeft een referentie-uur voor de trend van {hour}. Voer een lokaal uur van 0 tot 23 in."
+    },
+    "battery_soc_entity_unset": {
+      "title": "Accu: capaciteit ingesteld maar geen laadtoestandsensor",
+      "description": "{entry} geeft een accu van {capacity} kWh op maar geen laadtoestandsensor, dus de projectie blijft uit. Kies de laadtoestandsensor van de accu (in %) of wis de capaciteit."
+    },
+    "battery_capacity_unset": {
+      "title": "Accu: laadtoestandsensor ingesteld maar geen capaciteit",
+      "description": "{entry} noemt een laadtoestandsensor maar geen bruikbare capaciteit, dus de projectie blijft uit. Voer de bruikbare capaciteit van de accu in kWh in of wis de sensor."
+    },
+    "battery_capacity": {
+      "title": "Accucapaciteit buiten bereik",
+      "description": "{entry} geeft een accu van {capacity} kWh op, dat is geen thuisaccu. Voer de bruikbare capaciteit in kilowattuur in (bijvoorbeeld 10 in plaats van 10000)."
+    },
+    "battery_power": {
+      "title": "Laad- of ontlaadvermogen van de accu onwaarschijnlijk",
+      "description": "{entry} geeft een accuvermogen van {power} kW op voor een capaciteit van {capacity} kWh, meer dan drie keer de capaciteit per uur. Controleer de waarde en de eenheid (kW, geen W)."
+    },
+    "battery_min_soc": {
+      "title": "Accureserve buiten bereik",
+      "description": "{entry} heeft een minimale laadtoestand van {value}. Voer een percentage van 0 tot 100 in."
+    },
+    "battery_efficiency": {
+      "title": "Accurendement buiten bereik",
+      "description": "{entry} heeft een rondgangsrendement van {value}. Voer een percentage van 50 tot 100 in (de meeste thuisaccu's zitten rond 90)."
+    },
+    "benchmark_key": {
+      "title": "De benchmarksleutel ziet er niet uit als een sleutel",
+      "description": "{entry} doet mee aan de communitybenchmark maar de sleutel is er geen die de collector uitgeeft. Plak de hele sleutel van helios-ha.org/benchmark, of zet de benchmark uit."
+    },
+    "production_entity_missing": {
+      "title": "Productiesensor niet gevonden",
+      "description": "De productiesensor van {entry}, {entity}, bestaat niet. De voorspelling draait ongecorrigeerd tot hij er is. Controleer de entiteits-id, of kies de sensor opnieuw in de instellingen."
+    },
+    "production_entity_kind": {
+      "title": "De productiesensor is geen cumulatieve energiesensor",
+      "description": "De productiesensor van {entry}, {entity}, rapporteert {unit} met toestandsklasse {state_class}. Het leren heeft een cumulatieve energiesensor in kWh nodig (toestandsklasse total of total_increasing), geen vermogenssensor. Kies het energietotaal van uw omvormer of meter; de helper Integraal maakt van een vermogenssensor zo'n sensor."
+    },
+    "battery_soc_entity_missing": {
+      "title": "Laadtoestandsensor van de accu niet gevonden",
+      "description": "De accusensor van {entry}, {entity}, bestaat niet, dus de projectie blijft uit. Controleer de entiteits-id of kies de sensor opnieuw."
+    },
+    "battery_soc_entity_unit": {
+      "title": "De accusensor is geen percentage",
+      "description": "De accusensor van {entry}, {entity}, rapporteert {unit}. De projectie heeft de laadtoestand in procent nodig."
+    },
+    "curtailment_entity_missing": {
+      "title": "Begrenzingssignaal niet gevonden",
+      "description": "Het begrenzingssignaal van {entry}, {entity}, bestaat niet. Uren waarin de omvormer wordt begrensd, worden dan als slechte lucht geleerd. Controleer de entiteits-id of maak het veld leeg."
+    },
+    "production_history_empty": {
+      "title": "De productiesensor heeft nog geen geschiedenis",
+      "description": "{entity}, de productiesensor van {entry}, heeft nog geen langetermijnstatistieken. Het leren begint zodra de recorder een paar uur heeft; houdt dit na een dag aan, dan is de sensor geen cumulatieve energiesensor."
+    },
+    "production_at_night": {
+      "title": "De productiesensor telt 's nachts",
+      "description": "{entity}, de productiesensor van {entry}, registreerde {kwh} kWh terwijl de zon ruim onder de horizon stond. Panelen maken 's nachts niets, dus deze sensor meet meer dan de panelen (een net- of huismeter). Kies de sensor die alleen de uitgang van de omvormer telt."
+    },
+    "production_above_panels": {
+      "title": "Productie boven wat de opgegeven panelen kunnen leveren",
+      "description": "{entity}, de productiesensor van {entry}, haalde meerdere keren {kw} kW bij {kwp} kWp aan opgegeven panelen. Of het piekvermogen is te klein, of de sensor telt meer dan de panelen. Controleer beide."
+    },
+    "production_stale": {
+      "title": "Geen productie geregistreerd sinds {days} dagen",
+      "description": "{entity}, de productiesensor van {entry}, is al {days} dagen niet gestegen. Sneeuw of een storing kan het verklaren; produceren de panelen wel, dan is de sensor gestopt met rapporteren en droogt het leren op."
+    },
+    "consumption_source_sparse": {
+      "title": "Verbruiksbron {source} rapporteert met tussenpozen",
+      "description": "In het energiedashboard heeft {source} gegevens voor {pct}% van de uren die de beste bron dekt ({best}%). Het verbruiksprofiel wordt alleen gebouwd uit de uren die hij dekt, dus het blijft juist maar steunt op minder geschiedenis. Een betrouwbaardere sensor voor die stroom maakt de accuprojectie scherper."
+    },
+    "benchmark_excluded": {
+      "title": "Buiten de benchmarkcijfers gehouden ({reason})",
+      "description": "De communitybenchmark ontvangt de emissies van {entry} maar houdt ze buiten de gepubliceerde cijfers. Reden {reason}: kwp betekent dat het opgegeven piekvermogen ontbreekt, nul is of in watt staat; night betekent dat de productiesensor 's nachts energie registreert, dus meer meet dan de panelen. Corrigeer de configuratie en de installatie telt binnen een dag weer mee."
+    }
   }
 }

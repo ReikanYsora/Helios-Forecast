@@ -330,3 +330,87 @@ if __name__ == "__main__":
             fn()
             print(f"ok  {name}")
     print("all analog tests passed")
+
+
+# --- ratio analogs: the analog's word is a ratio to the physics, applied to today's physics ----------
+
+
+def _weather_flat(cloud: float = 20.0, ghi: float = 600.0) -> WeatherSeries:
+    times = [_june_noon(h) for h in range(24)]
+    return WeatherSeries(
+        times=times,
+        cloud=[cloud] * 24,
+        shortwave=[ghi] * 24,
+        direct=[ghi * 0.7] * 24,
+        diffuse=[ghi * 0.3] * 24,
+        temp=[20.0] * 24,
+        wind=[5.0] * 24,
+        snow=[0.0] * 24,
+    )
+
+
+def _layout(kwp: float = 3.0):
+    from custom_components.helios_forecast.solar.irradiance import PanelOrientation
+    from custom_components.helios_forecast.solar.power import PvLayout
+
+    return PvLayout(
+        orientations=[PanelOrientation(tilt_deg=30.0, azimuth_deg=180.0, tracker=None)],
+        shares=[1.0],
+        coords=[None],
+        total_kwp=kwp,
+        caps=[],
+    )
+
+
+def test_build_library_carries_a_ratio_when_the_layout_is_known() -> None:
+    lat, lon = 45.0, 0.0
+    noon = _june_noon(12)
+    prod = [_Bucket(noon.timestamp() * 1000.0, (noon + timedelta(hours=1)).timestamp() * 1000.0, 1.5)]
+    lib = build_library(prod, _weather_flat(), lat, lon, _layout(), 3200.0)
+    assert len(lib) == 1
+    assert lib[0].watt == 1500.0
+    assert lib[0].ratio is not None and 0.2 < lib[0].ratio < 2.0
+    # Without a layout there is no model to divide by: watts only.
+    assert build_library(prod, _weather_flat(), lat, lon)[0].ratio is None
+    # A model too small to divide by (no irradiance) leaves the sample as watts.
+    assert build_library(prod, _weather_flat(ghi=0.0), lat, lon, _layout(), 3200.0)[0].ratio is None
+
+
+def test_ratio_samples_need_a_spread() -> None:
+    from custom_components.helios_forecast.analog import ratio_samples
+
+    few = [AnalogSample(40.0, 180.0, 20.0, 1000.0, 20.0, ratio=0.8) for _ in range(10)]
+    assert ratio_samples(few) == []
+    many = few * 3
+    assert len(ratio_samples(many)) == 30
+    mixed = many + [AnalogSample(40.0, 180.0, 20.0, 1000.0, 20.0)]
+    assert len(ratio_samples(mixed)) == 30
+
+
+def test_predict_on_ratio_reads_the_ratio_column() -> None:
+    lib = [AnalogSample(40.0, 180.0, 50.0, 2000.0 + i, 20.0, ratio=0.7 + (i % 5) * 0.01) for i in range(40)]
+    band = predict(lib, 40.0, 180.0, 50.0, temp=20.0, on_ratio=True)
+    assert band is not None
+    assert 0.69 <= band.p50 <= 0.75
+    assert band.confidence > 0.9
+
+
+def test_ratio_analogs_follow_todays_physics_not_yesterdays_watts() -> None:
+    """The mechanism the fleet showed on clear mornings: analogs at the same altitude but a more
+    northerly azimuth made less. Read as watts they pull the forecast down; read as ratios (the site
+    made 90 % of its physics) they leave today's geometry to the physics."""
+    lat, lon = 45.0, 0.0
+    now = _june_noon(6)
+    fut = ForecastPoint(t=_june_noon(9), pv_w=2000.0, pv_raw_w=2000.0)
+    sun = sun_position(fut.t, lat, lon)
+    lib = [
+        AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=30.0, watt=1000.0, temp=20.0, ratio=0.9) for _ in range(40)
+    ]
+    weather = _weather_flat(cloud=30.0)
+    out = enrich_points([fut], lib, weather, lat, lon, now)[0]
+    # 0.9 x 2000 W of physics, not the 1000 W those analogs made under their own geometry.
+    assert abs(out.pv_w - 1800.0) < 60.0
+    assert out.pv_p10 is not None and abs(out.pv_p10 - 1800.0) < 60.0
+    # The same library without ratios is read as watts and drags the point toward 1000 W.
+    watts_only = [AnalogSample(alt=s.alt, az=s.az, cloud=s.cloud, watt=s.watt, temp=s.temp) for s in lib]
+    assert enrich_points([fut], watts_only, weather, lat, lon, now)[0].pv_w < 1200.0

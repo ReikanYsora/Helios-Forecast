@@ -145,8 +145,10 @@ Turn it on in the integration settings by filling in your **battery capacity** a
 your **state-of-charge sensor**; the reserve, efficiency and charge/discharge
 limits are optional. A **Predicted battery state of charge** sensor then appears,
 carrying the full curve as its `forecast` attribute (plus the projected low and
-high over those 48 hours, when each is reached, and the forecast reliability so you
-know how far to trust it). Four companion entities, disabled by default, carry the
+high over those 48 hours, when each is reached, the forecast reliability so you
+know how far to trust it, and `consumption_coverage`, how much of the learn window
+each Energy dashboard source had data for, since a source with gaps is the usual
+reason a projection runs optimistic). Four companion entities, disabled by default, carry the
 same low and high with their times (`battery_min_soc`, `battery_min_soc_time`,
 `battery_max_soc`, `battery_max_soc_time`) for a tile or an automation.
 
@@ -192,8 +194,11 @@ over-predicted.
 
 Then it stops trusting the physics alone. It learns a correction from your home's
 own recorded production, matching past hours on cloud cover, sun geometry and
-outdoor temperature. Over time the prediction absorbs what no generic model can
-know about your site: shading, soiling, an orientation that is a few degrees off.
+outdoor temperature, and reading each of them as the ratio between what your
+installation made and what the physics said it would, so that today's geometry
+stays the physics' business and the history only says how your site departs from
+it. Over time the prediction absorbs what no generic model can know about your
+site: shading, soiling, an orientation that is a few degrees off.
 
 What it does not learn is your hardware's limits. An hour where the inverter was
 held back, by a full battery, a zero-export rule or a grid limit, says nothing
@@ -217,6 +222,18 @@ is. A forecast that tells you when to doubt it is worth more than one that does
 not.
 
 Everything runs on your server. No account, no API key, no browser-side maths.
+
+### It checks its own configuration
+
+A forecast on a wrong configuration is wrong with a straight face, so every field
+is checked at startup and after every refresh: a peak power typed in watts, an
+inverter limit in watts, coordinates far from the home, a production sensor that
+is a power sensor or that counts energy at night, a battery whose charge power is
+ten times its capacity, a consumption source that reports intermittently. Each
+problem becomes a repair in Home Assistant (Settings, then Repairs, and the
+integration's own page), naming the value at fault and what to do about it, and it
+clears itself the moment the configuration is corrected. The integration's page
+also offers a diagnostics download for issue reports.
 
 ---
 

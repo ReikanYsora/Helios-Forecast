@@ -143,5 +143,139 @@
         }
       }
     }
+  },
+  "issues": {
+    "location_invalid": {
+      "title": "Asukoht väljaspool lubatud vahemikku",
+      "description": "{entry} asukoht ({latitude}, {longitude}) ei ole kehtiv laius- ja pikkuskraad. Laiuskraad jääb vahemikku -90 kuni 90 ja pikkuskraad -180 kuni 180; jätke mõlemad väljad tühjaks, et kasutada Home Assistanti kodu."
+    },
+    "location_far": {
+      "title": "Asukoht kaugel teie Home Assistanti kodust",
+      "description": "{entry} asukoht on Home Assistanti kodust {km} km kaugusel. Kui seade on tõesti seal, jätke see tähelepanuta; muidu kontrollige laius- või pikkuskraadi kümnendkohta."
+    },
+    "no_lines": {
+      "title": "Paneelirida puudub",
+      "description": "{entry} ei sisalda ühtegi paneelirida, seega pole midagi prognoosida. Lisage vähemalt üks rida koos kalde, asimuudi ja tippvõimsusega."
+    },
+    "line_kwp_missing": {
+      "title": "Rida {line}: tippvõimsus puudub",
+      "description": "{entry} real {line} puudub tippvõimsus või see on null. Ilma selleta jäävad kõik arvud nulli. Sisestage rea tippvõimsus kWp-des (näiteks 3,6 3600 Wp jaoks)."
+    },
+    "line_kwp_unit": {
+      "title": "Rida {line}: tippvõimsus näeb välja nagu vatid",
+      "description": "{entry} rida {line} deklareerib {kwp} kWp, mis on koduseadmest kaugel üle. Väärtus sisestati tõenäoliselt vattides. Sisestage see kilovatt-tipuna (näiteks 4,05, mitte 4050)."
+    },
+    "line_tilt": {
+      "title": "Rida {line}: kalle väljaspool vahemikku",
+      "description": "{entry} rea {line} kalle on {tilt} kraadi. Kalle jääb vahemikku 0 (horisontaalne) kuni 90 (vertikaalne)."
+    },
+    "line_azimuth": {
+      "title": "Rida {line}: asimuut väljaspool vahemikku",
+      "description": "{entry} rea {line} asimuut on {azimuth} kraadi. Asimuut jääb vahemikku 0 kuni 360 päripäeva põhjast: 90 on ida, 180 lõuna, 270 lääs."
+    },
+    "line_tracker": {
+      "title": "Rida {line}: tundmatu jälgija tüüp",
+      "description": "{entry} rida {line} deklareerib jälgija tüübiga {tracker}, mida see integratsioon ei tunne. Valige üks pakutud tüüpidest või mitte ükski fikseeritud paneelide jaoks."
+    },
+    "line_location_invalid": {
+      "title": "Rida {line}: koordinaadid väljaspool vahemikku",
+      "description": "{entry} rea {line} koordinaadid ei ole kehtiv laius- ja pikkuskraad. Parandage need või jätke mõlemad väljad tühjaks, et paigutada rida seadme asukohta."
+    },
+    "line_location_far": {
+      "title": "Rida {line}: koordinaadid seadmest kaugel",
+      "description": "{entry} rida {line} asub seadmest {km} km kaugusel. Paneelid kaugel põllul on võimalikud, vale kümnendkoht on tõenäolisem; kontrollige rea laius- ja pikkuskraadi."
+    },
+    "line_cap_unit": {
+      "title": "Rida {line}: inverteri piir näeb välja nagu vatid",
+      "description": "{entry} real {line} on inverteri piir {cap} kW {kwp} kWp paneelide jaoks. Piir sisestati tõenäoliselt vattides. Sisestage see kilovattides."
+    },
+    "inverter_cap_unit": {
+      "title": "Inverteri piir näeb välja nagu vatid",
+      "description": "{entry} inverteri piir on {cap} kW {kwp} kWp paneelide jaoks. Piir sisestati tõenäoliselt vattides. Sisestage see kilovattides (näiteks 5, mitte 5000)."
+    },
+    "inverter_cap_low": {
+      "title": "Inverteri piir tunduvalt alla paneelide",
+      "description": "{entry} inverteri piir on {cap} kW {kwp} kWp paneelide jaoks, seega lõigatakse prognoosi suurema osa päevast. Kui piir on õige, jätke see tähelepanuta; muidu kontrollige väärtust või selle ühikut."
+    },
+    "production_entity_unset": {
+      "title": "Tootmisandur puudub: prognoos ei saa õppida",
+      "description": "{entry} ei sisalda tootmisandurit. Prognoos töötab füüsika ja ilma põhjal, kuid miski ei paranda seda selle järgi, mida teie paneelid tegelikult annavad. Valige seadetes oma inverteri või arvesti kumulatiivne energiaandur (kWh)."
+    },
+    "trend_anchor_hour": {
+      "title": "Trendi võrdlustund väljaspool vahemikku",
+      "description": "{entry} trendi võrdlustund on {hour}. Sisestage kohalik tund 0 kuni 23."
+    },
+    "battery_soc_entity_unset": {
+      "title": "Aku: mahtuvus määratud, kuid laetuse andur puudub",
+      "description": "{entry} deklareerib aku mahtuvusega {capacity} kWh, kuid laetuse andurit pole, seega jääb projektsioon välja lülitatuks. Valige aku laetuse andur (%) või kustutage mahtuvus."
+    },
+    "battery_capacity_unset": {
+      "title": "Aku: laetuse andur määratud, kuid mahtuvus puudub",
+      "description": "{entry} nimetab laetuse anduri, kuid mitte kasutatavat mahtuvust, seega jääb projektsioon välja lülitatuks. Sisestage aku kasutatav mahtuvus kWh-des või kustutage andur."
+    },
+    "battery_capacity": {
+      "title": "Aku mahtuvus väljaspool vahemikku",
+      "description": "{entry} deklareerib aku mahtuvusega {capacity} kWh, mis ei ole koduaku. Sisestage kasutatav mahtuvus kilovatt-tundides (näiteks 10, mitte 10000)."
+    },
+    "battery_power": {
+      "title": "Aku laadimis- või tühjendusvõimsus on ebausutav",
+      "description": "{entry} deklareerib aku võimsuse {power} kW mahtuvuse {capacity} kWh juures, mis on tunnis üle kolme korra mahtuvusest. Kontrollige väärtust ja selle ühikut (kW, mitte W)."
+    },
+    "battery_min_soc": {
+      "title": "Aku reserv väljaspool vahemikku",
+      "description": "{entry} minimaalne laetus on {value}. Sisestage protsent 0 kuni 100."
+    },
+    "battery_efficiency": {
+      "title": "Aku kasutegur väljaspool vahemikku",
+      "description": "{entry} täistsükli kasutegur on {value}. Sisestage protsent 50 kuni 100 (enamik koduakusid on umbes 90)."
+    },
+    "benchmark_key": {
+      "title": "Võrdlusuuringu võti ei näe välja nagu võti",
+      "description": "{entry} osaleb kogukonna võrdlusuuringus, kuid selle võti ei ole koguja väljastatud. Kleepige kogu võti aadressilt helios-ha.org/benchmark või lülitage võrdlusuuring välja."
+    },
+    "production_entity_missing": {
+      "title": "Tootmisandurit ei leitud",
+      "description": "{entry} tootmisandurit {entity} ei ole olemas. Prognoos töötab parandamata, kuni see tekib. Kontrollige olemi ID-d või valige andur seadetes uuesti."
+    },
+    "production_entity_kind": {
+      "title": "Tootmisandur ei ole kumulatiivne energiaandur",
+      "description": "{entry} tootmisandur {entity} teatab ühikus {unit} olekuklassiga {state_class}. Õppimine vajab kumulatiivset energiaandurit kWh-des (olekuklass total või total_increasing), mitte võimsusandurit. Valige oma inverteri või arvesti energiasumma; abiline Integraal teeb võimsusandurist sellise anduri."
+    },
+    "battery_soc_entity_missing": {
+      "title": "Aku laetuse andurit ei leitud",
+      "description": "{entry} akuandurit {entity} ei ole olemas, seega jääb projektsioon välja lülitatuks. Kontrollige olemi ID-d või valige andur uuesti."
+    },
+    "battery_soc_entity_unit": {
+      "title": "Akuandur ei ole protsent",
+      "description": "{entry} akuandur {entity} teatab ühikus {unit}. Projektsioon vajab laetust protsentides."
+    },
+    "curtailment_entity_missing": {
+      "title": "Piirangusignaali ei leitud",
+      "description": "{entry} piirangusignaali {entity} ei ole olemas. Tunnid, mil inverterit piiratakse, õpitakse siis halva taevana. Kontrollige olemi ID-d või tühjendage väli."
+    },
+    "production_history_empty": {
+      "title": "Tootmisanduril pole veel ajalugu",
+      "description": "{entity}, {entry} tootmisandur, ei oma veel pikaajalist statistikat. Õppimine algab, kui salvestil on paar tundi; kui see püsib päeva pärast, ei ole andur kumulatiivne energiaandur."
+    },
+    "production_at_night": {
+      "title": "Tootmisandur loendab öösel",
+      "description": "{entity}, {entry} tootmisandur, salvestas {kwh} kWh, kui päike oli sügaval horisondi all. Paneelid ei tooda öösel midagi, seega mõõdab see andur rohkem kui paneelid (võrgu- või majaarvesti). Valige andur, mis loendab ainult inverteri väljundit."
+    },
+    "production_above_panels": {
+      "title": "Tootmine üle selle, mida deklareeritud paneelid suudavad anda",
+      "description": "{entity}, {entry} tootmisandur, saavutas mitu korda {kw} kW {kwp} kWp deklareeritud paneelide juures. Kas tippvõimsus on liiga väike või loendab andur rohkem kui paneelid. Kontrollige mõlemat."
+    },
+    "production_stale": {
+      "title": "Tootmist pole salvestatud {days} päeva",
+      "description": "{entity}, {entry} tootmisandur, ei ole {days} päeva kasvanud. Lumi või rike võivad seda seletada; kui paneelid toodavad, on andur lõpetanud teatamise ja õppimine nälgib."
+    },
+    "consumption_source_sparse": {
+      "title": "Tarbimisallikas {source} teatab katkendlikult",
+      "description": "Energia armatuurlaual on allikal {source} andmed {pct}% tundide kohta, mida katab parim allikas ({best}%). Tarbimisprofiil ehitatakse ainult tundidest, mida see katab, seega jääb see õigeks, kuid toetub väiksemale ajaloole. Usaldusväärsem andur selle voo jaoks muudab aku projektsiooni täpsemaks."
+    },
+    "benchmark_excluded": {
+      "title": "Võrdlusuuringu arvudest välja jäetud ({reason})",
+      "description": "Kogukonna võrdlusuuring võtab {entry} saadetised vastu, kuid hoiab need avaldatud arvudest väljas. Põhjus {reason}: kwp tähendab, et deklareeritud tippvõimsus puudub, on null või sisestati vattides; night tähendab, et tootmisandur salvestab energiat öösel, seega mõõdab rohkem kui paneelid. Parandage seadistus ja seade loetakse päeva jooksul uuesti."
+    }
   }
 }

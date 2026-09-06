@@ -31,7 +31,7 @@ from custom_components.helios_forecast.solar.residual import (  # noqa: E402
     ProductionBucket,
     SkyResidualInput,
     SkyResidualMap,
-    _capped_model_kwh,
+    capped_model_kwh,
     _dt,
     _nearest_cloud_idx,
     build_sky_residual_map,
@@ -218,7 +218,7 @@ def _capped_bucket_model_kwh(bucket: ProductionBucket, inp: SkyResidualInput) ->
         sub_t = bucket.start_ms + (s + 0.5) * (bucket.end_ms - bucket.start_ms) / LEARN_SUBSAMPLES
         moment = _dt(sub_t)
         pcts = compute_pv_power_per_array(moment, inp.lat, inp.lon, sample, inp.layout)
-        w_sum_kwh += _capped_model_kwh(pcts, inp.layout, k, snow_factor)
+        w_sum_kwh += capped_model_kwh(pcts, inp.layout, k, snow_factor)
         w_n += 1
     return w_sum_kwh / w_n
 

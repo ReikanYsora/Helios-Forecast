@@ -259,7 +259,7 @@ def replay(days: int) -> None:
     last_full = datetime.now(TZ).replace(hour=0, minute=0, second=0, microsecond=0)
     first = last_full - timedelta(days=days)
 
-    VARIANTS = ["physique", "residuel seul", "pipeline actuel", "analogues azimut pese", "analogues sur ratios",
+    VARIANTS = ["physique", "residuel seul", "pipeline actuel", "pipeline 2026.9.2 (watts)", "analogues azimut pese", "analogues sur ratios",
                 "ratios + azimut pese", "lissage vertical seul", "vertical + pipeline", "vertical + ratios + azimut"]
     acc = {v: {b: {"n": 0, "abs": 0.0, "pred": 0.0, "truth": 0.0} for b in BANDS + ["total"]} for v in VARIANTS}
     daily = {v: [] for v in VARIANTS}
@@ -285,14 +285,16 @@ def replay(days: int) -> None:
                                      step_minutes=15, residual_map=sky)
         vbase = build_forecast_series(weather, LAYOUT, LAT, LON, inverter_max_w=CAP_W, start=start, end=end,
                                       step_minutes=15, residual_map=vsky)
-        library = build_library(history, weather, LAT, LON)
+        library = build_library(history, weather, LAT, LON, LAYOUT, CAP_W)  # the integration's own call, ratios included
+        watts_library = build_library(history, weather, LAT, LON)  # the pre-2026.9.3 library, watts only
         rlib = ratio_library(history, weather, epochs)
         AZ = dict(az_weight=0.7, az_norm=90.0)
         series = {
             "physique": [replace(p, pv_w=p.pv_raw_w) for p in base],
             "residuel seul": base,
             "pipeline actuel": enrich_points(base, library, weather, LAT, LON, now),
-            "analogues azimut pese": enrich_variant(base, library, weather, w_epochs, now, **AZ),
+            "pipeline 2026.9.2 (watts)": enrich_points(base, watts_library, weather, LAT, LON, now),
+            "analogues azimut pese": enrich_variant(base, watts_library, weather, w_epochs, now, **AZ),
             "analogues sur ratios": enrich_variant(base, rlib, weather, w_epochs, now, ratio_lib=True),
             "ratios + azimut pese": enrich_variant(base, rlib, weather, w_epochs, now, ratio_lib=True, **AZ),
             "lissage vertical seul": vbase,

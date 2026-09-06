@@ -123,7 +123,7 @@ def sample_sky_residual(sky_map: SkyResidualMap, az_deg: float, alt_deg: float) 
     return num / den if den > 0 else g
 
 
-def _capped_model_kwh(pcts: List[float], layout: PvLayout, k: float, snow: float) -> float:
+def capped_model_kwh(pcts: List[float], layout: PvLayout, k: float, snow: float) -> float:
     """Per-array watts (share of ``k``), each clipped at its own inverter cap before summing, then
     converted to kWh. Mirrors forecast.py's per-array-cap-then-sum shape so the learned ratio sees the
     same hardware-clipped production the forecast-generation path applies, instead of conflating
@@ -183,7 +183,7 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
             if sun_position(moment, inp.lat, inp.lon).altitude <= 0:
                 continue
             pcts = compute_pv_power_per_array(moment, inp.lat, inp.lon, sample, inp.layout)
-            w_sum_kwh += _capped_model_kwh(pcts, inp.layout, k, snow_factor)
+            w_sum_kwh += capped_model_kwh(pcts, inp.layout, k, snow_factor)
             w_n += 1
         if w_n == 0:
             continue
