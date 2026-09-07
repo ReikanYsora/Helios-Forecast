@@ -145,101 +145,25 @@
     }
   },
   "issues": {
-    "location_invalid": {
-      "title": "Lokalizacja poza dopuszczalnym zakresem",
-      "description": "Lokalizacja {entry} ({latitude}, {longitude}) nie jest prawidłową szerokością i długością geograficzną. Szerokość mieści się w zakresie od -90 do 90, a długość od -180 do 180; pozostaw oba pola puste, aby użyć domu Home Assistant."
-    },
-    "location_far": {
-      "title": "Lokalizacja daleko od Twojego domu w Home Assistant",
-      "description": "Lokalizacja {entry} znajduje się {km} km od domu Home Assistant. Jeśli instalacja naprawdę tam jest, zignoruj to; w przeciwnym razie sprawdź miejsce po przecinku w szerokości lub długości."
-    },
-    "no_lines": {
-      "title": "Brak rzędu paneli",
-      "description": "{entry} nie ma żadnego rzędu paneli, więc nie ma czego prognozować. Dodaj co najmniej jeden rząd z nachyleniem, azymutem i mocą szczytową."
-    },
-    "line_kwp_missing": {
-      "title": "Rząd {line}: brak mocy szczytowej",
-      "description": "Rząd {line} w {entry} nie ma mocy szczytowej lub wynosi ona zero. Bez niej wszystkie liczby pozostają płaskie. Wpisz moc szczytową rzędu w kWp (na przykład 3,6 dla 3600 Wp)."
-    },
-    "line_kwp_unit": {
-      "title": "Rząd {line}: moc szczytowa wygląda na waty",
-      "description": "Rząd {line} w {entry} deklaruje {kwp} kWp, znacznie więcej niż instalacja domowa. Wartość została najprawdopodobniej wpisana w watach. Wpisz ją w kilowatach szczytowych (na przykład 4,05 zamiast 4050)."
-    },
-    "line_tilt": {
-      "title": "Rząd {line}: nachylenie poza zakresem",
-      "description": "Rząd {line} w {entry} ma nachylenie {tilt} stopni. Nachylenie mieści się w zakresie od 0 (płasko) do 90 (pionowo)."
-    },
-    "line_azimuth": {
-      "title": "Rząd {line}: azymut poza zakresem",
-      "description": "Rząd {line} w {entry} ma azymut {azimuth} stopni. Azymut mieści się w zakresie od 0 do 360 zgodnie z ruchem wskazówek zegara od północy: 90 to wschód, 180 południe, 270 zachód."
-    },
-    "line_tracker": {
-      "title": "Rząd {line}: nieznany typ trackera",
-      "description": "Rząd {line} w {entry} deklaruje tracker typu {tracker}, którego ta integracja nie zna. Wybierz jeden z proponowanych typów lub żaden dla paneli stałych."
-    },
-    "line_location_invalid": {
-      "title": "Rząd {line}: współrzędne poza zakresem",
-      "description": "Rząd {line} w {entry} ma współrzędne, które nie są prawidłową szerokością i długością geograficzną. Popraw je lub pozostaw oba pola puste, aby umieścić rząd w lokalizacji instalacji."
-    },
-    "line_location_far": {
-      "title": "Rząd {line}: współrzędne daleko od instalacji",
-      "description": "Rząd {line} w {entry} znajduje się {km} km od instalacji. Panele na odległym polu są możliwe, błędne miejsce po przecinku jest bardziej prawdopodobne; sprawdź szerokość i długość rzędu."
-    },
-    "line_cap_unit": {
-      "title": "Rząd {line}: limit falownika wygląda na waty",
-      "description": "Rząd {line} w {entry} ma limit falownika {cap} kW dla {kwp} kWp paneli. Limit został najprawdopodobniej wpisany w watach. Wpisz go w kilowatach."
-    },
-    "inverter_cap_unit": {
-      "title": "Limit falownika wygląda na waty",
-      "description": "{entry} ma limit falownika {cap} kW dla {kwp} kWp paneli. Limit został najprawdopodobniej wpisany w watach. Wpisz go w kilowatach (na przykład 5 zamiast 5000)."
-    },
-    "inverter_cap_low": {
-      "title": "Limit falownika znacznie poniżej paneli",
-      "description": "{entry} ma limit falownika {cap} kW dla {kwp} kWp paneli, więc prognoza będzie przycinana przez większość dnia. Jeśli limit jest prawidłowy, zignoruj to; w przeciwnym razie sprawdź wartość lub jej jednostkę."
-    },
-    "production_entity_unset": {
-      "title": "Brak czujnika produkcji: prognoza nie może się uczyć",
-      "description": "{entry} nie ma czujnika produkcji. Prognoza działa na fizyce i pogodzie, ale nic nie koryguje jej względem tego, co naprawdę dają Twoje panele. Wybierz w ustawieniach czujnik energii skumulowanej (kWh) falownika lub licznika."
-    },
-    "trend_anchor_hour": {
-      "title": "Godzina odniesienia trendu poza zakresem",
-      "description": "{entry} ma godzinę odniesienia trendu {hour}. Wpisz godzinę lokalną od 0 do 23."
-    },
-    "battery_soc_entity_unset": {
-      "title": "Bateria: pojemność ustawiona, ale brak czujnika stanu naładowania",
-      "description": "{entry} deklaruje baterię {capacity} kWh, ale nie ma czujnika stanu naładowania, więc projekcja pozostaje wyłączona. Wybierz czujnik stanu naładowania baterii (w %) lub wyczyść pojemność."
+    "battery_capacity": {
+      "title": "Pojemność baterii poza zakresem",
+      "description": "{entry} deklaruje baterię {capacity} kWh, co nie jest baterią domową. Wpisz użyteczną pojemność w kilowatogodzinach (na przykład 10 zamiast 10000)."
     },
     "battery_capacity_unset": {
       "title": "Bateria: czujnik stanu naładowania ustawiony, ale brak pojemności",
       "description": "{entry} wskazuje czujnik stanu naładowania, ale nie ma użytecznej pojemności, więc projekcja pozostaje wyłączona. Wpisz użyteczną pojemność baterii w kWh lub wyczyść czujnik."
     },
-    "battery_capacity": {
-      "title": "Pojemność baterii poza zakresem",
-      "description": "{entry} deklaruje baterię {capacity} kWh, co nie jest baterią domową. Wpisz użyteczną pojemność w kilowatogodzinach (na przykład 10 zamiast 10000)."
-    },
-    "battery_power": {
-      "title": "Nieprawdopodobna moc ładowania lub rozładowania baterii",
-      "description": "{entry} deklaruje moc baterii {power} kW przy pojemności {capacity} kWh, ponad trzykrotność pojemności na godzinę. Sprawdź wartość i jej jednostkę (kW, nie W)."
+    "battery_efficiency": {
+      "title": "Sprawność baterii poza zakresem",
+      "description": "{entry} ma sprawność w obie strony {value}. Wpisz procent od 50 do 100 (większość baterii domowych ma około 90)."
     },
     "battery_min_soc": {
       "title": "Rezerwa baterii poza zakresem",
       "description": "{entry} ma minimalny stan naładowania {value}. Wpisz procent od 0 do 100."
     },
-    "battery_efficiency": {
-      "title": "Sprawność baterii poza zakresem",
-      "description": "{entry} ma sprawność w obie strony {value}. Wpisz procent od 50 do 100 (większość baterii domowych ma około 90)."
-    },
-    "benchmark_key": {
-      "title": "Klucz benchmarku nie wygląda jak klucz",
-      "description": "{entry} bierze udział w benchmarku społeczności, ale jego klucz nie jest kluczem wydawanym przez kolektor. Wklej cały klucz z helios-ha.org/benchmark lub wyłącz benchmark."
-    },
-    "production_entity_missing": {
-      "title": "Nie znaleziono czujnika produkcji",
-      "description": "Czujnik produkcji {entry}, {entity}, nie istnieje. Prognoza działa bez korekty, dopóki się nie pojawi. Sprawdź identyfikator encji lub wybierz czujnik ponownie w ustawieniach."
-    },
-    "production_entity_kind": {
-      "title": "Czujnik produkcji nie jest czujnikiem energii skumulowanej",
-      "description": "Czujnik produkcji {entry}, {entity}, raportuje {unit} z klasą stanu {state_class}. Uczenie potrzebuje czujnika energii skumulowanej w kWh (klasa stanu total lub total_increasing), a nie czujnika mocy. Wybierz sumę energii falownika lub licznika; pomocnik Całka zamienia czujnik mocy w taki czujnik."
+    "battery_power": {
+      "title": "Nieprawdopodobna moc ładowania lub rozładowania baterii",
+      "description": "{entry} deklaruje moc baterii {power} kW przy pojemności {capacity} kWh, ponad trzykrotność pojemności na godzinę. Sprawdź wartość i jej jednostkę (kW, nie W)."
     },
     "battery_soc_entity_missing": {
       "title": "Nie znaleziono czujnika stanu naładowania baterii",
@@ -249,33 +173,113 @@
       "title": "Czujnik baterii nie jest procentem",
       "description": "Czujnik baterii {entry}, {entity}, raportuje {unit}. Projekcja potrzebuje stanu naładowania w procentach."
     },
-    "curtailment_entity_missing": {
-      "title": "Nie znaleziono sygnału ograniczenia",
-      "description": "Sygnał ograniczenia {entry}, {entity}, nie istnieje. Godziny, w których falownik jest ograniczany, są wtedy uczone jako złe niebo. Sprawdź identyfikator encji lub wyczyść pole."
+    "battery_soc_entity_unset": {
+      "title": "Bateria: pojemność ustawiona, ale brak czujnika stanu naładowania",
+      "description": "{entry} deklaruje baterię {capacity} kWh, ale nie ma czujnika stanu naładowania, więc projekcja pozostaje wyłączona. Wybierz czujnik stanu naładowania baterii (w %) lub wyczyść pojemność."
     },
-    "production_history_empty": {
-      "title": "Czujnik produkcji nie ma jeszcze historii",
-      "description": "{entity}, czujnik produkcji {entry}, nie ma jeszcze statystyk długoterminowych. Uczenie zaczyna się, gdy tylko rejestrator ma kilka godzin; jeśli utrzymuje się to po dniu, czujnik nie jest czujnikiem energii skumulowanej."
+    "benchmark_blocked": {
+      "title": "Nie wysyła do benchmarku ({count})",
+      "description": "{entry} bierze udział we wspólnotowym benchmarku, ale wstrzymuje wysyłkę: wymienione tu problemy sprawiłyby, że pomiar opisywałby konfigurację zamiast prognozy. Popraw je, a wysyłanie wznowi się samo. Nic, co zmierzono wcześniej, nie ginie."
     },
-    "production_at_night": {
-      "title": "Czujnik produkcji liczy w nocy",
-      "description": "{entity}, czujnik produkcji {entry}, zarejestrował {kwh} kWh, gdy słońce było znacznie poniżej horyzontu. Panele nie produkują nic w nocy, więc ten czujnik mierzy więcej niż panele (licznik sieci lub domu). Wybierz czujnik, który liczy tylko wyjście falownika."
+    "benchmark_excluded": {
+      "title": "Wyłączona z liczb benchmarku ({reason})",
+      "description": "Benchmark społeczności otrzymuje emisje {entry}, ale trzyma je poza publikowanymi liczbami. Powód {reason}: kwp oznacza, że zadeklarowana moc szczytowa jest pusta, zerowa lub wpisana w watach; night oznacza, że czujnik produkcji rejestruje energię w nocy, więc mierzy więcej niż panele; version oznacza, że ta instalacja używa zbyt starego Helios Forecast, aby jej pomiary były publikowane, i wystarczy aktualizacja. Popraw konfigurację, a instalacja zostanie ponownie policzona w ciągu dnia."
     },
-    "production_above_panels": {
-      "title": "Produkcja powyżej tego, co mogą dać zadeklarowane panele",
-      "description": "{entity}, czujnik produkcji {entry}, kilkakrotnie osiągnął {kw} kW przy {kwp} kWp zadeklarowanych paneli. Albo moc szczytowa jest za mała, albo czujnik liczy więcej niż panele. Sprawdź jedno i drugie."
-    },
-    "production_stale": {
-      "title": "Brak zarejestrowanej produkcji od {days} dni",
-      "description": "{entity}, czujnik produkcji {entry}, nie wzrósł od {days} dni. Śnieg lub awaria mogą to tłumaczyć; jeśli panele produkują, czujnik przestał raportować, a uczenie głoduje."
+    "benchmark_key": {
+      "title": "Klucz benchmarku nie wygląda jak klucz",
+      "description": "{entry} bierze udział w benchmarku społeczności, ale jego klucz nie jest kluczem wydawanym przez kolektor. Wklej cały klucz z helios-ha.org/benchmark lub wyłącz benchmark."
     },
     "consumption_source_sparse": {
       "title": "Źródło zużycia {source} raportuje z przerwami",
       "description": "W panelu Energia {source} ma dane dla {pct}% godzin, które pokrywa najlepsze źródło ({best}%). Profil zużycia jest budowany tylko z godzin, które pokrywa, więc pozostaje poprawny, ale opiera się na mniejszej historii. Bardziej niezawodny czujnik dla tego przepływu wyostrza projekcję baterii."
     },
-    "benchmark_excluded": {
-      "title": "Wyłączona z liczb benchmarku ({reason})",
-      "description": "Benchmark społeczności otrzymuje emisje {entry}, ale trzyma je poza publikowanymi liczbami. Powód {reason}: kwp oznacza, że zadeklarowana moc szczytowa jest pusta, zerowa lub wpisana w watach; night oznacza, że czujnik produkcji rejestruje energię w nocy, więc mierzy więcej niż panele. Popraw konfigurację, a instalacja zostanie ponownie policzona w ciągu dnia."
+    "curtailment_entity_missing": {
+      "title": "Nie znaleziono sygnału ograniczenia",
+      "description": "Sygnał ograniczenia {entry}, {entity}, nie istnieje. Godziny, w których falownik jest ograniczany, są wtedy uczone jako złe niebo. Sprawdź identyfikator encji lub wyczyść pole."
+    },
+    "inverter_cap_low": {
+      "title": "Limit falownika znacznie poniżej paneli",
+      "description": "{entry} ma limit falownika {cap} kW dla {kwp} kWp paneli, więc prognoza będzie przycinana przez większość dnia. Jeśli limit jest prawidłowy, zignoruj to; w przeciwnym razie sprawdź wartość lub jej jednostkę."
+    },
+    "inverter_cap_unit": {
+      "title": "Limit falownika wygląda na waty",
+      "description": "{entry} ma limit falownika {cap} kW dla {kwp} kWp paneli. Limit został najprawdopodobniej wpisany w watach. Wpisz go w kilowatach (na przykład 5 zamiast 5000)."
+    },
+    "line_azimuth": {
+      "title": "Rząd {line}: azymut poza zakresem",
+      "description": "Rząd {line} w {entry} ma azymut {azimuth} stopni. Azymut mieści się w zakresie od 0 do 360 zgodnie z ruchem wskazówek zegara od północy: 90 to wschód, 180 południe, 270 zachód."
+    },
+    "line_cap_unit": {
+      "title": "Rząd {line}: limit falownika wygląda na waty",
+      "description": "Rząd {line} w {entry} ma limit falownika {cap} kW dla {kwp} kWp paneli. Limit został najprawdopodobniej wpisany w watach. Wpisz go w kilowatach."
+    },
+    "line_kwp_missing": {
+      "title": "Rząd {line}: brak mocy szczytowej",
+      "description": "Rząd {line} w {entry} nie ma mocy szczytowej lub wynosi ona zero. Bez niej wszystkie liczby pozostają płaskie. Wpisz moc szczytową rzędu w kWp (na przykład 3,6 dla 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Rząd {line}: moc szczytowa wygląda na waty",
+      "description": "Rząd {line} w {entry} deklaruje {kwp} kWp, znacznie więcej niż instalacja domowa. Wartość została najprawdopodobniej wpisana w watach. Wpisz ją w kilowatach szczytowych (na przykład 4,05 zamiast 4050)."
+    },
+    "line_location_far": {
+      "title": "Rząd {line}: współrzędne daleko od instalacji",
+      "description": "Rząd {line} w {entry} znajduje się {km} km od instalacji. Panele na odległym polu są możliwe, błędne miejsce po przecinku jest bardziej prawdopodobne; sprawdź szerokość i długość rzędu."
+    },
+    "line_location_invalid": {
+      "title": "Rząd {line}: współrzędne poza zakresem",
+      "description": "Rząd {line} w {entry} ma współrzędne, które nie są prawidłową szerokością i długością geograficzną. Popraw je lub pozostaw oba pola puste, aby umieścić rząd w lokalizacji instalacji."
+    },
+    "line_tilt": {
+      "title": "Rząd {line}: nachylenie poza zakresem",
+      "description": "Rząd {line} w {entry} ma nachylenie {tilt} stopni. Nachylenie mieści się w zakresie od 0 (płasko) do 90 (pionowo)."
+    },
+    "line_tracker": {
+      "title": "Rząd {line}: nieznany typ trackera",
+      "description": "Rząd {line} w {entry} deklaruje tracker typu {tracker}, którego ta integracja nie zna. Wybierz jeden z proponowanych typów lub żaden dla paneli stałych."
+    },
+    "location_far": {
+      "title": "Lokalizacja daleko od Twojego domu w Home Assistant",
+      "description": "Lokalizacja {entry} znajduje się {km} km od domu Home Assistant. Jeśli instalacja naprawdę tam jest, zignoruj to; w przeciwnym razie sprawdź miejsce po przecinku w szerokości lub długości."
+    },
+    "location_invalid": {
+      "title": "Lokalizacja poza dopuszczalnym zakresem",
+      "description": "Lokalizacja {entry} ({latitude}, {longitude}) nie jest prawidłową szerokością i długością geograficzną. Szerokość mieści się w zakresie od -90 do 90, a długość od -180 do 180; pozostaw oba pola puste, aby użyć domu Home Assistant."
+    },
+    "no_lines": {
+      "title": "Brak rzędu paneli",
+      "description": "{entry} nie ma żadnego rzędu paneli, więc nie ma czego prognozować. Dodaj co najmniej jeden rząd z nachyleniem, azymutem i mocą szczytową."
+    },
+    "production_above_panels": {
+      "title": "Produkcja powyżej tego, co mogą dać zadeklarowane panele",
+      "description": "{entity}, czujnik produkcji {entry}, kilkakrotnie osiągnął {kw} kW przy {kwp} kWp zadeklarowanych paneli. Albo moc szczytowa jest za mała, albo czujnik liczy więcej niż panele. Sprawdź jedno i drugie."
+    },
+    "production_at_night": {
+      "title": "Czujnik produkcji liczy w nocy",
+      "description": "{entity}, czujnik produkcji {entry}, zarejestrował {kwh} kWh, gdy słońce było znacznie poniżej horyzontu. Panele nie produkują nic w nocy, więc ten czujnik mierzy więcej niż panele (licznik sieci lub domu). Wybierz czujnik, który liczy tylko wyjście falownika."
+    },
+    "production_entity_kind": {
+      "title": "Czujnik produkcji nie jest czujnikiem energii skumulowanej",
+      "description": "Czujnik produkcji {entry}, {entity}, raportuje {unit} z klasą stanu {state_class}. Uczenie potrzebuje czujnika energii skumulowanej w kWh (klasa stanu total lub total_increasing), a nie czujnika mocy. Wybierz sumę energii falownika lub licznika; pomocnik Całka zamienia czujnik mocy w taki czujnik."
+    },
+    "production_entity_missing": {
+      "title": "Nie znaleziono czujnika produkcji",
+      "description": "Czujnik produkcji {entry}, {entity}, nie istnieje. Prognoza działa bez korekty, dopóki się nie pojawi. Sprawdź identyfikator encji lub wybierz czujnik ponownie w ustawieniach."
+    },
+    "production_entity_unset": {
+      "title": "Brak czujnika produkcji: prognoza nie może się uczyć",
+      "description": "{entry} nie ma czujnika produkcji. Prognoza działa na fizyce i pogodzie, ale nic nie koryguje jej względem tego, co naprawdę dają Twoje panele. Wybierz w ustawieniach czujnik energii skumulowanej (kWh) falownika lub licznika."
+    },
+    "production_history_empty": {
+      "title": "Czujnik produkcji nie ma jeszcze historii",
+      "description": "{entity}, czujnik produkcji {entry}, nie ma jeszcze statystyk długoterminowych. Uczenie zaczyna się, gdy tylko rejestrator ma kilka godzin; jeśli utrzymuje się to po dniu, czujnik nie jest czujnikiem energii skumulowanej."
+    },
+    "production_stale": {
+      "title": "Brak zarejestrowanej produkcji od {days} dni",
+      "description": "{entity}, czujnik produkcji {entry}, nie wzrósł od {days} dni. Śnieg lub awaria mogą to tłumaczyć; jeśli panele produkują, czujnik przestał raportować, a uczenie głoduje."
+    },
+    "trend_anchor_hour": {
+      "title": "Godzina odniesienia trendu poza zakresem",
+      "description": "{entry} ma godzinę odniesienia trendu {hour}. Wpisz godzinę lokalną od 0 do 23."
     }
   }
 }

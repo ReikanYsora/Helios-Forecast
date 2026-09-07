@@ -145,101 +145,25 @@
     }
   },
   "issues": {
-    "location_invalid": {
-      "title": "Location out of range",
-      "description": "The location set for {entry} ({latitude}, {longitude}) is not a valid latitude and longitude. Latitude runs from -90 to 90 and longitude from -180 to 180; leave both blank to use the Home Assistant home."
-    },
-    "location_far": {
-      "title": "Location far from your Home Assistant home",
-      "description": "The location set for {entry} is {km} km from the Home Assistant home. If the installation really is there, ignore this; otherwise check a decimal in the latitude or longitude."
-    },
-    "no_lines": {
-      "title": "No panel line",
-      "description": "{entry} has no panel line, so there is nothing to forecast. Add at least one line with its tilt, azimuth and peak power."
-    },
-    "line_kwp_missing": {
-      "title": "Panel line {line}: peak power missing",
-      "description": "Line {line} of {entry} has no peak power, or zero. Without it every figure stays flat. Enter the line's peak power in kWp (for example 3.6 for 3600 Wp)."
-    },
-    "line_kwp_unit": {
-      "title": "Panel line {line}: peak power looks like watts",
-      "description": "Line {line} of {entry} declares {kwp} kWp, which is far beyond a home installation. The value was most likely typed in watts. Enter it in kilowatts-peak (for example 4.05 rather than 4050)."
-    },
-    "line_tilt": {
-      "title": "Panel line {line}: tilt out of range",
-      "description": "Line {line} of {entry} has a tilt of {tilt} degrees. Tilt runs from 0 (flat) to 90 (vertical)."
-    },
-    "line_azimuth": {
-      "title": "Panel line {line}: azimuth out of range",
-      "description": "Line {line} of {entry} has an azimuth of {azimuth} degrees. Azimuth runs from 0 to 360 clockwise from north: 90 is east, 180 south, 270 west."
-    },
-    "line_tracker": {
-      "title": "Panel line {line}: unknown tracker type",
-      "description": "Line {line} of {entry} declares a tracker of type {tracker}, which this integration does not know. Pick one of the offered types, or none for a fixed array."
-    },
-    "line_location_invalid": {
-      "title": "Panel line {line}: coordinates out of range",
-      "description": "Line {line} of {entry} has coordinates that are not a valid latitude and longitude. Correct them or leave both blank to place the line at the installation's location."
-    },
-    "line_location_far": {
-      "title": "Panel line {line}: coordinates far from the installation",
-      "description": "Line {line} of {entry} is placed {km} km from the installation. Panels on a distant field are possible, a wrong decimal is more likely; check the line's latitude and longitude."
-    },
-    "line_cap_unit": {
-      "title": "Panel line {line}: inverter limit looks like watts",
-      "description": "Line {line} of {entry} has an inverter limit of {cap} kW for {kwp} kWp of panels. The limit was most likely typed in watts. Enter it in kilowatts."
-    },
-    "inverter_cap_unit": {
-      "title": "Inverter limit looks like watts",
-      "description": "{entry} has an inverter limit of {cap} kW for {kwp} kWp of panels. The limit was most likely typed in watts. Enter it in kilowatts (for example 5 rather than 5000)."
-    },
-    "inverter_cap_low": {
-      "title": "Inverter limit well below the panels",
-      "description": "{entry} has an inverter limit of {cap} kW for {kwp} kWp of panels, so the forecast will be clipped most of the day. If the limit is right, ignore this; otherwise check the value or its unit."
-    },
-    "production_entity_unset": {
-      "title": "No production sensor: the forecast cannot learn",
-      "description": "{entry} has no production sensor. The forecast still runs on physics and weather, but nothing corrects it against what your panels really deliver. Pick the cumulative energy sensor (kWh) of your inverter or meter in the settings."
-    },
-    "trend_anchor_hour": {
-      "title": "Trend reference hour out of range",
-      "description": "{entry} has a trend reference hour of {hour}. Enter a local hour from 0 to 23."
-    },
-    "battery_soc_entity_unset": {
-      "title": "Battery: capacity set but no state of charge sensor",
-      "description": "{entry} declares a battery of {capacity} kWh but no state of charge sensor, so the projection stays off. Pick the battery's state of charge sensor (in %) or clear the capacity."
+    "battery_capacity": {
+      "title": "Battery capacity out of range",
+      "description": "{entry} declares a battery of {capacity} kWh, which is not a home battery. Enter the usable capacity in kilowatt-hours (for example 10 rather than 10000)."
     },
     "battery_capacity_unset": {
       "title": "Battery: state of charge sensor set but no capacity",
       "description": "{entry} names a battery state of charge sensor but no usable capacity, so the projection stays off. Enter the battery's usable capacity in kWh or clear the sensor."
     },
-    "battery_capacity": {
-      "title": "Battery capacity out of range",
-      "description": "{entry} declares a battery of {capacity} kWh, which is not a home battery. Enter the usable capacity in kilowatt-hours (for example 10 rather than 10000)."
-    },
-    "battery_power": {
-      "title": "Battery charge or discharge power implausible",
-      "description": "{entry} declares a battery power of {power} kW for a capacity of {capacity} kWh, more than three times its capacity per hour. Check the value and its unit (kW, not W)."
+    "battery_efficiency": {
+      "title": "Battery efficiency out of range",
+      "description": "{entry} has a round-trip efficiency of {value}. Enter a percentage from 50 to 100 (most home batteries sit around 90)."
     },
     "battery_min_soc": {
       "title": "Battery reserve out of range",
       "description": "{entry} has a minimum state of charge of {value}. Enter a percentage from 0 to 100."
     },
-    "battery_efficiency": {
-      "title": "Battery efficiency out of range",
-      "description": "{entry} has a round-trip efficiency of {value}. Enter a percentage from 50 to 100 (most home batteries sit around 90)."
-    },
-    "benchmark_key": {
-      "title": "Benchmark key does not look like a key",
-      "description": "{entry} takes part in the community benchmark but its key is not one the collector issues. Paste the whole key from helios-ha.org/benchmark, or switch the benchmark off."
-    },
-    "production_entity_missing": {
-      "title": "Production sensor not found",
-      "description": "The production sensor of {entry}, {entity}, does not exist. The forecast runs uncorrected until it does. Check the entity id, or pick the sensor again in the settings."
-    },
-    "production_entity_kind": {
-      "title": "Production sensor is not a cumulative energy sensor",
-      "description": "The production sensor of {entry}, {entity}, reports {unit} with state class {state_class}. The learning needs a cumulative energy sensor in kWh (state class total or total_increasing), not a power sensor. Pick your inverter's or meter's energy total; the Integral helper turns a power sensor into one."
+    "battery_power": {
+      "title": "Battery charge or discharge power implausible",
+      "description": "{entry} declares a battery power of {power} kW for a capacity of {capacity} kWh, more than three times its capacity per hour. Check the value and its unit (kW, not W)."
     },
     "battery_soc_entity_missing": {
       "title": "Battery state of charge sensor not found",
@@ -249,33 +173,113 @@
       "title": "Battery sensor is not a percentage",
       "description": "The battery sensor of {entry}, {entity}, reports {unit}. The projection needs the state of charge in percent."
     },
-    "curtailment_entity_missing": {
-      "title": "Curtailment signal not found",
-      "description": "The curtailment signal of {entry}, {entity}, does not exist. Hours the inverter is held back are then learned as bad sky. Check the entity id or clear the field."
+    "battery_soc_entity_unset": {
+      "title": "Battery: capacity set but no state of charge sensor",
+      "description": "{entry} declares a battery of {capacity} kWh but no state of charge sensor, so the projection stays off. Pick the battery's state of charge sensor (in %) or clear the capacity."
     },
-    "production_history_empty": {
-      "title": "Production sensor has no history yet",
-      "description": "{entity}, the production sensor of {entry}, has no long-term statistics yet. The learning starts as soon as the recorder has a few hours; if this persists after a day, the sensor is not a cumulative energy sensor."
+    "benchmark_blocked": {
+      "title": "Not sending to the benchmark ({count})",
+      "description": "{entry} takes part in the community benchmark but is holding its emissions back: the problems listed here would make the measurement describe the configuration rather than the forecast. Correct them and sending resumes on its own. Nothing measured before is lost."
     },
-    "production_at_night": {
-      "title": "Production sensor counts at night",
-      "description": "{entity}, the production sensor of {entry}, recorded {kwh} kWh while the sun was well below the horizon. Panels make nothing at night, so this sensor measures more than the panels (a grid or house meter). Pick the sensor that counts the inverter's output only."
+    "benchmark_excluded": {
+      "title": "Kept out of the benchmark figures ({reason})",
+      "description": "The community benchmark received the emissions of {entry} but keeps them out of the published figures. Reason {reason}: kwp means the declared peak power is missing, zero or typed in watts; night means the production sensor records energy at night, so it measures more than the panels; version means this installation runs a Helios Forecast too old for its measurements to be published, and updating is enough. Correct the configuration and the installation is counted again within a day."
     },
-    "production_above_panels": {
-      "title": "Production above what the declared panels can deliver",
-      "description": "{entity}, the production sensor of {entry}, reached {kw} kW several times for {kwp} kWp of declared panels. Either the peak power is too small, or the sensor counts more than the panels. Check both."
-    },
-    "production_stale": {
-      "title": "No production recorded for {days} days",
-      "description": "{entity}, the production sensor of {entry}, has not increased for {days} days. Snow or an outage can explain it; if the panels do produce, the sensor stopped reporting and the learning is starving."
+    "benchmark_key": {
+      "title": "Benchmark key does not look like a key",
+      "description": "{entry} takes part in the community benchmark but its key is not one the collector issues. Paste the whole key from helios-ha.org/benchmark, or switch the benchmark off."
     },
     "consumption_source_sparse": {
       "title": "Consumption source {source} reports intermittently",
       "description": "In the Energy dashboard, {source} has data for {pct}% of the hours the best source covers ({best}%). The consumption profile is built only from the hours it does cover, so it stays right but rests on less history. A more reliable sensor for that flow makes the battery projection sharper."
     },
-    "benchmark_excluded": {
-      "title": "Kept out of the benchmark figures ({reason})",
-      "description": "The community benchmark received the emissions of {entry} but keeps them out of the published figures. Reason {reason}: kwp means the declared peak power is missing, zero or typed in watts; night means the production sensor records energy at night, so it measures more than the panels. Correct the configuration and the installation is counted again within a day."
+    "curtailment_entity_missing": {
+      "title": "Curtailment signal not found",
+      "description": "The curtailment signal of {entry}, {entity}, does not exist. Hours the inverter is held back are then learned as bad sky. Check the entity id or clear the field."
+    },
+    "inverter_cap_low": {
+      "title": "Inverter limit well below the panels",
+      "description": "{entry} has an inverter limit of {cap} kW for {kwp} kWp of panels, so the forecast will be clipped most of the day. If the limit is right, ignore this; otherwise check the value or its unit."
+    },
+    "inverter_cap_unit": {
+      "title": "Inverter limit looks like watts",
+      "description": "{entry} has an inverter limit of {cap} kW for {kwp} kWp of panels. The limit was most likely typed in watts. Enter it in kilowatts (for example 5 rather than 5000)."
+    },
+    "line_azimuth": {
+      "title": "Panel line {line}: azimuth out of range",
+      "description": "Line {line} of {entry} has an azimuth of {azimuth} degrees. Azimuth runs from 0 to 360 clockwise from north: 90 is east, 180 south, 270 west."
+    },
+    "line_cap_unit": {
+      "title": "Panel line {line}: inverter limit looks like watts",
+      "description": "Line {line} of {entry} has an inverter limit of {cap} kW for {kwp} kWp of panels. The limit was most likely typed in watts. Enter it in kilowatts."
+    },
+    "line_kwp_missing": {
+      "title": "Panel line {line}: peak power missing",
+      "description": "Line {line} of {entry} has no peak power, or zero. Without it every figure stays flat. Enter the line's peak power in kWp (for example 3.6 for 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Panel line {line}: peak power looks like watts",
+      "description": "Line {line} of {entry} declares {kwp} kWp, which is far beyond a home installation. The value was most likely typed in watts. Enter it in kilowatts-peak (for example 4.05 rather than 4050)."
+    },
+    "line_location_far": {
+      "title": "Panel line {line}: coordinates far from the installation",
+      "description": "Line {line} of {entry} is placed {km} km from the installation. Panels on a distant field are possible, a wrong decimal is more likely; check the line's latitude and longitude."
+    },
+    "line_location_invalid": {
+      "title": "Panel line {line}: coordinates out of range",
+      "description": "Line {line} of {entry} has coordinates that are not a valid latitude and longitude. Correct them or leave both blank to place the line at the installation's location."
+    },
+    "line_tilt": {
+      "title": "Panel line {line}: tilt out of range",
+      "description": "Line {line} of {entry} has a tilt of {tilt} degrees. Tilt runs from 0 (flat) to 90 (vertical)."
+    },
+    "line_tracker": {
+      "title": "Panel line {line}: unknown tracker type",
+      "description": "Line {line} of {entry} declares a tracker of type {tracker}, which this integration does not know. Pick one of the offered types, or none for a fixed array."
+    },
+    "location_far": {
+      "title": "Location far from your Home Assistant home",
+      "description": "The location set for {entry} is {km} km from the Home Assistant home. If the installation really is there, ignore this; otherwise check a decimal in the latitude or longitude."
+    },
+    "location_invalid": {
+      "title": "Location out of range",
+      "description": "The location set for {entry} ({latitude}, {longitude}) is not a valid latitude and longitude. Latitude runs from -90 to 90 and longitude from -180 to 180; leave both blank to use the Home Assistant home."
+    },
+    "no_lines": {
+      "title": "No panel line",
+      "description": "{entry} has no panel line, so there is nothing to forecast. Add at least one line with its tilt, azimuth and peak power."
+    },
+    "production_above_panels": {
+      "title": "Production above what the declared panels can deliver",
+      "description": "{entity}, the production sensor of {entry}, reached {kw} kW several times for {kwp} kWp of declared panels. Either the peak power is too small, or the sensor counts more than the panels. Check both."
+    },
+    "production_at_night": {
+      "title": "Production sensor counts at night",
+      "description": "{entity}, the production sensor of {entry}, recorded {kwh} kWh while the sun was well below the horizon. Panels make nothing at night, so this sensor measures more than the panels (a grid or house meter). Pick the sensor that counts the inverter's output only."
+    },
+    "production_entity_kind": {
+      "title": "Production sensor is not a cumulative energy sensor",
+      "description": "The production sensor of {entry}, {entity}, reports {unit} with state class {state_class}. The learning needs a cumulative energy sensor in kWh (state class total or total_increasing), not a power sensor. Pick your inverter's or meter's energy total; the Integral helper turns a power sensor into one."
+    },
+    "production_entity_missing": {
+      "title": "Production sensor not found",
+      "description": "The production sensor of {entry}, {entity}, does not exist. The forecast runs uncorrected until it does. Check the entity id, or pick the sensor again in the settings."
+    },
+    "production_entity_unset": {
+      "title": "No production sensor: the forecast cannot learn",
+      "description": "{entry} has no production sensor. The forecast still runs on physics and weather, but nothing corrects it against what your panels really deliver. Pick the cumulative energy sensor (kWh) of your inverter or meter in the settings."
+    },
+    "production_history_empty": {
+      "title": "Production sensor has no history yet",
+      "description": "{entity}, the production sensor of {entry}, has no long-term statistics yet. The learning starts as soon as the recorder has a few hours; if this persists after a day, the sensor is not a cumulative energy sensor."
+    },
+    "production_stale": {
+      "title": "No production recorded for {days} days",
+      "description": "{entity}, the production sensor of {entry}, has not increased for {days} days. Snow or an outage can explain it; if the panels do produce, the sensor stopped reporting and the learning is starving."
+    },
+    "trend_anchor_hour": {
+      "title": "Trend reference hour out of range",
+      "description": "{entry} has a trend reference hour of {hour}. Enter a local hour from 0 to 23."
     }
   }
 }

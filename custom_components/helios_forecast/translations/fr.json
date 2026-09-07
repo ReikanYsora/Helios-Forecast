@@ -145,101 +145,25 @@
     }
   },
   "issues": {
-    "location_invalid": {
-      "title": "Position hors limites",
-      "description": "La position de {entry} ({latitude}, {longitude}) n'est pas une latitude et une longitude valides. La latitude va de -90 à 90 et la longitude de -180 à 180 ; laissez les deux champs vides pour utiliser la position de Home Assistant."
-    },
-    "location_far": {
-      "title": "Position éloignée de votre domicile Home Assistant",
-      "description": "La position de {entry} est à {km} km du domicile Home Assistant. Si l'installation est vraiment là, ignorez ce message ; sinon, vérifiez une décimale de la latitude ou de la longitude."
-    },
-    "no_lines": {
-      "title": "Aucune ligne de panneaux",
-      "description": "{entry} n'a aucune ligne de panneaux, il n'y a donc rien à prévoir. Ajoutez au moins une ligne avec son inclinaison, son azimut et sa puissance crête."
-    },
-    "line_kwp_missing": {
-      "title": "Ligne {line} : puissance crête manquante",
-      "description": "La ligne {line} de {entry} n'a pas de puissance crête, ou zéro. Sans elle, tous les chiffres restent à plat. Saisissez la puissance crête de la ligne en kWc (par exemple 3,6 pour 3600 Wc)."
-    },
-    "line_kwp_unit": {
-      "title": "Ligne {line} : la puissance crête ressemble à des watts",
-      "description": "La ligne {line} de {entry} déclare {kwp} kWc, bien au-delà d'une installation domestique. La valeur a très probablement été saisie en watts. Saisissez-la en kilowatts-crête (par exemple 4,05 et non 4050)."
-    },
-    "line_tilt": {
-      "title": "Ligne {line} : inclinaison hors limites",
-      "description": "La ligne {line} de {entry} a une inclinaison de {tilt} degrés. L'inclinaison va de 0 (à plat) à 90 (vertical)."
-    },
-    "line_azimuth": {
-      "title": "Ligne {line} : azimut hors limites",
-      "description": "La ligne {line} de {entry} a un azimut de {azimuth} degrés. L'azimut va de 0 à 360 dans le sens horaire depuis le nord : 90 est l'est, 180 le sud, 270 l'ouest."
-    },
-    "line_tracker": {
-      "title": "Ligne {line} : type de tracker inconnu",
-      "description": "La ligne {line} de {entry} déclare un tracker de type {tracker}, que cette intégration ne connaît pas. Choisissez un des types proposés, ou aucun pour des panneaux fixes."
-    },
-    "line_location_invalid": {
-      "title": "Ligne {line} : coordonnées hors limites",
-      "description": "La ligne {line} de {entry} a des coordonnées qui ne sont pas une latitude et une longitude valides. Corrigez-les ou laissez les deux champs vides pour placer la ligne à la position de l'installation."
-    },
-    "line_location_far": {
-      "title": "Ligne {line} : coordonnées éloignées de l'installation",
-      "description": "La ligne {line} de {entry} est placée à {km} km de l'installation. Des panneaux dans un champ éloigné sont possibles, une décimale erronée est plus probable ; vérifiez la latitude et la longitude de la ligne."
-    },
-    "line_cap_unit": {
-      "title": "Ligne {line} : la limite onduleur ressemble à des watts",
-      "description": "La ligne {line} de {entry} a une limite onduleur de {cap} kW pour {kwp} kWc de panneaux. La limite a très probablement été saisie en watts. Saisissez-la en kilowatts."
-    },
-    "inverter_cap_unit": {
-      "title": "La limite onduleur ressemble à des watts",
-      "description": "{entry} a une limite onduleur de {cap} kW pour {kwp} kWc de panneaux. La limite a très probablement été saisie en watts. Saisissez-la en kilowatts (par exemple 5 et non 5000)."
-    },
-    "inverter_cap_low": {
-      "title": "Limite onduleur bien inférieure aux panneaux",
-      "description": "{entry} a une limite onduleur de {cap} kW pour {kwp} kWc de panneaux, la prévision sera donc écrêtée presque toute la journée. Si la limite est exacte, ignorez ce message ; sinon, vérifiez la valeur ou son unité."
-    },
-    "production_entity_unset": {
-      "title": "Pas de capteur de production : la prévision ne peut pas apprendre",
-      "description": "{entry} n'a pas de capteur de production. La prévision tourne sur la physique et la météo, mais rien ne la corrige par rapport à ce que vos panneaux produisent vraiment. Choisissez dans les réglages le capteur d'énergie cumulée (kWh) de votre onduleur ou de votre compteur."
-    },
-    "trend_anchor_hour": {
-      "title": "Heure de référence de la tendance hors limites",
-      "description": "{entry} a une heure de référence de tendance de {hour}. Saisissez une heure locale de 0 à 23."
-    },
-    "battery_soc_entity_unset": {
-      "title": "Batterie : capacité renseignée mais pas de capteur d'état de charge",
-      "description": "{entry} déclare une batterie de {capacity} kWh mais aucun capteur d'état de charge, la projection reste donc désactivée. Choisissez le capteur d'état de charge de la batterie (en %) ou effacez la capacité."
+    "battery_capacity": {
+      "title": "Capacité de batterie hors limites",
+      "description": "{entry} déclare une batterie de {capacity} kWh, ce qui n'est pas une batterie domestique. Saisissez la capacité utile en kilowattheures (par exemple 10 et non 10000)."
     },
     "battery_capacity_unset": {
       "title": "Batterie : capteur d'état de charge renseigné mais pas de capacité",
       "description": "{entry} nomme un capteur d'état de charge de batterie mais aucune capacité utile, la projection reste donc désactivée. Saisissez la capacité utile de la batterie en kWh ou effacez le capteur."
     },
-    "battery_capacity": {
-      "title": "Capacité de batterie hors limites",
-      "description": "{entry} déclare une batterie de {capacity} kWh, ce qui n'est pas une batterie domestique. Saisissez la capacité utile en kilowattheures (par exemple 10 et non 10000)."
-    },
-    "battery_power": {
-      "title": "Puissance de charge ou de décharge de la batterie invraisemblable",
-      "description": "{entry} déclare une puissance de batterie de {power} kW pour une capacité de {capacity} kWh, plus de trois fois sa capacité par heure. Vérifiez la valeur et son unité (kW, pas W)."
+    "battery_efficiency": {
+      "title": "Rendement de batterie hors limites",
+      "description": "{entry} a un rendement aller-retour de {value}. Saisissez un pourcentage de 50 à 100 (la plupart des batteries domestiques sont autour de 90)."
     },
     "battery_min_soc": {
       "title": "Réserve de batterie hors limites",
       "description": "{entry} a un état de charge minimum de {value}. Saisissez un pourcentage de 0 à 100."
     },
-    "battery_efficiency": {
-      "title": "Rendement de batterie hors limites",
-      "description": "{entry} a un rendement aller-retour de {value}. Saisissez un pourcentage de 50 à 100 (la plupart des batteries domestiques sont autour de 90)."
-    },
-    "benchmark_key": {
-      "title": "La clé du benchmark ne ressemble pas à une clé",
-      "description": "{entry} participe au benchmark communautaire mais sa clé n'est pas une clé délivrée par le collecteur. Collez la clé entière obtenue sur helios-ha.org/benchmark, ou désactivez le benchmark."
-    },
-    "production_entity_missing": {
-      "title": "Capteur de production introuvable",
-      "description": "Le capteur de production de {entry}, {entity}, n'existe pas. La prévision tourne sans correction tant qu'il manque. Vérifiez l'identifiant de l'entité, ou choisissez de nouveau le capteur dans les réglages."
-    },
-    "production_entity_kind": {
-      "title": "Le capteur de production n'est pas un capteur d'énergie cumulée",
-      "description": "Le capteur de production de {entry}, {entity}, rapporte des {unit} avec la classe d'état {state_class}. L'apprentissage a besoin d'un capteur d'énergie cumulée en kWh (classe d'état total ou total_increasing), pas d'un capteur de puissance. Choisissez le total d'énergie de votre onduleur ou de votre compteur ; l'aide Intégrale transforme un capteur de puissance en un tel capteur."
+    "battery_power": {
+      "title": "Puissance de charge ou de décharge de la batterie invraisemblable",
+      "description": "{entry} déclare une puissance de batterie de {power} kW pour une capacité de {capacity} kWh, plus de trois fois sa capacité par heure. Vérifiez la valeur et son unité (kW, pas W)."
     },
     "battery_soc_entity_missing": {
       "title": "Capteur d'état de charge de la batterie introuvable",
@@ -249,33 +173,113 @@
       "title": "Le capteur de batterie n'est pas un pourcentage",
       "description": "Le capteur de batterie de {entry}, {entity}, rapporte des {unit}. La projection a besoin de l'état de charge en pourcentage."
     },
-    "curtailment_entity_missing": {
-      "title": "Signal de bridage introuvable",
-      "description": "Le signal de bridage de {entry}, {entity}, n'existe pas. Les heures où l'onduleur est bridé sont alors apprises comme un mauvais ciel. Vérifiez l'identifiant de l'entité ou videz le champ."
+    "battery_soc_entity_unset": {
+      "title": "Batterie : capacité renseignée mais pas de capteur d'état de charge",
+      "description": "{entry} déclare une batterie de {capacity} kWh mais aucun capteur d'état de charge, la projection reste donc désactivée. Choisissez le capteur d'état de charge de la batterie (en %) ou effacez la capacité."
     },
-    "production_history_empty": {
-      "title": "Le capteur de production n'a pas encore d'historique",
-      "description": "{entity}, le capteur de production de {entry}, n'a pas encore de statistiques à long terme. L'apprentissage commence dès que l'enregistreur a quelques heures ; si cela persiste après une journée, le capteur n'est pas un capteur d'énergie cumulée."
+    "benchmark_blocked": {
+      "title": "Envois au benchmark suspendus ({count})",
+      "description": "{entry} participe au benchmark communautaire mais retient ses envois : avec les problèmes listés ici, la mesure décrirait la configuration plutôt que la prévision. Corrigez-les et l'envoi repart tout seul, rien de ce qui a déjà été mesuré n'est perdu."
     },
-    "production_at_night": {
-      "title": "Le capteur de production compte la nuit",
-      "description": "{entity}, le capteur de production de {entry}, a enregistré {kwh} kWh alors que le soleil était bien sous l'horizon. Des panneaux ne produisent rien la nuit : ce capteur mesure donc plus que les panneaux (un compteur de réseau ou de maison). Choisissez le capteur qui ne compte que la sortie de l'onduleur."
+    "benchmark_excluded": {
+      "title": "Écartée des chiffres du benchmark ({reason})",
+      "description": "Le benchmark communautaire reçoit les émissions de {entry} mais les tient à l'écart des chiffres publiés. Motif {reason} : kwp signifie que la puissance crête déclarée est absente, nulle ou saisie en watts ; night signifie que le capteur de production enregistre de l'énergie la nuit, il mesure donc plus que les panneaux ; version signifie que cette installation tourne sur une version d'Helios Forecast trop ancienne pour que ses mesures soient publiées, et une mise à jour suffit. Corrigez la configuration et l'installation est de nouveau comptée sous un jour."
     },
-    "production_above_panels": {
-      "title": "Production supérieure à ce que les panneaux déclarés peuvent fournir",
-      "description": "{entity}, le capteur de production de {entry}, a atteint {kw} kW à plusieurs reprises pour {kwp} kWc de panneaux déclarés. Soit la puissance crête est trop faible, soit le capteur compte plus que les panneaux. Vérifiez les deux."
-    },
-    "production_stale": {
-      "title": "Aucune production enregistrée depuis {days} jours",
-      "description": "{entity}, le capteur de production de {entry}, n'a pas augmenté depuis {days} jours. La neige ou une panne peuvent l'expliquer ; si les panneaux produisent, le capteur a cessé de rapporter et l'apprentissage est à sec."
+    "benchmark_key": {
+      "title": "La clé du benchmark ne ressemble pas à une clé",
+      "description": "{entry} participe au benchmark communautaire mais sa clé n'est pas une clé délivrée par le collecteur. Collez la clé entière obtenue sur helios-ha.org/benchmark, ou désactivez le benchmark."
     },
     "consumption_source_sparse": {
       "title": "La source de consommation {source} rapporte par intermittence",
       "description": "Dans le tableau de bord Énergie, {source} a des données pour {pct} % des heures que couvre la meilleure source ({best} %). Le profil de consommation n'est construit qu'avec les heures qu'elle couvre, il reste donc juste mais repose sur moins d'historique. Un capteur plus fiable pour ce flux affine la projection de la batterie."
     },
-    "benchmark_excluded": {
-      "title": "Écartée des chiffres du benchmark ({reason})",
-      "description": "Le benchmark communautaire reçoit les émissions de {entry} mais les tient à l'écart des chiffres publiés. Motif {reason} : kwp signifie que la puissance crête déclarée est absente, nulle ou saisie en watts ; night signifie que le capteur de production enregistre de l'énergie la nuit, il mesure donc plus que les panneaux. Corrigez la configuration et l'installation est de nouveau comptée sous un jour."
+    "curtailment_entity_missing": {
+      "title": "Signal de bridage introuvable",
+      "description": "Le signal de bridage de {entry}, {entity}, n'existe pas. Les heures où l'onduleur est bridé sont alors apprises comme un mauvais ciel. Vérifiez l'identifiant de l'entité ou videz le champ."
+    },
+    "inverter_cap_low": {
+      "title": "Limite onduleur bien inférieure aux panneaux",
+      "description": "{entry} a une limite onduleur de {cap} kW pour {kwp} kWc de panneaux, la prévision sera donc écrêtée presque toute la journée. Si la limite est exacte, ignorez ce message ; sinon, vérifiez la valeur ou son unité."
+    },
+    "inverter_cap_unit": {
+      "title": "La limite onduleur ressemble à des watts",
+      "description": "{entry} a une limite onduleur de {cap} kW pour {kwp} kWc de panneaux. La limite a très probablement été saisie en watts. Saisissez-la en kilowatts (par exemple 5 et non 5000)."
+    },
+    "line_azimuth": {
+      "title": "Ligne {line} : azimut hors limites",
+      "description": "La ligne {line} de {entry} a un azimut de {azimuth} degrés. L'azimut va de 0 à 360 dans le sens horaire depuis le nord : 90 est l'est, 180 le sud, 270 l'ouest."
+    },
+    "line_cap_unit": {
+      "title": "Ligne {line} : la limite onduleur ressemble à des watts",
+      "description": "La ligne {line} de {entry} a une limite onduleur de {cap} kW pour {kwp} kWc de panneaux. La limite a très probablement été saisie en watts. Saisissez-la en kilowatts."
+    },
+    "line_kwp_missing": {
+      "title": "Ligne {line} : puissance crête manquante",
+      "description": "La ligne {line} de {entry} n'a pas de puissance crête, ou zéro. Sans elle, tous les chiffres restent à plat. Saisissez la puissance crête de la ligne en kWc (par exemple 3,6 pour 3600 Wc)."
+    },
+    "line_kwp_unit": {
+      "title": "Ligne {line} : la puissance crête ressemble à des watts",
+      "description": "La ligne {line} de {entry} déclare {kwp} kWc, bien au-delà d'une installation domestique. La valeur a très probablement été saisie en watts. Saisissez-la en kilowatts-crête (par exemple 4,05 et non 4050)."
+    },
+    "line_location_far": {
+      "title": "Ligne {line} : coordonnées éloignées de l'installation",
+      "description": "La ligne {line} de {entry} est placée à {km} km de l'installation. Des panneaux dans un champ éloigné sont possibles, une décimale erronée est plus probable ; vérifiez la latitude et la longitude de la ligne."
+    },
+    "line_location_invalid": {
+      "title": "Ligne {line} : coordonnées hors limites",
+      "description": "La ligne {line} de {entry} a des coordonnées qui ne sont pas une latitude et une longitude valides. Corrigez-les ou laissez les deux champs vides pour placer la ligne à la position de l'installation."
+    },
+    "line_tilt": {
+      "title": "Ligne {line} : inclinaison hors limites",
+      "description": "La ligne {line} de {entry} a une inclinaison de {tilt} degrés. L'inclinaison va de 0 (à plat) à 90 (vertical)."
+    },
+    "line_tracker": {
+      "title": "Ligne {line} : type de tracker inconnu",
+      "description": "La ligne {line} de {entry} déclare un tracker de type {tracker}, que cette intégration ne connaît pas. Choisissez un des types proposés, ou aucun pour des panneaux fixes."
+    },
+    "location_far": {
+      "title": "Position éloignée de votre domicile Home Assistant",
+      "description": "La position de {entry} est à {km} km du domicile Home Assistant. Si l'installation est vraiment là, ignorez ce message ; sinon, vérifiez une décimale de la latitude ou de la longitude."
+    },
+    "location_invalid": {
+      "title": "Position hors limites",
+      "description": "La position de {entry} ({latitude}, {longitude}) n'est pas une latitude et une longitude valides. La latitude va de -90 à 90 et la longitude de -180 à 180 ; laissez les deux champs vides pour utiliser la position de Home Assistant."
+    },
+    "no_lines": {
+      "title": "Aucune ligne de panneaux",
+      "description": "{entry} n'a aucune ligne de panneaux, il n'y a donc rien à prévoir. Ajoutez au moins une ligne avec son inclinaison, son azimut et sa puissance crête."
+    },
+    "production_above_panels": {
+      "title": "Production supérieure à ce que les panneaux déclarés peuvent fournir",
+      "description": "{entity}, le capteur de production de {entry}, a atteint {kw} kW à plusieurs reprises pour {kwp} kWc de panneaux déclarés. Soit la puissance crête est trop faible, soit le capteur compte plus que les panneaux. Vérifiez les deux."
+    },
+    "production_at_night": {
+      "title": "Le capteur de production compte la nuit",
+      "description": "{entity}, le capteur de production de {entry}, a enregistré {kwh} kWh alors que le soleil était bien sous l'horizon. Des panneaux ne produisent rien la nuit : ce capteur mesure donc plus que les panneaux (un compteur de réseau ou de maison). Choisissez le capteur qui ne compte que la sortie de l'onduleur."
+    },
+    "production_entity_kind": {
+      "title": "Le capteur de production n'est pas un capteur d'énergie cumulée",
+      "description": "Le capteur de production de {entry}, {entity}, rapporte des {unit} avec la classe d'état {state_class}. L'apprentissage a besoin d'un capteur d'énergie cumulée en kWh (classe d'état total ou total_increasing), pas d'un capteur de puissance. Choisissez le total d'énergie de votre onduleur ou de votre compteur ; l'aide Intégrale transforme un capteur de puissance en un tel capteur."
+    },
+    "production_entity_missing": {
+      "title": "Capteur de production introuvable",
+      "description": "Le capteur de production de {entry}, {entity}, n'existe pas. La prévision tourne sans correction tant qu'il manque. Vérifiez l'identifiant de l'entité, ou choisissez de nouveau le capteur dans les réglages."
+    },
+    "production_entity_unset": {
+      "title": "Pas de capteur de production : la prévision ne peut pas apprendre",
+      "description": "{entry} n'a pas de capteur de production. La prévision tourne sur la physique et la météo, mais rien ne la corrige par rapport à ce que vos panneaux produisent vraiment. Choisissez dans les réglages le capteur d'énergie cumulée (kWh) de votre onduleur ou de votre compteur."
+    },
+    "production_history_empty": {
+      "title": "Le capteur de production n'a pas encore d'historique",
+      "description": "{entity}, le capteur de production de {entry}, n'a pas encore de statistiques à long terme. L'apprentissage commence dès que l'enregistreur a quelques heures ; si cela persiste après une journée, le capteur n'est pas un capteur d'énergie cumulée."
+    },
+    "production_stale": {
+      "title": "Aucune production enregistrée depuis {days} jours",
+      "description": "{entity}, le capteur de production de {entry}, n'a pas augmenté depuis {days} jours. La neige ou une panne peuvent l'expliquer ; si les panneaux produisent, le capteur a cessé de rapporter et l'apprentissage est à sec."
+    },
+    "trend_anchor_hour": {
+      "title": "Heure de référence de la tendance hors limites",
+      "description": "{entry} a une heure de référence de tendance de {hour}. Saisissez une heure locale de 0 à 23."
     }
   }
 }

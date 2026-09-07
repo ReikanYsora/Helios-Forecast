@@ -145,101 +145,25 @@
     }
   },
   "issues": {
-    "location_invalid": {
-      "title": "Localização fora do intervalo",
-      "description": "A localização de {entry} ({latitude}, {longitude}) não é uma latitude e uma longitude válidas. A latitude vai de -90 a 90 e a longitude de -180 a 180; deixe ambos os campos vazios para usar a localização do Home Assistant."
-    },
-    "location_far": {
-      "title": "Localização longe da sua casa no Home Assistant",
-      "description": "A localização de {entry} fica a {km} km da casa do Home Assistant. Se a instalação está mesmo aí, ignore este aviso; caso contrário, verifique uma casa decimal da latitude ou da longitude."
-    },
-    "no_lines": {
-      "title": "Nenhuma fileira de painéis",
-      "description": "{entry} não tem nenhuma fileira de painéis, por isso não há nada a prever. Adicione pelo menos uma fileira com inclinação, azimute e potência de pico."
-    },
-    "line_kwp_missing": {
-      "title": "Fileira {line}: falta a potência de pico",
-      "description": "A fileira {line} de {entry} não tem potência de pico, ou é zero. Sem ela todos os números ficam a zero. Introduza a potência de pico da fileira em kWp (por exemplo 3,6 para 3600 Wp)."
-    },
-    "line_kwp_unit": {
-      "title": "Fileira {line}: a potência de pico parece estar em watts",
-      "description": "A fileira {line} de {entry} declara {kwp} kWp, muito acima de uma instalação doméstica. O valor foi muito provavelmente escrito em watts. Introduza-o em quilowatts-pico (por exemplo 4,05 em vez de 4050)."
-    },
-    "line_tilt": {
-      "title": "Fileira {line}: inclinação fora do intervalo",
-      "description": "A fileira {line} de {entry} tem uma inclinação de {tilt} graus. A inclinação vai de 0 (plana) a 90 (vertical)."
-    },
-    "line_azimuth": {
-      "title": "Fileira {line}: azimute fora do intervalo",
-      "description": "A fileira {line} de {entry} tem um azimute de {azimuth} graus. O azimute vai de 0 a 360 no sentido horário a partir do norte: 90 é este, 180 sul, 270 oeste."
-    },
-    "line_tracker": {
-      "title": "Fileira {line}: tipo de seguidor desconhecido",
-      "description": "A fileira {line} de {entry} declara um seguidor do tipo {tracker}, que esta integração não conhece. Escolha um dos tipos propostos, ou nenhum para painéis fixos."
-    },
-    "line_location_invalid": {
-      "title": "Fileira {line}: coordenadas fora do intervalo",
-      "description": "A fileira {line} de {entry} tem coordenadas que não são uma latitude e uma longitude válidas. Corrija-as ou deixe ambos os campos vazios para colocar a fileira na localização da instalação."
-    },
-    "line_location_far": {
-      "title": "Fileira {line}: coordenadas longe da instalação",
-      "description": "A fileira {line} de {entry} está colocada a {km} km da instalação. Painéis num campo distante são possíveis, uma casa decimal errada é mais provável; verifique a latitude e a longitude da fileira."
-    },
-    "line_cap_unit": {
-      "title": "Fileira {line}: o limite do inversor parece estar em watts",
-      "description": "A fileira {line} de {entry} tem um limite de inversor de {cap} kW para {kwp} kWp de painéis. O limite foi muito provavelmente escrito em watts. Introduza-o em quilowatts."
-    },
-    "inverter_cap_unit": {
-      "title": "O limite do inversor parece estar em watts",
-      "description": "{entry} tem um limite de inversor de {cap} kW para {kwp} kWp de painéis. O limite foi muito provavelmente escrito em watts. Introduza-o em quilowatts (por exemplo 5 em vez de 5000)."
-    },
-    "inverter_cap_low": {
-      "title": "Limite do inversor muito abaixo dos painéis",
-      "description": "{entry} tem um limite de inversor de {cap} kW para {kwp} kWp de painéis, por isso a previsão será cortada quase todo o dia. Se o limite estiver certo, ignore este aviso; caso contrário, verifique o valor ou a unidade."
-    },
-    "production_entity_unset": {
-      "title": "Sem sensor de produção: a previsão não consegue aprender",
-      "description": "{entry} não tem sensor de produção. A previsão corre com a física e a meteorologia, mas nada a corrige face ao que os seus painéis produzem realmente. Escolha nas definições o sensor de energia acumulada (kWh) do seu inversor ou do contador."
-    },
-    "trend_anchor_hour": {
-      "title": "Hora de referência da tendência fora do intervalo",
-      "description": "{entry} tem uma hora de referência da tendência de {hour}. Introduza uma hora local de 0 a 23."
-    },
-    "battery_soc_entity_unset": {
-      "title": "Bateria: capacidade definida mas sem sensor de estado de carga",
-      "description": "{entry} declara uma bateria de {capacity} kWh mas nenhum sensor de estado de carga, por isso a projeção fica desligada. Escolha o sensor de estado de carga da bateria (em %) ou apague a capacidade."
+    "battery_capacity": {
+      "title": "Capacidade da bateria fora do intervalo",
+      "description": "{entry} declara uma bateria de {capacity} kWh, o que não é uma bateria doméstica. Introduza a capacidade útil em quilowatts-hora (por exemplo 10 em vez de 10000)."
     },
     "battery_capacity_unset": {
       "title": "Bateria: sensor de estado de carga definido mas sem capacidade",
       "description": "{entry} indica um sensor de estado de carga mas nenhuma capacidade útil, por isso a projeção fica desligada. Introduza a capacidade útil da bateria em kWh ou apague o sensor."
     },
-    "battery_capacity": {
-      "title": "Capacidade da bateria fora do intervalo",
-      "description": "{entry} declara uma bateria de {capacity} kWh, o que não é uma bateria doméstica. Introduza a capacidade útil em quilowatts-hora (por exemplo 10 em vez de 10000)."
-    },
-    "battery_power": {
-      "title": "Potência de carga ou descarga da bateria inverosímil",
-      "description": "{entry} declara uma potência de bateria de {power} kW para uma capacidade de {capacity} kWh, mais de três vezes a capacidade por hora. Verifique o valor e a unidade (kW, não W)."
+    "battery_efficiency": {
+      "title": "Rendimento da bateria fora do intervalo",
+      "description": "{entry} tem um rendimento de ida e volta de {value}. Introduza uma percentagem de 50 a 100 (a maioria das baterias domésticas anda à volta de 90)."
     },
     "battery_min_soc": {
       "title": "Reserva da bateria fora do intervalo",
       "description": "{entry} tem um estado de carga mínimo de {value}. Introduza uma percentagem de 0 a 100."
     },
-    "battery_efficiency": {
-      "title": "Rendimento da bateria fora do intervalo",
-      "description": "{entry} tem um rendimento de ida e volta de {value}. Introduza uma percentagem de 50 a 100 (a maioria das baterias domésticas anda à volta de 90)."
-    },
-    "benchmark_key": {
-      "title": "A chave do benchmark não parece uma chave",
-      "description": "{entry} participa no benchmark da comunidade mas a sua chave não é uma das emitidas pelo coletor. Cole a chave inteira obtida em helios-ha.org/benchmark, ou desligue o benchmark."
-    },
-    "production_entity_missing": {
-      "title": "Sensor de produção não encontrado",
-      "description": "O sensor de produção de {entry}, {entity}, não existe. A previsão corre sem correção até ele existir. Verifique o identificador da entidade, ou volte a escolher o sensor nas definições."
-    },
-    "production_entity_kind": {
-      "title": "O sensor de produção não é um sensor de energia acumulada",
-      "description": "O sensor de produção de {entry}, {entity}, reporta {unit} com a classe de estado {state_class}. A aprendizagem precisa de um sensor de energia acumulada em kWh (classe de estado total ou total_increasing), não de um sensor de potência. Escolha o total de energia do seu inversor ou do contador; o auxiliar Integral transforma um sensor de potência num sensor assim."
+    "battery_power": {
+      "title": "Potência de carga ou descarga da bateria inverosímil",
+      "description": "{entry} declara uma potência de bateria de {power} kW para uma capacidade de {capacity} kWh, mais de três vezes a capacidade por hora. Verifique o valor e a unidade (kW, não W)."
     },
     "battery_soc_entity_missing": {
       "title": "Sensor de estado de carga da bateria não encontrado",
@@ -249,33 +173,113 @@
       "title": "O sensor da bateria não é uma percentagem",
       "description": "O sensor da bateria de {entry}, {entity}, reporta {unit}. A projeção precisa do estado de carga em percentagem."
     },
-    "curtailment_entity_missing": {
-      "title": "Sinal de limitação não encontrado",
-      "description": "O sinal de limitação de {entry}, {entity}, não existe. As horas em que o inversor é limitado são então aprendidas como mau céu. Verifique o identificador da entidade ou esvazie o campo."
+    "battery_soc_entity_unset": {
+      "title": "Bateria: capacidade definida mas sem sensor de estado de carga",
+      "description": "{entry} declara uma bateria de {capacity} kWh mas nenhum sensor de estado de carga, por isso a projeção fica desligada. Escolha o sensor de estado de carga da bateria (em %) ou apague a capacidade."
     },
-    "production_history_empty": {
-      "title": "O sensor de produção ainda não tem histórico",
-      "description": "{entity}, o sensor de produção de {entry}, ainda não tem estatísticas de longo prazo. A aprendizagem começa assim que o gravador tiver algumas horas; se persistir após um dia, o sensor não é um sensor de energia acumulada."
+    "benchmark_blocked": {
+      "title": "Não envia para o benchmark ({count})",
+      "description": "{entry} participa no benchmark comunitário mas está a reter as suas emissões: os problemas listados aqui fariam a medição descrever a configuração em vez da previsão. Corrija-os e o envio recomeça sozinho. Nada do que foi medido antes se perde."
     },
-    "production_at_night": {
-      "title": "O sensor de produção conta de noite",
-      "description": "{entity}, o sensor de produção de {entry}, registou {kwh} kWh com o sol bem abaixo do horizonte. Os painéis não produzem nada de noite, por isso este sensor mede mais do que os painéis (um contador da rede ou da casa). Escolha o sensor que conta apenas a saída do inversor."
+    "benchmark_excluded": {
+      "title": "Excluída dos números do benchmark ({reason})",
+      "description": "O benchmark da comunidade recebe as emissões de {entry} mas mantém-nas fora dos números publicados. Motivo {reason}: kwp significa que a potência de pico declarada falta, é zero ou está em watts; night significa que o sensor de produção regista energia de noite, por isso mede mais do que os painéis; version significa que esta instalação usa um Helios Forecast demasiado antigo para que as suas medições sejam publicadas, e basta atualizar. Corrija a configuração e a instalação volta a ser contada dentro de um dia."
     },
-    "production_above_panels": {
-      "title": "Produção acima do que os painéis declarados conseguem dar",
-      "description": "{entity}, o sensor de produção de {entry}, atingiu {kw} kW várias vezes com {kwp} kWp de painéis declarados. Ou a potência de pico é demasiado baixa, ou o sensor conta mais do que os painéis. Verifique ambos."
-    },
-    "production_stale": {
-      "title": "Nenhuma produção registada há {days} dias",
-      "description": "{entity}, o sensor de produção de {entry}, não aumenta há {days} dias. Neve ou uma avaria podem explicá-lo; se os painéis produzem, o sensor deixou de reportar e a aprendizagem fica sem dados."
+    "benchmark_key": {
+      "title": "A chave do benchmark não parece uma chave",
+      "description": "{entry} participa no benchmark da comunidade mas a sua chave não é uma das emitidas pelo coletor. Cole a chave inteira obtida em helios-ha.org/benchmark, ou desligue o benchmark."
     },
     "consumption_source_sparse": {
       "title": "A fonte de consumo {source} reporta de forma intermitente",
       "description": "No painel de Energia, {source} tem dados para {pct}% das horas que a melhor fonte cobre ({best}%). O perfil de consumo é construído apenas com as horas que ela cobre, por isso continua certo mas assenta em menos histórico. Um sensor mais fiável para esse fluxo torna a projeção da bateria mais precisa."
     },
-    "benchmark_excluded": {
-      "title": "Excluída dos números do benchmark ({reason})",
-      "description": "O benchmark da comunidade recebe as emissões de {entry} mas mantém-nas fora dos números publicados. Motivo {reason}: kwp significa que a potência de pico declarada falta, é zero ou está em watts; night significa que o sensor de produção regista energia de noite, por isso mede mais do que os painéis. Corrija a configuração e a instalação volta a ser contada dentro de um dia."
+    "curtailment_entity_missing": {
+      "title": "Sinal de limitação não encontrado",
+      "description": "O sinal de limitação de {entry}, {entity}, não existe. As horas em que o inversor é limitado são então aprendidas como mau céu. Verifique o identificador da entidade ou esvazie o campo."
+    },
+    "inverter_cap_low": {
+      "title": "Limite do inversor muito abaixo dos painéis",
+      "description": "{entry} tem um limite de inversor de {cap} kW para {kwp} kWp de painéis, por isso a previsão será cortada quase todo o dia. Se o limite estiver certo, ignore este aviso; caso contrário, verifique o valor ou a unidade."
+    },
+    "inverter_cap_unit": {
+      "title": "O limite do inversor parece estar em watts",
+      "description": "{entry} tem um limite de inversor de {cap} kW para {kwp} kWp de painéis. O limite foi muito provavelmente escrito em watts. Introduza-o em quilowatts (por exemplo 5 em vez de 5000)."
+    },
+    "line_azimuth": {
+      "title": "Fileira {line}: azimute fora do intervalo",
+      "description": "A fileira {line} de {entry} tem um azimute de {azimuth} graus. O azimute vai de 0 a 360 no sentido horário a partir do norte: 90 é este, 180 sul, 270 oeste."
+    },
+    "line_cap_unit": {
+      "title": "Fileira {line}: o limite do inversor parece estar em watts",
+      "description": "A fileira {line} de {entry} tem um limite de inversor de {cap} kW para {kwp} kWp de painéis. O limite foi muito provavelmente escrito em watts. Introduza-o em quilowatts."
+    },
+    "line_kwp_missing": {
+      "title": "Fileira {line}: falta a potência de pico",
+      "description": "A fileira {line} de {entry} não tem potência de pico, ou é zero. Sem ela todos os números ficam a zero. Introduza a potência de pico da fileira em kWp (por exemplo 3,6 para 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Fileira {line}: a potência de pico parece estar em watts",
+      "description": "A fileira {line} de {entry} declara {kwp} kWp, muito acima de uma instalação doméstica. O valor foi muito provavelmente escrito em watts. Introduza-o em quilowatts-pico (por exemplo 4,05 em vez de 4050)."
+    },
+    "line_location_far": {
+      "title": "Fileira {line}: coordenadas longe da instalação",
+      "description": "A fileira {line} de {entry} está colocada a {km} km da instalação. Painéis num campo distante são possíveis, uma casa decimal errada é mais provável; verifique a latitude e a longitude da fileira."
+    },
+    "line_location_invalid": {
+      "title": "Fileira {line}: coordenadas fora do intervalo",
+      "description": "A fileira {line} de {entry} tem coordenadas que não são uma latitude e uma longitude válidas. Corrija-as ou deixe ambos os campos vazios para colocar a fileira na localização da instalação."
+    },
+    "line_tilt": {
+      "title": "Fileira {line}: inclinação fora do intervalo",
+      "description": "A fileira {line} de {entry} tem uma inclinação de {tilt} graus. A inclinação vai de 0 (plana) a 90 (vertical)."
+    },
+    "line_tracker": {
+      "title": "Fileira {line}: tipo de seguidor desconhecido",
+      "description": "A fileira {line} de {entry} declara um seguidor do tipo {tracker}, que esta integração não conhece. Escolha um dos tipos propostos, ou nenhum para painéis fixos."
+    },
+    "location_far": {
+      "title": "Localização longe da sua casa no Home Assistant",
+      "description": "A localização de {entry} fica a {km} km da casa do Home Assistant. Se a instalação está mesmo aí, ignore este aviso; caso contrário, verifique uma casa decimal da latitude ou da longitude."
+    },
+    "location_invalid": {
+      "title": "Localização fora do intervalo",
+      "description": "A localização de {entry} ({latitude}, {longitude}) não é uma latitude e uma longitude válidas. A latitude vai de -90 a 90 e a longitude de -180 a 180; deixe ambos os campos vazios para usar a localização do Home Assistant."
+    },
+    "no_lines": {
+      "title": "Nenhuma fileira de painéis",
+      "description": "{entry} não tem nenhuma fileira de painéis, por isso não há nada a prever. Adicione pelo menos uma fileira com inclinação, azimute e potência de pico."
+    },
+    "production_above_panels": {
+      "title": "Produção acima do que os painéis declarados conseguem dar",
+      "description": "{entity}, o sensor de produção de {entry}, atingiu {kw} kW várias vezes com {kwp} kWp de painéis declarados. Ou a potência de pico é demasiado baixa, ou o sensor conta mais do que os painéis. Verifique ambos."
+    },
+    "production_at_night": {
+      "title": "O sensor de produção conta de noite",
+      "description": "{entity}, o sensor de produção de {entry}, registou {kwh} kWh com o sol bem abaixo do horizonte. Os painéis não produzem nada de noite, por isso este sensor mede mais do que os painéis (um contador da rede ou da casa). Escolha o sensor que conta apenas a saída do inversor."
+    },
+    "production_entity_kind": {
+      "title": "O sensor de produção não é um sensor de energia acumulada",
+      "description": "O sensor de produção de {entry}, {entity}, reporta {unit} com a classe de estado {state_class}. A aprendizagem precisa de um sensor de energia acumulada em kWh (classe de estado total ou total_increasing), não de um sensor de potência. Escolha o total de energia do seu inversor ou do contador; o auxiliar Integral transforma um sensor de potência num sensor assim."
+    },
+    "production_entity_missing": {
+      "title": "Sensor de produção não encontrado",
+      "description": "O sensor de produção de {entry}, {entity}, não existe. A previsão corre sem correção até ele existir. Verifique o identificador da entidade, ou volte a escolher o sensor nas definições."
+    },
+    "production_entity_unset": {
+      "title": "Sem sensor de produção: a previsão não consegue aprender",
+      "description": "{entry} não tem sensor de produção. A previsão corre com a física e a meteorologia, mas nada a corrige face ao que os seus painéis produzem realmente. Escolha nas definições o sensor de energia acumulada (kWh) do seu inversor ou do contador."
+    },
+    "production_history_empty": {
+      "title": "O sensor de produção ainda não tem histórico",
+      "description": "{entity}, o sensor de produção de {entry}, ainda não tem estatísticas de longo prazo. A aprendizagem começa assim que o gravador tiver algumas horas; se persistir após um dia, o sensor não é um sensor de energia acumulada."
+    },
+    "production_stale": {
+      "title": "Nenhuma produção registada há {days} dias",
+      "description": "{entity}, o sensor de produção de {entry}, não aumenta há {days} dias. Neve ou uma avaria podem explicá-lo; se os painéis produzem, o sensor deixou de reportar e a aprendizagem fica sem dados."
+    },
+    "trend_anchor_hour": {
+      "title": "Hora de referência da tendência fora do intervalo",
+      "description": "{entry} tem uma hora de referência da tendência de {hour}. Introduza uma hora local de 0 a 23."
     }
   }
 }

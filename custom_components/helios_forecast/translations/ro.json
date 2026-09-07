@@ -145,101 +145,25 @@
     }
   },
   "issues": {
-    "location_invalid": {
-      "title": "Locație în afara intervalului valid",
-      "description": "Locația pentru {entry} ({latitude}, {longitude}) nu este o latitudine și o longitudine valide. Latitudinea merge de la -90 la 90, iar longitudinea de la -180 la 180; lăsați ambele câmpuri goale pentru a folosi casa din Home Assistant."
-    },
-    "location_far": {
-      "title": "Locație departe de casa dumneavoastră din Home Assistant",
-      "description": "Locația pentru {entry} este la {km} km de casa din Home Assistant. Dacă instalația este într-adevăr acolo, ignorați acest mesaj; altfel, verificați o zecimală a latitudinii sau a longitudinii."
-    },
-    "no_lines": {
-      "title": "Niciun rând de panouri",
-      "description": "{entry} nu are niciun rând de panouri, deci nu este nimic de prognozat. Adăugați cel puțin un rând cu înclinarea, azimutul și puterea de vârf."
-    },
-    "line_kwp_missing": {
-      "title": "Rândul {line}: lipsește puterea de vârf",
-      "description": "Rândul {line} din {entry} nu are putere de vârf sau este zero. Fără ea, toate cifrele rămân plate. Introduceți puterea de vârf a rândului în kWp (de exemplu 3,6 pentru 3600 Wp)."
-    },
-    "line_kwp_unit": {
-      "title": "Rândul {line}: puterea de vârf pare în wați",
-      "description": "Rândul {line} din {entry} declară {kwp} kWp, mult peste o instalație casnică. Valoarea a fost cel mai probabil introdusă în wați. Introduceți-o în kilowați de vârf (de exemplu 4,05 în loc de 4050)."
-    },
-    "line_tilt": {
-      "title": "Rândul {line}: înclinare în afara intervalului",
-      "description": "Rândul {line} din {entry} are o înclinare de {tilt} grade. Înclinarea merge de la 0 (orizontal) la 90 (vertical)."
-    },
-    "line_azimuth": {
-      "title": "Rândul {line}: azimut în afara intervalului",
-      "description": "Rândul {line} din {entry} are un azimut de {azimuth} grade. Azimutul merge de la 0 la 360 în sensul acelor de ceasornic de la nord: 90 este est, 180 sud, 270 vest."
-    },
-    "line_tracker": {
-      "title": "Rândul {line}: tip de tracker necunoscut",
-      "description": "Rândul {line} din {entry} declară un tracker de tip {tracker}, pe care această integrare nu îl cunoaște. Alegeți unul dintre tipurile propuse sau niciunul pentru panouri fixe."
-    },
-    "line_location_invalid": {
-      "title": "Rândul {line}: coordonate în afara intervalului",
-      "description": "Rândul {line} din {entry} are coordonate care nu sunt o latitudine și o longitudine valide. Corectați-le sau lăsați ambele câmpuri goale pentru a plasa rândul la locația instalației."
-    },
-    "line_location_far": {
-      "title": "Rândul {line}: coordonate departe de instalație",
-      "description": "Rândul {line} din {entry} este plasat la {km} km de instalație. Panouri pe un câmp îndepărtat sunt posibile, o zecimală greșită este mai probabilă; verificați latitudinea și longitudinea rândului."
-    },
-    "line_cap_unit": {
-      "title": "Rândul {line}: limita invertorului pare în wați",
-      "description": "Rândul {line} din {entry} are o limită de invertor de {cap} kW pentru {kwp} kWp de panouri. Limita a fost cel mai probabil introdusă în wați. Introduceți-o în kilowați."
-    },
-    "inverter_cap_unit": {
-      "title": "Limita invertorului pare în wați",
-      "description": "{entry} are o limită de invertor de {cap} kW pentru {kwp} kWp de panouri. Limita a fost cel mai probabil introdusă în wați. Introduceți-o în kilowați (de exemplu 5 în loc de 5000)."
-    },
-    "inverter_cap_low": {
-      "title": "Limita invertorului mult sub panouri",
-      "description": "{entry} are o limită de invertor de {cap} kW pentru {kwp} kWp de panouri, așa că prognoza va fi tăiată cea mai mare parte a zilei. Dacă limita este corectă, ignorați acest mesaj; altfel, verificați valoarea sau unitatea ei."
-    },
-    "production_entity_unset": {
-      "title": "Niciun senzor de producție: prognoza nu poate învăța",
-      "description": "{entry} nu are senzor de producție. Prognoza rulează pe fizică și vreme, dar nimic nu o corectează față de ceea ce produc cu adevărat panourile dumneavoastră. Alegeți în setări senzorul de energie cumulată (kWh) al invertorului sau al contorului."
-    },
-    "trend_anchor_hour": {
-      "title": "Ora de referință a tendinței în afara intervalului",
-      "description": "{entry} are o oră de referință a tendinței de {hour}. Introduceți o oră locală de la 0 la 23."
-    },
-    "battery_soc_entity_unset": {
-      "title": "Baterie: capacitate setată, dar fără senzor de stare de încărcare",
-      "description": "{entry} declară o baterie de {capacity} kWh, dar niciun senzor de stare de încărcare, așa că proiecția rămâne oprită. Alegeți senzorul de stare de încărcare al bateriei (în %) sau ștergeți capacitatea."
+    "battery_capacity": {
+      "title": "Capacitatea bateriei în afara intervalului",
+      "description": "{entry} declară o baterie de {capacity} kWh, ceea ce nu este o baterie casnică. Introduceți capacitatea utilă în kilowați-oră (de exemplu 10 în loc de 10000)."
     },
     "battery_capacity_unset": {
       "title": "Baterie: senzor de stare de încărcare setat, dar fără capacitate",
       "description": "{entry} indică un senzor de stare de încărcare, dar nicio capacitate utilă, așa că proiecția rămâne oprită. Introduceți capacitatea utilă a bateriei în kWh sau ștergeți senzorul."
     },
-    "battery_capacity": {
-      "title": "Capacitatea bateriei în afara intervalului",
-      "description": "{entry} declară o baterie de {capacity} kWh, ceea ce nu este o baterie casnică. Introduceți capacitatea utilă în kilowați-oră (de exemplu 10 în loc de 10000)."
-    },
-    "battery_power": {
-      "title": "Putere de încărcare sau descărcare a bateriei neplauzibilă",
-      "description": "{entry} declară o putere a bateriei de {power} kW pentru o capacitate de {capacity} kWh, mai mult de trei ori capacitatea pe oră. Verificați valoarea și unitatea ei (kW, nu W)."
+    "battery_efficiency": {
+      "title": "Randamentul bateriei în afara intervalului",
+      "description": "{entry} are un randament dus-întors de {value}. Introduceți un procent de la 50 la 100 (majoritatea bateriilor casnice sunt în jur de 90)."
     },
     "battery_min_soc": {
       "title": "Rezerva bateriei în afara intervalului",
       "description": "{entry} are o stare de încărcare minimă de {value}. Introduceți un procent de la 0 la 100."
     },
-    "battery_efficiency": {
-      "title": "Randamentul bateriei în afara intervalului",
-      "description": "{entry} are un randament dus-întors de {value}. Introduceți un procent de la 50 la 100 (majoritatea bateriilor casnice sunt în jur de 90)."
-    },
-    "benchmark_key": {
-      "title": "Cheia benchmarkului nu arată ca o cheie",
-      "description": "{entry} participă la benchmarkul comunității, dar cheia sa nu este una emisă de colector. Lipiți întreaga cheie de pe helios-ha.org/benchmark sau dezactivați benchmarkul."
-    },
-    "production_entity_missing": {
-      "title": "Senzorul de producție nu a fost găsit",
-      "description": "Senzorul de producție al {entry}, {entity}, nu există. Prognoza rulează necorectată până când apare. Verificați identificatorul entității sau alegeți din nou senzorul în setări."
-    },
-    "production_entity_kind": {
-      "title": "Senzorul de producție nu este un senzor de energie cumulată",
-      "description": "Senzorul de producție al {entry}, {entity}, raportează {unit} cu clasa de stare {state_class}. Învățarea are nevoie de un senzor de energie cumulată în kWh (clasa de stare total sau total_increasing), nu de un senzor de putere. Alegeți totalul de energie al invertorului sau al contorului; ajutorul Integrală transformă un senzor de putere într-unul de acest fel."
+    "battery_power": {
+      "title": "Putere de încărcare sau descărcare a bateriei neplauzibilă",
+      "description": "{entry} declară o putere a bateriei de {power} kW pentru o capacitate de {capacity} kWh, mai mult de trei ori capacitatea pe oră. Verificați valoarea și unitatea ei (kW, nu W)."
     },
     "battery_soc_entity_missing": {
       "title": "Senzorul de stare de încărcare al bateriei nu a fost găsit",
@@ -249,33 +173,113 @@
       "title": "Senzorul bateriei nu este un procent",
       "description": "Senzorul bateriei din {entry}, {entity}, raportează {unit}. Proiecția are nevoie de starea de încărcare în procente."
     },
-    "curtailment_entity_missing": {
-      "title": "Semnalul de limitare nu a fost găsit",
-      "description": "Semnalul de limitare al {entry}, {entity}, nu există. Orele în care invertorul este limitat sunt atunci învățate ca cer prost. Verificați identificatorul entității sau goliți câmpul."
+    "battery_soc_entity_unset": {
+      "title": "Baterie: capacitate setată, dar fără senzor de stare de încărcare",
+      "description": "{entry} declară o baterie de {capacity} kWh, dar niciun senzor de stare de încărcare, așa că proiecția rămâne oprită. Alegeți senzorul de stare de încărcare al bateriei (în %) sau ștergeți capacitatea."
     },
-    "production_history_empty": {
-      "title": "Senzorul de producție nu are încă istoric",
-      "description": "{entity}, senzorul de producție al {entry}, nu are încă statistici pe termen lung. Învățarea începe de îndată ce recorderul are câteva ore; dacă persistă după o zi, senzorul nu este un senzor de energie cumulată."
+    "benchmark_blocked": {
+      "title": "Nu trimite către benchmark ({count})",
+      "description": "{entry} participă la benchmarkul comunitar, dar își reține emisiile: problemele enumerate aici ar face ca măsurătoarea să descrie configurația în loc de prognoză. Corectați-le și trimiterea reîncepe singură. Nimic din ce s-a măsurat înainte nu se pierde."
     },
-    "production_at_night": {
-      "title": "Senzorul de producție numără noaptea",
-      "description": "{entity}, senzorul de producție al {entry}, a înregistrat {kwh} kWh cu soarele mult sub orizont. Panourile nu produc nimic noaptea, deci acest senzor măsoară mai mult decât panourile (un contor de rețea sau al casei). Alegeți senzorul care numără doar ieșirea invertorului."
+    "benchmark_excluded": {
+      "title": "Exclusă din cifrele benchmarkului ({reason})",
+      "description": "Benchmarkul comunității primește emisiile {entry}, dar le ține în afara cifrelor publicate. Motiv {reason}: kwp înseamnă că puterea de vârf declarată lipsește, este zero sau este în wați; night înseamnă că senzorul de producție înregistrează energie noaptea, deci măsoară mai mult decât panourile; version înseamnă că această instalație rulează un Helios Forecast prea vechi pentru ca măsurătorile sale să fie publicate, iar o actualizare este de ajuns. Corectați configurația și instalația este numărată din nou în decurs de o zi."
     },
-    "production_above_panels": {
-      "title": "Producție peste ceea ce pot da panourile declarate",
-      "description": "{entity}, senzorul de producție al {entry}, a atins {kw} kW de mai multe ori pentru {kwp} kWp de panouri declarate. Fie puterea de vârf este prea mică, fie senzorul numără mai mult decât panourile. Verificați ambele."
-    },
-    "production_stale": {
-      "title": "Nicio producție înregistrată de {days} zile",
-      "description": "{entity}, senzorul de producție al {entry}, nu a crescut de {days} zile. Zăpada sau o pană o pot explica; dacă panourile produc, senzorul a încetat să raporteze și învățarea rămâne fără date."
+    "benchmark_key": {
+      "title": "Cheia benchmarkului nu arată ca o cheie",
+      "description": "{entry} participă la benchmarkul comunității, dar cheia sa nu este una emisă de colector. Lipiți întreaga cheie de pe helios-ha.org/benchmark sau dezactivați benchmarkul."
     },
     "consumption_source_sparse": {
       "title": "Sursa de consum {source} raportează intermitent",
       "description": "În panoul Energie, {source} are date pentru {pct}% din orele pe care le acoperă cea mai bună sursă ({best}%). Profilul de consum este construit doar din orele pe care le acoperă, deci rămâne corect, dar se sprijină pe mai puțin istoric. Un senzor mai fiabil pentru acel flux face proiecția bateriei mai precisă."
     },
-    "benchmark_excluded": {
-      "title": "Exclusă din cifrele benchmarkului ({reason})",
-      "description": "Benchmarkul comunității primește emisiile {entry}, dar le ține în afara cifrelor publicate. Motiv {reason}: kwp înseamnă că puterea de vârf declarată lipsește, este zero sau este în wați; night înseamnă că senzorul de producție înregistrează energie noaptea, deci măsoară mai mult decât panourile. Corectați configurația și instalația este numărată din nou în decurs de o zi."
+    "curtailment_entity_missing": {
+      "title": "Semnalul de limitare nu a fost găsit",
+      "description": "Semnalul de limitare al {entry}, {entity}, nu există. Orele în care invertorul este limitat sunt atunci învățate ca cer prost. Verificați identificatorul entității sau goliți câmpul."
+    },
+    "inverter_cap_low": {
+      "title": "Limita invertorului mult sub panouri",
+      "description": "{entry} are o limită de invertor de {cap} kW pentru {kwp} kWp de panouri, așa că prognoza va fi tăiată cea mai mare parte a zilei. Dacă limita este corectă, ignorați acest mesaj; altfel, verificați valoarea sau unitatea ei."
+    },
+    "inverter_cap_unit": {
+      "title": "Limita invertorului pare în wați",
+      "description": "{entry} are o limită de invertor de {cap} kW pentru {kwp} kWp de panouri. Limita a fost cel mai probabil introdusă în wați. Introduceți-o în kilowați (de exemplu 5 în loc de 5000)."
+    },
+    "line_azimuth": {
+      "title": "Rândul {line}: azimut în afara intervalului",
+      "description": "Rândul {line} din {entry} are un azimut de {azimuth} grade. Azimutul merge de la 0 la 360 în sensul acelor de ceasornic de la nord: 90 este est, 180 sud, 270 vest."
+    },
+    "line_cap_unit": {
+      "title": "Rândul {line}: limita invertorului pare în wați",
+      "description": "Rândul {line} din {entry} are o limită de invertor de {cap} kW pentru {kwp} kWp de panouri. Limita a fost cel mai probabil introdusă în wați. Introduceți-o în kilowați."
+    },
+    "line_kwp_missing": {
+      "title": "Rândul {line}: lipsește puterea de vârf",
+      "description": "Rândul {line} din {entry} nu are putere de vârf sau este zero. Fără ea, toate cifrele rămân plate. Introduceți puterea de vârf a rândului în kWp (de exemplu 3,6 pentru 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Rândul {line}: puterea de vârf pare în wați",
+      "description": "Rândul {line} din {entry} declară {kwp} kWp, mult peste o instalație casnică. Valoarea a fost cel mai probabil introdusă în wați. Introduceți-o în kilowați de vârf (de exemplu 4,05 în loc de 4050)."
+    },
+    "line_location_far": {
+      "title": "Rândul {line}: coordonate departe de instalație",
+      "description": "Rândul {line} din {entry} este plasat la {km} km de instalație. Panouri pe un câmp îndepărtat sunt posibile, o zecimală greșită este mai probabilă; verificați latitudinea și longitudinea rândului."
+    },
+    "line_location_invalid": {
+      "title": "Rândul {line}: coordonate în afara intervalului",
+      "description": "Rândul {line} din {entry} are coordonate care nu sunt o latitudine și o longitudine valide. Corectați-le sau lăsați ambele câmpuri goale pentru a plasa rândul la locația instalației."
+    },
+    "line_tilt": {
+      "title": "Rândul {line}: înclinare în afara intervalului",
+      "description": "Rândul {line} din {entry} are o înclinare de {tilt} grade. Înclinarea merge de la 0 (orizontal) la 90 (vertical)."
+    },
+    "line_tracker": {
+      "title": "Rândul {line}: tip de tracker necunoscut",
+      "description": "Rândul {line} din {entry} declară un tracker de tip {tracker}, pe care această integrare nu îl cunoaște. Alegeți unul dintre tipurile propuse sau niciunul pentru panouri fixe."
+    },
+    "location_far": {
+      "title": "Locație departe de casa dumneavoastră din Home Assistant",
+      "description": "Locația pentru {entry} este la {km} km de casa din Home Assistant. Dacă instalația este într-adevăr acolo, ignorați acest mesaj; altfel, verificați o zecimală a latitudinii sau a longitudinii."
+    },
+    "location_invalid": {
+      "title": "Locație în afara intervalului valid",
+      "description": "Locația pentru {entry} ({latitude}, {longitude}) nu este o latitudine și o longitudine valide. Latitudinea merge de la -90 la 90, iar longitudinea de la -180 la 180; lăsați ambele câmpuri goale pentru a folosi casa din Home Assistant."
+    },
+    "no_lines": {
+      "title": "Niciun rând de panouri",
+      "description": "{entry} nu are niciun rând de panouri, deci nu este nimic de prognozat. Adăugați cel puțin un rând cu înclinarea, azimutul și puterea de vârf."
+    },
+    "production_above_panels": {
+      "title": "Producție peste ceea ce pot da panourile declarate",
+      "description": "{entity}, senzorul de producție al {entry}, a atins {kw} kW de mai multe ori pentru {kwp} kWp de panouri declarate. Fie puterea de vârf este prea mică, fie senzorul numără mai mult decât panourile. Verificați ambele."
+    },
+    "production_at_night": {
+      "title": "Senzorul de producție numără noaptea",
+      "description": "{entity}, senzorul de producție al {entry}, a înregistrat {kwh} kWh cu soarele mult sub orizont. Panourile nu produc nimic noaptea, deci acest senzor măsoară mai mult decât panourile (un contor de rețea sau al casei). Alegeți senzorul care numără doar ieșirea invertorului."
+    },
+    "production_entity_kind": {
+      "title": "Senzorul de producție nu este un senzor de energie cumulată",
+      "description": "Senzorul de producție al {entry}, {entity}, raportează {unit} cu clasa de stare {state_class}. Învățarea are nevoie de un senzor de energie cumulată în kWh (clasa de stare total sau total_increasing), nu de un senzor de putere. Alegeți totalul de energie al invertorului sau al contorului; ajutorul Integrală transformă un senzor de putere într-unul de acest fel."
+    },
+    "production_entity_missing": {
+      "title": "Senzorul de producție nu a fost găsit",
+      "description": "Senzorul de producție al {entry}, {entity}, nu există. Prognoza rulează necorectată până când apare. Verificați identificatorul entității sau alegeți din nou senzorul în setări."
+    },
+    "production_entity_unset": {
+      "title": "Niciun senzor de producție: prognoza nu poate învăța",
+      "description": "{entry} nu are senzor de producție. Prognoza rulează pe fizică și vreme, dar nimic nu o corectează față de ceea ce produc cu adevărat panourile dumneavoastră. Alegeți în setări senzorul de energie cumulată (kWh) al invertorului sau al contorului."
+    },
+    "production_history_empty": {
+      "title": "Senzorul de producție nu are încă istoric",
+      "description": "{entity}, senzorul de producție al {entry}, nu are încă statistici pe termen lung. Învățarea începe de îndată ce recorderul are câteva ore; dacă persistă după o zi, senzorul nu este un senzor de energie cumulată."
+    },
+    "production_stale": {
+      "title": "Nicio producție înregistrată de {days} zile",
+      "description": "{entity}, senzorul de producție al {entry}, nu a crescut de {days} zile. Zăpada sau o pană o pot explica; dacă panourile produc, senzorul a încetat să raporteze și învățarea rămâne fără date."
+    },
+    "trend_anchor_hour": {
+      "title": "Ora de referință a tendinței în afara intervalului",
+      "description": "{entry} are o oră de referință a tendinței de {hour}. Introduceți o oră locală de la 0 la 23."
     }
   }
 }

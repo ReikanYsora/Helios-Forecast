@@ -51,12 +51,22 @@ async def _refresh(hass, monkeypatch, entry) -> HeliosForecastCoordinator:
 async def test_a_peak_power_in_watts_becomes_an_error_issue(hass, monkeypatch) -> None:
     entry = _entry(hass, {CONF_ARRAYS: [LINE, {**LINE, CONF_KWP: 4050.0}]})
     coordinator = await _refresh(hass, monkeypatch, entry)
-    assert _issues(hass) == ["checkup_entry_line_kwp_unit_2", "checkup_entry_production_entity_unset"]
+    # benchmark_blocked rides along: a peak power in watts is one of the problems that stop an
+    # installation from sending, and so is having no production meter to be scored against.
+    assert _issues(hass) == [
+        "checkup_entry_benchmark_blocked",
+        "checkup_entry_line_kwp_unit_2",
+        "checkup_entry_production_entity_unset",
+    ]
     issue = ir.async_get(hass).async_get_issue(DOMAIN, "checkup_entry_line_kwp_unit_2")
     assert issue.severity == ir.IssueSeverity.ERROR
     assert issue.translation_key == "line_kwp_unit"
     assert issue.translation_placeholders == {"entry": "Roof", "line": "2", "kwp": "4050"}
-    assert [p.key for p in coordinator.problems] == ["line_kwp_unit", "production_entity_unset"]
+    assert [p.key for p in coordinator.problems] == [
+        "line_kwp_unit",
+        "production_entity_unset",
+        "benchmark_blocked",
+    ]
 
 
 async def test_issues_are_published_even_when_the_weather_fetch_fails(hass, monkeypatch) -> None:
@@ -98,9 +108,24 @@ async def test_entities_are_judged_only_once_home_assistant_runs(hass, monkeypat
     assert "checkup_entry_production_entity_kind" in _issues(hass)
 
 
+def _sound_meter(hass, entity_id: str = "sensor.pv_energy") -> None:
+    """A production meter the check-up is happy with, so nothing holds the upload back."""
+    hass.states.async_set(
+        entity_id,
+        "1234",
+        {"unit_of_measurement": "kWh", "device_class": "energy", "state_class": "total_increasing"},
+    )
+
+
 async def test_the_collector_verdict_becomes_a_warning(hass, monkeypatch, enable_custom_integrations) -> None:
-    data = {CONF_ARRAYS: [LINE], CONF_BENCHMARK_ENABLED: True, CONF_BENCHMARK_KEY: "k" * 43}
+    data = {
+        CONF_ARRAYS: [LINE],
+        CONF_PRODUCTION_ENTITY: "sensor.pv_energy",
+        CONF_BENCHMARK_ENABLED: True,
+        CONF_BENCHMARK_KEY: "k" * 43,
+    }
     entry = _entry(hass, data)
+    _sound_meter(hass)
     with patch(
         "custom_components.helios_forecast.coordinator.async_upload",
         AsyncMock(return_value={"stored": True, "quality": {"excluded": "night"}}),
@@ -110,6 +135,37 @@ async def test_the_collector_verdict_becomes_a_warning(hass, monkeypatch, enable
     issue = ir.async_get(hass).async_get_issue(DOMAIN, "checkup_entry_benchmark_excluded_night")
     assert issue.severity == ir.IssueSeverity.WARNING
     assert issue.translation_placeholders["reason"] == "night"
+
+
+async def test_a_configuration_that_would_spoil_the_measurement_holds_the_upload_back(
+    hass, monkeypatch, enable_custom_integrations
+) -> None:
+    # A peak power typed in watts makes every normalised figure a thousand times too small. The
+    # collector would set the installation aside afterwards; the point is that nothing is sent at all,
+    # and that its owner is told here rather than discovering it on the public page.
+    data = {
+        CONF_ARRAYS: [{**LINE, CONF_KWP: 3000.0}],
+        CONF_PRODUCTION_ENTITY: "sensor.pv_energy",
+        CONF_BENCHMARK_ENABLED: True,
+        CONF_BENCHMARK_KEY: "k" * 43,
+    }
+    entry = _entry(hass, data)
+    _sound_meter(hass)
+    upload = AsyncMock(return_value={"stored": True, "quality": {"excluded": None}})
+    with patch("custom_components.helios_forecast.coordinator.async_upload", upload):
+        coordinator = await _refresh(hass, monkeypatch, entry)
+    upload.assert_not_awaited()
+    assert "checkup_entry_benchmark_blocked" in _issues(hass)
+    issue = ir.async_get(hass).async_get_issue(DOMAIN, "checkup_entry_benchmark_blocked")
+    assert issue.translation_placeholders["count"] == "1"
+
+    # Corrected, it sends again on the next refresh and the warning retires by itself.
+    hass.config_entries.async_update_entry(entry, data={**data, CONF_ARRAYS: [LINE]})
+    with patch("custom_components.helios_forecast.coordinator.async_upload", upload):
+        await coordinator.async_refresh()
+        await hass.async_block_till_done()
+    upload.assert_awaited()
+    assert "checkup_entry_benchmark_blocked" not in _issues(hass)
 
 
 async def test_removing_the_entry_clears_its_issues(hass, monkeypatch) -> None:

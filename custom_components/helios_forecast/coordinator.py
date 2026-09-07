@@ -52,6 +52,8 @@ from .benchmark import DEFAULT_ENDPOINT, async_upload, build_payload
 from .checkup import (
     EntitySnapshot,
     Problem,
+    benchmark_blockers,
+    check_benchmark_blocked,
     check_benchmark_quality,
     check_config,
     check_consumption_coverage,
@@ -160,6 +162,9 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # Production history (recorder change buckets) from the most recent refresh, kept so the
         # reliability index can reuse it without a second recorder fetch.
         self._production_buckets: List[ProductionBucket] = []
+        # What the check-up found, kept apart from the two repairs derived from it so a refresh can
+        # replace the findings without retiring the answers standing beside them (_publish_problems).
+        self._found: List[Problem] = []
         # Persisted today-trend reference (frozen daily snapshot of the predicted total). Survives
         # restarts so the morning anchor is not lost when HA restarts mid-day.
         self._trend_store: Store = Store(hass, 1, f"{DOMAIN}.{entry.entry_id}.trend")
@@ -221,14 +226,28 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         return problems
 
     @callback
-    def _publish_problems(self, problems: List[Problem]) -> None:
-        self.problems = list(problems)
+    def _publish_problems(self, problems: Optional[List[Problem]] = None) -> None:
+        """Publish what was found, plus the two repairs that are answers rather than findings: this
+        installation holding its own emissions back, and the collector's verdict on it.
+
+        They are composed here rather than appended by each caller because a refresh publishes twice,
+        once before fetching anything and once at the end: a caller-side answer would be retired by
+        the first publish and put back by the second, so a contributor would watch the same warning
+        appear and disappear every half hour. Called with no argument, it republishes the last
+        findings against whatever the answers now say.
+        """
+        if problems is not None:
+            self._found = list(problems)
+        self.problems = (
+            self._found + check_benchmark_blocked(self._found) + check_benchmark_quality(self._benchmark_quality)
+        )
         self._issue_ids = repairs.sync(self.hass, self.entry, self.problems, self._issue_ids)
 
     @callback
     def clear_problems(self) -> None:
         repairs.clear(self.hass, self.entry)
         self._issue_ids = set()
+        self._found = []
         self.problems = []
 
     async def _async_update_data(self) -> ForecastData:
@@ -333,7 +352,6 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         battery_soc = await self._project_battery_soc(data, points, now)
         if self._consumption_profile is not None:
             problems += check_consumption_coverage(self._consumption_profile.coverage)
-        problems += check_benchmark_quality(self._benchmark_quality)
         self._publish_problems(problems)
         await self._maybe_upload_benchmark(data, lat, lon, points, reliability, now_utc)
 
@@ -359,6 +377,14 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             return
         key = str(data.get(CONF_BENCHMARK_KEY) or "").strip()
         if not key:
+            return
+        # Nothing leaves an installation whose configuration would make the measurement meaningless.
+        # The collector would set those figures aside anyway, but hearing it here, before sending,
+        # and from the integration that knows which field is wrong, is the difference between a
+        # problem someone can fix and one they never learn about (see checkup.BENCHMARK_BLOCKERS).
+        blocked = benchmark_blockers(self._found)
+        if blocked:
+            _LOGGER.debug("Benchmark emission held back: %s", ", ".join(sorted(p.issue_id for p in blocked)))
             return
         hour = now_utc.replace(minute=0, second=0, microsecond=0)
         if self._last_upload_hour == hour:
@@ -405,8 +431,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         if quality == self._benchmark_quality:
             return
         self._benchmark_quality = quality
-        kept = [p for p in self.problems if p.key != "benchmark_excluded"]
-        self._publish_problems(kept + check_benchmark_quality(quality))
+        self._publish_problems()
 
     async def _project_battery_soc(self, data, points, now) -> List[BatterySocPoint]:
         """Project the battery SoC over the next BATTERY_SOC_HORIZON_HOURS, or [] when the feature can't run.

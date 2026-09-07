@@ -93,6 +93,24 @@ power is zero, so they lose nothing. Building the curve in UTC and converting on
 at the day boundaries would close the whole family at once; that is a bigger change
 than a fix release should carry.
 
+### Changed: an installation checks itself before it sends to the benchmark
+
+The check-up already found the configuration problems that make a measurement
+meaningless: a peak power typed in watts, a tilt out of range, a meter that records
+at night. The collector found them too, afterwards, and set the installation aside.
+Now the integration refuses to send at all while one of them stands, and says so in
+a repair of its own: **the emissions are held back, here is what to correct, and it
+resumes on its own**. Nothing measured before is lost. The list is deliberately
+narrower than "every error": a battery field or a trend hour changes nothing about
+what is measured and does not hold an upload back. An installation with no
+production meter is in the list, though it is only a warning otherwise: without a
+meter there is nothing for a forecast to be scored against.
+
+The other half of the same idea: the collector now answers `version` when an
+installation runs a release whose measurements it does not publish, and that reaches
+its owner as a repair like any other. It keeps contributing either way, and rejoins
+the published figures on its own once updated.
+
 ### Fixed: a meter reset no longer teaches the learning that the sky went dark
 
 Found while repairing a database on a real installation, not in a test. When an

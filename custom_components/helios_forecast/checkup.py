@@ -368,6 +368,52 @@ def check_consumption_coverage(coverage: Dict[str, float]) -> List[Problem]:
 # --- the benchmark collector's verdict --------------------------------------------------------
 
 
+# The problems that make an emission worth nothing to the benchmark. They do not merely make the
+# forecast worse: they misdescribe the roof the forecast is scored against, so a measurement taken
+# under one of them says nothing about the model and everything about the configuration. An
+# installation carrying one does not send at all, and is told why, rather than sending figures that
+# the collector will set aside afterwards. Deliberately narrower than "every error": a battery field
+# or a trend hour changes nothing about what is measured, so it does not hold an upload back.
+#
+# `production_entity_unset` sits here although it is only a warning: without a meter there is no
+# measured production to compare a forecast against, so the emission has nothing to be scored on.
+BENCHMARK_BLOCKERS: frozenset = frozenset(
+    {
+        "location_invalid",
+        "no_lines",
+        "line_kwp_missing",
+        "line_kwp_unit",
+        "line_tilt",
+        "line_azimuth",
+        "line_tracker",
+        "line_location_invalid",
+        "line_cap_unit",
+        "inverter_cap_unit",
+        "production_entity_unset",
+        "production_entity_missing",
+        "production_at_night",
+    }
+)
+
+
+def benchmark_blockers(problems: List[Problem]) -> List[Problem]:
+    """Those of `problems` that stop this installation from taking part in the benchmark."""
+    return [p for p in problems if p.key in BENCHMARK_BLOCKERS]
+
+
+def check_benchmark_blocked(problems: List[Problem]) -> List[Problem]:
+    """The one repair that says an installation is holding its own emissions back, and why.
+
+    Its reasons are the problems already listed beside it, so this does not repeat them: it exists
+    because a configuration problem and "you have therefore left the benchmark" are two different
+    pieces of news, and only the second explains why a contributor stopped appearing on the page.
+    """
+    blockers = benchmark_blockers(problems)
+    if not blockers:
+        return []
+    return [Problem("benchmark_blocked", WARNING, {"count": str(len(blockers))})]
+
+
 def check_benchmark_quality(quality: Optional[Dict[str, Any]]) -> List[Problem]:
     """What the collector answered about this installation: excluded from the public figures, and why."""
     if not isinstance(quality, dict):

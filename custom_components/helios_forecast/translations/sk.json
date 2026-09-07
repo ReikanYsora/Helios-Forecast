@@ -145,101 +145,25 @@
     }
   },
   "issues": {
-    "location_invalid": {
-      "title": "Poloha mimo platného rozsahu",
-      "description": "Poloha {entry} ({latitude}, {longitude}) nie je platná zemepisná šírka a dĺžka. Šírka je v rozsahu -90 až 90 a dĺžka -180 až 180; nechajte obe polia prázdne, aby sa použil domov Home Assistantu."
-    },
-    "location_far": {
-      "title": "Poloha ďaleko od vášho domova v Home Assistante",
-      "description": "Poloha {entry} je {km} km od domova Home Assistantu. Ak tam inštalácia naozaj je, ignorujte to; inak skontrolujte desatinné miesto šírky alebo dĺžky."
-    },
-    "no_lines": {
-      "title": "Žiadny rad panelov",
-      "description": "{entry} nemá žiadny rad panelov, takže nie je čo predpovedať. Pridajte aspoň jeden rad so sklonom, azimutom a špičkovým výkonom."
-    },
-    "line_kwp_missing": {
-      "title": "Rad {line}: chýba špičkový výkon",
-      "description": "Rad {line} v {entry} nemá špičkový výkon alebo je nulový. Bez neho zostávajú všetky čísla na nule. Zadajte špičkový výkon radu v kWp (napríklad 3,6 pre 3600 Wp)."
-    },
-    "line_kwp_unit": {
-      "title": "Rad {line}: špičkový výkon vyzerá ako watty",
-      "description": "Rad {line} v {entry} udáva {kwp} kWp, ďaleko nad domácou inštaláciou. Hodnota bola najskôr zadaná vo wattoch. Zadajte ju v kilowattoch špičkových (napríklad 4,05 namiesto 4050)."
-    },
-    "line_tilt": {
-      "title": "Rad {line}: sklon mimo rozsahu",
-      "description": "Rad {line} v {entry} má sklon {tilt} stupňov. Sklon je v rozsahu 0 (vodorovne) až 90 (zvislo)."
-    },
-    "line_azimuth": {
-      "title": "Rad {line}: azimut mimo rozsahu",
-      "description": "Rad {line} v {entry} má azimut {azimuth} stupňov. Azimut je v rozsahu 0 až 360 v smere hodinových ručičiek od severu: 90 je východ, 180 juh, 270 západ."
-    },
-    "line_tracker": {
-      "title": "Rad {line}: neznámy typ trackera",
-      "description": "Rad {line} v {entry} udáva tracker typu {tracker}, ktorý táto integrácia nepozná. Vyberte jeden z ponúkaných typov, alebo žiadny pre pevné panely."
-    },
-    "line_location_invalid": {
-      "title": "Rad {line}: súradnice mimo rozsahu",
-      "description": "Rad {line} v {entry} má súradnice, ktoré nie sú platná zemepisná šírka a dĺžka. Opravte ich alebo nechajte obe polia prázdne, aby sa rad umiestnil na polohu inštalácie."
-    },
-    "line_location_far": {
-      "title": "Rad {line}: súradnice ďaleko od inštalácie",
-      "description": "Rad {line} v {entry} je umiestnený {km} km od inštalácie. Panely na vzdialenom poli sú možné, chybné desatinné miesto je pravdepodobnejšie; skontrolujte šírku a dĺžku radu."
-    },
-    "line_cap_unit": {
-      "title": "Rad {line}: limit striedača vyzerá ako watty",
-      "description": "Rad {line} v {entry} má limit striedača {cap} kW pre {kwp} kWp panelov. Limit bol najskôr zadaný vo wattoch. Zadajte ho v kilowattoch."
-    },
-    "inverter_cap_unit": {
-      "title": "Limit striedača vyzerá ako watty",
-      "description": "{entry} má limit striedača {cap} kW pre {kwp} kWp panelov. Limit bol najskôr zadaný vo wattoch. Zadajte ho v kilowattoch (napríklad 5 namiesto 5000)."
-    },
-    "inverter_cap_low": {
-      "title": "Limit striedača hlboko pod panelmi",
-      "description": "{entry} má limit striedača {cap} kW pre {kwp} kWp panelov, takže predpoveď bude orezaná väčšinu dňa. Ak je limit správny, ignorujte to; inak skontrolujte hodnotu alebo jej jednotku."
-    },
-    "production_entity_unset": {
-      "title": "Žiadny senzor výroby: predpoveď sa nemôže učiť",
-      "description": "{entry} nemá senzor výroby. Predpoveď beží na fyzike a počasí, ale nič ju nekoriguje podľa toho, čo vaše panely skutočne dodávajú. Vyberte v nastaveniach senzor kumulovanej energie (kWh) striedača alebo elektromera."
-    },
-    "trend_anchor_hour": {
-      "title": "Referenčná hodina trendu mimo rozsahu",
-      "description": "{entry} má referenčnú hodinu trendu {hour}. Zadajte miestnu hodinu od 0 do 23."
-    },
-    "battery_soc_entity_unset": {
-      "title": "Batéria: kapacita nastavená, ale chýba senzor stavu nabitia",
-      "description": "{entry} udáva batériu {capacity} kWh, ale žiadny senzor stavu nabitia, takže projekcia zostáva vypnutá. Vyberte senzor stavu nabitia batérie (v %) alebo kapacitu vymažte."
+    "battery_capacity": {
+      "title": "Kapacita batérie mimo rozsahu",
+      "description": "{entry} udáva batériu {capacity} kWh, čo nie je domáca batéria. Zadajte využiteľnú kapacitu v kilowatthodinách (napríklad 10 namiesto 10000)."
     },
     "battery_capacity_unset": {
       "title": "Batéria: senzor stavu nabitia nastavený, ale chýba kapacita",
       "description": "{entry} uvádza senzor stavu nabitia, ale žiadnu využiteľnú kapacitu, takže projekcia zostáva vypnutá. Zadajte využiteľnú kapacitu batérie v kWh alebo senzor vymažte."
     },
-    "battery_capacity": {
-      "title": "Kapacita batérie mimo rozsahu",
-      "description": "{entry} udáva batériu {capacity} kWh, čo nie je domáca batéria. Zadajte využiteľnú kapacitu v kilowatthodinách (napríklad 10 namiesto 10000)."
-    },
-    "battery_power": {
-      "title": "Nepravdepodobný nabíjací alebo vybíjací výkon batérie",
-      "description": "{entry} udáva výkon batérie {power} kW pri kapacite {capacity} kWh, viac než trojnásobok kapacity za hodinu. Skontrolujte hodnotu a jej jednotku (kW, nie W)."
+    "battery_efficiency": {
+      "title": "Účinnosť batérie mimo rozsahu",
+      "description": "{entry} má celkovú účinnosť {value}. Zadajte percento od 50 do 100 (väčšina domácich batérií je okolo 90)."
     },
     "battery_min_soc": {
       "title": "Rezerva batérie mimo rozsahu",
       "description": "{entry} má minimálny stav nabitia {value}. Zadajte percento od 0 do 100."
     },
-    "battery_efficiency": {
-      "title": "Účinnosť batérie mimo rozsahu",
-      "description": "{entry} má celkovú účinnosť {value}. Zadajte percento od 50 do 100 (väčšina domácich batérií je okolo 90)."
-    },
-    "benchmark_key": {
-      "title": "Kľúč benchmarku nevyzerá ako kľúč",
-      "description": "{entry} sa zúčastňuje komunitného benchmarku, ale jeho kľúč nie je kľúč vydaný kolektorom. Vložte celý kľúč z helios-ha.org/benchmark, alebo benchmark vypnite."
-    },
-    "production_entity_missing": {
-      "title": "Senzor výroby sa nenašiel",
-      "description": "Senzor výroby {entry}, {entity}, neexistuje. Predpoveď beží bez korekcie, kým sa neobjaví. Skontrolujte ID entity alebo senzor znovu vyberte v nastaveniach."
-    },
-    "production_entity_kind": {
-      "title": "Senzor výroby nie je senzor kumulovanej energie",
-      "description": "Senzor výroby {entry}, {entity}, hlási {unit} s triedou stavu {state_class}. Učenie potrebuje senzor kumulovanej energie v kWh (trieda stavu total alebo total_increasing), nie senzor výkonu. Vyberte súčet energie striedača alebo elektromera; pomocník Integrál zo senzora výkonu taký senzor urobí."
+    "battery_power": {
+      "title": "Nepravdepodobný nabíjací alebo vybíjací výkon batérie",
+      "description": "{entry} udáva výkon batérie {power} kW pri kapacite {capacity} kWh, viac než trojnásobok kapacity za hodinu. Skontrolujte hodnotu a jej jednotku (kW, nie W)."
     },
     "battery_soc_entity_missing": {
       "title": "Senzor stavu nabitia batérie sa nenašiel",
@@ -249,33 +173,113 @@
       "title": "Senzor batérie nie je percento",
       "description": "Senzor batérie {entry}, {entity}, hlási {unit}. Projekcia potrebuje stav nabitia v percentách."
     },
-    "curtailment_entity_missing": {
-      "title": "Signál obmedzenia sa nenašiel",
-      "description": "Signál obmedzenia {entry}, {entity}, neexistuje. Hodiny, keď je striedač obmedzovaný, sa potom učia ako zlá obloha. Skontrolujte ID entity alebo pole vymažte."
+    "battery_soc_entity_unset": {
+      "title": "Batéria: kapacita nastavená, ale chýba senzor stavu nabitia",
+      "description": "{entry} udáva batériu {capacity} kWh, ale žiadny senzor stavu nabitia, takže projekcia zostáva vypnutá. Vyberte senzor stavu nabitia batérie (v %) alebo kapacitu vymažte."
     },
-    "production_history_empty": {
-      "title": "Senzor výroby zatiaľ nemá históriu",
-      "description": "{entity}, senzor výroby {entry}, zatiaľ nemá dlhodobé štatistiky. Učenie začne, len čo má rekordér pár hodín; ak to pretrváva po jednom dni, senzor nie je senzor kumulovanej energie."
+    "benchmark_blocked": {
+      "title": "Neodosiela do benchmarku ({count})",
+      "description": "{entry} sa zúčastňuje komunitného benchmarku, ale zadržiava svoje odoslania: tu uvedené problémy by spôsobili, že by meranie popisovalo konfiguráciu namiesto predpovede. Opravte ich a odosielanie sa obnoví samo. Nič z predtým nameraného sa nestráca."
     },
-    "production_at_night": {
-      "title": "Senzor výroby počíta v noci",
-      "description": "{entity}, senzor výroby {entry}, zaznamenal {kwh} kWh, keď bolo slnko hlboko pod obzorom. Panely v noci nič nevyrábajú, takže tento senzor meria viac než panely (elektromer siete alebo domu). Vyberte senzor, ktorý počíta len výstup striedača."
+    "benchmark_excluded": {
+      "title": "Vyradená z čísel benchmarku ({reason})",
+      "description": "Komunitný benchmark prijíma emisie {entry}, ale drží ich mimo zverejnených čísel. Dôvod {reason}: kwp znamená, že deklarovaný špičkový výkon chýba, je nulový alebo zadaný vo wattoch; night znamená, že senzor výroby zaznamenáva energiu v noci, takže meria viac než panely; version znamená, že táto inštalácia používa príliš starý Helios Forecast, než aby sa jej merania publikovali, a stačí aktualizovať. Opravte konfiguráciu a inštalácia sa do jedného dňa znovu započíta."
     },
-    "production_above_panels": {
-      "title": "Výroba nad tým, čo deklarované panely môžu dodať",
-      "description": "{entity}, senzor výroby {entry}, niekoľkokrát dosiahol {kw} kW pri {kwp} kWp deklarovaných panelov. Buď je špičkový výkon príliš malý, alebo senzor počíta viac než panely. Skontrolujte oboje."
-    },
-    "production_stale": {
-      "title": "Žiadna výroba zaznamenaná už {days} dní",
-      "description": "{entity}, senzor výroby {entry}, sa nezvýšil už {days} dní. Sneh alebo výpadok to môžu vysvetliť; ak panely vyrábajú, senzor prestal hlásiť a učenie hladuje."
+    "benchmark_key": {
+      "title": "Kľúč benchmarku nevyzerá ako kľúč",
+      "description": "{entry} sa zúčastňuje komunitného benchmarku, ale jeho kľúč nie je kľúč vydaný kolektorom. Vložte celý kľúč z helios-ha.org/benchmark, alebo benchmark vypnite."
     },
     "consumption_source_sparse": {
       "title": "Zdroj spotreby {source} hlási prerušovane",
       "description": "V paneli Energia má {source} údaje pre {pct} % hodín, ktoré pokrýva najlepší zdroj ({best} %). Profil spotreby sa stavia len z hodín, ktoré pokrýva, takže zostáva správny, ale opiera sa o menej histórie. Spoľahlivejší senzor pre tento tok spresní projekciu batérie."
     },
-    "benchmark_excluded": {
-      "title": "Vyradená z čísel benchmarku ({reason})",
-      "description": "Komunitný benchmark prijíma emisie {entry}, ale drží ich mimo zverejnených čísel. Dôvod {reason}: kwp znamená, že deklarovaný špičkový výkon chýba, je nulový alebo zadaný vo wattoch; night znamená, že senzor výroby zaznamenáva energiu v noci, takže meria viac než panely. Opravte konfiguráciu a inštalácia sa do jedného dňa znovu započíta."
+    "curtailment_entity_missing": {
+      "title": "Signál obmedzenia sa nenašiel",
+      "description": "Signál obmedzenia {entry}, {entity}, neexistuje. Hodiny, keď je striedač obmedzovaný, sa potom učia ako zlá obloha. Skontrolujte ID entity alebo pole vymažte."
+    },
+    "inverter_cap_low": {
+      "title": "Limit striedača hlboko pod panelmi",
+      "description": "{entry} má limit striedača {cap} kW pre {kwp} kWp panelov, takže predpoveď bude orezaná väčšinu dňa. Ak je limit správny, ignorujte to; inak skontrolujte hodnotu alebo jej jednotku."
+    },
+    "inverter_cap_unit": {
+      "title": "Limit striedača vyzerá ako watty",
+      "description": "{entry} má limit striedača {cap} kW pre {kwp} kWp panelov. Limit bol najskôr zadaný vo wattoch. Zadajte ho v kilowattoch (napríklad 5 namiesto 5000)."
+    },
+    "line_azimuth": {
+      "title": "Rad {line}: azimut mimo rozsahu",
+      "description": "Rad {line} v {entry} má azimut {azimuth} stupňov. Azimut je v rozsahu 0 až 360 v smere hodinových ručičiek od severu: 90 je východ, 180 juh, 270 západ."
+    },
+    "line_cap_unit": {
+      "title": "Rad {line}: limit striedača vyzerá ako watty",
+      "description": "Rad {line} v {entry} má limit striedača {cap} kW pre {kwp} kWp panelov. Limit bol najskôr zadaný vo wattoch. Zadajte ho v kilowattoch."
+    },
+    "line_kwp_missing": {
+      "title": "Rad {line}: chýba špičkový výkon",
+      "description": "Rad {line} v {entry} nemá špičkový výkon alebo je nulový. Bez neho zostávajú všetky čísla na nule. Zadajte špičkový výkon radu v kWp (napríklad 3,6 pre 3600 Wp)."
+    },
+    "line_kwp_unit": {
+      "title": "Rad {line}: špičkový výkon vyzerá ako watty",
+      "description": "Rad {line} v {entry} udáva {kwp} kWp, ďaleko nad domácou inštaláciou. Hodnota bola najskôr zadaná vo wattoch. Zadajte ju v kilowattoch špičkových (napríklad 4,05 namiesto 4050)."
+    },
+    "line_location_far": {
+      "title": "Rad {line}: súradnice ďaleko od inštalácie",
+      "description": "Rad {line} v {entry} je umiestnený {km} km od inštalácie. Panely na vzdialenom poli sú možné, chybné desatinné miesto je pravdepodobnejšie; skontrolujte šírku a dĺžku radu."
+    },
+    "line_location_invalid": {
+      "title": "Rad {line}: súradnice mimo rozsahu",
+      "description": "Rad {line} v {entry} má súradnice, ktoré nie sú platná zemepisná šírka a dĺžka. Opravte ich alebo nechajte obe polia prázdne, aby sa rad umiestnil na polohu inštalácie."
+    },
+    "line_tilt": {
+      "title": "Rad {line}: sklon mimo rozsahu",
+      "description": "Rad {line} v {entry} má sklon {tilt} stupňov. Sklon je v rozsahu 0 (vodorovne) až 90 (zvislo)."
+    },
+    "line_tracker": {
+      "title": "Rad {line}: neznámy typ trackera",
+      "description": "Rad {line} v {entry} udáva tracker typu {tracker}, ktorý táto integrácia nepozná. Vyberte jeden z ponúkaných typov, alebo žiadny pre pevné panely."
+    },
+    "location_far": {
+      "title": "Poloha ďaleko od vášho domova v Home Assistante",
+      "description": "Poloha {entry} je {km} km od domova Home Assistantu. Ak tam inštalácia naozaj je, ignorujte to; inak skontrolujte desatinné miesto šírky alebo dĺžky."
+    },
+    "location_invalid": {
+      "title": "Poloha mimo platného rozsahu",
+      "description": "Poloha {entry} ({latitude}, {longitude}) nie je platná zemepisná šírka a dĺžka. Šírka je v rozsahu -90 až 90 a dĺžka -180 až 180; nechajte obe polia prázdne, aby sa použil domov Home Assistantu."
+    },
+    "no_lines": {
+      "title": "Žiadny rad panelov",
+      "description": "{entry} nemá žiadny rad panelov, takže nie je čo predpovedať. Pridajte aspoň jeden rad so sklonom, azimutom a špičkovým výkonom."
+    },
+    "production_above_panels": {
+      "title": "Výroba nad tým, čo deklarované panely môžu dodať",
+      "description": "{entity}, senzor výroby {entry}, niekoľkokrát dosiahol {kw} kW pri {kwp} kWp deklarovaných panelov. Buď je špičkový výkon príliš malý, alebo senzor počíta viac než panely. Skontrolujte oboje."
+    },
+    "production_at_night": {
+      "title": "Senzor výroby počíta v noci",
+      "description": "{entity}, senzor výroby {entry}, zaznamenal {kwh} kWh, keď bolo slnko hlboko pod obzorom. Panely v noci nič nevyrábajú, takže tento senzor meria viac než panely (elektromer siete alebo domu). Vyberte senzor, ktorý počíta len výstup striedača."
+    },
+    "production_entity_kind": {
+      "title": "Senzor výroby nie je senzor kumulovanej energie",
+      "description": "Senzor výroby {entry}, {entity}, hlási {unit} s triedou stavu {state_class}. Učenie potrebuje senzor kumulovanej energie v kWh (trieda stavu total alebo total_increasing), nie senzor výkonu. Vyberte súčet energie striedača alebo elektromera; pomocník Integrál zo senzora výkonu taký senzor urobí."
+    },
+    "production_entity_missing": {
+      "title": "Senzor výroby sa nenašiel",
+      "description": "Senzor výroby {entry}, {entity}, neexistuje. Predpoveď beží bez korekcie, kým sa neobjaví. Skontrolujte ID entity alebo senzor znovu vyberte v nastaveniach."
+    },
+    "production_entity_unset": {
+      "title": "Žiadny senzor výroby: predpoveď sa nemôže učiť",
+      "description": "{entry} nemá senzor výroby. Predpoveď beží na fyzike a počasí, ale nič ju nekoriguje podľa toho, čo vaše panely skutočne dodávajú. Vyberte v nastaveniach senzor kumulovanej energie (kWh) striedača alebo elektromera."
+    },
+    "production_history_empty": {
+      "title": "Senzor výroby zatiaľ nemá históriu",
+      "description": "{entity}, senzor výroby {entry}, zatiaľ nemá dlhodobé štatistiky. Učenie začne, len čo má rekordér pár hodín; ak to pretrváva po jednom dni, senzor nie je senzor kumulovanej energie."
+    },
+    "production_stale": {
+      "title": "Žiadna výroba zaznamenaná už {days} dní",
+      "description": "{entity}, senzor výroby {entry}, sa nezvýšil už {days} dní. Sneh alebo výpadok to môžu vysvetliť; ak panely vyrábajú, senzor prestal hlásiť a učenie hladuje."
+    },
+    "trend_anchor_hour": {
+      "title": "Referenčná hodina trendu mimo rozsahu",
+      "description": "{entry} má referenčnú hodinu trendu {hour}. Zadajte miestnu hodinu od 0 do 23."
     }
   }
 }
