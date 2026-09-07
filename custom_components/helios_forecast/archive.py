@@ -19,6 +19,7 @@ it could read back somewhere else.
 from __future__ import annotations
 
 import logging
+import time
 from functools import partial
 from typing import Any, Dict, List, Optional
 
@@ -129,6 +130,8 @@ async def async_migrate(hass: HomeAssistant, entry: ConfigEntry) -> None:
         if (entity_id := registry.async_get_entity_id("sensor", DOMAIN, f"{entry.entry_id}_{key}"))
     }
     stuck: set = set()
+    hours = 0
+    started = time.monotonic()
     if legacy:
         instance = get_instance(hass)
         known = await instance.async_add_executor_job(partial(get_metadata, hass, statistic_ids=set(legacy.values())))
@@ -143,9 +146,11 @@ async def async_migrate(hass: HomeAssistant, entry: ConfigEntry) -> None:
                 moved = await _move(hass, entity_id, external_statistic_id(entry.entry_id, key), unit, name)
             except Exception:  # noqa: BLE001 - a repair must never take the integration down with it
                 _LOGGER.exception("Could not move the statistics of %s, they are left untouched", entity_id)
-                moved = False
-            if not moved:
+                moved = None
+            if moved is None:
                 stuck.add(key)
+            else:
+                hours += moved
 
     # A retired entity's registry entry goes only once its history is safe elsewhere, so a failed
     # move can be retried on the next start with the entity id it needs still resolvable.
@@ -154,20 +159,29 @@ async def async_migrate(hass: HomeAssistant, entry: ConfigEntry) -> None:
         if entity_id is not None and key not in stuck:
             registry.async_remove(entity_id)
 
+    # Logged once, at the end: this runs on every start, and how long the one that actually moved
+    # something took is the only thing worth knowing about it afterwards.
+    if hours:
+        _LOGGER.info(
+            "Moved %d archived hours onto this integration's own statistics in %.1f s",
+            hours,
+            time.monotonic() - started,
+        )
 
-async def _move(hass: HomeAssistant, legacy_id: str, statistic_id: str, unit: str, name: str) -> bool:
+
+async def _move(hass: HomeAssistant, legacy_id: str, statistic_id: str, unit: str, name: str) -> Optional[int]:
     """Copy every archived hour of `legacy_id` onto `statistic_id`, then drop the old series.
 
-    Returns True when nothing is left under the old id. The old series is deleted only after the new
-    one has been read back and found to hold at least as many hours, so an interrupted move leaves
-    the history in place twice rather than not at all. Re-running is safe: the recorder updates an
-    hour it already has instead of adding a second one.
+    Returns how many hours were moved, or None when the old series had to be kept. The old series is
+    deleted only after the new one has been read back and found to hold at least as many hours, so an
+    interrupted move leaves the history in place twice rather than not at all. Re-running is safe: the
+    recorder updates an hour it already has instead of adding a second one.
     """
     instance = get_instance(hass)
     rows = await _read(hass, legacy_id)
     if not rows:
         instance.async_clear_statistics([legacy_id])
-        return True
+        return 0
 
     meta = metadata(statistic_id, unit, name)
     for offset in range(0, len(rows), _BATCH):
@@ -184,11 +198,11 @@ async def _move(hass: HomeAssistant, legacy_id: str, statistic_id: str, unit: st
             statistic_id,
             len(written),
         )
-        return False
+        return None
 
     instance.async_clear_statistics([legacy_id])
     _LOGGER.info("Moved %d hours of statistics from %s to %s", len(rows), legacy_id, statistic_id)
-    return True
+    return len(rows)
 
 
 async def _read(hass: HomeAssistant, statistic_id: str) -> List[Dict[str, Any]]:
