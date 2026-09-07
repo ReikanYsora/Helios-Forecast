@@ -63,6 +63,26 @@ and so on) rather than under a `sensor.` entity. History graphs of the weather
 sensors themselves now show the recorded states only, which is what those sensors
 are for.
 
+### Fixed: an hour the weather service publishes late no longer goes missing from the archive
+
+Found by @Manama2011 on their own instance, running the 2026.9.5 alpha on MariaDB, and
+reported as an observation rather than a problem. It was a problem.
+
+Open-Meteo publishes a past hour with a delay. The weather archive moved its
+high-water mark to the current hour as soon as anything at all had been written,
+while rows are only written for hours that carry a value, so a refresh with an
+older hour to write while the newest was still missing stepped over the gap and
+never came back to it. Until this release that hole was invisible: the recorder
+compiled the same entities, so the late hour reached the statistics through the
+entity's own state. The archive is the only writer now, and a skipped hour would
+have stayed skipped.
+
+The mark now stops short of a trailing window, so the most recent hours are
+offered again on every refresh until they actually arrive. Re-offering an hour
+already stored costs nothing, the write is an update of a row that is already
+right; an hour that never arrives is given up at the end of that window rather
+than making the integration rescan for ever.
+
 ### Fixed: the battery projection loses an hour of house load on the clock changes
 
 Reported by @Manama2011, with the cause, a patch and its numbers, from reading the
