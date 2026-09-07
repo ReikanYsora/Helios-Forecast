@@ -18,6 +18,7 @@ it could read back somewhere else.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
 from functools import partial
@@ -54,6 +55,11 @@ _TYPES = {"mean", "min", "max"}
 
 # Rows are handed to the recorder in batches rather than as one transaction of tens of thousands.
 _BATCH = 2000
+
+# How long to wait for the recorder to have committed the copy before giving up on it. Generous:
+# tens of thousands of hours on a small machine take minutes. Reaching it deletes nothing, it just
+# leaves the old series in place for the next start to retry, so it can never cost history.
+_COMMIT_TIMEOUT = 900
 
 # Compat: `mean_type` and `unit_class` are mandatory in newer StatisticMetaData and absent from older
 # cores, so they are imported defensively.
@@ -186,7 +192,17 @@ async def _move(hass: HomeAssistant, legacy_id: str, statistic_id: str, unit: st
     meta = metadata(statistic_id, unit, name)
     for offset in range(0, len(rows), _BATCH):
         async_add_external_statistics(hass, meta, [_row(r) for r in rows[offset : offset + _BATCH]])
-    await instance.async_block_till_done()
+    try:
+        async with asyncio.timeout(_COMMIT_TIMEOUT):
+            await instance.async_block_till_done()
+    except TimeoutError:
+        _LOGGER.error(
+            "The recorder did not commit the copy of %s within %d s, so nothing was deleted. The "
+            "move will be retried on the next start",
+            legacy_id,
+            _COMMIT_TIMEOUT,
+        )
+        return None
 
     written = await _read(hass, statistic_id)
     if len(written) < len(rows):

@@ -6,6 +6,7 @@ __init__.py itself is responsible for.
 
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
 from unittest.mock import AsyncMock
 
@@ -15,6 +16,7 @@ from homeassistant.const import Platform
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
+import custom_components.helios_forecast.archive as archive_mod
 import custom_components.helios_forecast.coordinator as coordinator_mod
 from custom_components.helios_forecast import async_setup_entry, async_unload_entry, _legacy_issue_id
 from custom_components.helios_forecast.const import DOMAIN
@@ -51,6 +53,24 @@ async def test_setup_entry_registers_coordinator_and_forwards_sensor_platform(ha
     hass.config_entries.async_forward_entry_setups.assert_awaited_once()
     forwarded_platforms = hass.config_entries.async_forward_entry_setups.call_args.args[1]
     assert list(forwarded_platforms) == [Platform.SENSOR]
+
+
+async def test_setup_completes_even_if_the_archive_migration_never_returns(hass, monkeypatch) -> None:
+    """The recorder does not process its queue until Home Assistant has finished starting, so a
+    migration awaited inside setup waits for a start that is waiting for that same setup, and Home
+    Assistant cancels the entry after five minutes. Setup must never depend on it finishing."""
+    running = asyncio.Event()
+
+    async def _never_returns(_hass, _entry) -> None:
+        running.set()
+        await asyncio.Event().wait()
+
+    monkeypatch.setattr(archive_mod, "async_migrate", _never_returns)
+    entry = await asyncio.wait_for(_setup(hass, monkeypatch), 10)
+
+    assert hass.data[DOMAIN][entry.entry_id].last_update_success
+    assert running.is_set()  # armed and started, just not waited on
+    await async_unload_entry(hass, entry)
 
 
 async def test_setup_entry_deletes_legacy_multi_array_issue(hass, monkeypatch) -> None:
