@@ -258,7 +258,7 @@ def _conversion(legacy: StatisticMetaData, unit: str) -> Optional[Dict[str, str]
     """
     stored = legacy.get("unit_of_measurement")
     raw_class = legacy.get("unit_class") or UNIT_CLASSES.get(unit)
-    unit_class = str(raw_class) if raw_class else None
+    unit_class: str = str(raw_class) if raw_class else ""
     converter = UNIT_CLASS_TO_UNIT_CONVERTER.get(unit_class) if unit_class and UNIT_CLASS_TO_UNIT_CONVERTER else None
     if converter is None or unit not in converter.VALID_UNITS:
         # Nothing can convert this quantity, so the recorder hands the values back exactly as stored
