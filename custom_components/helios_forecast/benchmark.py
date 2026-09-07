@@ -7,10 +7,10 @@ hour after hour, what it announced before reality had a say. That is all this do
 hour it posts the curve this entry currently predicts, together with the production already
 measured, and an external collector scores the two against each other once the day is over.
 
-Off unless switched on. What it sends is fixed and deliberately small: the geometry of the
-installation, the predicted curve with the cloud cover behind it, the measured production and the
-reliability index. No
-entity names, no consumption, no other sensor, nothing about the rest of the house.
+Off unless switched on. What it sends is fixed and stays about the sky and the roof: the geometry
+of the installation, the predicted curve, the weather the model read to produce it, the measured
+production, and what the learning stood on. No entity names, no consumption, no other sensor,
+nothing about the rest of the house.
 Coordinates are rounded to two decimals, roughly a kilometre, which no weather model can
 tell apart and which keeps a street address out of the upload. The site is identified by a
 hash of the config entry, so the collector can follow one installation over time without
@@ -32,8 +32,11 @@ from typing import Any, Dict, List, Optional
 _LOGGER = logging.getLogger(__name__)
 
 # Payload shape. The collector refuses what it does not know how to read, so this only ever
-# goes up when a field changes meaning.
-SCHEMA_VERSION = 1
+# goes up when a field changes meaning. 2 adds the weather the model actually read, the ground
+# elevation, the local zone, the per-point analog confidence and what the learning stood on:
+# without those, an error can be measured but not attributed, and a benchmark that cannot say
+# whether the sky or the model was wrong cannot make either of them better.
+SCHEMA_VERSION = 2
 
 # Where an upload goes when the entry does not name its own collector.
 DEFAULT_ENDPOINT = "https://helios-ha.org/bench/v1/emissions"
@@ -45,6 +48,12 @@ UPLOAD_INTERVAL = timedelta(hours=1)
 # How much measured production travels with each emission. Well past the interval on purpose:
 # every upload repeats the recent past, so a collector that missed an hour heals on the next.
 OBSERVED_HOURS = 72
+
+# How far ahead the curve travels at its native sub-hourly step. Past it the forecast is thinned to
+# the top of each hour, and nothing is lost by that: an hour is scored against the meter's reading
+# for the hour that contains it, so four points inside one hour are four comparisons with the same
+# truth. Sub-hourly detail earns its place in the near term, where a battery decision turns on it.
+DENSE_HOURS = 24
 
 # About a kilometre. Sun geometry over that distance is identical and every weather model used
 # here has a coarser grid, so the rounding costs the benchmark nothing.
@@ -70,6 +79,56 @@ def _iso(moment: datetime) -> str:
     return moment.isoformat()
 
 
+def thin_forecast(points: List[Any], emitted_at: datetime) -> List[Any]:
+    """The curve as it travels: every point up to DENSE_HOURS ahead, the top of each hour beyond.
+
+    A point whose time cannot be read is dropped rather than guessed at, and a curve that is already
+    hourly comes back untouched.
+    """
+    out: List[Any] = []
+    dense_until = emitted_at + timedelta(hours=DENSE_HOURS)
+    for p in points:
+        moment = getattr(p, "t", None)
+        if not isinstance(moment, datetime):
+            continue
+        if moment < dense_until or (moment.minute == 0 and moment.second == 0):
+            out.append(p)
+    return out
+
+
+def weather_series(weather: Any, since: datetime) -> List[Dict[str, Any]]:
+    """The hourly weather the model read, from `since` onward, as plain rows.
+
+    Every field the physics consumes, and the ensemble's own disagreement beside it. An hour with no
+    usable timestamp is dropped rather than sent with a null time; a missing value stays null, since
+    "the service had nothing here" is itself worth recording.
+    """
+    times = list(getattr(weather, "times", None) or [])
+    if not times:
+        return []
+    fields = (
+        ("ghi", "shortwave"),
+        ("direct", "direct"),
+        ("diffuse", "diffuse"),
+        ("temp", "temp"),
+        ("wind", "wind"),
+        ("snow", "snow"),
+        ("cloud", "cloud"),
+        ("cloud_spread", "cloud_spread"),
+    )
+    arrays = {name: list(getattr(weather, attr, None) or []) for name, attr in fields}
+    rows: List[Dict[str, Any]] = []
+    for i, moment in enumerate(times):
+        if not isinstance(moment, datetime) or moment < since:
+            continue
+        row: Dict[str, Any] = {"t": _iso(moment)}
+        for name, values in arrays.items():
+            value = values[i] if i < len(values) else None
+            row[name] = _round(value, 2) if isinstance(value, (int, float)) else None
+        rows.append(row)
+    return rows
+
+
 def build_payload(
     *,
     entry_id: str,
@@ -79,10 +138,13 @@ def build_payload(
     longitude: float,
     lines: List[Dict[str, Any]],
     country: Optional[str],
+    time_zone: Optional[str],
     inverter_max_kw: Optional[float],
     points: List[Any],
     reliability: Any,
     production: List[Any],
+    weather: Any,
+    learning: Dict[str, Any],
     has_battery: bool,
     has_curtailment_signal: bool,
 ) -> Dict[str, Any]:
@@ -92,6 +154,8 @@ def build_payload(
     published can be read in one place rather than pieced together from call sites.
     """
     horizon_start = emitted_at - timedelta(hours=OBSERVED_HOURS)
+    weather_rows = weather_series(weather, horizon_start) if weather is not None else []
+    curve = thin_forecast(points, emitted_at)
     observed = [
         {
             "t": _iso(datetime.fromtimestamp(b.start_ms / 1000.0, tz=emitted_at.tzinfo)),
@@ -112,6 +176,11 @@ def build_payload(
             # The country the installation sits in. Far coarser than the coordinates already sent,
             # and what lets the benchmark say which climates it actually covers.
             "country": (country or None),
+            # The installation's own zone. A morning bias cannot be compared between installations
+            # without it, and deducing one from the longitude gets the boundary cases wrong.
+            "time_zone": (time_zone or None),
+            # Ground elevation as the weather service reports it for this cell, metres.
+            "elevation_m": _round(getattr(weather, "elevation_m", None), 1),
             "inverter_max_kw": _round(inverter_max_kw, 3),
             "has_battery": has_battery,
             "has_curtailment_signal": has_curtailment_signal,
@@ -141,9 +210,20 @@ def build_payload(
                 "p10": _round(p.pv_p10, 2),
                 "p90": _round(p.pv_p90, 2),
                 "cloud": _round(p.cloud, 1),
+                # How much the analog ensemble was trusted here, 0 to 1, or null where it had
+                # nothing to say. It separates an error of the learning from an error of the physics.
+                "conf": _round(getattr(p, "analog_confidence", None), 3),
             }
-            for p in points
+            for p in curve
         ],
+        # The weather the model read, hourly, over the same window the emission speaks about. Without
+        # it a wrong forecast cannot be told from a wrong sky, which is the first question to ask of
+        # any of these numbers.
+        "weather": weather_rows,
+        # What the learning stood on at this moment: how much history it had, how much of it it had
+        # to set aside, and how much of the sky it had learned. A score means something different
+        # from an installation with sixty days behind it than from one with three.
+        "learning": learning,
         "observed": observed,
     }
 

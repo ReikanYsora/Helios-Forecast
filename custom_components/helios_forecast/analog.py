@@ -342,8 +342,8 @@ def _enrich_one(
     if ceiling is not None:
         blended = min(blended, ceiling)
     if c >= BAND_MIN_CONFIDENCE:
-        return replace(p, pv_w=blended, pv_p10=p10, pv_p90=p90)
-    return replace(p, pv_w=blended)
+        return replace(p, pv_w=blended, pv_p10=p10, pv_p90=p90, analog_confidence=c)
+    return replace(p, pv_w=blended, analog_confidence=c)
 
 
 def enrich_points(

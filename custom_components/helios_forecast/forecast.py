@@ -40,6 +40,11 @@ class ForecastPoint:
     # irradiance / cloud at that exact instant when scrubbing (already computed for the model).
     ghi: Optional[float] = None
     cloud: Optional[float] = None
+    # How much the analog ensemble was trusted at this bucket, 0 to 1, or None where it had nothing
+    # to say. It is the weight the blend gave the learned answer against the physical model, so it
+    # says whether an error came from the site's own history or from the physics, which no other
+    # field in a recorded emission can tell apart afterwards.
+    analog_confidence: Optional[float] = None
 
 
 def forecast_point_dict(p: ForecastPoint) -> Dict[str, object]:

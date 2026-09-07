@@ -93,6 +93,37 @@ power is zero, so they lose nothing. Building the curve in UTC and converting on
 at the day boundaries would close the whole family at once; that is a bigger change
 than a fix release should carry.
 
+### Changed: a benchmark emission now says enough to explain an error, not only to measure it
+
+The benchmark could tell you how wrong a forecast was and never why. An emission
+carried the curve and the cloud cover behind it, so a bad day could equally have been
+a bad sky or a bad model, and there was no way to tell them apart afterwards. Five
+things travel with it now, none of them about the household:
+
+- **the weather the model actually read**, hourly over the same window the emission
+  speaks about: irradiance direct, diffuse and global, temperature, wind, snow depth,
+  cloud cover and the weather ensemble's own disagreement. This is the one that
+  separates a wrong forecast from a wrong sky.
+- **the ground elevation** the weather service reports for the cell, and the
+  installation's **time zone**. Irradiance at 1500 m is not irradiance at sea level,
+  and a morning bias cannot be compared between installations without knowing what
+  morning means at each of them.
+- **how much the analog ensemble was trusted at each point**, which separates an error
+  of the learning from an error of the physics.
+- **what the learning stood on**: hours of production behind it, hours it had to set
+  aside as curtailed, how many of the 648 sky cells the site has produced under, and
+  the global correction. A score from an installation with sixty days behind it does
+  not mean what the same score means from one with three.
+
+It costs nothing to send. The curve travels at its native quarter-hour step for the
+first 24 hours and at the top of each hour beyond, which loses no accuracy at all: an
+hour is scored against the meter's reading for the hour that contains it, so four
+points inside one hour were four comparisons with the same truth. An emission carrying
+all of the above is **73 kB against the 79 kB sent today**.
+
+The collector reads both shapes for as long as installations take to update, so
+nobody is silenced by the change.
+
 ### Changed: an installation checks itself before it sends to the benchmark
 
 The check-up already found the configuration problems that make a measurement

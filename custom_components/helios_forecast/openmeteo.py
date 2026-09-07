@@ -131,6 +131,11 @@ class WeatherSeries:
     # overlaid from the best-effort ensemble call. Empty when that call yielded nothing. Read as a
     # forecast-uncertainty signal by the reliability index.
     cloud_spread: list[float] = field(default_factory=list)
+    # Ground elevation of the weather grid cell, metres, as Open-Meteo reports it with every
+    # response. Not used by the model; it travels with a benchmark emission because irradiance at
+    # 1500 m and at sea level are not the same question, and a fleet-wide error cannot be read
+    # without knowing which one an installation was asking.
+    elevation_m: float | None = None
 
 
 def build_weather_url(
@@ -225,6 +230,8 @@ def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
     if not time_strs or not any(low_arrays):
         return None
     n = len(time_strs)
+    raw_elevation = payload.get("elevation")
+    elevation = float(raw_elevation) if isinstance(raw_elevation, (int, float)) else None
 
     def fuse(base: str) -> list:
         arrays = _model_arrays(hourly, base)
@@ -246,6 +253,7 @@ def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
         snow=fuse("snow_depth"),
         # Baseline zero spread aligned to times; the ensemble call overlays the real cross-model spread.
         cloud_spread=[0.0] * n,
+        elevation_m=elevation,
     )
 
 

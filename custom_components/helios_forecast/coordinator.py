@@ -95,6 +95,12 @@ _SERIES_NAMES: Dict[str, str] = {key: name for key, _unit, name in ARCHIVED_SERI
 
 _LOGGER = logging.getLogger(__name__)
 
+
+def _round_or_none(value: Any, digits: int = 4) -> Optional[float]:
+    """A float rounded for transport, or None when there is nothing to round."""
+    return None if not isinstance(value, (int, float)) else round(float(value), digits)
+
+
 UPDATE_INTERVAL = timedelta(minutes=30)
 STEP_MINUTES = 15
 FORECAST_DAYS = 7
@@ -162,6 +168,10 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # Production history (recorder change buckets) from the most recent refresh, kept so the
         # reliability index can reuse it without a second recorder fetch.
         self._production_buckets: List[ProductionBucket] = []
+        # The two learned objects of the most recent refresh, kept so an emission can say what it
+        # stood on. Held rather than recomputed: they are the refresh's own work, not a new question.
+        self._residual_map: Optional[Any] = None
+        self._analog_library: List[Any] = []
         # What the check-up found, kept apart from the two repairs derived from it so a refresh can
         # replace the findings without retiring the answers standing beside them (_publish_problems).
         self._found: List[Problem] = []
@@ -279,6 +289,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         now = dt_util.now()  # local-aware, drives the local-day boundaries
         residual_map = await self._build_residual_map(data, lat, lon, layout, weather, now)
+        self._residual_map = residual_map
         production_entity = learning_from_config(data)
         if production_entity and self._production_history_read:
             problems += check_production_history(
@@ -309,6 +320,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         analog_library = await self.hass.async_add_executor_job(
             build_library, self._production_buckets, weather, lat, lon, layout, cap
         )
+        self._analog_library = analog_library
         points = await self.hass.async_add_executor_job(enrich_points, points, analog_library, weather, lat, lon, now)
         # The live series keeps its elapsed points raw on purpose (what the forecast said at the time), but the
         # card draws them next to the archive's clamped hours, where a raw point hugs the nameplate ceiling for
@@ -395,6 +407,28 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         except Exception as err:  # noqa: BLE001 - see the docstring
             _LOGGER.debug("Benchmark emission skipped: %s", err)
 
+    def _learning_state(self) -> Dict[str, Any]:
+        """What the learning stood on at this moment, for an emission to carry.
+
+        A score means a different thing from an installation with sixty days behind it than from one
+        with three, and an error under a sky cell the site has never produced under is not the same
+        error as one where it has. None of this can be reconstructed from the curve afterwards.
+        """
+        buckets = self._production_buckets
+        residual = self._residual_map
+        return {
+            "production_hours": len(buckets),
+            "curtailed_hours": sum(1 for b in buckets if getattr(b, "curtailed", False)),
+            "analog_samples": len(self._analog_library),
+            # Cells of the 36 x 18 sky grid the site has actually produced under, out of 648.
+            "sky_cells": getattr(residual, "visited_cells", None),
+            "sky_cells_total": (
+                getattr(residual, "n_az", 0) * getattr(residual, "n_alt", 0) if residual is not None else None
+            ),
+            "residual_global": _round_or_none(getattr(residual, "global_ratio", None)),
+            "learn_days": LEARN_DAYS,
+        }
+
     async def _upload_benchmark(self, data, lat, lon, points, reliability, now_utc, key) -> None:
         """Assemble this hour's emission and hand it to a background task."""
         if self._version is None:
@@ -408,10 +442,13 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             longitude=lon,
             lines=lines_from_config(data),
             country=self.hass.config.country,
+            time_zone=self.hass.config.time_zone,
             inverter_max_kw=data.get(CONF_INVERTER_MAX_KW),
             points=points,
             reliability=reliability,
             production=self._production_buckets,
+            weather=self.weather_series,
+            learning=self._learning_state(),
             has_battery=bool(data.get(CONF_BATTERY_CAPACITY_KWH) and data.get(CONF_BATTERY_SOC_ENTITY)),
             has_curtailment_signal=bool(curtailment_entity_from_config(data)),
         )
