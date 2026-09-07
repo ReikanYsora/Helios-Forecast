@@ -374,34 +374,27 @@ async def test_build_residual_map_none_when_production_history_empty(hass, caplo
 # --- weather statistics archive: entity-registration gating -----------------------------------
 
 
-async def test_write_weather_statistics_noop_before_entities_registered(hass) -> None:
-    entry = _entry(hass)
-    coordinator = HeliosForecastCoordinator(hass, entry)
-    coordinator.weather_series = make_weather_series(dt_util.utcnow())
-
-    coordinator.write_weather_statistics(dt_util.utcnow(), full=True)
-
-    # No sensor entity registered yet for any weather field: nothing counted as written,
-    # so the high-water mark must not advance (or the real backfill would be skipped later).
-    assert coordinator._last_weather_stat_hour is None
-
-
-async def test_write_weather_statistics_advances_marker_once_entity_exists(hass) -> None:
-    from homeassistant.helpers import entity_registry as er
+async def test_write_weather_statistics_needs_no_entity(hass, monkeypatch) -> None:
+    from custom_components.helios_forecast.statistics import WEATHER_FIELDS, external_statistic_id
 
     entry = _entry(hass)
     coordinator = HeliosForecastCoordinator(hass, entry)
     coordinator.weather_series = make_weather_series(dt_util.utcnow())
 
-    registry = er.async_get(hass)
-    registry.async_get_or_create(
-        "sensor", DOMAIN, f"{entry.entry_id}_cloud_cover", suggested_object_id="helios_cloud_cover"
+    written: list = []
+    monkeypatch.setattr(
+        coordinator_mod, "async_add_external_statistics", lambda _hass, meta, rows: written.append((meta, rows))
     )
-
     now_utc = dt_util.utcnow()
     coordinator.write_weather_statistics(now_utc, full=True)
 
+    # No sensor entity is registered, and that no longer matters: the series belong to the
+    # integration, so the backfill lands and the high-water mark advances.
     assert coordinator._last_weather_stat_hour == now_utc.replace(minute=0, second=0, microsecond=0)
+    assert {meta["statistic_id"] for meta, _rows in written} == {
+        external_statistic_id(entry.entry_id, field.key) for field in WEATHER_FIELDS
+    }
+    assert all(meta["source"] == DOMAIN and meta["name"] for meta, _rows in written)
 
 
 # --- curtailment flagging ------------------------------------------------------------------

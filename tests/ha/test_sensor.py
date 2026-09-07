@@ -8,6 +8,7 @@ import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.helios_forecast import sensor as sensor_mod
+from custom_components.helios_forecast import statistics as statistics_mod
 from custom_components.helios_forecast.battery import BatterySocPoint
 from custom_components.helios_forecast.const import DOMAIN
 from custom_components.helios_forecast.coordinator import ForecastData, HeliosForecastCoordinator
@@ -129,12 +130,15 @@ def test_energy_sensor_has_no_state_class(hass, entry, coordinator) -> None:
     assert description.device_class.value == "energy"
 
 
-def test_archive_energy_sensor_has_measurement_but_no_device_class(hass, entry, coordinator) -> None:
-    # The archive entity needs a state_class for its long-term statistics, but kWh + MEASUREMENT is only
-    # valid without the energy device class (HA rejects energy + measurement).
-    description = sensor_mod._archive_energy("predicted_energy", "Predicted energy", lambda s: s.energy_this_hour_kwh)
-    assert description.state_class is not None
-    assert description.device_class is None
+def test_no_entity_carries_a_state_class_the_archive_writes_to(hass, entry, coordinator) -> None:
+    # A state class is what makes the recorder compile an entity into statistics. Every series this
+    # integration writes is integration-owned (archive.py), so no entity of ours may claim one under
+    # a key the archive also writes: that is the collision that rolls back the recorder's whole hour.
+    archived = {key for key, _unit, _name in statistics_mod.ARCHIVED_SERIES}
+    descriptions = [*sensor_mod._build_descriptions(), *sensor_mod._build_weather_descriptions()]
+    assert not [d for d in descriptions if d.key in archived and d.state_class is not None]
+    # And the weather sensors, which share their key with an archived series, carry none at all.
+    assert {d.key for d in sensor_mod._build_weather_descriptions()} <= archived
 
 
 def test_build_descriptions_day_lambdas_bind_their_own_index(hass, entry, coordinator) -> None:
@@ -160,9 +164,9 @@ def test_build_descriptions_enabled_defaults(hass, entry, coordinator) -> None:
     for n in range(1, 8):
         assert descriptions[f"peak_power_day_{n}"].entity_registry_enabled_default is False
         assert descriptions[f"peak_time_day_{n}"].entity_registry_enabled_default is False
-    # The archive entities stay enabled (their statistics are the card's past-prediction curve).
-    assert descriptions["predicted_power"].entity_registry_enabled_default is True
-    assert descriptions["predicted_energy"].entity_registry_enabled_default is True
+    # The two archive entities were removed in 2026.9.5; their history is an integration-owned series.
+    assert "predicted_power" not in descriptions
+    assert "predicted_energy" not in descriptions
 
 
 def test_weather_sensor_reads_observed_and_forecast(hass, entry, coordinator) -> None:

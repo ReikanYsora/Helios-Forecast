@@ -5,6 +5,81 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.9.5
+
+The release that stops taking the whole machine's statistics down with it. A
+Home Assistant instance running this integration was losing entire hours of
+long-term statistics, for every integration on it, not just this one. The cause
+was here, it had been here since the first version, and it is fixed at the root
+rather than worked around.
+
+### Fixed: the integration no longer breaks Home Assistant's hourly statistics
+
+Home Assistant knows two kinds of long-term statistics. A series named after an
+entity belongs to the recorder, which compiles it from that entity's state every
+hour on its own. A series named `domain:something` belongs to the integration
+that declares it, and the recorder never touches it.
+
+This integration archives nine series: the seven weather variables (Open-Meteo
+only serves a rolling 60-day window, the archive keeps them for good) and the
+predicted production for hours that have since happened (the past curve the card
+draws behind today). All nine were written under entity ids, on entities that
+also carried a `state_class`. So there were two writers on the same series: the
+recorder compiling the entity, and this integration importing the same hour. When
+they landed on the same hour, the duplicate violated the unique index, and Home
+Assistant rolls that back by abandoning the **entire** hourly compile, not just
+the offending row. Every other integration on the machine silently lost that hour
+of history too.
+
+It was not theoretical, and not rare. On the maintainer's own instance, two hours
+of 2026-09-06 kept 14 series out of 494: the nine written here, plus five belonging
+to another integration that already used its own ids. A healthy hour on the same
+instance holds 419. Everything else on that machine, every hour, was gone.
+
+The nine series are now written under this integration's own ids,
+`helios_forecast:<entry_id>_<series>`, which the recorder never compiles. One
+writer by construction, so the collision cannot happen rather than happening
+rarely. The seven weather sensors lose their `state_class` accordingly: they show
+the current hour, and their history is the archive, which no longer needs an
+entity to hang from.
+
+**Your history is moved, not dropped.** On the first start after the update, every
+archived hour is copied onto the new id, read back and counted, and the old series
+is deleted only once the new one is verified to hold at least as many hours. If
+anything does not line up, nothing is deleted, it is written to the log, and the
+next start tries again. The move runs on every start rather than once, so an
+installation that skips a version, or is restored from a backup taken before the
+update, is repaired all the same; once there is nothing left to move it costs a
+single metadata read. The one thing not carried over is the 5-minute short-term
+statistics, kept 10 days at most: integration-owned series are hourly by design in
+Home Assistant. The full long-term history is carried over whole.
+
+Where to find them afterwards: in a statistics or energy-date card, the archive
+appears under its readable name (Cloud cover, Global irradiance, Predicted power,
+and so on) rather than under a `sensor.` entity. History graphs of the weather
+sensors themselves now show the recorded states only, which is what those sensors
+are for.
+
+### Removed: the `predicted_power` and `predicted_energy` entities
+
+Both existed for one reason: to give the predicted-production archive an entity to
+be named after. That is exactly what no longer happens, and their live value was a
+duplicate of `power_now` and `energy_this_hour` respectively. Rather than keep two
+entities that do nothing and carry a deprecation for a year, they are removed now.
+
+- `sensor.helios_forecast_predicted_power` is replaced by
+  **`sensor.helios_forecast_power_now`** (same value, same unit, same device class).
+- `sensor.helios_forecast_predicted_energy` is replaced by
+  **`sensor.helios_forecast_energy_this_hour`** (same value, same unit; it is
+  disabled by default, enable it from the integration's entity list).
+
+A dashboard or automation naming either of them needs that one edit. Their archived
+history is not lost: it is moved to `helios_forecast:<entry_id>_predicted_power` and
+`helios_forecast:<entry_id>_predicted_energy` like everything else, and their now
+empty registry entries are removed so no dead entity is left behind.
+
+---
+
 ## 2026.9.4
 
 ### Fixed: saving the settings no longer drops the benchmark opt-in and key

@@ -35,7 +35,7 @@ from .openmeteo import WeatherSeries
 from .solar.geometry import sun_position
 from .solar.irradiance import snow_cover_factor
 from .solar.power import PvLayout, WeatherSample, compute_pv_power_per_array
-from .solar.residual import capped_model_kwh
+from .solar.residual import ProductionBucket, capped_model_kwh
 
 # Feature weights in the (normalised) distance. Cloud is the variable that drives
 # production at a fixed geometry, so it dominates; altitude sets the available
@@ -151,7 +151,7 @@ def _sample_series(
 
 
 def _model_watts(
-    b: object,
+    b: ProductionBucket,
     weather: WeatherSeries,
     w_epochs: Optional[List[float]],
     lat: float,
