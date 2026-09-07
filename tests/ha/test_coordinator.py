@@ -15,6 +15,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 import custom_components.helios_forecast.coordinator as coordinator_mod
 from custom_components.helios_forecast.const import DOMAIN
 from custom_components.helios_forecast.coordinator import HeliosForecastCoordinator
+from custom_components.helios_forecast.statistics import WEATHER_FIELDS as _WEATHER_FIELDS
 from custom_components.helios_forecast.summary import DayForecast, ForecastSummary
 
 from _weather import make_weather_series
@@ -390,7 +391,10 @@ async def test_write_weather_statistics_needs_no_entity(hass, monkeypatch) -> No
 
     # No sensor entity is registered, and that no longer matters: the series belong to the
     # integration, so the backfill lands and the high-water mark advances.
-    assert coordinator._last_weather_stat_hour == now_utc.replace(minute=0, second=0, microsecond=0)
+    # The mark stops short of the trailing window the archive keeps re-offering.
+    assert coordinator._last_weather_stat_hour == now_utc.replace(minute=0, second=0, microsecond=0) - timedelta(
+        hours=coordinator_mod.ARCHIVE_RETRY_HOURS
+    )
     assert {meta["statistic_id"] for meta, _rows in written} == {
         external_statistic_id(entry.entry_id, field.key) for field in WEATHER_FIELDS
     }
@@ -430,3 +434,73 @@ async def test_flag_curtailed_marks_full_battery_hours_at_the_cap(hass, monkeypa
         {"battery_soc_entity": "sensor.soc"}, buckets, start, start + timedelta(hours=24)
     )
     assert [b.curtailed for b in out] == [False, False]
+
+
+async def test_an_hour_the_weather_service_publishes_late_still_reaches_the_archive(hass, monkeypatch) -> None:
+    """The defect this guards against was found on a contributor's instance, on MariaDB.
+
+    Open-Meteo publishes a past hour with a delay. A refresh that has an older hour to write while the
+    newest is still missing used to move the mark past the gap, and that hour was never written again:
+    before 2026.9.5 the recorder compiled the same entities, so it arrived through the entity's own
+    state and the hole never showed, but the archive is the only writer now.
+    """
+    from custom_components.helios_forecast.openmeteo import WeatherSeries
+    from custom_components.helios_forecast.statistics import external_statistic_id
+
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    written: list = []
+    monkeypatch.setattr(
+        coordinator_mod,
+        "async_add_external_statistics",
+        lambda _hass, meta, rows: written.append((meta["statistic_id"], [r["start"] for r in rows])),
+    )
+
+    top = dt_util.utcnow().replace(minute=0, second=0, microsecond=0)
+
+    def window(hours: list, values: list) -> WeatherSeries:
+        return WeatherSeries(
+            times=hours,
+            cloud=list(values),
+            shortwave=list(values),
+            direct=list(values),
+            diffuse=list(values),
+            temp=list(values),
+            wind=list(values),
+            snow=list(values),
+            cloud_spread=[0.0] * len(hours),
+        )
+
+    # Two hours back is published, one hour back is not yet.
+    two_back, one_back = top - timedelta(hours=2), top - timedelta(hours=1)
+    coordinator.weather_series = window([two_back, one_back], [10.0, float("nan")])
+    coordinator.write_weather_statistics(top)
+    first = {h for _sid, hours in written for h in hours}
+    assert two_back in first and one_back not in first
+
+    # The next refresh, an hour later: the missing hour has arrived. It must be written now.
+    written.clear()
+    later = top + timedelta(hours=1)
+    coordinator.weather_series = window([two_back, one_back, top], [10.0, 20.0, 30.0])
+    coordinator.write_weather_statistics(later)
+    second = {h for _sid, hours in written for h in hours}
+    assert one_back in second, "the late hour was left behind by the mark"
+    assert top in second
+    # Every field caught up, not just the first one.
+    ids = {sid for sid, _hours in written}
+    assert ids == {external_statistic_id(entry.entry_id, f.key) for f in _WEATHER_FIELDS}
+
+
+async def test_the_archive_mark_never_moves_backwards(hass, monkeypatch) -> None:
+    # The mark is derived from the current hour, so a clock that jumps back, or a refresh running late
+    # behind another, must not make the archive re-offer a window it has already left.
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    monkeypatch.setattr(coordinator_mod, "async_add_external_statistics", lambda *_a: None)
+    coordinator.weather_series = make_weather_series(dt_util.utcnow())
+
+    now_utc = dt_util.utcnow()
+    coordinator.write_weather_statistics(now_utc)
+    ahead = coordinator._last_weather_stat_hour
+    coordinator.write_weather_statistics(now_utc - timedelta(hours=3))
+    assert coordinator._last_weather_stat_hour == ahead

@@ -94,6 +94,12 @@ _SERIES_NAMES: Dict[str, str] = {key: name for key, _unit, name in ARCHIVED_SERI
 _LOGGER = logging.getLogger(__name__)
 
 UPDATE_INTERVAL = timedelta(minutes=30)
+# How far back the weather archive keeps re-offering its hours. Open-Meteo publishes a past hour with
+# a delay, so the most recently completed hours routinely carry no value yet, and an archive that
+# moved its high-water mark past them would skip them for good: a refresh with an older hour to write
+# leapfrogs the one that has not arrived. Re-offering costs nothing, the write is an upsert, and an
+# hour that never arrives is given up at the end of this window rather than rescanning for ever.
+ARCHIVE_RETRY_HOURS = 6
 STEP_MINUTES = 15
 FORECAST_DAYS = 7
 # How far ahead the battery SoC projection runs. Reaches past the FOLLOWING day's solar peak, so a
@@ -565,11 +571,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
     def write_weather_statistics(self, now: datetime, *, full: bool = False) -> None:
         """Copy the past weather hours into this integration's own long-term statistics.
 
-        A refresh imports only the hours added since the last write; the full 60-day backfill (install
-        and self-heal after downtime) runs once at startup with ``full=True``. Only completed hours are
-        written, the in-progress current hour is left out. The series belong to this integration
-        rather than to the weather sensors (see archive.py), so nothing here depends on an entity
-        being registered and the recorder never writes the same rows from its side.
+        A refresh imports the hours added since the last write, plus the trailing window it always
+        re-offers; the full 60-day backfill (install and self-heal after downtime) runs once at
+        startup with ``full=True``. Only completed hours are written, the in-progress current hour is
+        left out. The series belong to this integration rather than to the weather sensors (see
+        archive.py), so nothing here depends on an entity being registered and the recorder never
+        writes the same rows from its side.
         """
         weather = self.weather_series
         if weather is None:
@@ -577,7 +584,6 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         cutoff = now.replace(minute=0, second=0, microsecond=0)
         since = None if (full or self._last_weather_stat_hour is None) else self._last_weather_stat_hour
-        wrote_any = False
         for field in WEATHER_FIELDS:
             rows = hourly_statistics(weather.times, getattr(weather, field.attr), cutoff, since=since)
             if not rows:
@@ -586,11 +592,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 external_statistic_id(self.entry.entry_id, field.key), field.unit, _SERIES_NAMES[field.key]
             )
             async_add_external_statistics(self.hass, metadata, rows)
-            wrote_any = True
-        # Advance the marker only once something was actually written, so a call made before the
-        # weather window covers a full hour does not skip the backlog the next one still has to cover.
-        if wrote_any:
-            self._last_weather_stat_hour = cutoff
+        # The mark stops short of the trailing window and never moves backwards (see
+        # ARCHIVE_RETRY_HOURS), so an hour the weather service has not published yet is offered again
+        # on the next refresh instead of being left behind by the one that has.
+        mark = cutoff - timedelta(hours=ARCHIVE_RETRY_HOURS)
+        if self._last_weather_stat_hour is None or mark > self._last_weather_stat_hour:
+            self._last_weather_stat_hour = mark
 
     def _compute_archive_points(self, now, weather, layout, lat, lon, cap, residual_map, analog_library):
         """Hourly predicted points over the past window [now - LEARN_DAYS, current hour).
