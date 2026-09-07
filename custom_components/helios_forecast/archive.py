@@ -14,6 +14,10 @@ there does not fail our write alone: it rolls back the recorder's entire hourly 
 other integration on the machine silently loses that hour of history. `async_migrate` moves the
 history off those entity ids once and for all, and never deletes anything it has not first checked
 it could read back somewhere else.
+
+It runs once Home Assistant has finished starting, never during setup. The recorder waits for that
+same event before it processes its queue, so anything here that waits on a recorder write while the
+start is still in progress waits on a start that is waiting on it.
 """
 
 from __future__ import annotations
@@ -125,10 +129,11 @@ def metadata(statistic_id: str, unit: str, name: str) -> StatisticMetaData:
 async def async_migrate(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Move any history still held under an entity id onto this integration's own series.
 
-    Runs on every setup rather than behind a one-time marker, deliberately: an installation that
-    skips a version, or that is restored from a backup taken before the move, still gets the fix on
-    its next start. Once there is nothing left under an entity id the whole thing costs one metadata
-    read, so it can stay in the startup path for good.
+    Armed on every setup rather than once behind a marker, deliberately: an installation that skips a
+    version, or that is restored from a backup taken before the move, still gets the fix on its next
+    start. Once there is nothing left under an entity id it costs one metadata read, so it can stay
+    armed for good. Called from the started event and off the setup path (see the module docstring);
+    a caller must not wait on it.
     """
     registry = er.async_get(hass)
     legacy = {
@@ -136,7 +141,7 @@ async def async_migrate(hass: HomeAssistant, entry: ConfigEntry) -> None:
         for key, _unit, _name in ARCHIVED_SERIES
         if (entity_id := registry.async_get_entity_id("sensor", DOMAIN, f"{entry.entry_id}_{key}"))
     }
-    stuck: set = set()
+    stuck: set[str] = set()
     hours = 0
     started = time.monotonic()
     if legacy:

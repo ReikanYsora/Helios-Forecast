@@ -134,13 +134,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=UPDATE_INTERVAL)
         self.entry = entry
-        # Last weather window fetched, kept so the statistics archive can be
-        # written both at the end of a refresh and once right after the sensor
-        # entities are registered (so the first backfill lands immediately).
+        # Last weather window fetched, kept so the statistics archive can be written both at the
+        # end of a refresh and once at setup (so the first backfill lands immediately).
         self.weather_series: Optional[WeatherSeries] = None
-        # Predicted-production statistic rows from the most recent refresh, keyed by archive entity
-        # key. Written to HA statistics by write_forecast_statistics, both at refresh end and once
-        # right after the entities register (first backfill).
+        # Predicted-production statistic rows from the most recent refresh, keyed by series key.
+        # Written to HA statistics by write_forecast_statistics, both at the end of a refresh and
+        # once at setup (first backfill).
         self._forecast_stat_rows: Dict[str, List[Dict[str, Any]]] = {}
         # Hourly predicted points over the past window (now - LEARN_DAYS .. current hour), kept so
         # the detail websocket can serve the past forecast curve the live `points` (today onward) do

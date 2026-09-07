@@ -132,7 +132,7 @@ def external_statistic_id(entry_id: str, key: str) -> str:
 
 
 def forecast_statistics(points: list) -> Dict[str, List[dict]]:
-    """Per-hour statistic rows for the predicted-power and predicted-energy archive entities.
+    """Per-hour statistic rows for the predicted-power and predicted-energy archive series.
 
     ``points`` is an iterable of hourly forecast points (objects with ``.t`` UTC datetime and
     ``.pv_w`` watts). Each hour becomes one row; predicted energy is the hour's Wh expressed in kWh
