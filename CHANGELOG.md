@@ -63,6 +63,36 @@ and so on) rather than under a `sensor.` entity. History graphs of the weather
 sensors themselves now show the recorded states only, which is what those sensors
 are for.
 
+### Fixed: the battery projection loses an hour of house load on the clock changes
+
+Reported by @Manama2011, with the cause, a patch and its numbers, from reading the
+code alone. Thank you: it was dormant and would have shown itself on **25 October**.
+
+The forecast curve is built on the local clock, so a local day always carries 96
+quarter-hour points, whether that day is 23, 24 or 25 real hours long. The battery
+projection then charged every one of them as a quarter of an hour of real time. On
+the two changeover days it therefore integrated the house load over the wrong
+amount of time: **one hour too little in autumn, one hour too much in spring**. At
+a 700 W night load that is 0.7 kWh, about 7 points of state of charge on a 9.8 kWh
+battery, in a projection whose entire job is to say whether the reserve is reached.
+Nothing showed in the log, and the guard meant to catch a cadence mismatch could
+not fire: it subtracted two timestamps that share one time zone object, which
+Python does on the wall clock, so it measured the very quantity it was checking.
+
+A step now lasts the real time to the next point. The spring day needed one thing
+more: the four quarter-hours from 02:00 to 02:45 name local times that never happen
+and land on the same instants as the four that follow, so the series is not even
+ascending in real time. The projection keeps one point per real instant, the one a
+clock in the house would show. Verified against the three days: 16.800 kWh drawn on
+an ordinary day, 17.500 in autumn, 16.100 in spring, each equal to the truth to the
+watt-hour, where all three read 16.800 before.
+
+The daily energy totals integrate the same fixed step, and were checked rather than
+assumed: both changeovers happen in the middle of the night, where the predicted
+power is zero, so they lose nothing. Building the curve in UTC and converting only
+at the day boundaries would close the whole family at once; that is a bigger change
+than a fix release should carry.
+
 ### Fixed: the benchmark step's link no longer fails Home Assistant's own checks
 
 Home Assistant tightened its translation rules and no longer allows a URL inside a
