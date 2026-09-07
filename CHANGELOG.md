@@ -93,6 +93,16 @@ power is zero, so they lose nothing. Building the curve in UTC and converting on
 at the day boundaries would close the whole family at once; that is a bigger change
 than a fix release should carry.
 
+### Fixed: a meter reset no longer teaches the learning that the sky went dark
+
+Found while repairing a database on a real installation, not in a test. When an
+energy meter is reset, replaced, or restored from an older backup, Home Assistant
+writes one enormous negative hour into the recorder: the case seen here read
+**-927.750 kWh** on a bright afternoon. The sky-residual map already refused those
+hours; the analog library clamped them to zero instead, which filed a bright hour as
+one where the sky gave nothing and dragged every later prediction under similar sun
+and cloud down with it. Both now refuse a negative hour on the same grounds.
+
 ### Fixed: the benchmark step's link no longer fails Home Assistant's own checks
 
 Home Assistant tightened its translation rules and no longer allows a URL inside a

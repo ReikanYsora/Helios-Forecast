@@ -203,6 +203,33 @@ def test_build_library_drops_curtailed_hours() -> None:
     assert [s.watt for s in lib] == [3000.0]
 
 
+def test_build_library_drops_a_meter_reset_instead_of_filing_it_as_a_dark_hour() -> None:
+    # A meter that is reset, replaced, or restored from an older backup writes one enormous negative
+    # hour into the recorder. Seen for real: change = -927.750 kWh on a bright afternoon. Clamped to
+    # zero it would file that hour in the library as one where the sky gave nothing, and drag every
+    # later prediction under similar sun and cloud down with it.
+    lat, lon = 45.0, 0.0
+    noon = _june_noon(12)
+    one = _june_noon(13)
+    prod = [
+        _Bucket(noon.timestamp() * 1000.0, (noon + timedelta(hours=1)).timestamp() * 1000.0, 3.0),
+        _Bucket(one.timestamp() * 1000.0, (one + timedelta(hours=1)).timestamp() * 1000.0, -927.75),
+    ]
+    times = [_june_noon(h) for h in range(24)]
+    weather = WeatherSeries(
+        times=times,
+        cloud=[20.0] * 24,
+        shortwave=[0.0] * 24,
+        direct=[0.0] * 24,
+        diffuse=[0.0] * 24,
+        temp=[20.0] * 24,
+        wind=[5.0] * 24,
+        snow=[0.0] * 24,
+    )
+    lib = build_library(prod, weather, lat, lon)
+    assert [s.watt for s in lib] == [3000.0]
+
+
 def test_enrich_points_past_untouched_future_blended() -> None:
     lat, lon = 45.0, 0.0
     now = _june_noon(12)
