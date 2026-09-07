@@ -6,13 +6,14 @@ import math
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
 import pytest  # noqa: E402
 
-from custom_components.helios_forecast.battery import StepCadenceError, project_battery_soc  # noqa: E402
+from custom_components.helios_forecast.battery import project_battery_soc  # noqa: E402
 from custom_components.helios_forecast.config import INF, BatteryConfig  # noqa: E402
 from custom_components.helios_forecast.consumption import ConsumptionProfile  # noqa: E402
 from custom_components.helios_forecast.forecast import ForecastPoint  # noqa: E402
@@ -101,15 +102,17 @@ def test_multistep_stays_capped_once_full() -> None:
     assert [p.soc for p in soc] == [100.0, 100.0, 100.0]
 
 
-def test_cadence_mismatch_is_caught_not_silently_mis_integrated() -> None:
-    # Points spaced 30 min apart but step_minutes still declares 15: dt_h would silently double
-    # the integrated energy for every step. That must raise rather than mis-integrate.
+def test_a_step_lasts_the_time_to_the_next_point_not_the_declared_cadence() -> None:
+    # Points spaced 30 min apart while step_minutes declares 15. The first step must integrate the
+    # 30 minutes it really lasts; only the last one, having no successor, falls back on the 15.
     points = [
         ForecastPoint(t=_NOW, pv_w=4000.0, pv_raw_w=4000.0),
         ForecastPoint(t=_NOW + timedelta(minutes=30), pv_w=4000.0, pv_raw_w=4000.0),
     ]
-    with pytest.raises(StepCadenceError):
-        project_battery_soc(_config(), 0.5, points, _flat_load(0.0), now=_NOW, tz=_UTC, step_minutes=15)
+    soc = project_battery_soc(_config(), 0.5, points, _flat_load(0.0), now=_NOW, tz=_UTC, step_minutes=15)
+    stored = math.sqrt(0.9) / 10_000.0 * 100.0  # percent per Wh at the terminals
+    assert soc[0].soc == pytest.approx(50.0 + 2000.0 * stored, abs=0.01)  # 4000 W over 30 min
+    assert soc[1].soc == pytest.approx(soc[0].soc + 1000.0 * stored, abs=0.01)  # then the declared 15
 
 
 def test_horizon_window_excludes_out_of_range_points() -> None:
@@ -121,3 +124,56 @@ def test_horizon_window_excludes_out_of_range_points() -> None:
     ]
     soc = project_battery_soc(_config(), 0.5, points, _flat_load(0.0), now=_NOW, tz=_UTC)
     assert [p.t for p in soc] == [_NOW, _NOW + timedelta(minutes=15)]
+
+
+# --- daylight saving ------------------------------------------------------------------------
+#
+# The forecast series is built on the local clock, so a local day carries 96 quarter-hour points
+# whether it is 23, 24 or 25 real hours long. Integrating each of them as a fixed quarter of an
+# hour loses a whole hour of house load in autumn and counts one twice in spring, which is around
+# 7 points of state of charge on a 9.8 kWh battery at a 700 W night load.
+
+_BERLIN = ZoneInfo("Europe/Berlin")
+
+
+def _local_day(day: datetime) -> list[ForecastPoint]:
+    """96 wall-clock quarter-hours from local midnight, exactly as the series builder walks them."""
+    t = datetime(day.year, day.month, day.day, tzinfo=_BERLIN)
+    points = []
+    for _ in range(96):
+        points.append(ForecastPoint(t=t, pv_w=0.0, pv_raw_w=0.0))
+        t += timedelta(minutes=15)
+    return points
+
+
+def _drawn_kwh(points: list[ForecastPoint], load_w: float) -> float:
+    """Energy the projection takes out of a battery large enough that nothing clamps."""
+    config = _config(capacity_kwh=1000.0, min_soc_frac=0.0, efficiency=1.0)
+    soc = project_battery_soc(config, 1.0, points, _flat_load(load_w), now=points[0].t, tz=_BERLIN, horizon_hours=48)
+    return (1.0 - soc[-1].soc / 100.0) * 1000.0
+
+
+def test_an_ordinary_day_is_integrated_over_its_24_hours() -> None:
+    assert _drawn_kwh(_local_day(datetime(2026, 9, 10)), 700.0) == pytest.approx(16.8, abs=0.01)
+
+
+def test_the_hour_daylight_saving_adds_in_autumn_is_integrated() -> None:
+    # 25 October 2026 is 25 real hours long: 02:45+02:00 is followed by 03:00+01:00, 75 minutes later.
+    assert _drawn_kwh(_local_day(datetime(2026, 10, 25)), 700.0) == pytest.approx(17.5, abs=0.01)
+
+
+def test_the_hour_daylight_saving_removes_in_spring_is_not_counted() -> None:
+    # 28 March 2027 is 23 real hours long: the four points from 02:00 to 02:45 name local times that
+    # do not exist and land on the same instants as 03:00 to 03:45.
+    assert _drawn_kwh(_local_day(datetime(2027, 3, 28)), 700.0) == pytest.approx(16.1, abs=0.01)
+
+
+def test_an_instant_named_twice_is_projected_once() -> None:
+    # The spring series holds 96 local quarter-hours but only 92 real instants, and a curve that
+    # doubles back on itself would draw four points on top of four others.
+    points = _local_day(datetime(2027, 3, 28))
+    soc = project_battery_soc(_config(), 0.5, points, _flat_load(0.0), now=points[0].t, tz=_BERLIN, horizon_hours=48)
+    instants = [p.t.timestamp() for p in soc]
+    assert len(points) == 96
+    assert len(instants) == 92
+    assert instants == sorted(set(instants))
