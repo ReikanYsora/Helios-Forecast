@@ -183,11 +183,39 @@ async def test_a_failed_move_keeps_the_old_series_and_the_entity(hass, monkeypat
         return [] if ":" in statistic_id else await _read(hass_, statistic_id)
 
     monkeypatch.setattr(archive, "_read", _nothing)
+    monkeypatch.setattr(archive, "_COMMIT_TIMEOUT", 0.0)
     await archive.async_migrate(hass, entry)
     await async_wait_recording_done(hass)
 
     assert len(await _read(hass, entity_id)) == _HOURS
     assert er.async_get(hass).async_get(entity_id) is not None
+
+
+async def test_the_move_waits_for_the_copy_instead_of_trusting_the_queue(hass, monkeypatch) -> None:
+    """The recorder answers "queue empty" from the moment it takes the import off the queue, before
+    the rows are written, so the read-back has to be retried rather than taken once."""
+    entry = _entry(hass)
+    entity_id = _register(hass, entry, "direct", "helios_direct_irradiance")
+    await _write_legacy(hass, entity_id, "W/m²", datetime(2026, 8, 1, tzinfo=_UTC))
+
+    real_read = archive._read
+    late = {"calls": 0}
+
+    async def _slow_to_appear(hass_, statistic_id):
+        if ":" in statistic_id:
+            late["calls"] += 1
+            if late["calls"] < 3:  # the copy is not visible yet on the first two looks
+                return []
+        return await real_read(hass_, statistic_id)
+
+    monkeypatch.setattr(archive, "_read", _slow_to_appear)
+    monkeypatch.setattr(archive, "_POLL", 0.01)
+    await archive.async_migrate(hass, entry)
+    await async_wait_recording_done(hass)
+
+    assert late["calls"] >= 3
+    assert len(await _read(hass, external_statistic_id(entry.entry_id, "direct"))) == _HOURS
+    assert await _read(hass, entity_id) == []
 
 
 async def test_every_archived_series_has_a_valid_statistic_id(hass) -> None:

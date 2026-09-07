@@ -56,10 +56,11 @@ _TYPES = {"mean", "min", "max"}
 # Rows are handed to the recorder in batches rather than as one transaction of tens of thousands.
 _BATCH = 2000
 
-# How long to wait for the recorder to have committed the copy before giving up on it. Generous:
-# tens of thousands of hours on a small machine take minutes. Reaching it deletes nothing, it just
-# leaves the old series in place for the next start to retry, so it can never cost history.
-_COMMIT_TIMEOUT = 900
+# How long to wait for the recorder to have committed the copy, and how often to look. Generous:
+# tens of thousands of hours on a small machine take minutes. Reaching the deadline deletes nothing,
+# it just leaves the old series in place for the next start to retry, so it can never cost history.
+_COMMIT_TIMEOUT = 900.0
+_POLL = 1.0
 
 # Compat: `mean_type` and `unit_class` are mandatory in newer StatisticMetaData and absent from older
 # cores, so they are imported defensively.
@@ -192,33 +193,39 @@ async def _move(hass: HomeAssistant, legacy_id: str, statistic_id: str, unit: st
     meta = metadata(statistic_id, unit, name)
     for offset in range(0, len(rows), _BATCH):
         async_add_external_statistics(hass, meta, [_row(r) for r in rows[offset : offset + _BATCH]])
-    try:
-        async with asyncio.timeout(_COMMIT_TIMEOUT):
-            await instance.async_block_till_done()
-    except TimeoutError:
-        _LOGGER.error(
-            "The recorder did not commit the copy of %s within %d s, so nothing was deleted. The "
-            "move will be retried on the next start",
-            legacy_id,
-            _COMMIT_TIMEOUT,
-        )
-        return None
 
-    written = await _read(hass, statistic_id)
-    if len(written) < len(rows):
+    written = await _wait_for(hass, statistic_id, len(rows))
+    if written < len(rows):
         _LOGGER.error(
-            "Kept the statistics of %s: %d hours were read from it but %s holds %d, so nothing was "
-            "deleted. The move will be retried on the next start",
+            "Kept the statistics of %s: %d hours were read from it but %s holds %d after %.0f s, so "
+            "nothing was deleted. The move will be retried on the next start",
             legacy_id,
             len(rows),
             statistic_id,
-            len(written),
+            written,
+            _COMMIT_TIMEOUT,
         )
         return None
 
     instance.async_clear_statistics([legacy_id])
     _LOGGER.info("Moved %d hours of statistics from %s to %s", len(rows), legacy_id, statistic_id)
     return len(rows)
+
+
+async def _wait_for(hass: HomeAssistant, statistic_id: str, expected: int) -> int:
+    """Wait until `statistic_id` holds `expected` hours and return how many it holds.
+
+    The copy is committed by the recorder on its own thread, and asking that thread when it is done
+    has a hole in it: it answers "queue empty" from the moment it takes the import off the queue,
+    which is before the rows are written. So the wait is the read-back itself, which is in any case
+    the only thing that has to be true before the old series can go.
+    """
+    deadline = time.monotonic() + _COMMIT_TIMEOUT
+    while True:
+        held = len(await _read(hass, statistic_id))
+        if held >= expected or time.monotonic() >= deadline:
+            return held
+        await asyncio.sleep(_POLL)
 
 
 async def _read(hass: HomeAssistant, statistic_id: str) -> List[Dict[str, Any]]:
