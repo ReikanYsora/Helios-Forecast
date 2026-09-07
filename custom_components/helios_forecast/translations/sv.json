@@ -98,7 +98,7 @@
       },
       "benchmark": {
         "title": "Helios Forecast: gemenskapens jämförelse",
-        "description": "En öppen mätning av hur noggrann Helios Forecast verkligen är, på riktiga anläggningar, publicerad efter hand. Vill du vara med? Det sker här: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHämta en nyckel med ett klick, utan konto och utan namn, och klistra in den nedan. Radera den för att stoppa allt.",
+        "description": "En öppen mätning av hur noggrann Helios Forecast verkligen är, på riktiga anläggningar, publicerad efter hand. Vill du vara med? Det sker här: {benchmark_page}\n\nHämta en nyckel med ett klick, utan konto och utan namn, och klistra in den nedan. Radera den för att stoppa allt.",
         "data": {
           "benchmark_enabled": "Bidra till den offentliga noggrannhetsjämförelsen (valfritt)",
           "benchmark_key": "Jämförelsenyckel",

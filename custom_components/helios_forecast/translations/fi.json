@@ -98,7 +98,7 @@
       },
       "benchmark": {
         "title": "Helios Forecast: yhteisön vertailu",
-        "description": "Avoin mittaus siitä, kuinka tarkka Helios Forecast todella on, oikeilla järjestelmillä, julkaistuna sitä mukaa. Haluatko osallistua? Täältä pääset: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHae avain yhdellä klikkauksella, ilman tiliä ja ilman nimeä, ja liitä se alle. Poista se lopettaaksesi kaiken.",
+        "description": "Avoin mittaus siitä, kuinka tarkka Helios Forecast todella on, oikeilla järjestelmillä, julkaistuna sitä mukaa. Haluatko osallistua? Täältä pääset: {benchmark_page}\n\nHae avain yhdellä klikkauksella, ilman tiliä ja ilman nimeä, ja liitä se alle. Poista se lopettaaksesi kaiken.",
         "data": {
           "benchmark_enabled": "Osallistu julkiseen tarkkuusvertailuun (valinnainen)",
           "benchmark_key": "Vertailun avain",

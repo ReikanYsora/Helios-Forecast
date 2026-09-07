@@ -98,7 +98,7 @@
       },
       "benchmark": {
         "title": "Helios Forecast: kogukonna võrdlustest",
-        "description": "Avatud mõõtmine sellest, kui täpne Helios Forecast tegelikult on, päris paigaldistel, jooksvalt avaldatud. Kas soovid osaleda? Siit läheb: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHangi võti ühe klikiga, ilma kontota ja ilma nimeta, ning kleebi see allapoole. Kõige peatamiseks kustuta see.",
+        "description": "Avatud mõõtmine sellest, kui täpne Helios Forecast tegelikult on, päris paigaldistel, jooksvalt avaldatud. Kas soovid osaleda? Siit läheb: {benchmark_page}\n\nHangi võti ühe klikiga, ilma kontota ja ilma nimeta, ning kleebi see allapoole. Kõige peatamiseks kustuta see.",
         "data": {
           "benchmark_enabled": "Osale avalikus täpsuse võrdlustestis (valikuline)",
           "benchmark_key": "Võrdlustesti võti",

@@ -98,7 +98,7 @@
       },
       "benchmark": {
         "title": "Helios Forecast: community benchmark",
-        "description": "An open measurement of how accurate Helios Forecast really is, on real installations, published as it goes. Would you like to take part? It happens here: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nGet a key in one click, with no account and no name, then paste it below. To stop everything, clear it.",
+        "description": "An open measurement of how accurate Helios Forecast really is, on real installations, published as it goes. Would you like to take part? It happens here: {benchmark_page}\n\nGet a key in one click, with no account and no name, then paste it below. To stop everything, clear it.",
         "data": {
           "benchmark_enabled": "Contribute to the public accuracy benchmark (optional)",
           "benchmark_key": "Benchmark key",

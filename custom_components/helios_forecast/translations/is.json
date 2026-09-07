@@ -98,7 +98,7 @@
       },
       "benchmark": {
         "title": "Helios Forecast: samanburður samfélagsins",
-        "description": "Opin mæling á því hversu nákvæmt Helios Forecast er í raun, á raunverulegum kerfum, birt jafnóðum. Viltu taka þátt? Hér er leiðin: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNáðu í lykil með einum smelli, án reiknings og án nafns, og límdu hann hér að neðan. Til að stöðva allt, eyddu honum.",
+        "description": "Opin mæling á því hversu nákvæmt Helios Forecast er í raun, á raunverulegum kerfum, birt jafnóðum. Viltu taka þátt? Hér er leiðin: {benchmark_page}\n\nNáðu í lykil með einum smelli, án reiknings og án nafns, og límdu hann hér að neðan. Til að stöðva allt, eyddu honum.",
         "data": {
           "benchmark_enabled": "Taka þátt í opinberum nákvæmnisamanburði (valfrjálst)",
           "benchmark_key": "Samanburðarlykill",

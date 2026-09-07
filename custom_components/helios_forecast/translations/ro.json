@@ -98,7 +98,7 @@
       },
       "benchmark": {
         "title": "Helios Forecast: testul comunității",
-        "description": "O măsurătoare deschisă a preciziei reale a Helios Forecast, pe instalații adevărate, publicată pe măsură. Doriți să participați? Pe aici: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nObțineți o cheie dintr-un clic, fără cont și fără nume, apoi lipiți-o mai jos. Pentru a opri totul, ștergeți-o.",
+        "description": "O măsurătoare deschisă a preciziei reale a Helios Forecast, pe instalații adevărate, publicată pe măsură. Doriți să participați? Pe aici: {benchmark_page}\n\nObțineți o cheie dintr-un clic, fără cont și fără nume, apoi lipiți-o mai jos. Pentru a opri totul, ștergeți-o.",
         "data": {
           "benchmark_enabled": "Contribuie la testul public de precizie (opțional)",
           "benchmark_key": "Cheia testului",

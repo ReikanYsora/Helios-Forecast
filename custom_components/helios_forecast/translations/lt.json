@@ -98,7 +98,7 @@
       },
       "benchmark": {
         "title": "Helios Forecast: bendruomenės palyginimas",
-        "description": "Atviras matavimas, kiek Helios Forecast iš tikrųjų tikslus, tikrose sistemose, skelbiamas nuolat. Norite dalyvauti? Štai čia: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nGaukite raktą vienu paspaudimu, be paskyros ir be vardo, ir įklijuokite jį žemiau. Norėdami viską sustabdyti, jį ištrinkite.",
+        "description": "Atviras matavimas, kiek Helios Forecast iš tikrųjų tikslus, tikrose sistemose, skelbiamas nuolat. Norite dalyvauti? Štai čia: {benchmark_page}\n\nGaukite raktą vienu paspaudimu, be paskyros ir be vardo, ir įklijuokite jį žemiau. Norėdami viską sustabdyti, jį ištrinkite.",
         "data": {
           "benchmark_enabled": "Prisidėti prie viešojo tikslumo palyginimo (neprivaloma)",
           "benchmark_key": "Palyginimo raktas",

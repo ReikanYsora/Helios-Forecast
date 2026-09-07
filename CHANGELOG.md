@@ -63,6 +63,13 @@ and so on) rather than under a `sensor.` entity. History graphs of the weather
 sensors themselves now show the recorded states only, which is what those sensors
 are for.
 
+### Fixed: the benchmark step's link no longer fails Home Assistant's own checks
+
+Home Assistant tightened its translation rules and no longer allows a URL inside a
+strings file. The benchmark page's address now travels as a placeholder, which is
+better anyway: it is written once instead of in 28 translations, and the day the
+page moves there is one line to change.
+
 ### Removed: the `predicted_power` and `predicted_energy` entities
 
 Both existed for one reason: to give the predicted-production archive an entity to

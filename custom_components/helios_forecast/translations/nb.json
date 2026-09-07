@@ -98,7 +98,7 @@
       },
       "benchmark": {
         "title": "Helios Forecast: fellesskapets test",
-        "description": "En åpen måling av hvor nøyaktig Helios Forecast faktisk er, på virkelige anlegg, publisert underveis. Vil du være med? Det skjer her: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHent en nøkkel med ett klikk, uten konto og uten navn, og lim den inn nedenfor. Slett den for å stoppe alt.",
+        "description": "En åpen måling av hvor nøyaktig Helios Forecast faktisk er, på virkelige anlegg, publisert underveis. Vil du være med? Det skjer her: {benchmark_page}\n\nHent en nøkkel med ett klikk, uten konto og uten navn, og lim den inn nedenfor. Slett den for å stoppe alt.",
         "data": {
           "benchmark_enabled": "Bidra til den offentlige nøyaktighetstesten (valgfritt)",
           "benchmark_key": "Testnøkkel",

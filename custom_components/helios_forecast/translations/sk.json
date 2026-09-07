@@ -98,7 +98,7 @@
       },
       "benchmark": {
         "title": "Helios Forecast: komunitné porovnanie",
-        "description": "Otvorené meranie skutočnej presnosti Helios Forecast na reálnych inštaláciách, priebežne zverejňované. Chcete sa zapojiť? Tadiaľto: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nZískajte kľúč jedným kliknutím, bez účtu a bez mena, a vložte ho nižšie. Ak chcete všetko zastaviť, zmažte ho.",
+        "description": "Otvorené meranie skutočnej presnosti Helios Forecast na reálnych inštaláciách, priebežne zverejňované. Chcete sa zapojiť? Tadiaľto: {benchmark_page}\n\nZískajte kľúč jedným kliknutím, bez účtu a bez mena, a vložte ho nižšie. Ak chcete všetko zastaviť, zmažte ho.",
         "data": {
           "benchmark_enabled": "Prispieť do verejného porovnávacieho testu presnosti (voliteľné)",
           "benchmark_key": "Kľúč porovnávacieho testu",

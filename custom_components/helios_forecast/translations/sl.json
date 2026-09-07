@@ -98,7 +98,7 @@
       },
       "benchmark": {
         "title": "Helios Forecast: primerjava skupnosti",
-        "description": "Odprto merjenje dejanske natančnosti Helios Forecasta na resničnih napravah, objavljeno sproti. Želite sodelovati? Tukaj: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nPridobite ključ z enim klikom, brez računa in brez imena, in ga prilepite spodaj. Za ustavitev vsega ga izbrišite.",
+        "description": "Odprto merjenje dejanske natančnosti Helios Forecasta na resničnih napravah, objavljeno sproti. Želite sodelovati? Tukaj: {benchmark_page}\n\nPridobite ključ z enim klikom, brez računa in brez imena, in ga prilepite spodaj. Za ustavitev vsega ga izbrišite.",
         "data": {
           "benchmark_enabled": "Prispevaj k javni primerjavi natančnosti (izbirno)",
           "benchmark_key": "Ključ primerjave",

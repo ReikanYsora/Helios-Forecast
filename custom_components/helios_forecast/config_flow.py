@@ -59,6 +59,9 @@ _DEFAULT_NAME = "Helios Forecast"
 _NAME = "name"
 # Control keys, read for flow branching and never stored (split_line / split_settings
 # only keep the geometry / settings keys).
+# Where someone gets a benchmark key. Shown on the benchmark step, kept here rather than in the
+# translations so it is written once and stays correct in all 28 of them.
+_BENCHMARK_PAGE = "helios-ha.org/benchmark"
 _ADD_ANOTHER = "add_another"
 _REMOVE = "remove_this_line"
 
@@ -300,7 +303,14 @@ class HeliosForecastOptionsFlow(OptionsFlow):
             if settings.get(CONF_BENCHMARK_URL) == DEFAULT_ENDPOINT:
                 settings.pop(CONF_BENCHMARK_URL, None)
             return self.async_create_entry(title="", data=merge_entry_data(settings, lines_from_config(current)))
-        return self.async_show_form(step_id="benchmark", data_schema=vol.Schema(_benchmark_fields(current)))
+        # The page's address travels as a placeholder rather than sitting in the translations: a URL
+        # written into a strings file has to be corrected in 28 of them the day it moves, and Home
+        # Assistant rejects one there anyway.
+        return self.async_show_form(
+            step_id="benchmark",
+            data_schema=vol.Schema(_benchmark_fields(current)),
+            description_placeholders={"benchmark_page": f"[{_BENCHMARK_PAGE}](https://{_BENCHMARK_PAGE})"},
+        )
 
     async def async_step_lines(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Walk the existing lines (edit / remove each), then optionally append new ones."""

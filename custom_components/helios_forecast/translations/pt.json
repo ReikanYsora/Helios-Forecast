@@ -98,7 +98,7 @@
       },
       "benchmark": {
         "title": "Helios Forecast: teste comunitário",
-        "description": "Uma medição aberta da precisão real do Helios Forecast, em instalações reais, publicada à medida. Quer participar? É por aqui: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nObtenha uma chave num clique, sem conta e sem nome, e cole-a abaixo. Para parar tudo, apague-a.",
+        "description": "Uma medição aberta da precisão real do Helios Forecast, em instalações reais, publicada à medida. Quer participar? É por aqui: {benchmark_page}\n\nObtenha uma chave num clique, sem conta e sem nome, e cole-a abaixo. Para parar tudo, apague-a.",
         "data": {
           "benchmark_enabled": "Contribuir para o teste público de precisão (opcional)",
           "benchmark_key": "Chave do teste",
