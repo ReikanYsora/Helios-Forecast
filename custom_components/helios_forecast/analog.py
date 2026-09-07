@@ -28,7 +28,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, TypeGuard
 
 from .forecast import ForecastPoint
 from .openmeteo import WeatherSeries
@@ -104,7 +104,7 @@ class AnalogBand:
     ceiling: Optional[float] = None  # learned production cap (W), or None when analog support is thin
 
 
-def _finite(v: object) -> bool:
+def _finite(v: object) -> TypeGuard[float]:
     return isinstance(v, (int, float)) and math.isfinite(v)
 
 
@@ -203,7 +203,12 @@ def build_library(
     w_epochs = series_epochs(weather.times) if weather.times else None
     floor_w = max(_RATIO_MODEL_FLOOR_W, _RATIO_MODEL_FLOOR_FRAC * layout.total_kwp * 1000.0) if layout else None
     for b in production:
-        if not _finite(getattr(b, "kwh", None)):
+        kwh = getattr(b, "kwh", None)
+        # Negative as well as non-finite: a meter that is reset, replaced or restored from an older
+        # backup writes one enormous negative hour into the recorder, and clamping it to zero would
+        # file a bright hour in the library as one where the sky gave nothing. The residual map
+        # already refuses those (solar/residual.py); the library refuses them on the same grounds.
+        if not _finite(kwh) or kwh < 0:
             continue
         # A curtailed hour is what the inverter allowed, not what the sky gave: it has no place in a
         # library of actual production under similar conditions.
@@ -220,7 +225,7 @@ def build_library(
         if cloud is None:
             continue
         temp = _sample_series(weather.times, weather.temp, mid_ms, w_epochs)
-        watt = max(0.0, b.kwh * 1000.0)
+        watt = kwh * 1000.0
         ratio = None
         if layout is not None:
             model = _model_watts(b, weather, w_epochs, lat, lon, layout, inverter_max_w)
