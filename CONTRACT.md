@@ -429,3 +429,10 @@ orientation.
   the forecast moves out.
 - **Card requirement:** none. The forecast is optional; with none configured the
   card shows no forecast curve and no forecast label, and is otherwise unchanged.
+- **Archived statistics are the integration's, never an entity's** (section 2b).
+  No entity this integration creates may carry a `state_class` on a key the
+  archive also writes: that hands the same series to two writers, and Home
+  Assistant answers a collision by rolling back its whole hourly compile, which
+  costs every other integration on the machine that hour of history. Anything
+  worth keeping beyond what an entity's own state gives goes to
+  `helios_forecast:<entry_id>_<series>`.

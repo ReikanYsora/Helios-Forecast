@@ -123,9 +123,8 @@ def _timestamp(
 
 def _build_descriptions() -> list[HeliosSensorDescription]:
     # Keep the recorder lean by default: only the everyday headline values are enabled, the rest
-    # are registered but disabled so the user opts into the ones they actually automate on. The two
-    # `predicted_*` archive entities stay enabled because their long-term statistics are the card's
-    # past predicted-production curve. Enabling a disabled entity later never loses history.
+    # are registered but disabled so the user opts into the ones they actually automate on.
+    # Enabling a disabled entity later never loses history.
     descriptions: list[HeliosSensorDescription] = [
         _power("power_now", "Power now", lambda s: s.power_now_w, attrs_fn=_forecast_attrs),
         # Analog uncertainty band on the current power: P10 (low) and P90 (high). None until the

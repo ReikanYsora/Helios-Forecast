@@ -48,13 +48,14 @@ archived hour is copied onto the new id, read back and counted, and the old seri
 is deleted only once the new one is verified to hold at least as many hours. If
 anything does not line up, nothing is deleted, it is written to the log, and the
 next start tries again. It waits for Home Assistant to have finished starting and
-runs in the background, so it never holds the start up: on a 20 864-hour archive,
-a Raspberry Pi 5 took about a minute, with everything else already running. The move runs on every start rather than once, so an
-installation that skips a version, or is restored from a backup taken before the
-update, is repaired all the same; once there is nothing left to move it costs a
-single metadata read. The one thing not carried over is the 5-minute short-term
-statistics, kept 10 days at most: integration-owned series are hourly by design in
-Home Assistant. The full long-term history is carried over whole.
+runs in the background, so it never holds the start up: on a 20 864-hour archive
+a Raspberry Pi 5 took about a minute, with everything else already running. And it
+runs on every start rather than once, so an installation that skips a version, or
+is restored from a backup taken before the update, is repaired all the same; once
+there is nothing left to move it costs a single metadata read. The one thing not
+carried over is the 5-minute short-term statistics, kept 10 days at most:
+integration-owned series are hourly by design in Home Assistant. The full
+long-term history is carried over whole.
 
 Where to find them afterwards: in a statistics or energy-date card, the archive
 appears under its readable name (Cloud cover, Global irradiance, Predicted power,
