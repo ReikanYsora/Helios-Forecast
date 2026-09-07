@@ -35,6 +35,11 @@ from homeassistant.components.recorder.statistics import (
     get_metadata,
     statistics_during_period,
 )
+
+try:
+    from homeassistant.components.recorder.statistics import UNIT_CLASS_TO_UNIT_CONVERTER
+except ImportError:  # pragma: no cover - older HA cores name the map differently
+    UNIT_CLASS_TO_UNIT_CONVERTER = {}
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
@@ -155,7 +160,7 @@ async def async_migrate(hass: HomeAssistant, entry: ConfigEntry) -> None:
             if entity_id is None or found is None or found[1].get("source") != RECORDER_SOURCE:
                 continue
             try:
-                moved = await _move(hass, entity_id, external_statistic_id(entry.entry_id, key), unit, name)
+                moved = await _move(hass, entity_id, external_statistic_id(entry.entry_id, key), unit, name, found[1])
             except Exception:  # noqa: BLE001 - a repair must never take the integration down with it
                 _LOGGER.exception("Could not move the statistics of %s, they are left untouched", entity_id)
                 moved = None
@@ -181,16 +186,35 @@ async def async_migrate(hass: HomeAssistant, entry: ConfigEntry) -> None:
         )
 
 
-async def _move(hass: HomeAssistant, legacy_id: str, statistic_id: str, unit: str, name: str) -> Optional[int]:
+async def _move(
+    hass: HomeAssistant,
+    legacy_id: str,
+    statistic_id: str,
+    unit: str,
+    name: str,
+    legacy: StatisticMetaData,
+) -> Optional[int]:
     """Copy every archived hour of `legacy_id` onto `statistic_id`, then drop the old series.
 
     Returns how many hours were moved, or None when the old series had to be kept. The old series is
-    deleted only after the new one has been read back and found to hold at least as many hours, so an
+    deleted only once every hour that was read from it has been read back at the destination, so an
     interrupted move leaves the history in place twice rather than not at all. Re-running is safe: the
     recorder updates an hour it already has instead of adding a second one.
     """
     instance = get_instance(hass)
-    rows = await _read(hass, legacy_id)
+    units = _conversion(legacy, unit)
+    if units is None:
+        _LOGGER.error(
+            "Kept the statistics of %s: they are stored in %s, which cannot be converted to the %s "
+            "this integration archives, so moving them would relabel the values rather than convert "
+            "them. Nothing was deleted",
+            legacy_id,
+            legacy.get("unit_of_measurement"),
+            unit,
+        )
+        return None
+
+    rows = await _read(hass, legacy_id, units)
     if not rows:
         instance.async_clear_statistics([legacy_id])
         return 0
@@ -199,15 +223,19 @@ async def _move(hass: HomeAssistant, legacy_id: str, statistic_id: str, unit: st
     for offset in range(0, len(rows), _BATCH):
         async_add_external_statistics(hass, meta, [_row(r) for r in rows[offset : offset + _BATCH]])
 
-    written = await _wait_for(hass, statistic_id, len(rows))
-    if written < len(rows):
+    # The hours themselves, not how many there are. The destination is normally already populated by
+    # the coordinator's own backfill before this runs, so a count would be satisfied by rows this move
+    # never wrote, and the series it then deleted would be the only copy of its oldest hours.
+    wanted = {row["start"] for row in rows}
+    missing = await _wait_for(hass, statistic_id, wanted)
+    if missing:
         _LOGGER.error(
-            "Kept the statistics of %s: %d hours were read from it but %s holds %d after %.0f s, so "
-            "nothing was deleted. The move will be retried on the next start",
+            "Kept the statistics of %s: %d of its %d hours are still not readable under %s after "
+            "%.0f s, so nothing was deleted. The move will be retried on the next start",
             legacy_id,
+            len(missing),
             len(rows),
             statistic_id,
-            written,
             _COMMIT_TIMEOUT,
         )
         return None
@@ -217,8 +245,30 @@ async def _move(hass: HomeAssistant, legacy_id: str, statistic_id: str, unit: st
     return len(rows)
 
 
-async def _wait_for(hass: HomeAssistant, statistic_id: str, expected: int) -> int:
-    """Wait until `statistic_id` holds `expected` hours and return how many it holds.
+def _conversion(legacy: StatisticMetaData, unit: str) -> Optional[Dict[str, str]]:
+    """How to read a legacy series so its values arrive in `unit`, or None when they cannot.
+
+    The recorder stores an entity-bound statistic in the unit the entity displayed, so an
+    installation on the US customary system holds its temperature in Fahrenheit, its wind in miles per
+    hour and its snow depth in feet, and a user may also have changed a series' unit by hand. Copying
+    those values under this integration's own unit would relabel 68 degrees Fahrenheit as 68 degrees
+    Celsius and then delete the only copy, so a series whose unit cannot be converted is left where it
+    is instead. An empty mapping means the units already agree and nothing has to be converted.
+    """
+    stored = legacy.get("unit_of_measurement")
+    if stored == unit:
+        return {}
+    unit_class = legacy.get("unit_class") or UNIT_CLASSES.get(unit)
+    if not unit_class:
+        return None
+    converter = UNIT_CLASS_TO_UNIT_CONVERTER.get(unit_class) if UNIT_CLASS_TO_UNIT_CONVERTER else None
+    if converter is None or stored not in converter.VALID_UNITS or unit not in converter.VALID_UNITS:
+        return None
+    return {unit_class: unit}
+
+
+async def _wait_for(hass: HomeAssistant, statistic_id: str, wanted: set) -> set:
+    """Wait until `statistic_id` holds every hour in `wanted`, and return those still missing.
 
     The copy is committed by the recorder on its own thread, and asking that thread when it is done
     has a hole in it: it answers "queue empty" from the moment it takes the import off the queue,
@@ -227,16 +277,27 @@ async def _wait_for(hass: HomeAssistant, statistic_id: str, expected: int) -> in
     """
     deadline = time.monotonic() + _COMMIT_TIMEOUT
     while True:
-        held = len(await _read(hass, statistic_id))
-        if held >= expected or time.monotonic() >= deadline:
-            return held
+        missing = wanted - {row["start"] for row in await _read(hass, statistic_id)}
+        if not missing or time.monotonic() >= deadline:
+            return missing
         await asyncio.sleep(_POLL)
 
 
-async def _read(hass: HomeAssistant, statistic_id: str) -> List[Dict[str, Any]]:
-    """Every hour ever archived under `statistic_id`, oldest first, in its stored unit."""
+async def _read(hass: HomeAssistant, statistic_id: str, units: Optional[Dict[str, str]] = None) -> List[Dict[str, Any]]:
+    """Every hour ever archived under `statistic_id`, oldest first.
+
+    `units` asks the recorder to convert as it reads, which is how a legacy series stored in another
+    unit reaches the archive as a value and not as a relabelling. Empty or None reads it as stored.
+    """
     result = await get_instance(hass).async_add_executor_job(
-        statistics_during_period, hass, dt_util.utc_from_timestamp(0), None, {statistic_id}, "hour", None, _TYPES
+        statistics_during_period,
+        hass,
+        dt_util.utc_from_timestamp(0),
+        None,
+        {statistic_id},
+        "hour",
+        units or None,
+        _TYPES,
     )
     return result.get(statistic_id, [])
 

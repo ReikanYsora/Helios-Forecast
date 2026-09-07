@@ -63,6 +63,28 @@ and so on) rather than under a `sensor.` entity. History graphs of the weather
 sensors themselves now show the recorded states only, which is what those sensors
 are for.
 
+### Fixed: the migration converts what it moves, and checks the hours rather than counting them
+
+Two defects in the move of the archived history, both found by an audit of the
+release candidate, both reproduced against the real recorder before being fixed.
+
+**A history stored in another unit was relabelled rather than converted.** Home
+Assistant stores an entity-bound statistic in the unit the entity displayed, so an
+installation on the US customary system holds its temperature in Fahrenheit, its
+wind in miles per hour and its snow depth in feet. The move stamped this
+integration's own unit on the copy without looking: a year of 20 degrees became a
+year of 68 degrees, and the only copy was then deleted. The move now asks the
+recorder to convert as it reads, and a series whose unit cannot be converted is
+left exactly where it is, with an error in the log, rather than relabelled.
+
+**The check before the delete counted rows on a series that already had some.** By
+the time the move runs, the coordinator's own backfill has already written the
+recent window to the destination. Counting rows there could be satisfied entirely
+by hours the move never wrote, and an installation whose history is old but sparse
+would have had its only copy deleted with none of it arriving. The check is now on
+the hours themselves: every hour read from the old series has to be readable at the
+new one before anything is deleted.
+
 ### Fixed: an hour the weather service publishes late no longer goes missing from the archive
 
 Found by @Manama2011 on their own instance, running the 2026.9.5 alpha on MariaDB, and

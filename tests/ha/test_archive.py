@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 from homeassistant.components.recorder.statistics import (
+    async_add_external_statistics,
     async_import_statistics,
     get_metadata,
     statistics_during_period,
@@ -50,6 +51,17 @@ def _rows(start: datetime, count: int = _HOURS) -> list[dict]:
     return [
         {"start": start + timedelta(hours=i), "mean": float(i), "min": float(i), "max": float(i)} for i in range(count)
     ]
+
+
+async def _write_owned(hass, statistic_id: str, unit: str, start: datetime, count: int) -> None:
+    """Rows already at the destination when the move runs: the coordinator's own backfill writes the
+    trailing window to these ids from _initial_statistics_archive, before the started event fires."""
+    async_add_external_statistics(
+        hass,
+        archive.metadata(statistic_id, unit, "Cloud cover"),
+        [{"start": start + timedelta(hours=i), "mean": 50.0, "min": 50.0, "max": 50.0} for i in range(count)],
+    )
+    await async_wait_recording_done(hass)
 
 
 async def _read(hass, statistic_id: str) -> list[dict]:
@@ -179,7 +191,7 @@ async def test_a_failed_move_keeps_the_old_series_and_the_entity(hass, monkeypat
     entity_id = _register(hass, entry, "predicted_energy", "helios_predicted_energy")
     await _write_legacy(hass, entity_id, "kWh", datetime(2026, 8, 1, tzinfo=_UTC))
 
-    async def _nothing(hass_, statistic_id):
+    async def _nothing(hass_, statistic_id, units=None):
         return [] if ":" in statistic_id else await _read(hass_, statistic_id)
 
     monkeypatch.setattr(archive, "_read", _nothing)
@@ -201,12 +213,12 @@ async def test_the_move_waits_for_the_copy_instead_of_trusting_the_queue(hass, m
     real_read = archive._read
     late = {"calls": 0}
 
-    async def _slow_to_appear(hass_, statistic_id):
+    async def _slow_to_appear(hass_, statistic_id, units=None):
         if ":" in statistic_id:
             late["calls"] += 1
             if late["calls"] < 3:  # the copy is not visible yet on the first two looks
                 return []
-        return await real_read(hass_, statistic_id)
+        return await real_read(hass_, statistic_id, units)
 
     monkeypatch.setattr(archive, "_read", _slow_to_appear)
     monkeypatch.setattr(archive, "_POLL", 0.01)
@@ -223,3 +235,74 @@ async def test_every_archived_series_has_a_valid_statistic_id(hass) -> None:
 
     for key, _unit, _name in ARCHIVED_SERIES:
         assert valid_statistic_id(external_statistic_id(_ENTRY_ID, key))
+
+
+# --- the two states the first version of these tests could not see ---------------------------
+
+
+async def test_a_legacy_series_in_fahrenheit_arrives_in_celsius(hass) -> None:
+    # The recorder stores an entity-bound statistic in the unit the entity displayed, so an
+    # installation on the US customary system holds this series in Fahrenheit. Copying the numbers
+    # under this integration's own unit would turn 20 degrees into 68 and then delete the only copy.
+    entry = _entry(hass)
+    entity_id = _register(hass, entry, "temperature", "helios_temperature")
+    await _write_legacy(hass, entity_id, "°F", datetime(2026, 8, 1, tzinfo=_UTC), 24)
+
+    await archive.async_migrate(hass, entry)
+    await async_wait_recording_done(hass)
+
+    statistic_id = external_statistic_id(entry.entry_id, "temperature")
+    known = await hass.async_add_executor_job(get_metadata, hass)
+    assert known[statistic_id][1]["unit_of_measurement"] == "°C"
+    moved = await _read(hass, statistic_id)
+    assert len(moved) == 24
+    # _rows writes i as the value, so hour 0 is 0 F, which is -17.8 C.
+    assert moved[0]["mean"] == pytest.approx(-17.7778, abs=0.01)
+    assert await _read(hass, entity_id) == []
+
+
+async def test_a_series_in_a_unit_that_cannot_be_converted_is_left_alone(hass) -> None:
+    entry = _entry(hass)
+    entity_id = _register(hass, entry, "cloud_cover", "helios_cloud_cover")
+    await _write_legacy(hass, entity_id, "kWh", datetime(2026, 8, 1, tzinfo=_UTC))
+
+    await archive.async_migrate(hass, entry)
+    await async_wait_recording_done(hass)
+
+    # Nothing was relabelled, and nothing was deleted: the history stays where it is, readable.
+    assert len(await _read(hass, entity_id)) == _HOURS
+    assert await _read(hass, external_statistic_id(entry.entry_id, "cloud_cover")) == []
+
+
+async def test_the_old_series_survives_when_the_copy_does_not_land(hass, monkeypatch) -> None:
+    # The destination is already populated by the coordinator's own backfill, and holds MORE rows
+    # than the legacy series does. A guard counting rows would be satisfied by hours this move never
+    # wrote, and would then delete the only copy of the oldest ones.
+    entry = _entry(hass)
+    entity_id = _register(hass, entry, "cloud_cover", "helios_cloud_cover")
+    statistic_id = external_statistic_id(entry.entry_id, "cloud_cover")
+    await _write_legacy(hass, entity_id, "%", datetime(2025, 6, 1, tzinfo=_UTC), 10)
+    await _write_owned(hass, statistic_id, "%", datetime(2026, 8, 1, tzinfo=_UTC), 100)
+
+    monkeypatch.setattr(archive, "async_add_external_statistics", lambda *a, **k: None)
+    monkeypatch.setattr(archive, "_COMMIT_TIMEOUT", 0.0)
+    await archive.async_migrate(hass, entry)
+    await async_wait_recording_done(hass)
+
+    assert len(await _read(hass, entity_id)) == 10, "the only copy of the 2025 hours was deleted"
+
+
+async def test_a_populated_destination_does_not_stop_a_real_move(hass) -> None:
+    # The same shape, with the copy allowed through: the old series goes, and both sets of hours are
+    # readable at the destination.
+    entry = _entry(hass)
+    entity_id = _register(hass, entry, "cloud_cover", "helios_cloud_cover")
+    statistic_id = external_statistic_id(entry.entry_id, "cloud_cover")
+    await _write_legacy(hass, entity_id, "%", datetime(2025, 6, 1, tzinfo=_UTC), 10)
+    await _write_owned(hass, statistic_id, "%", datetime(2026, 8, 1, tzinfo=_UTC), 100)
+
+    await archive.async_migrate(hass, entry)
+    await async_wait_recording_done(hass)
+
+    assert await _read(hass, entity_id) == []
+    assert len(await _read(hass, statistic_id)) == 110
