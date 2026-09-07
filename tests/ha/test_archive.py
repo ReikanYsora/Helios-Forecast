@@ -306,3 +306,24 @@ async def test_a_populated_destination_does_not_stop_a_real_move(hass) -> None:
 
     assert await _read(hass, entity_id) == []
     assert len(await _read(hass, statistic_id)) == 110
+
+
+async def test_the_unit_asked_for_is_the_one_stored_not_the_one_on_display(hass) -> None:
+    # The recorder converts a statistic to the unit the LIVE entity displays unless it is asked for
+    # one by name. An installation that switched Home Assistant to another unit system after these
+    # statistics were written holds them in one unit and shows another: read without asking, the
+    # values would arrive converted and then be labelled with the archive's own unit.
+    entry = _entry(hass)
+    entity_id = _register(hass, entry, "temperature", "helios_temperature")
+    await _write_legacy(hass, entity_id, "°C", datetime(2026, 8, 1, tzinfo=_UTC), 24)
+    hass.states.async_set(entity_id, "20", {"unit_of_measurement": "°F", "device_class": "temperature"})
+
+    await archive.async_migrate(hass, entry)
+    await async_wait_recording_done(hass)
+
+    statistic_id = external_statistic_id(entry.entry_id, "temperature")
+    known = await hass.async_add_executor_job(get_metadata, hass)
+    assert known[statistic_id][1]["unit_of_measurement"] == "°C"
+    moved = await _read(hass, statistic_id)
+    # _rows writes i as the value, so hour 0 is 0 and hour 10 is 10, in the stored Celsius.
+    assert [row["mean"] for row in moved[:3]] == [0.0, 1.0, 2.0]

@@ -253,17 +253,24 @@ def _conversion(legacy: StatisticMetaData, unit: str) -> Optional[Dict[str, str]
     hour and its snow depth in feet, and a user may also have changed a series' unit by hand. Copying
     those values under this integration's own unit would relabel 68 degrees Fahrenheit as 68 degrees
     Celsius and then delete the only copy, so a series whose unit cannot be converted is left where it
-    is instead. An empty mapping means the units already agree and nothing has to be converted.
+    is instead. An empty mapping means no conversion is possible at all, which for these quantities
+    also means none can happen.
     """
     stored = legacy.get("unit_of_measurement")
-    if stored == unit:
-        return {}
-    unit_class = legacy.get("unit_class") or UNIT_CLASSES.get(unit)
-    if not unit_class:
+    raw_class = legacy.get("unit_class") or UNIT_CLASSES.get(unit)
+    unit_class = str(raw_class) if raw_class else None
+    converter = UNIT_CLASS_TO_UNIT_CONVERTER.get(unit_class) if unit_class and UNIT_CLASS_TO_UNIT_CONVERTER else None
+    if converter is None or unit not in converter.VALID_UNITS:
+        # Nothing can convert this quantity, so the recorder hands the values back exactly as stored
+        # and they are only usable if the unit already matches.
+        return {} if stored == unit else None
+    if stored is not None and stored not in converter.VALID_UNITS:
         return None
-    converter = UNIT_CLASS_TO_UNIT_CONVERTER.get(unit_class) if UNIT_CLASS_TO_UNIT_CONVERTER else None
-    if converter is None or stored not in converter.VALID_UNITS or unit not in converter.VALID_UNITS:
-        return None
+    # Always asked for by name, even when the stored unit already matches. Left unasked, the recorder
+    # converts to whatever the live entity is displaying at that moment (statistics.py, where
+    # display_unit falls back to state_unit), which is not necessarily the unit the series is stored
+    # in: an installation that switched Home Assistant to another unit system after these statistics
+    # were written would have had its values converted on read and then labelled with ours.
     return {unit_class: unit}
 
 
