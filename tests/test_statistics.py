@@ -7,6 +7,7 @@ statistic rows derived from an Open-Meteo weather window. Runnable with
 
 from __future__ import annotations
 
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -16,9 +17,11 @@ sys.path.insert(0, str(_REPO_ROOT))
 
 from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: E402
 from custom_components.helios_forecast.statistics import (  # noqa: E402
+    ARCHIVED_SERIES,
     FORECAST_ENERGY_KEY,
     FORECAST_POWER_KEY,
     WEATHER_FIELDS,
+    external_statistic_id,
     forecast_statistics,
     hourly_statistics,
     observed_snapshot,
@@ -149,6 +152,39 @@ def test_weather_forecast_series_drops_non_finite() -> None:
 def test_weather_forecast_series_rounds_to_two_decimals() -> None:
     out = weather_forecast_series(_series([_h(11)], [20.5678]), _h(11), timezone.utc)
     assert out["cloud_cover"][0]["cloud_cover"] == 20.57
+
+
+# --- the archive's identity ----------------------------------------------------------------
+
+
+def test_archived_series_covers_every_weather_field_with_its_own_unit() -> None:
+    units = {key: unit for key, unit, _name in ARCHIVED_SERIES}
+    # A unit that drifts between the sensor and the archive would make HA convert or reject the
+    # history, so the two are asserted equal rather than merely both present.
+    assert {field.key: field.unit for field in WEATHER_FIELDS} == {
+        field.key: units[field.key] for field in WEATHER_FIELDS
+    }
+    assert set(units) == {field.key for field in WEATHER_FIELDS} | {FORECAST_POWER_KEY, FORECAST_ENERGY_KEY}
+
+
+def test_archived_series_all_carry_a_readable_name() -> None:
+    # These series have no entity to borrow a name from: the interface shows the metadata's.
+    assert all(name and name[0].isupper() for _key, _unit, name in ARCHIVED_SERIES)
+
+
+def test_external_statistic_id_shape() -> None:
+    stat_id = external_statistic_id("01KZ0S5BNAQR1H29CYZXVDC9EE", "cloud_cover")
+    domain, _, object_id = stat_id.partition(":")
+    # Same rules as an entity id, with a colon instead of the dot: lowercase, no dot on either side.
+    assert domain == "helios_forecast"
+    assert object_id == "01kz0s5bnaqr1h29cyzxvdc9ee_cloud_cover"
+    assert stat_id.count(":") == 1 and "." not in stat_id
+    assert re.fullmatch(r"[a-z0-9_]+:[a-z0-9_]+", stat_id)
+
+
+def test_external_statistic_id_is_unique_per_entry_and_series() -> None:
+    ids = [external_statistic_id(entry, key) for entry in ("aaa", "bbb") for key, _u, _n in ARCHIVED_SERIES]
+    assert len(set(ids)) == len(ids)
 
 
 if __name__ == "__main__":

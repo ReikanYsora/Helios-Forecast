@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from datetime import datetime, tzinfo
 from typing import Dict, List, Optional
 
+from .const import DOMAIN
 from .openmeteo import WeatherSeries
 
 
@@ -90,10 +91,44 @@ def weather_forecast_series(weather: WeatherSeries, start: datetime, tz: tzinfo)
     return out
 
 
-# Archive entity keys for the predicted production. Their long-term statistics, backfilled by the
-# coordinator from the model run over the past weather window, are the stored forecast history.
+# Keys for the predicted-production archive, backfilled by the coordinator from the model run over
+# the past weather window. They are series of their own, not entities: see external_statistic_id.
 FORECAST_POWER_KEY = "predicted_power"
 FORECAST_ENERGY_KEY = "predicted_energy"
+
+
+# Every series this integration archives, as (key, unit, name). Both writers and the migration read
+# this one list, so a series can never be archived under one name and migrated under another. The
+# names are what the interface shows for a statistic that has no entity behind it; they mirror the
+# weather sensors' own names on purpose.
+ARCHIVED_SERIES: tuple[tuple[str, str, str], ...] = (
+    ("cloud_cover", "%", "Cloud cover"),
+    ("ghi", "W/m²", "Global irradiance"),
+    ("direct", "W/m²", "Direct irradiance"),
+    ("diffuse", "W/m²", "Diffuse irradiance"),
+    ("temperature", "°C", "Temperature"),
+    ("wind_speed", "km/h", "Wind speed"),
+    ("snow_depth", "m", "Snow depth"),
+    (FORECAST_POWER_KEY, "W", "Predicted power"),
+    (FORECAST_ENERGY_KEY, "kWh", "Predicted energy"),
+)
+
+
+def external_statistic_id(entry_id: str, key: str) -> str:
+    """The integration-owned statistic id for one archived series.
+
+    These statistics are published under this integration's own id rather than under the entity id of
+    a sensor, and the difference is not cosmetic. A statistic named after an entity belongs to the
+    recorder, which compiles it from that entity's state on its own schedule; writing to it from here
+    puts two writers on one unique index. When they collide the recorder's whole hourly compile is
+    rolled back, and every other integration on the machine silently loses that hour of long-term
+    statistics. An integration-owned id has exactly one writer by construction, so the collision
+    cannot happen at all rather than happening rarely.
+
+    The entry id makes it unique across several installations in one Home Assistant; it is opaque, so
+    the metadata carries a readable name for the interface to show.
+    """
+    return f"{DOMAIN}:{entry_id.lower()}_{key}"
 
 
 def forecast_statistics(points: list) -> Dict[str, List[dict]]:

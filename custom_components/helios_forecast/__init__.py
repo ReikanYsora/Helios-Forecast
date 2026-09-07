@@ -34,7 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     from homeassistant.const import Platform
     from homeassistant.helpers import issue_registry as ir
 
-    from . import services, websocket
+    from . import archive, services, websocket
     from .config import CONF_BATTERY_SOC_ENTITY
     from .coordinator import HeliosForecastCoordinator
 
@@ -79,15 +79,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         entry.async_on_unload(async_track_state_change_event(hass, [soc_entity], _soc_recovered))
 
+    # Before anything writes a statistic: move any history still held under an entity id onto this
+    # integration's own series. Runs on every setup, not once behind a marker, so an installation
+    # that skips a version or is restored from an older backup is repaired all the same. It costs one
+    # metadata read when there is nothing left to move, which is the normal case after the first run.
+    await archive.async_migrate(hass, entry)
+
     await coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR])
 
-    # The sensor entities now exist, so the weather archive's first backfill can land. It walks a
-    # 60-day window and is not needed for the live forecast, so run it off the setup path as a
-    # background task: a fresh install finishes setting up promptly instead of waiting on the
-    # trailing statistics build.
+    # The archive's first backfill walks a 60-day window and is not needed for the live forecast, so
+    # it runs off the setup path as a background task: a fresh install finishes setting up promptly
+    # instead of waiting on the trailing statistics build.
     from homeassistant.util import dt as dt_util
 
     async def _initial_statistics_archive() -> None:
@@ -111,8 +116,8 @@ def _purge_orphan_forecast_stats(hass: HomeAssistant, entry: ConfigEntry) -> Non
 
     These sensors are point-in-time forecast values, not meters, and carry no state_class, which
     makes HA flag "entity no longer has a state class" on every statistics cycle if any statistics
-    exist for them. We clear those to keep that warning from firing. predicted_energy is excluded:
-    it is the archive entity whose statistics are kept on purpose (it carries a valid state_class).
+    exist for them. We clear those to keep that warning from firing. The predicted-production archive
+    is not concerned: it lives in this integration's own series, behind no entity at all (archive.py).
     Idempotent: the live sensors never regain a state_class, so this is a no-op once their stats
     are gone.
     """

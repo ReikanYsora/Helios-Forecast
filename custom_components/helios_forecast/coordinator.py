@@ -20,13 +20,12 @@ from typing import Any, Dict, List, Optional, Set
 from homeassistant.components.recorder import get_instance, history
 from homeassistant.components.recorder.models import StatisticMetaData
 from homeassistant.components.recorder.statistics import (
-    async_import_statistics,
+    async_add_external_statistics,
     statistics_during_period,
 )
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CoreState, HomeAssistant, callback
-from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -60,6 +59,7 @@ from .checkup import (
     check_production_history,
 )
 from . import repairs
+from .archive import metadata as archive_metadata
 from .analog import build_library, enrich_archive_points, enrich_points
 from .curtailment import flag_curtailed, on_intervals_from_states
 from .battery import BatterySocPoint, project_battery_soc
@@ -70,9 +70,11 @@ from .forecast import ForecastPoint, build_forecast_series
 from .openmeteo import WeatherSeries, fetch_weather
 from .reliability import Reliability, compute_reliability
 from .statistics import (
+    ARCHIVED_SERIES,
     FORECAST_ENERGY_KEY,
     FORECAST_POWER_KEY,
     WEATHER_FIELDS,
+    external_statistic_id,
     forecast_statistics,
     hourly_statistics,
     observed_snapshot,
@@ -86,44 +88,8 @@ from .solar.residual import (
 )
 from .summary import ForecastSummary, summarize
 
-# Compat: `mean_type` and `unit_class` are mandatory in newer StatisticMetaData and absent from older
-# cores, so they are imported defensively.
-try:
-    from homeassistant.components.recorder.models import StatisticMeanType
-
-    _MEAN_TYPE_ARITHMETIC = StatisticMeanType.ARITHMETIC
-except ImportError:  # pragma: no cover - older HA cores
-    _MEAN_TYPE_ARITHMETIC = None
-
-
-# `unit_class` names the unit-conversion class HA uses to migrate a statistic's history if its unit
-# later changes. We derive the unit -> class map from the core's own converters so the value always
-# matches the installed core. Units with no converter (e.g. W/m2 irradiance) map to None, the correct
-# "not convertible" answer. The key is always declared in the metadata; cores predating it ignore it.
-def _build_unit_classes() -> Dict[str, Optional[str]]:
-    mapping: Dict[str, Optional[str]] = {}
-    try:
-        from homeassistant.util import unit_conversion as _uc
-    except ImportError:  # pragma: no cover - older HA cores
-        return mapping
-    for name in (
-        "PowerConverter",
-        "EnergyConverter",
-        "TemperatureConverter",
-        "SpeedConverter",
-        "DistanceConverter",
-        "UnitlessRatioConverter",
-    ):
-        converter = getattr(_uc, name, None)
-        unit_class = getattr(converter, "UNIT_CLASS", None)
-        if converter is None or unit_class is None:
-            continue
-        for unit in getattr(converter, "VALID_UNITS", ()):  # e.g. "W" -> "power"
-            mapping.setdefault(unit, unit_class)
-    return mapping
-
-
-_UNIT_CLASSES: Dict[str, Optional[str]] = _build_unit_classes()
+# The interface has no entity to borrow a name from for these series, so the metadata carries one.
+_SERIES_NAMES: Dict[str, str] = {key: name for key, _unit, name in ARCHIVED_SERIES}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -598,13 +564,13 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
     @callback
     def write_weather_statistics(self, now: datetime, *, full: bool = False) -> None:
-        """Copy the past weather hours into HA long-term statistics.
+        """Copy the past weather hours into this integration's own long-term statistics.
 
         A refresh imports only the hours added since the last write; the full 60-day backfill (install
         and self-heal after downtime) runs once at startup with ``full=True``. Only completed hours are
-        written, the in-progress current hour is left to the recorder. Skips a field until its sensor
-        entity is registered (the statistic_id is the entity_id), so the first backfill lands once setup
-        has added the entities.
+        written, the in-progress current hour is left out. The series belong to this integration
+        rather than to the weather sensors (see archive.py), so nothing here depends on an entity
+        being registered and the recorder never writes the same rows from its side.
         """
         weather = self.weather_series
         if weather is None:
@@ -612,32 +578,18 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
         cutoff = now.replace(minute=0, second=0, microsecond=0)
         since = None if (full or self._last_weather_stat_hour is None) else self._last_weather_stat_hour
-        registry = er.async_get(self.hass)
         wrote_any = False
         for field in WEATHER_FIELDS:
-            entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"{self.entry.entry_id}_{field.key}")
-            if entity_id is None:
-                continue
             rows = hourly_statistics(weather.times, getattr(weather, field.attr), cutoff, since=since)
             if not rows:
                 continue
-            # mean_type + unit_class are declared statically (not added after the literal) so both the
-            # runtime and static API scanners see them. has_mean stays for cores that predate mean_type,
-            # where the extra key is ignored.
-            metadata: StatisticMetaData = {
-                "has_mean": True,
-                "mean_type": _MEAN_TYPE_ARITHMETIC,
-                "has_sum": False,
-                "name": None,
-                "source": "recorder",
-                "statistic_id": entity_id,
-                "unit_of_measurement": field.unit,
-                "unit_class": _UNIT_CLASSES.get(field.unit),
-            }
-            async_import_statistics(self.hass, metadata, rows)
+            metadata: StatisticMetaData = archive_metadata(
+                external_statistic_id(self.entry.entry_id, field.key), field.unit, _SERIES_NAMES[field.key]
+            )
+            async_add_external_statistics(self.hass, metadata, rows)
             wrote_any = True
-        # Advance the marker only once the entities exist and a write happened, so a pre-registration
-        # call does not skip the backlog the first real backfill still has to cover.
+        # Advance the marker only once something was actually written, so a call made before the
+        # weather window covers a full hour does not skip the backlog the next one still has to cover.
         if wrote_any:
             self._last_weather_stat_hour = cutoff
 
@@ -666,36 +618,24 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
     @callback
     def write_forecast_statistics(self) -> None:
-        """Copy the predicted-production rows into HA long-term statistics.
+        """Copy the predicted-production rows into this integration's own long-term statistics.
 
         Idempotent: re-importing the trailing window every refresh backfills on install and
-        self-heals downtime gaps. Skips an archive entity until it is registered (the statistic_id is
-        the entity_id), so the first call lands once setup has added the entities.
+        self-heals downtime gaps. Like the weather archive these are integration-owned series, with
+        no entity behind them, which is why they survived the removal of the two archive sensors.
         """
         rows_by_key = self._forecast_stat_rows
         if not rows_by_key:
             return
 
-        registry = er.async_get(self.hass)
         for key, unit in ((FORECAST_POWER_KEY, "W"), (FORECAST_ENERGY_KEY, "kWh")):
             rows = rows_by_key.get(key)
             if not rows:
                 continue
-            entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"{self.entry.entry_id}_{key}")
-            if entity_id is None:
-                continue
-            # Same static mean_type + unit_class declaration as the weather archive above.
-            metadata: StatisticMetaData = {
-                "has_mean": True,
-                "mean_type": _MEAN_TYPE_ARITHMETIC,
-                "has_sum": False,
-                "name": None,
-                "source": "recorder",
-                "statistic_id": entity_id,
-                "unit_of_measurement": unit,
-                "unit_class": _UNIT_CLASSES.get(unit),
-            }
-            async_import_statistics(self.hass, metadata, rows)
+            metadata: StatisticMetaData = archive_metadata(
+                external_statistic_id(self.entry.entry_id, key), unit, _SERIES_NAMES[key]
+            )
+            async_add_external_statistics(self.hass, metadata, rows)
 
     async def _build_residual_map(self, data, lat, lon, layout, weather, now):
         """Learn the actual/model residual from the recorder's production history."""

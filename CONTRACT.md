@@ -124,10 +124,9 @@ residual-corrected**, so it tracks the site's real behaviour better than a raw
 model. The card does not depend on these entity names for its baseline layer.
 
 Only the everyday values are **enabled by default** (`power_now`, `energy_today_remaining`,
-`energy_day_1` = today, `energy_day_2` = tomorrow, `reliability`, the archive pair
-`predicted_power` / `predicted_energy`, whose long-term statistics back the card's
-past-forecast curve, the seven weather archive sensors and, when the battery block is
-configured, `predicted_battery_soc`). The rest of the set below is registered but
+`energy_day_1` = today, `energy_day_2` = tomorrow, `reliability`, the seven weather
+sensors and, when the battery block is configured, `predicted_battery_soc`). The rest
+of the set below is registered but
 **disabled by default**, so the recorder stays lean and each user enables the entities
 they actually automate on; enabling one later never loses its history.
 
@@ -163,13 +162,10 @@ Energy, intraday:
 | `sensor.helios_forecast_energy_this_hour` | predicted production this hour, **kWh** | |
 | `sensor.helios_forecast_energy_next_hour` | predicted production next hour, **kWh** | |
 
-Archive (enabled by default: their long-term statistics are what backs the card's
-past-forecast curve, kept by HA well beyond Open-Meteo's rolling window):
-
-| Entity | State | Notes |
-|---|---|---|
-| `sensor.helios_forecast_predicted_power` | predicted PV power, **W** | `device_class: power`, `state_class: measurement`. Mirrors `power_now`; its purpose is the point the statistics import backfills from. |
-| `sensor.helios_forecast_predicted_energy` | predicted energy this hour, **kWh** | `state_class: measurement` (no `device_class`: kWh + `measurement` is only valid without the energy class, the entity-bound long-term statistics need a state class). |
+There is **no `predicted_power` / `predicted_energy` entity**. Both existed only to
+anchor the predicted-production archive to an entity id, and were removed in 2026.9.5
+along with that anchoring (section 2b). Their live value duplicated `power_now` and
+`energy_this_hour`; a dashboard that showed them uses those instead.
 
 Forecast quality:
 
@@ -186,8 +182,10 @@ Battery state of charge (2026.9.0, only when the battery block in section 5 is c
 | `sensor.helios_forecast_battery_min_soc` / `_battery_max_soc` | the projection's lowest / highest SoC over the 48 h window, **%** | `device_class: battery`, `state_class: measurement`, disabled by default, created with the SoC sensor; `unknown` while there is no projection |
 | `sensor.helios_forecast_battery_min_soc_time` / `_battery_max_soc_time` | when that low / high is reached | `device_class: timestamp`, disabled by default, same lifecycle |
 
-Weather archive (one sensor per Open-Meteo variable the model reads, enabled by default; their
-long-term statistics back the card's past weather):
+Weather (one sensor per Open-Meteo variable the model reads, enabled by default, showing the
+current hour). They carry **no `state_class`**, deliberately: their history is the archive of
+section 2b, which the integration writes itself, and a series written from here must never be one
+the recorder also compiles.
 
 | Entity | State |
 |---|---|
@@ -218,6 +216,46 @@ the detail series in section 3.
 are inherently low-confidence for solar (cloud predictability collapses), to be
 stated plainly in the docs. The Helios card's visible window is unchanged: **J-2
 to J+2**, exactly as today; the extra forecast days live only in the entities.
+
+## 2b. Long-term statistics: the archive the integration owns
+
+Two things the integration knows are worth keeping far longer than the source will
+serve them: the **past weather** (Open-Meteo only serves a rolling 60-day window) and
+the **past prediction** (what the model said for an hour that has since happened,
+which is what the card draws behind today). Both are written into Home Assistant's
+long-term statistics, which are never purged.
+
+They are written as **statistics of this integration**, not of an entity:
+
+| Statistic id | Series | Unit |
+|---|---|---|
+| `helios_forecast:<entry_id>_cloud_cover` | effective cloud cover | % |
+| `helios_forecast:<entry_id>_ghi` / `_direct` / `_diffuse` | horizontal irradiance | W/m2 |
+| `helios_forecast:<entry_id>_temperature` | temperature | °C |
+| `helios_forecast:<entry_id>_wind_speed` | wind speed | km/h |
+| `helios_forecast:<entry_id>_snow_depth` | snow depth | m |
+| `helios_forecast:<entry_id>_predicted_power` | predicted PV power | W |
+| `helios_forecast:<entry_id>_predicted_energy` | predicted energy for the hour | kWh |
+
+`<entry_id>` is the config entry's id, lowercased, so several installations in one
+Home Assistant never collide. Each series carries a readable name in its metadata,
+which is what the interface shows: there is no entity behind it to borrow one from.
+
+**Why not an entity id.** A statistic named after an entity belongs to the recorder,
+which compiles it from that entity's state every hour on its own schedule. Writing to
+it from the integration as well puts two writers on the same `(series, hour)` unique
+index. A collision there does not fail our write alone: it rolls back the recorder's
+**entire** hourly compile, so every other integration on the machine silently loses
+that hour of history. An integration-owned id has exactly one writer by construction.
+
+**One-time move.** Installations before 2026.9.5 hold this history under entity ids.
+It is moved on setup: every archived hour is copied onto the new id, read back and
+counted, and the old series is deleted only once the new one is verified to hold at
+least as many hours. The move runs on **every** setup rather than behind a one-time
+marker, so an installation that skips a version, or is restored from an older backup,
+is repaired all the same; once there is nothing left to move it costs one metadata
+read. Short-term (5-minute) statistics are not carried over: integration-owned series
+are hourly by design in Home Assistant.
 
 ## 3. Enhanced detail series (Helios-Forecast only): WebSocket API
 
