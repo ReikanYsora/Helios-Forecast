@@ -249,10 +249,13 @@ That recording is built in, off by default. It has its own entry in the options
 menu, next to the settings and the panel lines. Switched on there, your
 installation posts once an hour the curve it is currently predicting, together
 with the production it has already measured. A collector scores the two against
-each other once the day is over, alongside the same measurement taken from other
-forecast providers, and the results are published openly at
-[helios-ha.org/benchmark](https://helios-ha.org/benchmark). You can watch the
+each other once the day is over, beside two references, the bare physical model
+and yesterday's curve replayed as a forecast, and the results are published openly
+at [helios-ha.org/benchmark](https://helios-ha.org/benchmark). You can watch the
 benchmark fill up, day after day, including the days the forecast gets it wrong.
+The point is not a contest with other services: it is to know where the forecast
+is strong and where it is weak, so that each version can be measured against the
+last on the same installations.
 
 Taking part costs a click. There is no account and no name to give: the page hands
 you a key, you paste it into that menu, and that is all. What leaves your
