@@ -79,12 +79,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         entry.async_on_unload(async_track_state_change_event(hass, [soc_entity], _soc_recovered))
 
-    # Before anything writes a statistic: move any history still held under an entity id onto this
-    # integration's own series. Runs on every setup, not once behind a marker, so an installation
-    # that skips a version or is restored from an older backup is repaired all the same. It costs one
-    # metadata read when there is nothing left to move, which is the normal case after the first run.
-    await archive.async_migrate(hass, entry)
-
     await coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
@@ -103,6 +97,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _purge_orphan_forecast_stats(hass, entry)
 
     entry.async_create_background_task(hass, _initial_statistics_archive(), "helios_forecast_initial_statistics")
+
+    # Move any archived history still held under an entity id onto this integration's own series.
+    # It waits for Home Assistant to have finished starting, and never runs inside setup: the
+    # recorder does not process its queue until the started event (recorder/core.py waits for it
+    # before entering its run loop), so a setup that waits for a recorder commit would be waiting on
+    # a start that is itself waiting on that setup. Home Assistant cancels the entry after five
+    # minutes of that. Started this way it also keeps a slow first move off the startup path
+    # entirely. Runs on every setup, not once behind a marker, so an installation that skips a
+    # version or is restored from an older backup is repaired all the same; it costs one metadata
+    # read when there is nothing left to move, which is the normal case after the first run.
+    from homeassistant.helpers.start import async_at_started
+
+    @callback
+    def _repair_archive(_hass: HomeAssistant) -> None:
+        entry.async_create_background_task(
+            hass, archive.async_migrate(hass, entry), "helios_forecast_archive_migration"
+        )
+
+    entry.async_on_unload(async_at_started(hass, _repair_archive))
 
     entry.async_on_unload(entry.add_update_listener(_async_reload_entry))
 
