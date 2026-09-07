@@ -178,9 +178,13 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # stood on. Held rather than recomputed: they are the refresh's own work, not a new question.
         self._residual_map: Optional[Any] = None
         self._analog_library: List[Any] = []
-        # What the check-up found, kept apart from the two repairs derived from it so a refresh can
-        # replace the findings without retiring the answers standing beside them (_publish_problems).
-        self._found: List[Problem] = []
+        # What the check-up found, in the two halves a refresh replaces at different moments, kept
+        # apart from the answers derived from them (see _publish_problems).
+        self._config_problems: List[Problem] = []
+        self._data_problems: List[Problem] = []
+        # Whether this entry actually takes part in the benchmark. Read with the configuration, so the
+        # repair that says emissions are held back is never shown to someone who never opted in.
+        self._benchmark_on = False
         # Persisted today-trend reference (frozen daily snapshot of the predicted total). Survives
         # restarts so the morning anchor is not lost when HA restarts mid-day.
         self._trend_store: Store = Store(hass, 1, f"{DOMAIN}.{entry.entry_id}.trend")
@@ -231,6 +235,9 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         """The configuration and the entities it names. Entities are only judged once Home Assistant is
         running: during startup they routinely do not exist yet, and a false alarm that clears itself
         half an hour later is worse than none."""
+        self._benchmark_on = bool(data.get(CONF_BENCHMARK_ENABLED)) and bool(
+            str(data.get(CONF_BENCHMARK_KEY) or "").strip()
+        )
         problems = check_config(data, self.hass.config.latitude, self.hass.config.longitude)
         if self.hass.state is CoreState.running:
             problems += check_entities(
@@ -242,28 +249,32 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         return problems
 
     @callback
-    def _publish_problems(self, problems: Optional[List[Problem]] = None) -> None:
+    def _publish_problems(self, config: Optional[List[Problem]] = None, data: Optional[List[Problem]] = None) -> None:
         """Publish what was found, plus the two repairs that are answers rather than findings: this
         installation holding its own emissions back, and the collector's verdict on it.
 
-        They are composed here rather than appended by each caller because a refresh publishes twice,
-        once before fetching anything and once at the end: a caller-side answer would be retired by
-        the first publish and put back by the second, so a contributor would watch the same warning
-        appear and disappear every half hour. Called with no argument, it republishes the last
-        findings against whatever the answers now say.
+        The findings come in two halves because a refresh publishes twice: the configuration is judged
+        before anything is fetched, the data checks join once each source has been read. Each half is
+        replaced on its own, so the early publish does not retire what only the late one can find, and
+        a refresh that fails on the weather service leaves the previous data findings standing rather
+        than telling an owner that everything is now fine. The two answers are composed here rather
+        than appended by a caller for the same reason.
         """
-        if problems is not None:
-            self._found = list(problems)
-        self.problems = (
-            self._found + check_benchmark_blocked(self._found) + check_benchmark_quality(self._benchmark_quality)
-        )
+        if config is not None:
+            self._config_problems = list(config)
+        if data is not None:
+            self._data_problems = list(data)
+        found = self._config_problems + self._data_problems
+        derived = check_benchmark_blocked(found, self._benchmark_on) + check_benchmark_quality(self._benchmark_quality)
+        self.problems = found + derived
         self._issue_ids = repairs.sync(self.hass, self.entry, self.problems, self._issue_ids)
 
     @callback
     def clear_problems(self) -> None:
         repairs.clear(self.hass, self.entry)
         self._issue_ids = set()
-        self._found = []
+        self._config_problems = []
+        self._data_problems = []
         self.problems = []
 
     async def _async_update_data(self) -> ForecastData:
@@ -276,7 +287,10 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # The configuration is judged before anything is fetched, so a wrong field shows up even when the
         # weather service is down; the data checks join the list as the refresh reads each source.
         problems = self._check_configuration(data)
-        self._publish_problems(problems)
+        self._publish_problems(config=problems)
+        # The data checks are collected apart: they are only knowable once each source has been read,
+        # and the publish above must not retire the ones the previous refresh found.
+        data_problems: List[Problem] = []
 
         # One combined window: 60 past days feed the learning, 7 future the forecast.
         try:
@@ -298,7 +312,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         self._residual_map = residual_map
         production_entity = learning_from_config(data)
         if production_entity and self._production_history_read:
-            problems += check_production_history(
+            data_problems += check_production_history(
                 self._production_buckets, production_entity, lat, lon, layout.total_kwp, now, LEARN_DAYS
             )
 
@@ -369,8 +383,8 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         trend = await self._today_trend(data, now, summary)
         battery_soc = await self._project_battery_soc(data, points, now)
         if self._consumption_profile is not None:
-            problems += check_consumption_coverage(self._consumption_profile.coverage)
-        self._publish_problems(problems)
+            data_problems += check_consumption_coverage(self._consumption_profile.coverage)
+        self._publish_problems(data=data_problems)
         await self._maybe_upload_benchmark(data, lat, lon, points, reliability, now_utc)
 
         return ForecastData(
@@ -400,7 +414,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # The collector would set those figures aside anyway, but hearing it here, before sending,
         # and from the integration that knows which field is wrong, is the difference between a
         # problem someone can fix and one they never learn about (see checkup.BENCHMARK_BLOCKERS).
-        blocked = benchmark_blockers(self._found)
+        blocked = benchmark_blockers(self._config_problems + self._data_problems)
         if blocked:
             _LOGGER.debug("Benchmark emission held back: %s", ", ".join(sorted(p.issue_id for p in blocked)))
             return

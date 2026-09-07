@@ -131,10 +131,11 @@ class WeatherSeries:
     # overlaid from the best-effort ensemble call. Empty when that call yielded nothing. Read as a
     # forecast-uncertainty signal by the reliability index.
     cloud_spread: list[float] = field(default_factory=list)
-    # Ground elevation of the weather grid cell, metres, as Open-Meteo reports it with every
-    # response. Not used by the model; it travels with a benchmark emission because irradiance at
-    # 1500 m and at sea level are not the same question, and a fleet-wide error cannot be read
-    # without knowing which one an installation was asking.
+    # Ground elevation at the requested position, metres, from the weather service's own terrain
+    # model. It is a point value, not a cell average, which is why a benchmark emission coarsens it
+    # into bands before sending (benchmark.ELEVATION_STEP_M). Not used by the model; it travels so a
+    # fleet-wide error can be read, since irradiance at 1500 m and at sea level are not the same
+    # question.
     elevation_m: float | None = None
 
 

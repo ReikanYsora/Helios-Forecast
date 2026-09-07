@@ -41,6 +41,20 @@ SCHEMA_VERSION = 2
 # Where an upload goes when the entry does not name its own collector.
 DEFAULT_ENDPOINT = "https://helios-ha.org/bench/v1/emissions"
 
+# What the learning block may say. An allow-list rather than whatever the coordinator hands over,
+# because this module's docstring promises that everything leaving an installation is assembled here
+# and nowhere else, and a dict copied through unread makes that false: a field added upstream while
+# diagnosing something would travel to a public export with nothing here or in the tests to stop it.
+LEARNING_FIELDS: tuple[str, ...] = (
+    "production_hours",
+    "curtailed_hours",
+    "analog_samples",
+    "sky_cells",
+    "sky_cells_total",
+    "residual_global",
+    "learn_days",
+)
+
 # One emission an hour. The forecast refreshes twice as often, but the weather behind it does
 # not, and the extra origins would only add rows the scoring cannot use.
 UPLOAD_INTERVAL = timedelta(hours=1)
@@ -59,6 +73,14 @@ DENSE_HOURS = 24
 # here has a coarser grid, so the rounding costs the benchmark nothing.
 COORD_DECIMALS = 2
 
+# The elevation travels in bands, for the same reason the position travels rounded. The weather
+# service answers with the height of the exact point it was asked about, to a tenth of a metre, and
+# a value that fine undoes the coordinate rounding on its own: intersected with a public terrain
+# model it leaves only the few points of the cell that stand at that height, and the address the
+# rounding removed comes back. A hundred-metre band still says whether a roof is at sea level or at
+# fifteen hundred metres, which is the only thing the field is for.
+ELEVATION_STEP_M = 100
+
 _TIMEOUT_S = 15
 
 
@@ -73,6 +95,14 @@ def site_id(entry_id: str) -> str:
 
 def _round(value: Optional[float], digits: int) -> Optional[float]:
     return None if value is None else round(float(value), digits)
+
+
+def _banded(value: Any, step: float) -> Optional[float]:
+    """`value` snapped to the nearest multiple of `step`, or None. Coarsening, not rounding: the
+    point is that the published number says less than the one that was measured."""
+    if not isinstance(value, (int, float)):
+        return None
+    return round(float(value) / step) * step
 
 
 def _iso(moment: datetime) -> str:
@@ -179,8 +209,8 @@ def build_payload(
             # The installation's own zone. A morning bias cannot be compared between installations
             # without it, and deducing one from the longitude gets the boundary cases wrong.
             "time_zone": (time_zone or None),
-            # Ground elevation as the weather service reports it for this cell, metres.
-            "elevation_m": _round(getattr(weather, "elevation_m", None), 1),
+            # Ground elevation where this installation is, to the nearest ELEVATION_STEP_M.
+            "elevation_m": _banded(getattr(weather, "elevation_m", None), ELEVATION_STEP_M),
             "inverter_max_kw": _round(inverter_max_kw, 3),
             "has_battery": has_battery,
             "has_curtailment_signal": has_curtailment_signal,
@@ -222,8 +252,9 @@ def build_payload(
         "weather": weather_rows,
         # What the learning stood on at this moment: how much history it had, how much of it it had
         # to set aside, and how much of the sky it had learned. A score means something different
-        # from an installation with sixty days behind it than from one with three.
-        "learning": learning,
+        # from an installation with sixty days behind it than from one with three. Projected through
+        # LEARNING_FIELDS, so what leaves is what this module says leaves.
+        "learning": {key: learning.get(key) for key in LEARNING_FIELDS},
         "observed": observed,
     }
 

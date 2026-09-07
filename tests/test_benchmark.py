@@ -10,6 +10,7 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
 from custom_components.helios_forecast.benchmark import (  # noqa: E402
+    LEARNING_FIELDS as BENCHMARK_LEARNING_FIELDS,
     COORD_DECIMALS,
     DENSE_HOURS,
     OBSERVED_HOURS,
@@ -194,10 +195,34 @@ def test_a_short_weather_array_leaves_a_null_rather_than_shifting_the_others() -
     assert rows[1]["ghi"] == 100.0
 
 
-def test_the_ground_elevation_and_the_local_zone_travel() -> None:
+def test_the_ground_elevation_travels_in_bands_and_the_local_zone_travels() -> None:
+    # The elevation is a point value from the weather service's terrain model. Published beside a
+    # coordinate rounded to a kilometre, a tenth of a metre would hand the address back: intersected
+    # with a public terrain model it leaves the few points of the cell standing at that height.
     site = _payload()["site"]
-    assert site["elevation_m"] == 137.0
+    assert site["elevation_m"] == 100.0
     assert site["time_zone"] == "Europe/Paris"
+
+
+def test_the_elevation_band_still_separates_a_valley_from_a_mountain() -> None:
+    from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: F811
+
+    def at(metres: float) -> float:
+        w = _weather()
+        return _payload(weather=WeatherSeries(**{**w.__dict__, "elevation_m": metres}))["site"]["elevation_m"]
+
+    assert at(3.4) == 0.0
+    assert at(137.0) == 100.0
+    assert at(1487.0) == 1500.0
+    assert at(2050.0) == 2000.0
+
+
+def test_an_installation_that_did_not_get_an_elevation_sends_none() -> None:
+    from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: F811
+
+    w = _weather()
+    payload = _payload(weather=WeatherSeries(**{**w.__dict__, "elevation_m": None}))
+    assert payload["site"]["elevation_m"] is None
 
 
 def test_the_analog_confidence_of_each_point_travels() -> None:
@@ -251,3 +276,14 @@ def test_a_point_with_no_readable_time_is_dropped_rather_than_guessed_at() -> No
     good = ForecastPoint(t=_NOW, pv_w=1.0, pv_raw_w=1.0)
     curve = _payload(points=[good, _Broken()])["forecast"]
     assert [row["t"] for row in curve] == [_NOW.isoformat()]
+
+
+def test_a_field_added_to_the_learning_block_upstream_does_not_travel() -> None:
+    # This module's docstring promises that everything leaving an installation is assembled there.
+    # A dict copied through unread would make that false: a field added to _learning_state while
+    # diagnosing something would reach the public export with nothing to stop it.
+    leaked = {"production_hours": 1440, "production_entity": "sensor.pv_energy"}
+    travelled = _payload(learning=leaked)["learning"]
+    assert "production_entity" not in travelled
+    assert travelled["production_hours"] == 1440
+    assert set(travelled) == set(BENCHMARK_LEARNING_FIELDS)

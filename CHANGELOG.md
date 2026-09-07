@@ -166,6 +166,27 @@ all of the above is **73 kB against the 79 kB sent today**.
 The collector reads both shapes for as long as installations take to update, so
 nobody is silenced by the change.
 
+### Fixed: three things the release-candidate audit found in the check-up wiring
+
+**The repair that says emissions are held back was shown to installations that never
+joined the benchmark.** It is opt-in and off by default, and a production meter is
+optional, so on upgrade every entry configured without one would have been told it
+takes part in a programme it never joined and is withholding emissions it was never
+sending, in all twenty-seven languages. It is now shown only to an installation that
+has actually opted in with a key.
+
+**A refresh that failed on the weather service left the owner with nothing shown.**
+The configuration is judged before anything is fetched and the data checks join at
+the end, and both publishes replaced the whole list, so a failure in between retired
+the findings only the second one can make. The two halves are now replaced
+separately: a weather outage no longer says everything is fine.
+
+**The learning block travelled as whatever the coordinator handed over.** This
+module's docstring promises that everything leaving an installation is assembled in
+one place, and a dict copied through unread made that false. It is now projected
+through a named list of fields, with a test that a field added upstream does not
+travel.
+
 ### Changed: an installation checks itself before it sends to the benchmark
 
 The check-up already found the configuration problems that make a measurement

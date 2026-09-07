@@ -401,13 +401,19 @@ def benchmark_blockers(problems: List[Problem]) -> List[Problem]:
     return [p for p in problems if p.key in BENCHMARK_BLOCKERS]
 
 
-def check_benchmark_blocked(problems: List[Problem]) -> List[Problem]:
+def check_benchmark_blocked(problems: List[Problem], taking_part: bool) -> List[Problem]:
     """The one repair that says an installation is holding its own emissions back, and why.
 
     Its reasons are the problems already listed beside it, so this does not repeat them: it exists
     because a configuration problem and "you have therefore left the benchmark" are two different
     pieces of news, and only the second explains why a contributor stopped appearing on the page.
+
+    Nothing is said to an installation that never joined. The benchmark is opt-in and off by default,
+    and a production meter is optional, so without this every entry configured without one would be
+    told on upgrade that it is holding back emissions it was never sending.
     """
+    if not taking_part:
+        return []
     blockers = benchmark_blockers(problems)
     if not blockers:
         return []
