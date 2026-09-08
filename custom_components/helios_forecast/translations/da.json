@@ -23,14 +23,12 @@
           "battery_max_discharge_kw": "Maks. afladningseffekt for batteri (kW, valgfrit)",
           "battery_min_soc": "Batterireserve, minimal ladetilstand (%, standard 10)",
           "battery_efficiency": "Batteriets rundtursvirkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begrænsningssignal (binær sensor, input boolean eller kontakt, valgfri)",
-          "benchmark_enabled": "Bidrag til den offentlige nøjagtighedsmåling (valgfrit)"
+          "curtailment_entity": "Begrænsningssignal (binær sensor, input boolean eller kontakt, valgfri)"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), f.eks. din inverters eller elmålers samlede produktion. En effektsensor (W) virker ikke: den har ingen langtidsstatistik for summen, så læringen og pålidelighedsindekset ville forblive slået fra.",
           "battery_soc_entity": "Udfyld kapaciteten og denne sensor for at slå projektionen af ladetilstand til. Husforbruget hentes fra dit Energi-dashboard, så der kræves ingen sensor her.",
-          "curtailment_entity": "Tændt, så længe din inverter holdes tilbage af en grund, himlen ikke forklarer: fuldt batteri, nul-eksport, netgrænse. De markerede timer læres ikke som lav produktion. Uden det opdages et fuldt batteri stadig ud fra ladetilstandssensoren og inverterloftet.",
-          "benchmark_enabled": "Sender en gang i timen, hvad dette anlæg forudsiger, så det kan sammenlignes med, hvad det virkelig producerede. Resultaterne offentliggøres åbent på helios-ha.org/benchmark. Kun panelernes geometri, den forudsagte kurve, den målte produktion og pålidelighedsindekset sendes: ingen entitetsnavne, intet forbrug, ingen anden sensor, og dine koordinater afrundet til omkring en kilometer. Kræver 2026.9.5 eller nyere, den version der måles. Slået fra, indtil du slår det til."
+          "curtailment_entity": "Tændt, så længe din inverter holdes tilbage af en grund, himlen ikke forklarer: fuldt batteri, nul-eksport, netgrænse. De markerede timer læres ikke som lav produktion. Uden det opdages et fuldt batteri stadig ud fra ladetilstandssensoren og inverterloftet."
         }
       },
       "line": {
@@ -56,7 +54,8 @@
         "description": "Vælg hvad der skal redigeres.",
         "menu_options": {
           "settings": "Rediger indstillinger (placering, inverter, produktionssensor, batteri, begrænsningssignal)",
-          "lines": "Rediger panellinjer"
+          "lines": "Rediger panellinjer",
+          "benchmark": "Deltag i fællesskabets benchmark"
         }
       },
       "settings": {
@@ -74,14 +73,12 @@
           "battery_max_discharge_kw": "Maks. afladningseffekt for batteri (kW, valgfrit)",
           "battery_min_soc": "Batterireserve, minimal ladetilstand (%, standard 10)",
           "battery_efficiency": "Batteriets rundtursvirkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begrænsningssignal (binær sensor, input boolean eller kontakt, valgfri)",
-          "benchmark_enabled": "Bidrag til den offentlige nøjagtighedsmåling (valgfrit)"
+          "curtailment_entity": "Begrænsningssignal (binær sensor, input boolean eller kontakt, valgfri)"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), f.eks. din inverters eller elmålers samlede produktion. En effektsensor (W) virker ikke: den har ingen langtidsstatistik for summen, så læringen og pålidelighedsindekset ville forblive slået fra.",
           "battery_soc_entity": "Udfyld kapaciteten og denne sensor for at slå projektionen af ladetilstand til. Husforbruget hentes fra dit Energi-dashboard, så der kræves ingen sensor her.",
-          "curtailment_entity": "Tændt, så længe din inverter holdes tilbage af en grund, himlen ikke forklarer: fuldt batteri, nul-eksport, netgrænse. De markerede timer læres ikke som lav produktion. Uden det opdages et fuldt batteri stadig ud fra ladetilstandssensoren og inverterloftet.",
-          "benchmark_enabled": "Sender en gang i timen, hvad dette anlæg forudsiger, så det kan sammenlignes med, hvad det virkelig producerede. Resultaterne offentliggøres åbent på helios-ha.org/benchmark. Kun panelernes geometri, den forudsagte kurve, den målte produktion og pålidelighedsindekset sendes: ingen entitetsnavne, intet forbrug, ingen anden sensor, og dine koordinater afrundet til omkring en kilometer. Kræver 2026.9.5 eller nyere, den version der måles. Slået fra, indtil du slår det til."
+          "curtailment_entity": "Tændt, så længe din inverter holdes tilbage af en grund, himlen ikke forklarer: fuldt batteri, nul-eksport, netgrænse. De markerede timer læres ikke som lav produktion. Uden det opdages et fuldt batteri stadig ud fra ladetilstandssensoren og inverterloftet."
         }
       },
       "lines": {
@@ -97,6 +94,16 @@
           "longitude": "Længdegrad for denne linje (valgfrit)",
           "remove_this_line": "Fjern denne panellinje",
           "add_another": "Tilføj endnu en panellinje"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: fællesskabets benchmark",
+        "description": "En åben måling af, hvor nøjagtig Helios Forecast faktisk er, på rigtige anlæg, offentliggjort løbende. Vil du være med? Det foregår her: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nDer er ingen nøgle at bede om og ingen konto at oprette: sæt flueben nedenfor, og det er det hele. Fjern fluebenet for at stoppe.",
+        "data": {
+          "benchmark_enabled": "Bidrag til den offentlige nøjagtighedsmåling (valgfrit)"
+        },
+        "data_description": {
+          "benchmark_enabled": "Sender en gang i timen, hvad dette anlæg forudsiger, så det kan sammenlignes med, hvad det virkelig producerede. Resultaterne offentliggøres åbent på helios-ha.org/benchmark. Kun panelernes geometri, den forudsagte kurve, den målte produktion og pålidelighedsindekset sendes: ingen entitetsnavne, intet forbrug, ingen anden sensor, og dine koordinater afrundet til omkring en kilometer. Kræver 2026.9.5 eller nyere, den version der måles. Slået fra, indtil du slår det til."
         }
       }
     }

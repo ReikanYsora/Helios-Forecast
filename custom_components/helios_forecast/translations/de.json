@@ -23,14 +23,12 @@
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
           "battery_min_soc": "Batteriereserve, minimaler Ladezustand (%, Standard 10)",
           "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
-          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)",
-          "benchmark_enabled": "Zum öffentlichen Genauigkeits-Benchmark beitragen (optional)"
+          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)"
         },
         "data_description": {
           "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
           "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
-          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt.",
-          "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit dem verglichen werden kann, was sie wirklich erzeugt hat. Die Ergebnisse werden offen auf helios-ha.org/benchmark veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Erzeugung und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, kein anderer Sensor, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Erfordert 2026.9.5 oder neuer, die gemessene Version. Aus, solange Sie es nicht einschalten."
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
         }
       },
       "line": {
@@ -56,7 +54,8 @@
         "description": "Wählen Sie, was Sie bearbeiten möchten.",
         "menu_options": {
           "settings": "Einstellungen bearbeiten (Standort, Wechselrichter, Produktionssensor, Batterie, Abregelungssignal)",
-          "lines": "Modulreihen bearbeiten"
+          "lines": "Modulreihen bearbeiten",
+          "benchmark": "Am Community-Benchmark teilnehmen"
         }
       },
       "settings": {
@@ -74,14 +73,12 @@
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
           "battery_min_soc": "Batteriereserve, minimaler Ladezustand (%, Standard 10)",
           "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
-          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)",
-          "benchmark_enabled": "Zum öffentlichen Genauigkeits-Benchmark beitragen (optional)"
+          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)"
         },
         "data_description": {
           "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
           "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
-          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt.",
-          "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit dem verglichen werden kann, was sie wirklich erzeugt hat. Die Ergebnisse werden offen auf helios-ha.org/benchmark veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Erzeugung und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, kein anderer Sensor, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Erfordert 2026.9.5 oder neuer, die gemessene Version. Aus, solange Sie es nicht einschalten."
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
         }
       },
       "lines": {
@@ -97,6 +94,16 @@
           "longitude": "Längengrad für diese Linie (optional)",
           "remove_this_line": "Diese Modulreihe entfernen",
           "add_another": "Weitere Modulreihe hinzufügen"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: Community-Benchmark",
+        "description": "Eine offene Messung der tatsächlichen Genauigkeit von Helios Forecast, an echten Anlagen, laufend veröffentlicht. Möchten Sie mitmachen? Hier entlang: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nEs gibt keinen Schlüssel anzufordern und kein Konto anzulegen: Setzen Sie unten das Häkchen, das ist alles. Zum Beenden entfernen Sie es wieder.",
+        "data": {
+          "benchmark_enabled": "Zum öffentlichen Genauigkeits-Benchmark beitragen (optional)"
+        },
+        "data_description": {
+          "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit dem verglichen werden kann, was sie wirklich erzeugt hat. Die Ergebnisse werden offen auf helios-ha.org/benchmark veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Erzeugung und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, kein anderer Sensor, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Erfordert 2026.9.5 oder neuer, die gemessene Version. Aus, solange Sie es nicht einschalten."
         }
       }
     }

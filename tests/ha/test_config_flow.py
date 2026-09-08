@@ -13,6 +13,7 @@ from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.helios_forecast.config import (
     CONF_ARRAYS,
+    CONF_BENCHMARK_ENABLED,
     CONF_BATTERY_SOC_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
@@ -95,7 +96,7 @@ async def test_options_init_shows_menu(recorder_mock, hass: HomeAssistant, enabl
 
     result = await hass.config_entries.options.async_init(entry.entry_id)
     assert result["type"] == FlowResultType.MENU
-    assert set(result["menu_options"]) == {"settings", "lines"}
+    assert set(result["menu_options"]) == {"settings", "lines", "benchmark"}
 
 
 async def test_options_settings_step_keeps_lines_untouched(
@@ -244,3 +245,66 @@ async def test_options_lines_step_per_line_coordinate_override(
 
     layout = layout_from_config(entry.data)
     assert layout.coords == [None, (43.2965, 5.3698)]
+
+
+# --- the benchmark opt-in ------------------------------------------------------------------------
+
+# It is the point of the release, and it is one checkbox on a step of its own, so the three ways it
+# could silently go missing each get a test: it must not be lost when the settings are saved, it must
+# come back ticked for an installation that already takes part, and leaving must really leave.
+
+
+async def test_saving_the_settings_leaves_the_benchmark_opt_in_alone(
+    recorder_mock, hass: HomeAssistant, enable_custom_integrations
+) -> None:
+    """A contributor who edits any setting stays a contributor: the box lives on another form."""
+    entry = MockConfigEntry(
+        domain=DOMAIN, data={CONF_ARRAYS: [_LINE_A], CONF_BENCHMARK_ENABLED: True, CONF_INVERTER_MAX_KW: 5.0}
+    )
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "settings"})
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {"inverter_max_kw": 8.0, "trend_anchor_hour": 6, "battery_min_soc": 10, "battery_efficiency": 90},
+    )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_INVERTER_MAX_KW] == 8.0
+    assert entry.data[CONF_BENCHMARK_ENABLED] is True
+
+
+async def test_the_benchmark_step_opens_on_the_value_already_stored(
+    recorder_mock, hass: HomeAssistant, enable_custom_integrations
+) -> None:
+    """An installation that already takes part sees the box ticked, or it would quietly opt out."""
+    entry = MockConfigEntry(domain=DOMAIN, data={CONF_ARRAYS: [_LINE_A], CONF_BENCHMARK_ENABLED: True})
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "benchmark"})
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "benchmark"
+    marker = next(k for k in result["data_schema"].schema if str(k) == CONF_BENCHMARK_ENABLED)
+    assert marker.default() is True
+
+
+async def test_the_benchmark_step_joins_and_leaves_without_touching_anything_else(
+    recorder_mock, hass: HomeAssistant, enable_custom_integrations
+) -> None:
+    entry = MockConfigEntry(domain=DOMAIN, data={CONF_ARRAYS: [_LINE_A], CONF_INVERTER_MAX_KW: 5.0})
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "benchmark"})
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {CONF_BENCHMARK_ENABLED: True})
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_BENCHMARK_ENABLED] is True
+    assert entry.data[CONF_INVERTER_MAX_KW] == 5.0
+    assert entry.data[CONF_ARRAYS] == [_LINE_A]
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "benchmark"})
+    await hass.config_entries.options.async_configure(result["flow_id"], {CONF_BENCHMARK_ENABLED: False})
+    assert entry.data.get(CONF_BENCHMARK_ENABLED) is False
+    assert entry.data[CONF_INVERTER_MAX_KW] == 5.0

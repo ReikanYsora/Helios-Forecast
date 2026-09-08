@@ -23,14 +23,12 @@
           "battery_max_discharge_kw": "Max. urladdningseffekt för batteri (kW, valfritt)",
           "battery_min_soc": "Batterireserv, minimal laddningsnivå (%, standard 10)",
           "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begränsningssignal (binär sensor, input boolean eller strömbrytare, valfritt)",
-          "benchmark_enabled": "Bidra till den öppna noggrannhetsmätningen (valfritt)"
+          "curtailment_entity": "Begränsningssignal (binär sensor, input boolean eller strömbrytare, valfritt)"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), t.ex. växelriktarens eller elmätarens totala produktion. En effektsensor (W) fungerar inte: den saknar långtidsstatistik för summan, så inlärningen och tillförlitlighetsindexet skulle förbli avstängda.",
           "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här.",
-          "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket.",
-          "benchmark_enabled": "Skickar en gång i timmen vad denna anläggning förutsäger, så att det kan jämföras med vad den verkligen producerade. Resultaten publiceras öppet på helios-ha.org/benchmark. Endast panelernas geometri, den förutsagda kurvan, den uppmätta produktionen och tillförlitlighetsindexet skickas: inga entitetsnamn, ingen förbrukning, ingen annan sensor, och dina koordinater avrundade till ungefär en kilometer. Kräver 2026.9.5 eller senare, den version som mäts. Av tills du slår på det."
+          "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket."
         }
       },
       "line": {
@@ -56,7 +54,8 @@
         "description": "Välj vad du vill redigera.",
         "menu_options": {
           "settings": "Redigera inställningar (plats, växelriktare, produktionssensor, batteri, begränsningssignal)",
-          "lines": "Redigera panelrader"
+          "lines": "Redigera panelrader",
+          "benchmark": "Delta i gemenskapens jämförelse"
         }
       },
       "settings": {
@@ -74,14 +73,12 @@
           "battery_max_discharge_kw": "Max. urladdningseffekt för batteri (kW, valfritt)",
           "battery_min_soc": "Batterireserv, minimal laddningsnivå (%, standard 10)",
           "battery_efficiency": "Batteriets tur och retur-verkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begränsningssignal (binär sensor, input boolean eller strömbrytare, valfritt)",
-          "benchmark_enabled": "Bidra till den öppna noggrannhetsmätningen (valfritt)"
+          "curtailment_entity": "Begränsningssignal (binär sensor, input boolean eller strömbrytare, valfritt)"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), t.ex. växelriktarens eller elmätarens totala produktion. En effektsensor (W) fungerar inte: den saknar långtidsstatistik för summan, så inlärningen och tillförlitlighetsindexet skulle förbli avstängda.",
           "battery_soc_entity": "Fyll i kapaciteten och den här sensorn för att slå på laddningsnivåprojektionen. Hemförbrukningen hämtas från din Energi-panel, så ingen sensor behövs här.",
-          "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket.",
-          "benchmark_enabled": "Skickar en gång i timmen vad denna anläggning förutsäger, så att det kan jämföras med vad den verkligen producerade. Resultaten publiceras öppet på helios-ha.org/benchmark. Endast panelernas geometri, den förutsagda kurvan, den uppmätta produktionen och tillförlitlighetsindexet skickas: inga entitetsnamn, ingen förbrukning, ingen annan sensor, och dina koordinater avrundade till ungefär en kilometer. Kräver 2026.9.5 eller senare, den version som mäts. Av tills du slår på det."
+          "curtailment_entity": "På så länge växelriktaren hålls tillbaka av ett skäl som himlen inte förklarar: fullt batteri, nollexport, nätgräns. De markerade timmarna lärs inte in som låg produktion. Utan den upptäcks ett fullt batteri ändå via laddningsnivåsensorn och växelriktartaket."
         }
       },
       "lines": {
@@ -97,6 +94,16 @@
           "longitude": "Longitud för denna rad (valfritt)",
           "remove_this_line": "Ta bort denna panelrad",
           "add_another": "Lägg till ytterligare en panelrad"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: gemenskapens jämförelse",
+        "description": "En öppen mätning av hur noggrann Helios Forecast verkligen är, på riktiga anläggningar, publicerad efter hand. Vill du vara med? Det sker här: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nDet finns ingen nyckel att be om och inget konto att skapa: kryssa i rutan nedan, det är allt. Ta bort krysset för att sluta.",
+        "data": {
+          "benchmark_enabled": "Bidra till den öppna noggrannhetsmätningen (valfritt)"
+        },
+        "data_description": {
+          "benchmark_enabled": "Skickar en gång i timmen vad denna anläggning förutsäger, så att det kan jämföras med vad den verkligen producerade. Resultaten publiceras öppet på helios-ha.org/benchmark. Endast panelernas geometri, den förutsagda kurvan, den uppmätta produktionen och tillförlitlighetsindexet skickas: inga entitetsnamn, ingen förbrukning, ingen annan sensor, och dina koordinater avrundade till ungefär en kilometer. Kräver 2026.9.5 eller senare, den version som mäts. Av tills du slår på det."
         }
       }
     }

@@ -23,14 +23,12 @@
           "battery_max_discharge_kw": "Maks. snaga pražnjenja baterije (kW, neobavezno)",
           "battery_min_soc": "Rezerva baterije, minimalno stanje napunjenosti (%, zadano 10)",
           "battery_efficiency": "Učinkovitost punog ciklusa baterije (%, zadano 90)",
-          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)",
-          "benchmark_enabled": "Doprinesite javnom mjerenju točnosti (neobavezno)"
+          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbroja, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Ispunite kapacitet i ovaj senzor da biste uključili projekciju stanja napunjenosti. Potrošnja kuće uzima se s vaše Energetske nadzorne ploče, senzor ovdje nije potreban.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
-          "benchmark_enabled": "Jednom na sat šalje ono što ova instalacija predviđa, kako bi se moglo usporediti s onim što je stvarno proizvela. Rezultati se objavljuju otvoreno na helios-ha.org/benchmark. Putuju samo geometrija panela, predviđena krivulja, izmjerena proizvodnja i indeks pouzdanosti: nikakvi nazivi entiteta, nikakva potrošnja, nikakav drugi senzor, a vaše koordinate zaokružene na otprilike kilometar. Zahtijeva verziju 2026.9.5 ili noviju, onu koja se mjeri. Isključeno dok ga ne uključite."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
         }
       },
       "line": {
@@ -56,7 +54,8 @@
         "description": "Odaberite što želite urediti.",
         "menu_options": {
           "settings": "Uredi postavke (lokacija, pretvarač, senzor proizvodnje, baterija, signal ograničenja)",
-          "lines": "Uredi linije panela"
+          "lines": "Uredi linije panela",
+          "benchmark": "Sudjeluj u usporedbi zajednice"
         }
       },
       "settings": {
@@ -74,14 +73,12 @@
           "battery_max_discharge_kw": "Maks. snaga pražnjenja baterije (kW, neobavezno)",
           "battery_min_soc": "Rezerva baterije, minimalno stanje napunjenosti (%, zadano 10)",
           "battery_efficiency": "Učinkovitost punog ciklusa baterije (%, zadano 90)",
-          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)",
-          "benchmark_enabled": "Doprinesite javnom mjerenju točnosti (neobavezno)"
+          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbroja, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Ispunite kapacitet i ovaj senzor da biste uključili projekciju stanja napunjenosti. Potrošnja kuće uzima se s vaše Energetske nadzorne ploče, senzor ovdje nije potreban.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
-          "benchmark_enabled": "Jednom na sat šalje ono što ova instalacija predviđa, kako bi se moglo usporediti s onim što je stvarno proizvela. Rezultati se objavljuju otvoreno na helios-ha.org/benchmark. Putuju samo geometrija panela, predviđena krivulja, izmjerena proizvodnja i indeks pouzdanosti: nikakvi nazivi entiteta, nikakva potrošnja, nikakav drugi senzor, a vaše koordinate zaokružene na otprilike kilometar. Zahtijeva verziju 2026.9.5 ili noviju, onu koja se mjeri. Isključeno dok ga ne uključite."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
         }
       },
       "lines": {
@@ -97,6 +94,16 @@
           "longitude": "Zemljopisna dužina za ovu liniju (opcionalno)",
           "remove_this_line": "Ukloni ovu liniju panela",
           "add_another": "Dodaj još jednu liniju panela"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: usporedba zajednice",
+        "description": "Otvoreno mjerenje stvarne točnosti Helios Forecasta, na pravim instalacijama, objavljivano usput. Želite sudjelovati? Ovuda: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNema ključa koji treba tražiti ni računa koji treba otvoriti: označite kvadratić ispod i to je sve. Za prestanak uklonite oznaku.",
+        "data": {
+          "benchmark_enabled": "Doprinesite javnom mjerenju točnosti (neobavezno)"
+        },
+        "data_description": {
+          "benchmark_enabled": "Jednom na sat šalje ono što ova instalacija predviđa, kako bi se moglo usporediti s onim što je stvarno proizvela. Rezultati se objavljuju otvoreno na helios-ha.org/benchmark. Putuju samo geometrija panela, predviđena krivulja, izmjerena proizvodnja i indeks pouzdanosti: nikakvi nazivi entiteta, nikakva potrošnja, nikakav drugi senzor, a vaše koordinate zaokružene na otprilike kilometar. Zahtijeva verziju 2026.9.5 ili noviju, onu koja se mjeri. Isključeno dok ga ne uključite."
         }
       }
     }

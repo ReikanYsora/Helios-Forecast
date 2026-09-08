@@ -287,19 +287,20 @@ moves fastest.
 
 ### Changed: the benchmark asks for no key at all
 
-An earlier build stored a benchmark write key in the config entry. Nothing reads it
-any more: taking part is a box in the settings and nothing else, and the entry is
-cleaned of the key on the next start. Diagnostics now masks anything whose name reads
-like a credential, since that file is what this project invites you to attach to a
+An earlier build stored a benchmark write key in the config entry. Nothing reads it any
+more: taking part is one checkbox, on a step of its own in the options menu ("Join the
+community benchmark"), because taking part is a decision rather than a setting and should
+not be hidden at the foot of a form of thirty fields. An installation that had already
+opted in keeps its answer across the update. Diagnostics now masks anything whose name
+reads like a credential, since that file is what this project invites you to attach to a
 public issue.
 
 The measurement itself starts over with this release and only accepts 2026.9.5 or
 newer, so the published averages describe the model rather than the gaps between
-versions. An installation that had already opted in stays opted in. What goes up is
-the predicted curve, the geometry of the installation and the production your meter
-measured, once an hour, under a hash of the config entry: no entity name, no
-consumption, no account, coordinates rounded to about a kilometre before they leave
-your machine. Results at helios-ha.org/benchmark.
+versions. What goes up is the predicted curve, the geometry of the installation and the
+production your meter measured, once an hour, under a hash of the config entry: no entity
+name, no consumption, no account, coordinates rounded to about a kilometre before they
+leave your machine. Results at helios-ha.org/benchmark.
 
 ### Fixed: Korea gets the Korean weather model
 

@@ -21,6 +21,7 @@ from homeassistant.core import callback
 from homeassistant.helpers import selector
 
 from .config import (
+    BENCHMARK_KEYS,
     CONF_AZIMUTH,
     CONF_BATTERY_CAPACITY_KWH,
     CONF_BATTERY_EFFICIENCY,
@@ -179,12 +180,17 @@ def _settings_fields(
     # Curtailment signal: on while the inverter is held back for a reason the sky cannot explain, so those
     # hours are not learned as low production (zero export, grid limits; a full battery is detected without it).
     _optional(fields, CONF_CURTAILMENT_ENTITY, _CURTAIL_ENTITY, s.get(CONF_CURTAILMENT_ENTITY))
-    # Taking part in the public accuracy benchmark. One switch and nothing else: there is no key to
-    # ask for and no address to type, so it belongs on this form rather than on a step of its own,
-    # and no form has to carry another's fields across a save. What travels, and why it has to be
-    # written down at the moment it is predicted rather than reconstructed later, is in benchmark.py.
-    fields[vol.Optional(CONF_BENCHMARK_ENABLED, default=bool(s.get(CONF_BENCHMARK_ENABLED, False)))] = _BOOL
     return fields
+
+
+def _benchmark_fields(settings: dict[str, Any]) -> dict[Any, Any]:
+    """Taking part in the public benchmark: one switch, and nothing else.
+
+    There is no key to ask for and no address to type, so this form is a single checkbox. What
+    travels, and why it has to be written down at the moment it is predicted rather than
+    reconstructed later, is in benchmark.py.
+    """
+    return {vol.Optional(CONF_BENCHMARK_ENABLED, default=bool(settings.get(CONF_BENCHMARK_ENABLED, False))): _BOOL}
 
 
 class HeliosForecastConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]  # HA passes `domain` to __init_subclass__
@@ -261,16 +267,35 @@ class HeliosForecastOptionsFlow(OptionsFlow):
         return self.async_create_entry(title="", data={})
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        return self.async_show_menu(step_id="init", menu_options=["settings", "lines"])
+        return self.async_show_menu(step_id="init", menu_options=["settings", "lines", "benchmark"])
 
     async def async_step_settings(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Edit the entry-level settings, keeping the existing panel lines untouched."""
         current = self._current()
         if user_input is not None:
-            # This form shows the installation settings only: a field left empty here is cleared.
-            return self._save(merge_entry_data(split_settings(user_input), lines_from_config(current)))
+            # This form shows the installation settings only: a field left empty here is cleared, while the
+            # benchmark switch, decided on its own step, is carried over untouched.
+            kept = {k: v for k, v in split_settings(current).items() if k in BENCHMARK_KEYS}
+            data = merge_entry_data({**kept, **split_settings(user_input)}, lines_from_config(current))
+            return self._save(data)
         schema = vol.Schema(_settings_fields(self.hass.config.latitude, self.hass.config.longitude, settings=current))
         return self.async_show_form(step_id="settings", data_schema=schema)
+
+    async def async_step_benchmark(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Join the community benchmark, or leave it.
+
+        A menu of its own rather than a checkbox at the bottom of the settings: taking part is a
+        decision, not a setting, and someone who has never heard of it should be able to find out
+        what it is without reading a form of thirty other fields.
+        """
+        current = self._current()
+        if user_input is not None:
+            # The mirror of the settings step: the installation settings are carried over, the benchmark
+            # switch is exactly what this form says, so leaving really leaves.
+            kept = {k: v for k, v in split_settings(current).items() if k not in BENCHMARK_KEYS}
+            settings = {**kept, **split_settings(user_input)}
+            return self._save(merge_entry_data(settings, lines_from_config(current)))
+        return self.async_show_form(step_id="benchmark", data_schema=vol.Schema(_benchmark_fields(current)))
 
     async def async_step_lines(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Walk the existing lines (edit / remove each), then optionally append new ones."""

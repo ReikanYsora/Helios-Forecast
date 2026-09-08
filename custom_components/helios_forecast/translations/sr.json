@@ -23,14 +23,12 @@
           "battery_max_discharge_kw": "Макс. снага пражњења батерије (kW, опционо)",
           "battery_min_soc": "Резерва батерије, минимално стање напуњености (%, подразумевано 10)",
           "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)",
-          "curtailment_entity": "Сигнал ограничења (бинарни сензор, input boolean или прекидач, опционо)",
-          "benchmark_enabled": "Допринесите јавном мерењу тачности (опционо)"
+          "curtailment_entity": "Сигнал ограничења (бинарни сензор, input boolean или прекидач, опционо)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbira, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
-          "benchmark_enabled": "Једном на сат шаље оно што ова инсталација предвиђа, како би се упоредило са оним што је стварно произвела. Резултати се објављују отворено на helios-ha.org/benchmark. Путују само геометрија панела, предвиђена крива, измерена производња и индекс поузданости: никаква имена ентитета, никаква потрошња, никакав други сензор, а ваше координате заокружене на отприлике километар. Захтева верзију 2026.9.5 или новију, ону која се мери. Искључено док га не укључите."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
         }
       },
       "line": {
@@ -56,7 +54,8 @@
         "description": "Изаберите шта желите да уредите.",
         "menu_options": {
           "settings": "Uredi podešavanja (lokacija, pretvarač, senzor proizvodnje, baterija, signal ograničenja)",
-          "lines": "Уреди линије панела"
+          "lines": "Уреди линије панела",
+          "benchmark": "Учествуј у поређењу заједнице"
         }
       },
       "settings": {
@@ -74,14 +73,12 @@
           "battery_max_discharge_kw": "Макс. снага пражњења батерије (kW, опционо)",
           "battery_min_soc": "Резерва батерије, минимално стање напуњености (%, подразумевано 10)",
           "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)",
-          "curtailment_entity": "Сигнал ограничења (бинарни сензор, input boolean или прекидач, опционо)",
-          "benchmark_enabled": "Допринесите јавном мерењу тачности (опционо)"
+          "curtailment_entity": "Сигнал ограничења (бинарни сензор, input boolean или прекидач, опционо)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbira, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
-          "benchmark_enabled": "Једном на сат шаље оно што ова инсталација предвиђа, како би се упоредило са оним што је стварно произвела. Резултати се објављују отворено на helios-ha.org/benchmark. Путују само геометрија панела, предвиђена крива, измерена производња и индекс поузданости: никаква имена ентитета, никаква потрошња, никакав други сензор, а ваше координате заокружене на отприлике километар. Захтева верзију 2026.9.5 или новију, ону која се мери. Искључено док га не укључите."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
         }
       },
       "lines": {
@@ -97,6 +94,16 @@
           "longitude": "Географска дужина за ову линију (опционо)",
           "remove_this_line": "Уклони ову линију панела",
           "add_another": "Додај још једну линију панела"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: поређење заједнице",
+        "description": "Отворено мерење стварне тачности Helios Forecasta, на правим инсталацијама, објављивано успут. Желите да учествујете? Овуда: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nНема кључа који треба тражити ни налога који треба направити: означите поље испод и то је све. За прекид уклоните ознаку.",
+        "data": {
+          "benchmark_enabled": "Допринесите јавном мерењу тачности (опционо)"
+        },
+        "data_description": {
+          "benchmark_enabled": "Једном на сат шаље оно што ова инсталација предвиђа, како би се упоредило са оним што је стварно произвела. Резултати се објављују отворено на helios-ha.org/benchmark. Путују само геометрија панела, предвиђена крива, измерена производња и индекс поузданости: никаква имена ентитета, никаква потрошња, никакав други сензор, а ваше координате заокружене на отприлике километар. Захтева верзију 2026.9.5 или новију, ону која се мери. Искључено док га не укључите."
         }
       }
     }
