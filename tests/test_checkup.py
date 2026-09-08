@@ -226,7 +226,7 @@ def test_silent_meter_for_days() -> None:
     assert _keys(check_production_history(never, "sensor.pv", *HOME, 3.0, NOW, 60)) == ["production_stale"]
 
 
-# --- consumption coverage and the collector's verdict -----------------------------------------
+# --- consumption coverage ---------------------------------------------------------------------
 
 
 def test_sparse_consumption_source_is_named_with_its_share() -> None:

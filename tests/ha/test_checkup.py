@@ -1,5 +1,5 @@
-"""Tests for the check-up wiring: problems become repair issues, retire when fixed, and the
-collector's verdict reaches the owner. The rules themselves are tested in tests/test_checkup.py."""
+"""Tests for the check-up wiring: problems become repair issues and retire when they are fixed.
+The rules themselves are tested in tests/test_checkup.py."""
 
 from __future__ import annotations
 
