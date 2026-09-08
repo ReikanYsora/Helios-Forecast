@@ -106,23 +106,6 @@ def _energy(
     )
 
 
-def _archive_energy(key: str, name: str, value_fn: Callable[[ForecastSummary], _ValueType]) -> HeliosSensorDescription:
-    # Archive entity: its purpose is the long-term mean statistics the coordinator imports
-    # (the card's past predicted-production curve). Those imported stats are entity-bound
-    # (statistic_id == entity_id), so the entity MUST carry a state_class, otherwise HA flags
-    # "entity no longer has a state class" on every statistics cycle. kWh + MEASUREMENT is valid
-    # only WITHOUT the energy device class (HA rejects energy + measurement), so we drop
-    # device_class here, the same pattern the trend sensor uses.
-    return HeliosSensorDescription(
-        key=key,
-        name=name,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        suggested_display_precision=2,
-        value_fn=value_fn,
-    )
-
-
 def _timestamp(
     key: str,
     name: str,
@@ -140,9 +123,8 @@ def _timestamp(
 
 def _build_descriptions() -> list[HeliosSensorDescription]:
     # Keep the recorder lean by default: only the everyday headline values are enabled, the rest
-    # are registered but disabled so the user opts into the ones they actually automate on. The two
-    # `predicted_*` archive entities stay enabled because their long-term statistics are the card's
-    # past predicted-production curve. Enabling a disabled entity later never loses history.
+    # are registered but disabled so the user opts into the ones they actually automate on.
+    # Enabling a disabled entity later never loses history.
     descriptions: list[HeliosSensorDescription] = [
         _power("power_now", "Power now", lambda s: s.power_now_w, attrs_fn=_forecast_attrs),
         # Analog uncertainty band on the current power: P10 (low) and P90 (high). None until the
@@ -153,11 +135,6 @@ def _build_descriptions() -> list[HeliosSensorDescription]:
         _energy("energy_today_remaining", "Energy today remaining", lambda s: s.energy_today_remaining_kwh),
         _energy("energy_this_hour", "Energy this hour", lambda s: s.energy_this_hour_kwh, enabled_default=False),
         _energy("energy_next_hour", "Energy next hour", lambda s: s.energy_next_hour_kwh, enabled_default=False),
-        # Archive entities: their live value mirrors the prediction for the current hour, but their
-        # purpose is the long-term statistics the coordinator backfills (predicted production history,
-        # kept by HA well beyond Open-Meteo's 60-day window so the card can draw the past forecast).
-        _power("predicted_power", "Predicted power", lambda s: s.power_now_w),
-        _archive_energy("predicted_energy", "Predicted energy", lambda s: s.energy_this_hour_kwh),
     ]
     for n in range(1, _HORIZON_DAYS + 1):
         i = n - 1
@@ -206,7 +183,13 @@ _WEATHER_META: dict[str, tuple[Optional[SensorDeviceClass], str, str, int]] = {
 
 
 def _build_weather_descriptions() -> list[SensorEntityDescription]:
-    """One MEASUREMENT sensor per archived Open-Meteo weather variable."""
+    """One sensor per archived Open-Meteo weather variable, showing the current hour.
+
+    No state class, deliberately: the hourly history of these variables is archived by the
+    coordinator into this integration's own statistics, over a window Open-Meteo alone could not
+    serve, and a series written from here must never be one the recorder also compiles (see
+    statistics.external_statistic_id).
+    """
     descriptions: list[SensorEntityDescription] = []
     for field in WEATHER_FIELDS:
         meta = _WEATHER_META.get(field.key)
@@ -222,7 +205,6 @@ def _build_weather_descriptions() -> list[SensorEntityDescription]:
                 name=name,
                 device_class=device_class,
                 native_unit_of_measurement=unit,
-                state_class=SensorStateClass.MEASUREMENT,
                 suggested_display_precision=precision,
             )
         )
@@ -293,11 +275,11 @@ class HeliosForecastSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorE
 class HeliosWeatherSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEntity):
     """An archived Open-Meteo weather value, read from the current-hour snapshot.
 
-    The long-term history of these entities is written to HA statistics by the
-    coordinator (see write_weather_statistics), which is what keeps it available
-    beyond Open-Meteo's rolling 60-day window. Each also carries a `forecast`
-    attribute (the forward-looking hourly series) for charting, mirroring the
-    power sensor.
+    These entities carry no state class and no long-term history of their own. The past weather is
+    kept as statistics the integration owns, under ids of its own rather than under an entity id
+    (archive.py), which is what keeps it beyond Open-Meteo's rolling 60-day window without the
+    recorder compiling the same series from its side. Each also carries a `forecast` attribute (the
+    forward-looking hourly series) for charting, mirroring the power sensor.
     """
 
     _attr_has_entity_name = True

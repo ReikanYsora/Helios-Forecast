@@ -120,9 +120,16 @@ def build_forecast_series(
     if not times:
         return points
 
+    # Open-Meteo answers whole UTC days while the caller's horizon runs on local midnights, so at a
+    # negative offset the tail of the last day sits past the final sample. Stop there: the bracket
+    # below would otherwise collapse onto that sample and hold it forward, which reads as an
+    # ordinary forecast because the sun geometry on top of it is still right. The last sample
+    # describes the hour beginning on it, hence the hour of slack.
+    limit = min(end, times[-1] + timedelta(hours=1))
+
     wi = 0
     t = start
-    while t < end:
+    while t < limit:
         t_ms = t.timestamp()
         # Bracket between two hourly weather samples, moving cursor (ascending t).
         while wi < len(times) - 1 and epochs[wi + 1] <= t_ms:

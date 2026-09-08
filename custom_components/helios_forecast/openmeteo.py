@@ -19,10 +19,13 @@ caller-provided session (HA's shared aiohttp client).
 from __future__ import annotations
 
 import asyncio
+import logging
 import math
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, TypeVar
+
+_LOGGER = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from aiohttp import ClientSession
@@ -79,26 +82,38 @@ _REGIONAL_MODELS: tuple[tuple[str, float, float, float, float], ...] = (
     ("italia_meteo_arpae_icon_2i", 36.5, 47.0, 10.0, 18.5),  # Italy
     ("metno_seamless", 54.5, 71.5, 4.0, 32.0),  # Nordics (MET Nordic 1 km)
     ("gfs_seamless", 24.5, 49.5, -125.0, -66.5),  # CONUS (HRRR via gfs_seamless)
-    ("kma_seamless", 33.0, 39.0, 124.5, 132.0),  # Korea (box enclosed by Japan)
+    ("kma_seamless", 33.0, 38.7, 125.0, 129.7),  # Korea (box enclosed by Japan), Jeju to the DMZ
     ("jma_seamless", 24.0, 46.0, 122.0, 146.0),  # Japan (JMA MSM 5 km)
     ("bom_access_global", -47.5, -10.0, 112.0, 179.0),  # Australia & NZ (BOM ACCESS-G)
 )
 
 
-# The coverage boxes overlap (national borders are fuzzy: eastern France also falls in the Central-Europe
-# box, southern England in the France box, Korea entirely inside Japan). Of every box the point falls in,
-# keep the one it sits most centrally inside, measured as a fraction of each box's own size. That single
-# rule resolves both a partial border overlap and a fully enclosed box (Korea's small box outscores the
-# vast Japan box at the same point), with no reliance on declaration order. Anywhere uncovered falls back
-# to two independent global models, whose median beats either alone.
+def _encloses(outer: tuple, inner: tuple) -> bool:
+    """Whether `outer`'s box wholly contains `inner`'s, the two being different boxes."""
+    _, o_lat_min, o_lat_max, o_lon_min, o_lon_max = outer
+    _, i_lat_min, i_lat_max, i_lon_min, i_lon_max = inner
+    return outer is not inner and (
+        o_lat_min <= i_lat_min and i_lat_max <= o_lat_max and o_lon_min <= i_lon_min and i_lon_max <= o_lon_max
+    )
+
+
+# The coverage boxes overlap: national borders are fuzzy, so eastern France also falls in the
+# Central-Europe box and southern England in the France box, while Korea's box sits entirely inside
+# Japan's. Two rules, in order. A box that wholly contains another candidate is dropped, because the
+# narrower one is the more specific answer wherever both apply. Among what is left, keep the box the
+# point sits most centrally inside, as a fraction of that box's own size, which settles a border
+# overlap without depending on declaration order. Centrality alone could not do the enclosed case:
+# near the small box's own edge the vast box around it scores higher, and Jeju, on the southern edge
+# of the Korea box, was forecast from the Japanese model. Anywhere uncovered falls back to two
+# independent global models, whose median beats either alone.
 def pick_models_for_location(lat: float, lon: float) -> list[str]:
     """Model set for the weather request: the most central regional model plus a global one, or two globals."""
     GLOBAL = "ecmwf_ifs025"
+    inside = [box for box in _REGIONAL_MODELS if box[1] <= lat <= box[2] and box[3] <= lon <= box[4]]
+    candidates = [box for box in inside if not any(_encloses(box, other) for other in inside)]
     best: str | None = None
     best_score = float("-inf")
-    for model, lat_min, lat_max, lon_min, lon_max in _REGIONAL_MODELS:
-        if not (lat_min <= lat <= lat_max and lon_min <= lon <= lon_max):
-            continue
+    for model, lat_min, lat_max, lon_min, lon_max in candidates:
         # Distance to the nearest edge as a fraction of the box's extent (0 on an edge, 0.5 dead centre).
         score = min(
             (lat - lat_min) / (lat_max - lat_min),
@@ -130,7 +145,9 @@ class WeatherSeries:
     # Per-hour standard deviation of cloud cover across the ensemble models (model disagreement),
     # overlaid from the best-effort ensemble call. Empty when that call yielded nothing. Read as a
     # forecast-uncertainty signal by the reliability index.
-    cloud_spread: list[float] = field(default_factory=list)
+    # None where the ensemble said nothing about an hour, never 0.0: a missing answer is not the
+    # models agreeing perfectly, and the reliability index reads this as agreement.
+    cloud_spread: list[Optional[float]] = field(default_factory=list)
 
 
 def build_weather_url(
@@ -245,7 +262,7 @@ def parse_weather(payload: dict[str, Any]) -> WeatherSeries | None:
         wind=fuse("wind_speed_10m"),
         snow=fuse("snow_depth"),
         # Baseline zero spread aligned to times; the ensemble call overlays the real cross-model spread.
-        cloud_spread=[0.0] * n,
+        cloud_spread=[None] * n,
     )
 
 
@@ -259,12 +276,17 @@ def parse_cloud_spread(payload: dict[str, Any]) -> tuple[list[datetime], list[fl
     hourly = payload.get("hourly") or {}
     time_strs = hourly.get("time") or []
     # "cloud_cover" is a string-prefix of the per-layer keys ("cloud_cover_low" and friends), so
-    # _model_arrays' prefix match would silently fold them into this aggregate lookup if a payload
-    # ever carried both key families at once. Today the values and ensemble calls are always two
-    # separate HTTP responses, so this never happens; fail loudly instead of drifting quietly if it ever does.
-    assert not any(k.startswith(("cloud_cover_low", "cloud_cover_mid", "cloud_cover_high")) for k in hourly), (
-        "ensemble payload unexpectedly also carries per-layer cloud keys, would corrupt the spread lookup"
-    )
+    # _model_arrays' prefix match would fold them into this aggregate lookup if a payload ever
+    # carried both key families at once. Today the values and ensemble calls are two separate HTTP
+    # responses, so this never happens. An assert would not help: the only caller catches every
+    # exception, so it would read as "no spread this refresh", which downstream reads as the models
+    # agreeing perfectly. Refuse the payload and say why.
+    if any(k.startswith(("cloud_cover_low", "cloud_cover_mid", "cloud_cover_high")) for k in hourly):
+        _LOGGER.warning(
+            "Ensemble response carries per-layer cloud keys as well as the aggregate; "
+            "the cross-model spread is skipped this refresh rather than read from the wrong arrays"
+        )
+        return None
     cloud_arrays = _model_arrays(hourly, "cloud_cover")
     if not time_strs or not any(cloud_arrays):
         return None
@@ -275,9 +297,14 @@ def parse_cloud_spread(payload: dict[str, Any]) -> tuple[list[datetime], list[fl
 def _overlay_cloud_spread(
     series: WeatherSeries, spread_times: list[datetime], spread_vals: list[float]
 ) -> WeatherSeries:
-    """Return ``series`` with the ensemble cloud spread aligned onto its own hours (0.0 where absent)."""
+    """Return ``series`` with the ensemble cloud spread aligned onto its own hours, None where absent.
+
+    The ensemble call is best effort and its window does not always match; an hour it did not cover
+    has no spread, which is not the same as a spread of zero. Filled with zero it reads downstream as
+    every model agreeing exactly, and the published reliability rises on a call that failed.
+    """
     by_time = dict(zip(spread_times, spread_vals))
-    return replace(series, cloud_spread=[by_time.get(t, 0.0) for t in series.times])
+    return replace(series, cloud_spread=[by_time.get(t) for t in series.times])
 
 
 async def _get_json(session: ClientSession, url: str) -> Optional[dict]:
@@ -336,12 +363,20 @@ async def fetch_weather(
     series is returned with a zero spread rather than failing the whole refresh."""
     base_url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days)
     ensemble_url = build_weather_url(lat, lon, past_days=past_days, forecast_days=forecast_days, ensemble=True)
+    # return_exceptions so a raised values call does not leave the ensemble call running with nobody
+    # holding it: gather cancels nothing on the first failure, and that task is created here rather
+    # than by the config entry, so unloading the entry would not reach it either.
     series, spread = await asyncio.gather(
         _fetch_parsed(session, base_url, parse_weather),
         _ensemble_spread(session, ensemble_url),
+        return_exceptions=True,
     )
+    # Both are settled by now, so nothing is left running. The values call's failure is still the
+    # caller's to handle, and becomes the retry it was before; the ensemble call's is not.
+    if isinstance(series, BaseException):
+        raise series
     if series is None:
         return None
-    if spread is not None:
-        series = _overlay_cloud_spread(series, spread[0], spread[1])
-    return series
+    if isinstance(spread, BaseException) or spread is None:
+        return series
+    return _overlay_cloud_spread(series, spread[0], spread[1])

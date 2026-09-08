@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
@@ -36,6 +37,26 @@ def test_day_energy_raw_kwh_sums_pv_raw_w_the_same_way_as_energy_kwh() -> None:
     assert abs(s.days[0].energy_kwh - 2.4) < 1e-9  # 24 x 100 W x 1h
     assert abs(s.days[0].energy_raw_kwh - 4.8) < 1e-9  # 24 x 200 W x 1h
     assert abs(s.days[0].energy_raw_kwh - 2 * s.days[0].energy_kwh) < 1e-9
+
+
+def test_the_days_are_cut_on_the_local_midnight_not_on_utc() -> None:
+    """summarize is the only code that turns the curve into the calendar days the user reads, and
+    every other test here passes UTC, where a wrong boundary looks right. At UTC+2 in summer, the two
+    hours before local midnight belong to today; taken on UTC they would open tomorrow."""
+    paris = ZoneInfo("Europe/Paris")
+    # Local midnight on 21 June is 22:00 UTC on the 20th. Two 15-minute buckets on each side of it.
+    base = datetime(2026, 6, 20, 21, 30, tzinfo=_UTC)
+    points = [ForecastPoint(t=base + timedelta(minutes=15 * i), pv_w=4000.0, pv_raw_w=4000.0) for i in range(4)]
+
+    summary = summarize(points, now=base, tz=paris, step_minutes=15)
+
+    # Two buckets before local midnight, two after: two kWh each side, not four on a single day.
+    assert (summary.days[0].date, summary.days[0].energy_kwh) == ("2026-06-20", 2.0)
+    assert (summary.days[1].date, summary.days[1].energy_kwh) == ("2026-06-21", 2.0)
+
+    # And which day is "today" is the local one: at 23:30 UTC it is already tomorrow in Paris.
+    late = summarize(points, now=datetime(2026, 6, 20, 23, 30, tzinfo=_UTC), tz=paris, step_minutes=15)
+    assert late.days[0].date == "2026-06-21"
 
 
 def test_power_now_and_next_hour() -> None:
@@ -111,7 +132,7 @@ def test_power_now_band_interpolates_when_both_buckets_have_one() -> None:
 def test_power_now_band_falls_back_to_the_future_side_when_the_past_side_lacks_one() -> None:
     """The realistic shape at "now": the lower bracket is always at or before
     ``now``, and past points never carry a band (enrich_points only attaches
-    one to the future). #421/#51: this used to return None here, permanently,
+    one to the future). This used to return None here, permanently,
     on any install with a solid enough analog library for the future side to
     actually have a band - which is exactly when it should stop being None."""
     base = datetime(2026, 6, 21, tzinfo=_UTC)

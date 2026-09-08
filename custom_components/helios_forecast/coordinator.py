@@ -13,20 +13,19 @@ import asyncio
 import math
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from functools import partial
 from typing import Any, Dict, List, Optional, Set
 
 from homeassistant.components.recorder import get_instance, history
 from homeassistant.components.recorder.models import StatisticMetaData
 from homeassistant.components.recorder.statistics import (
-    async_import_statistics,
+    async_add_external_statistics,
     statistics_during_period,
 )
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CoreState, HomeAssistant, callback
-from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -35,44 +34,45 @@ from homeassistant.util import dt as dt_util
 
 from .config import (
     battery_from_config,
+    benchmark_enabled_from_config,
     inverter_max_w_from_config,
     layout_from_config,
     learning_from_config,
+    lines_from_config,
     location_from_config,
     trend_anchor_hour_from_config,
     curtailment_entity_from_config,
-    lines_from_config,
     CONF_BATTERY_CAPACITY_KWH,
     CONF_BATTERY_SOC_ENTITY,
-    CONF_BENCHMARK_ENABLED,
-    CONF_BENCHMARK_KEY,
-    CONF_BENCHMARK_URL,
     CONF_INVERTER_MAX_KW,
 )
-from .benchmark import DEFAULT_ENDPOINT, async_upload, build_payload
 from .checkup import (
     EntitySnapshot,
     Problem,
-    check_benchmark_quality,
     check_config,
+    check_benchmark_quality,
     check_consumption_coverage,
     check_entities,
     check_production_history,
 )
 from . import repairs
+from .archive import metadata as archive_metadata
 from .analog import build_library, enrich_archive_points, enrich_points
 from .curtailment import flag_curtailed, on_intervals_from_states
 from .battery import BatterySocPoint, project_battery_soc
+from .benchmark import DEFAULT_ENDPOINT, async_upload, build_payload
 from .consumption import ConsumptionProfile, build_consumption_profile, consumption_sources
 from .trend import TodayTrend, TrendReference, compute_trend, should_capture
 from .const import DOMAIN
 from .forecast import ForecastPoint, build_forecast_series
 from .openmeteo import WeatherSeries, fetch_weather
-from .reliability import Reliability, compute_reliability
+from .reliability import SKILL_WINDOW_DAYS, Reliability, compute_reliability
 from .statistics import (
+    ARCHIVED_SERIES,
     FORECAST_ENERGY_KEY,
     FORECAST_POWER_KEY,
     WEATHER_FIELDS,
+    external_statistic_id,
     forecast_statistics,
     hourly_statistics,
     observed_snapshot,
@@ -86,48 +86,20 @@ from .solar.residual import (
 )
 from .summary import ForecastSummary, summarize
 
-# Compat: `mean_type` and `unit_class` are mandatory in newer StatisticMetaData and absent from older
-# cores, so they are imported defensively.
-try:
-    from homeassistant.components.recorder.models import StatisticMeanType
-
-    _MEAN_TYPE_ARITHMETIC = StatisticMeanType.ARITHMETIC
-except ImportError:  # pragma: no cover - older HA cores
-    _MEAN_TYPE_ARITHMETIC = None
-
-
-# `unit_class` names the unit-conversion class HA uses to migrate a statistic's history if its unit
-# later changes. We derive the unit -> class map from the core's own converters so the value always
-# matches the installed core. Units with no converter (e.g. W/m2 irradiance) map to None, the correct
-# "not convertible" answer. The key is always declared in the metadata; cores predating it ignore it.
-def _build_unit_classes() -> Dict[str, Optional[str]]:
-    mapping: Dict[str, Optional[str]] = {}
-    try:
-        from homeassistant.util import unit_conversion as _uc
-    except ImportError:  # pragma: no cover - older HA cores
-        return mapping
-    for name in (
-        "PowerConverter",
-        "EnergyConverter",
-        "TemperatureConverter",
-        "SpeedConverter",
-        "DistanceConverter",
-        "UnitlessRatioConverter",
-    ):
-        converter = getattr(_uc, name, None)
-        unit_class = getattr(converter, "UNIT_CLASS", None)
-        if converter is None or unit_class is None:
-            continue
-        for unit in getattr(converter, "VALID_UNITS", ()):  # e.g. "W" -> "power"
-            mapping.setdefault(unit, unit_class)
-    return mapping
-
-
-_UNIT_CLASSES: Dict[str, Optional[str]] = _build_unit_classes()
+# The interface has no entity to borrow a name from for these series, so the metadata carries one.
+# The unit and the name every archived series is written with, taken from the one list the
+# migration also reads, so a series cannot be written under one unit and moved under another.
+_SERIES: Dict[str, tuple[str, str]] = {key: (unit, name) for key, unit, name in ARCHIVED_SERIES}
 
 _LOGGER = logging.getLogger(__name__)
 
 UPDATE_INTERVAL = timedelta(minutes=30)
+# How far back the weather archive keeps re-offering its hours. Open-Meteo publishes a past hour with
+# a delay, so the most recently completed hours routinely carry no value yet, and an archive that
+# moved its high-water mark past them would skip them for good: a refresh with an older hour to write
+# leapfrogs the one that has not arrived. Re-offering costs nothing, the write is an upsert, and an
+# hour that never arrives is given up at the end of this window rather than rescanning for ever.
+ARCHIVE_RETRY_HOURS = 6
 STEP_MINUTES = 15
 FORECAST_DAYS = 7
 # How far ahead the battery SoC projection runs. Reaches past the FOLLOWING day's solar peak, so a
@@ -168,13 +140,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=UPDATE_INTERVAL)
         self.entry = entry
-        # Last weather window fetched, kept so the statistics archive can be
-        # written both at the end of a refresh and once right after the sensor
-        # entities are registered (so the first backfill lands immediately).
+        # Last weather window fetched, kept so the statistics archive can be written both at the
+        # end of a refresh and once at setup (so the first backfill lands immediately).
         self.weather_series: Optional[WeatherSeries] = None
-        # Predicted-production statistic rows from the most recent refresh, keyed by archive entity
-        # key. Written to HA statistics by write_forecast_statistics, both at refresh end and once
-        # right after the entities register (first backfill).
+        # Predicted-production statistic rows from the most recent refresh, keyed by series key.
+        # Written to HA statistics by write_forecast_statistics, both at the end of a refresh and
+        # once at setup (first backfill).
         self._forecast_stat_rows: Dict[str, List[Dict[str, Any]]] = {}
         # Hourly predicted points over the past window (now - LEARN_DAYS .. current hour), kept so
         # the detail websocket can serve the past forecast curve the live `points` (today onward) do
@@ -186,9 +157,13 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # The UTC hour the archive was last recomputed. The 60-day past curve only changes at its
         # trailing hour, so it is rebuilt once an hour rather than on every 30-minute refresh.
         self._last_archive_hour: Optional[datetime] = None
-        # The UTC hour up to which the weather statistics have been written. A refresh then imports only
-        # the new hours; the full 60-day backfill (self-heal) runs once at startup.
+        # How far the weather archive is considered settled: the newest hour written, less the window
+        # it keeps re-offering, so it deliberately lags what has been written. A refresh imports only
+        # the hours after it; the full 60-day backfill (self-heal) runs once at startup.
         self._last_weather_stat_hour: Optional[datetime] = None
+        # When the weather series in hand was actually fetched. A refresh that reuses an older series
+        # knows the past only up to here, so the archive stops there instead of at the wall clock.
+        self._weather_fetched_at: Optional[datetime] = None
         # Home consumption profile for the SoC projection; rebuilt hourly by _consumption_profile_for.
         self._consumption_profile: Optional[ConsumptionProfile] = None
         self._last_consumption_hour: Optional[datetime] = None
@@ -200,19 +175,26 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         self._trend_store: Store = Store(hass, 1, f"{DOMAIN}.{entry.entry_id}.trend")
         self._trend_ref: Optional[TrendReference] = None
         self._trend_loaded = False
+        # What was predicted for each recent day, written down before that day happened. The only way
+        # the skill term measures anything: the archive is rebuilt every hour by a model fitted on the
+        # very production it would be compared against.
+        self._skill_store: Store = Store(hass, 1, f"{DOMAIN}.{entry.entry_id}.day_ahead")
+        self._day_ahead: Dict[date, float] = {}
+        self._day_ahead_loaded = False
         # Last-logged reason the battery SoC projection was skipped, so _battery_off() warns once per reason.
         self._battery_off_logged: Optional[str] = None
-        # The hour whose prediction was last handed to the benchmark collector, and this integration's
-        # version, read once from the manifest so every emission says which model produced it.
+        # Benchmark: the hour whose prediction was last handed to the collector, this integration's
+        # own version string (read once from the manifest, and what the collector gates on), and the
+        # collector's latest verdict on this installation, which the check-up turns into a repair.
         self._last_upload_hour: Optional[datetime] = None
         self._version: Optional[str] = None
-        # The check-up (checkup.py): the problems found by the latest pass, the repair issues published for
-        # them, whether the production history could be read this refresh (a fetch that failed is not a
-        # silent meter), and the collector's latest verdict on this installation.
+        self._benchmark_quality: Optional[Dict[str, Any]] = None
+        # The check-up (checkup.py): the problems found by the latest pass, the repair issues published
+        # for them, and whether the production history could be read this refresh (a fetch that failed is
+        # not a silent meter).
         self.problems: List[Problem] = []
         self._issue_ids: Set[str] = set()
         self._production_history_read = False
-        self._benchmark_quality: Optional[Dict[str, Any]] = None
 
     def _config(self) -> Dict[str, Any]:
         return {**self.entry.data, **self.entry.options}
@@ -256,9 +238,9 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         return problems
 
     @callback
-    def _publish_problems(self, problems: List[Problem]) -> None:
+    def _publish_problems(self, problems: List[Problem], *, retire: bool = True) -> None:
         self.problems = list(problems)
-        self._issue_ids = repairs.sync(self.hass, self.entry, self.problems, self._issue_ids)
+        self._issue_ids = repairs.sync(self.hass, self.entry, self.problems, self._issue_ids, retire=retire)
 
     @callback
     def clear_problems(self) -> None:
@@ -276,15 +258,23 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # The configuration is judged before anything is fetched, so a wrong field shows up even when the
         # weather service is down; the data checks join the list as the refresh reads each source.
         problems = self._check_configuration(data)
-        self._publish_problems(problems)
+        # Adds only: the data checks have not run yet, and retiring on a partial list would delete
+        # every issue they raised and create it again at the end of this same refresh.
+        self._publish_problems(problems, retire=False)
 
-        # One combined window: 60 past days feed the learning, 7 future the forecast.
+        # One combined window: 60 past days feed the learning, the future days the forecast. Open-Meteo
+        # answers whole UTC days while the horizon below runs on local midnights, so west of Greenwich
+        # the last local day ends after the final UTC hour of a FORECAST_DAYS window; one day of slack
+        # covers every offset, and build_forecast_series stops at the weather either way.
         try:
-            weather = await fetch_weather(session, lat, lon, past_days=LEARN_DAYS, forecast_days=FORECAST_DAYS)
-            # A transient empty response should not blank the forecast: reuse the last good
-            # fetch so the model still runs. The data is only ~30 min old and the
-            # next refresh recovers; a first-ever empty response (no prior fetch) still fails.
-            if weather is None and self.weather_series is not None:
+            weather = await fetch_weather(session, lat, lon, past_days=LEARN_DAYS, forecast_days=FORECAST_DAYS + 1)
+            if weather is not None:
+                self._weather_fetched_at = dt_util.utcnow()
+            # A transient empty response should not blank the forecast: reuse the last good fetch so
+            # the model still runs, for as long as the service stays silent. What that series does not
+            # gain is knowledge of the hours since, which is why the archive is bounded by the fetch
+            # instant above; a first-ever empty response (no prior fetch) still fails.
+            elif self.weather_series is not None:
                 _LOGGER.warning("Open-Meteo returned no weather data; reusing the last successful fetch")
                 weather = self.weather_series
         except Exception as err:  # noqa: BLE001 - any transport error becomes a retry
@@ -294,7 +284,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             raise UpdateFailed("Open-Meteo returned no weather data")
 
         now = dt_util.now()  # local-aware, drives the local-day boundaries
-        residual_map = await self._build_residual_map(data, lat, lon, layout, weather, now)
+        residual_map = await self._build_residual_map(data, lat, lon, layout, cap, weather, now)
         production_entity = learning_from_config(data)
         if production_entity and self._production_history_read:
             problems += check_production_history(
@@ -333,8 +323,13 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             enrich_archive_points, [p for p in points if p.t < now], analog_library, weather, lat, lon
         )
 
+        # The sensors read the same curve the card draws: clamped up to now, raw after it. "Now" always
+        # falls inside a step that began in the past, so power_now used to answer from a raw elapsed
+        # point while the card showed the clamped one for that very instant, and on a shaded roof the
+        # two disagreed by the whole height of the learned ceiling.
+        served = self.elapsed_points + [p for p in points if p.t >= now]
         summary = await self.hass.async_add_executor_job(
-            partial(summarize, points, now=now, tz=dt_util.DEFAULT_TIME_ZONE, step_minutes=STEP_MINUTES)
+            partial(summarize, served, now=now, tz=dt_util.DEFAULT_TIME_ZONE, step_minutes=STEP_MINUTES)
         )
 
         now_utc = dt_util.utcnow()
@@ -357,20 +352,19 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             self.write_forecast_statistics()
             self._last_archive_hour = archive_hour
 
-        # Reliability index: blends learning maturity, recent predicted-vs-actual skill and today's
-        # cloud predictability. Reuses the production history already fetched for the residual map and
-        # the hourly archive points, so no extra recorder or model work.
+        # Reliability index: blends learning maturity, day-ahead-versus-measured skill and today's
+        # cloud predictability. Reuses the production history already fetched for the residual map, so
+        # no extra recorder work.
+        day_ahead = await self._record_day_ahead(now, summary)
         reliability = await self.hass.async_add_executor_job(
-            compute_reliability, self._production_buckets, self.archive_points, weather, now, dt_util.DEFAULT_TIME_ZONE
+            compute_reliability, self._production_buckets, day_ahead, weather, now, dt_util.DEFAULT_TIME_ZONE
         )
 
         trend = await self._today_trend(data, now, summary)
         battery_soc = await self._project_battery_soc(data, points, now)
         if self._consumption_profile is not None:
             problems += check_consumption_coverage(self._consumption_profile.coverage)
-        problems += check_benchmark_quality(self._benchmark_quality)
         self._publish_problems(problems)
-        await self._maybe_upload_benchmark(data, lat, lon, points, reliability, now_utc)
 
         return ForecastData(
             points=points,
@@ -381,67 +375,6 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             trend=trend,
             battery_soc=battery_soc,
         )
-
-    async def _maybe_upload_benchmark(self, data, lat, lon, points, reliability, now_utc) -> None:
-        """Hand this hour's prediction to the benchmark collector, when the entry opted in.
-
-        Started beside the refresh instead of inside it: a collector that is slow, unreachable or
-        gone must never hold up a forecast. Once an hour, whatever the refresh rate. The whole
-        thing is wrapped: an optional upload has no business failing a forecast, so anything that
-        goes wrong on the way out is a debug line and nothing more (see benchmark.py).
-        """
-        if not data.get(CONF_BENCHMARK_ENABLED):
-            return
-        key = str(data.get(CONF_BENCHMARK_KEY) or "").strip()
-        if not key:
-            return
-        hour = now_utc.replace(minute=0, second=0, microsecond=0)
-        if self._last_upload_hour == hour:
-            return
-        self._last_upload_hour = hour
-        try:
-            await self._upload_benchmark(data, lat, lon, points, reliability, now_utc, key)
-        except Exception as err:  # noqa: BLE001 - see the docstring
-            _LOGGER.debug("Benchmark emission skipped: %s", err)
-
-    async def _upload_benchmark(self, data, lat, lon, points, reliability, now_utc, key) -> None:
-        """Assemble this hour's emission and hand it to a background task."""
-        if self._version is None:
-            integration = await async_get_integration(self.hass, DOMAIN)
-            self._version = str(integration.version)
-        payload = build_payload(
-            entry_id=self.entry.entry_id,
-            version=self._version,
-            emitted_at=now_utc,
-            latitude=lat,
-            longitude=lon,
-            lines=lines_from_config(data),
-            country=self.hass.config.country,
-            inverter_max_kw=data.get(CONF_INVERTER_MAX_KW),
-            points=points,
-            reliability=reliability,
-            production=self._production_buckets,
-            has_battery=bool(data.get(CONF_BATTERY_CAPACITY_KWH) and data.get(CONF_BATTERY_SOC_ENTITY)),
-            has_curtailment_signal=bool(curtailment_entity_from_config(data)),
-        )
-        url = str(data.get(CONF_BENCHMARK_URL) or "").strip() or DEFAULT_ENDPOINT
-        session = async_get_clientsession(self.hass)
-        self.entry.async_create_background_task(
-            self.hass, self._upload_and_note(session, url, key, payload), name=f"{DOMAIN}-benchmark-upload"
-        )
-
-    async def _upload_and_note(self, session, url, key, payload) -> None:
-        """Send the emission and keep what the collector said of this installation: an exclusion from the
-        public figures is a configuration problem the owner should hear about from here, not from the site."""
-        answer = await async_upload(session, url, key, payload)
-        if not isinstance(answer, dict) or "quality" not in answer:
-            return
-        quality = answer.get("quality") if isinstance(answer.get("quality"), dict) else {}
-        if quality == self._benchmark_quality:
-            return
-        self._benchmark_quality = quality
-        kept = [p for p in self.problems if p.key != "benchmark_excluded"]
-        self._publish_problems(kept + check_benchmark_quality(quality))
 
     async def _project_battery_soc(self, data, points, now) -> List[BatterySocPoint]:
         """Project the battery SoC over the next BATTERY_SOC_HORIZON_HOURS, or [] when the feature can't run.
@@ -565,6 +498,91 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             self._consumption_profile = profile
         return self._consumption_profile
 
+    async def _maybe_upload_benchmark(self, data, lat, lon, points, reliability, now_utc) -> None:
+        """Hand this hour's prediction to the benchmark collector, when the entry opted in.
+
+        Started beside the refresh instead of inside it: a collector that is slow, unreachable or
+        gone must never hold up a forecast. Once an hour, whatever the refresh rate. The whole thing
+        is wrapped: an optional upload has no business failing a forecast, so anything that goes
+        wrong on the way out is a debug line and nothing more (see benchmark.py).
+        """
+        if not benchmark_enabled_from_config(data):
+            return
+        hour = now_utc.replace(minute=0, second=0, microsecond=0)
+        if self._last_upload_hour == hour:
+            return
+        self._last_upload_hour = hour
+        try:
+            await self._upload_benchmark(data, lat, lon, points, reliability, now_utc)
+        except Exception as err:  # noqa: BLE001 - see the docstring
+            _LOGGER.debug("Benchmark emission skipped: %s", err)
+
+    async def _upload_benchmark(self, data, lat, lon, points, reliability, now_utc) -> None:
+        """Assemble this hour's emission and hand it to a background task."""
+        if self._version is None:
+            integration = await async_get_integration(self.hass, DOMAIN)
+            self._version = str(integration.version)
+        payload = build_payload(
+            entry_id=self.entry.entry_id,
+            version=self._version,
+            emitted_at=now_utc,
+            latitude=lat,
+            longitude=lon,
+            lines=lines_from_config(data),
+            country=self.hass.config.country,
+            inverter_max_kw=data.get(CONF_INVERTER_MAX_KW),
+            points=points,
+            reliability=reliability,
+            production=self._production_buckets,
+            has_battery=bool(data.get(CONF_BATTERY_CAPACITY_KWH) and data.get(CONF_BATTERY_SOC_ENTITY)),
+            has_curtailment_signal=bool(curtailment_entity_from_config(data)),
+        )
+        session = async_get_clientsession(self.hass)
+        self.entry.async_create_background_task(
+            self.hass, self._upload_and_note(session, DEFAULT_ENDPOINT, payload), name=f"{DOMAIN}-benchmark-upload"
+        )
+
+    async def _upload_and_note(self, session, url, payload) -> None:
+        """Send the emission and keep what the collector said of this installation: an exclusion from
+        the public figures is a configuration problem the owner should hear about from here, not from
+        the site."""
+        answer = await async_upload(session, url, payload)
+        if not isinstance(answer, dict) or "quality" not in answer:
+            return
+        quality = answer.get("quality") if isinstance(answer.get("quality"), dict) else {}
+        if quality == self._benchmark_quality:
+            return
+        self._benchmark_quality = quality
+        kept = [p for p in self.problems if p.key != "benchmark_excluded"]
+        self._publish_problems(kept + check_benchmark_quality(quality))
+
+    async def _record_day_ahead(self, now: datetime, summary) -> Dict[date, float]:
+        """Write down tomorrow's predicted total, once, and return the recent days already written.
+
+        Recorded the first time a day is seen as tomorrow, so the entry is always made before that day
+        starts and can never have been fitted on it. The lead time therefore varies with when Home
+        Assistant happens to be running, which is fine: what matters is that the prediction is older
+        than the measurement it is scored against.
+        """
+        if not self._day_ahead_loaded:
+            stored = await self._skill_store.async_load()
+            for key, value in (stored or {}).get("days", {}).items():
+                try:
+                    self._day_ahead[date.fromisoformat(key)] = float(value)
+                except (TypeError, ValueError):
+                    continue
+            self._day_ahead_loaded = True
+
+        tomorrow = now.date() + timedelta(days=1)
+        if tomorrow not in self._day_ahead and len(summary.days) > 1:
+            self._day_ahead[tomorrow] = summary.days[1].energy_kwh
+            oldest = now.date() - timedelta(days=SKILL_WINDOW_DAYS + 1)
+            self._day_ahead = {d: kwh for d, kwh in self._day_ahead.items() if d >= oldest}
+            await self._skill_store.async_save(
+                {"days": {d.isoformat(): kwh for d, kwh in sorted(self._day_ahead.items())}}
+            )
+        return self._day_ahead
+
     async def _today_trend(self, data, now, summary) -> TodayTrend:
         """Today's predicted total versus its frozen daily reference (default 06:00).
 
@@ -574,14 +592,20 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         current = summary.days[0].energy_kwh if summary.days else 0.0
 
         if not self._trend_loaded:
-            stored = await self._trend_store.async_load()
-            if stored and stored.get("date") and stored.get("captured_at"):
-                self._trend_ref = TrendReference(
-                    date=stored["date"],
-                    kwh=float(stored["kwh"]),
-                    captured_at=dt_util.parse_datetime(stored["captured_at"]),
-                )
+            stored = await self._trend_store.async_load() or {}
             self._trend_loaded = True
+            # A store file is not something a user can go and repair, so anything unreadable in it
+            # starts the day over rather than raising out of every refresh and failing the setup.
+            try:
+                if stored.get("date") and stored.get("captured_at"):
+                    self._trend_ref = TrendReference(
+                        date=str(stored["date"]),
+                        kwh=float(stored["kwh"]),
+                        captured_at=dt_util.parse_datetime(str(stored["captured_at"])),
+                    )
+            except (KeyError, TypeError, ValueError):
+                _LOGGER.warning("Ignored an unreadable today-trend reference; today's trend starts over")
+                self._trend_ref = None
 
         anchor = trend_anchor_hour_from_config(data)
         if should_capture(self._trend_ref, today_date, now, anchor):
@@ -598,48 +622,46 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
     @callback
     def write_weather_statistics(self, now: datetime, *, full: bool = False) -> None:
-        """Copy the past weather hours into HA long-term statistics.
+        """Copy the past weather hours into this integration's own long-term statistics.
 
-        A refresh imports only the hours added since the last write; the full 60-day backfill (install
-        and self-heal after downtime) runs once at startup with ``full=True``. Only completed hours are
-        written, the in-progress current hour is left to the recorder. Skips a field until its sensor
-        entity is registered (the statistic_id is the entity_id), so the first backfill lands once setup
-        has added the entities.
+        A refresh imports the hours added since the last write, plus the trailing window it always
+        re-offers; the full 60-day backfill (install and self-heal after downtime) runs once at
+        startup with ``full=True``. Only completed hours are written, the in-progress current hour is
+        left out. The series belong to this integration rather than to the weather sensors (see
+        archive.py), so nothing here depends on an entity being registered and the recorder never
+        writes the same rows from its side.
         """
         weather = self.weather_series
         if weather is None:
             return
 
-        cutoff = now.replace(minute=0, second=0, microsecond=0)
+        # The series knows the past up to the moment it was fetched and no further. On a refresh that
+        # reused an older series, the hours since are its forecast, not the observed record, and writing
+        # them would also carry the mark past hours nobody has measured yet.
+        known_until = min(now, self._weather_fetched_at) if self._weather_fetched_at is not None else now
+        cutoff = known_until.replace(minute=0, second=0, microsecond=0)
         since = None if (full or self._last_weather_stat_hour is None) else self._last_weather_stat_hour
-        registry = er.async_get(self.hass)
-        wrote_any = False
+        newest: Optional[datetime] = None
         for field in WEATHER_FIELDS:
-            entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"{self.entry.entry_id}_{field.key}")
-            if entity_id is None:
-                continue
             rows = hourly_statistics(weather.times, getattr(weather, field.attr), cutoff, since=since)
             if not rows:
                 continue
-            # mean_type + unit_class are declared statically (not added after the literal) so both the
-            # runtime and static API scanners see them. has_mean stays for cores that predate mean_type,
-            # where the extra key is ignored.
-            metadata: StatisticMetaData = {
-                "has_mean": True,
-                "mean_type": _MEAN_TYPE_ARITHMETIC,
-                "has_sum": False,
-                "name": None,
-                "source": "recorder",
-                "statistic_id": entity_id,
-                "unit_of_measurement": field.unit,
-                "unit_class": _UNIT_CLASSES.get(field.unit),
-            }
-            async_import_statistics(self.hass, metadata, rows)
-            wrote_any = True
-        # Advance the marker only once the entities exist and a write happened, so a pre-registration
-        # call does not skip the backlog the first real backfill still has to cover.
-        if wrote_any:
-            self._last_weather_stat_hour = cutoff
+            newest = max(newest, rows[-1]["start"]) if newest else rows[-1]["start"]
+            unit, name = _SERIES[field.key]
+            metadata: StatisticMetaData = archive_metadata(
+                external_statistic_id(self.entry.entry_id, field.key), unit, name
+            )
+            async_add_external_statistics(self.hass, metadata, rows)
+        if newest is None:
+            return
+        # The mark follows the newest hour actually written, stops short of it by the trailing window
+        # and never moves backwards (see ARCHIVE_RETRY_HOURS), so an hour the weather service has not
+        # published yet is offered again on the next refresh instead of being left behind by the one
+        # that has. Taken from the clock instead, a machine whose time runs ahead strands it in the
+        # future and the archive then writes nothing at all until real time catches up.
+        mark = newest - timedelta(hours=ARCHIVE_RETRY_HOURS)
+        if self._last_weather_stat_hour is None or mark > self._last_weather_stat_hour:
+            self._last_weather_stat_hour = mark
 
     def _compute_archive_points(self, now, weather, layout, lat, lon, cap, residual_map, analog_library):
         """Hourly predicted points over the past window [now - LEARN_DAYS, current hour).
@@ -666,38 +688,28 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
 
     @callback
     def write_forecast_statistics(self) -> None:
-        """Copy the predicted-production rows into HA long-term statistics.
+        """Copy the predicted-production rows into this integration's own long-term statistics.
 
-        Idempotent: re-importing the trailing window every refresh backfills on install and
-        self-heals downtime gaps. Skips an archive entity until it is registered (the statistic_id is
-        the entity_id), so the first call lands once setup has added the entities.
+        Idempotent, and deliberately whole: the sixty-day window is rebuilt and re-imported rather
+        than appended to, which backfills on install and closes any gap left by downtime. The write is
+        an upsert, so re-offering an hour costs an update and never a duplicate. Runs at most once an
+        hour, with the archive rebuild it follows, not on every refresh. Like the weather archive
+        these are integration-owned series with no entity behind them, which is why they survived the
+        removal of the two archive sensors.
         """
         rows_by_key = self._forecast_stat_rows
         if not rows_by_key:
             return
 
-        registry = er.async_get(self.hass)
-        for key, unit in ((FORECAST_POWER_KEY, "W"), (FORECAST_ENERGY_KEY, "kWh")):
+        for key in (FORECAST_POWER_KEY, FORECAST_ENERGY_KEY):
             rows = rows_by_key.get(key)
             if not rows:
                 continue
-            entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"{self.entry.entry_id}_{key}")
-            if entity_id is None:
-                continue
-            # Same static mean_type + unit_class declaration as the weather archive above.
-            metadata: StatisticMetaData = {
-                "has_mean": True,
-                "mean_type": _MEAN_TYPE_ARITHMETIC,
-                "has_sum": False,
-                "name": None,
-                "source": "recorder",
-                "statistic_id": entity_id,
-                "unit_of_measurement": unit,
-                "unit_class": _UNIT_CLASSES.get(unit),
-            }
-            async_import_statistics(self.hass, metadata, rows)
+            unit, name = _SERIES[key]
+            metadata: StatisticMetaData = archive_metadata(external_statistic_id(self.entry.entry_id, key), unit, name)
+            async_add_external_statistics(self.hass, metadata, rows)
 
-    async def _build_residual_map(self, data, lat, lon, layout, weather, now):
+    async def _build_residual_map(self, data, lat, lon, layout, cap, weather, now):
         """Learn the actual/model residual from the recorder's production history."""
         self._production_buckets = []
         self._production_history_read = False
@@ -734,6 +746,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 lon=lon,
                 layout=layout,
                 production=production,
+                inverter_max_w=cap,
                 cloud_times=[t.timestamp() * 1000.0 for t in weather.times],
                 cloud=weather.cloud,
                 shortwave=weather.shortwave,

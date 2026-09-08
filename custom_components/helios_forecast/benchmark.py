@@ -7,17 +7,18 @@ hour after hour, what it announced before reality had a say. That is all this do
 hour it posts the curve this entry currently predicts, together with the production already
 measured, and an external collector scores the two against each other once the day is over.
 
-Off unless switched on. What it sends is fixed and deliberately small: the geometry of the
-installation, the predicted curve with the cloud cover behind it, the measured production and the
-reliability index. No
-entity names, no consumption, no other sensor, nothing about the rest of the house.
-Coordinates are rounded to two decimals, roughly a kilometre, which no weather model can
-tell apart and which keeps a street address out of the upload. The site is identified by a
-hash of the config entry, so the collector can follow one installation over time without
-ever being told whose it is.
+Off unless switched on, and switched on is the whole of it: there is no key to ask for and none
+to keep. What it sends is fixed and deliberately small: the geometry of the installation, the
+predicted curve with the cloud cover behind it, the measured production and the reliability index.
+No entity names, no consumption, no other sensor, nothing about the rest of the house. Coordinates
+are rounded to two decimals, roughly a kilometre, which no weather model can tell apart and which
+keeps a street address out of the upload. The site is identified by a hash of the config entry,
+which Home Assistant generates when the integration is added and which survives restarts, updates,
+reconfigurations and backups. So the collector can follow one installation over time without ever
+being told whose it is, and without anybody having to carry a credential around.
 
 The upload runs beside the refresh, never inside it: it cannot delay a forecast, and any
-failure (server down, no network, bad key) is dropped after a debug line. A missed hour is
+failure (server down, no network, a refused version) is dropped after a debug line. A missed hour is
 a missing row in someone's benchmark, never a broken integration.
 """
 
@@ -31,9 +32,11 @@ from typing import Any, Dict, List, Optional
 
 _LOGGER = logging.getLogger(__name__)
 
-# Payload shape. The collector refuses what it does not know how to read, so this only ever
-# goes up when a field changes meaning.
-SCHEMA_VERSION = 1
+# Payload shape. The collector refuses what it does not know how to read, so this only ever goes up
+# when a field changes meaning. Three, and the collector accepts nothing else: the store starts empty
+# with this release, so there is no older row to stay readable for and no compatibility branch to
+# carry.
+SCHEMA_VERSION = 3
 
 # Where an upload goes when the entry does not name its own collector.
 DEFAULT_ENDPOINT = "https://helios-ha.org/bench/v1/emissions"
@@ -148,21 +151,19 @@ def build_payload(
     }
 
 
-async def async_upload(session: Any, url: str, key: str, payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+async def async_upload(session: Any, url: str, payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Post one emission. The collector's answer (a dict) when it accepted it, None otherwise.
 
     The answer carries `quality`, the collector's verdict on this installation (excluded from the
     public figures, and why), which the check-up turns into a repair issue. Swallows everything
     else: an upload is never a reason for a forecast to fail, and the caller has nothing useful to
-    do with the error beyond leaving it in the debug log.
+    do with the error beyond leaving it in the debug log. A refusal is one of those: the collector
+    turns away a version older than the one the current round of measurement is on, which is not a
+    fault of the installation and not something to interrupt it for.
     """
     try:
         async with asyncio.timeout(_TIMEOUT_S):
-            async with session.post(
-                url,
-                json=payload,
-                headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-            ) as response:
+            async with session.post(url, json=payload, headers={"Content-Type": "application/json"}) as response:
                 if response.status >= 400:
                     _LOGGER.debug("Benchmark upload refused with status %s", response.status)
                     return None

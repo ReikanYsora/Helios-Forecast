@@ -19,8 +19,10 @@ This refines the physical model rather than replacing it: when few close analogs
 exist (cold start, unusual conditions) the prediction blends back toward the
 physical value by confidence, so the forecast degrades gracefully.
 
-Pure functions, no Home Assistant. Production buckets are duck-typed
-(``.start_ms`` + ``.end_ms`` + ``.kwh``); the only dependency is the sun geometry.
+Pure functions, no Home Assistant. Production buckets are the ProductionBucket
+of solar/residual.py, and the ratio side needs the whole PV power model, not the
+sun geometry alone: it compares the meter against what the model said for that
+same hour, inverter cap included.
 """
 
 from __future__ import annotations
@@ -28,14 +30,14 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, TypeGuard
 
 from .forecast import ForecastPoint
 from .openmeteo import WeatherSeries
 from .solar.geometry import sun_position
 from .solar.irradiance import snow_cover_factor
 from .solar.power import PvLayout, WeatherSample, compute_pv_power_per_array
-from .solar.residual import capped_model_kwh
+from .solar.residual import ProductionBucket, capped_model_kwh, implausible_hour
 
 # Feature weights in the (normalised) distance. Cloud is the variable that drives
 # production at a fixed geometry, so it dominates; altitude sets the available
@@ -51,25 +53,34 @@ _W_AZ = 0.3
 # overriding cloud/geometry.
 _TEMP_SCALE = 15.0
 # Distance contributed when either side has no temperature reading. A missing reading is not a
-# match: it is worse than a real 8 degC mismatch (about half a typical seasonal swing) but still
-# small enough that an otherwise excellent geometry+cloud analog is not thrown out for it.
-_TEMP_MISSING_PENALTY = _W_TEMP * (8.0 / _TEMP_SCALE) ** 2
+# match, so it ranks behind any real reading, but it has to stay under _CLOSE_D2 below: above it,
+# one absent reading puts EVERY analog beyond the close threshold at once, the confidence collapses
+# to zero and the whole correction switches itself off on a site whose weather carries no
+# temperature. Worth about a 4 degC mismatch.
+_TEMP_MISSING_PENALTY = _W_TEMP * (4.0 / _TEMP_SCALE) ** 2
 
 # Kernel bandwidth on the squared normalised distance for the analog weights.
 _BANDWIDTH2 = 0.02
 # Analogs closer than this squared distance count toward the confidence tally.
 _CLOSE_D2 = 0.04
-# Close-analog count at which confidence saturates to 1.
+# Close-analog count at which confidence saturates to 1. Measured on the fleet, that saturation is
+# reached by almost every query once a site has a month of history, and at weight 1 the blend is not
+# a blend: it publishes the analog median and discards the residual-corrected physics. Holding the
+# weight to about 0.4 was measured to help, but it moves the published point without moving the
+# p10/p90 band with it, and the band's own calibration was measured against the point as it stands.
+# The two are one change and need measuring together, on the thirty clean days rather than on four.
 _CONFIDENCE_FULL = 25
 # Below this confidence we keep the blended point but do not surface a band.
 BAND_MIN_CONFIDENCE = 0.35
 # How many nearest analogs feed the weighted percentiles.
 _K = 60
-# Learned production ceiling. Once at least this many close analogs exist, the blended forecast is
-# capped at the 90th percentile of what the site ACTUALLY produced under similar sun+cloud, times a
-# margin. The physical model cannot see near-field shadows (a tree in the morning, a roof in the
-# evening), but the real production already reflects them, so this stops the model over-predicting on
-# shaded sites while the margin still allows an unusually clear day.
+# Learned production ceiling. Once at least this many close analogs exist, the blend is capped. On the
+# ratio path, which is the normal one, the cap is the 90th percentile of the measured-over-modelled
+# RATIO under similar sun and cloud, times a margin, and only becomes watts once scaled by today's
+# model; on the watt path it is those percentiles in watts directly. The physical model cannot see
+# near-field shadows, a tree in the morning or a roof in the evening, while the real production
+# already carries them, so this stops the model over-predicting on a shaded site while the margin
+# still allows an unusually clear day.
 _CEILING_MIN_ANALOGS = 5
 _CEILING_MARGIN = 1.25
 
@@ -104,7 +115,7 @@ class AnalogBand:
     ceiling: Optional[float] = None  # learned production cap (W), or None when analog support is thin
 
 
-def _finite(v: object) -> bool:
+def _finite(v: object) -> TypeGuard[float]:
     return isinstance(v, (int, float)) and math.isfinite(v)
 
 
@@ -151,7 +162,7 @@ def _sample_series(
 
 
 def _model_watts(
-    b: object,
+    b: ProductionBucket,
     weather: WeatherSeries,
     w_epochs: Optional[List[float]],
     lat: float,
@@ -185,7 +196,11 @@ def _model_watts(
         pcts = compute_pv_power_per_array(moment, lat, lon, sample, layout)
         total += min(cap_w, capped_model_kwh(pcts, layout, k, snow) * 1000.0)
         n += 1
-    return total / n if n else None
+    # Averaged over the whole bucket, night subsamples included, because that is what the meter
+    # measured: dividing by the sun-up count instead compares the mean power of the lit part of the
+    # hour against the mean power of all of it, and every bucket straddling sunrise or sunset then
+    # reads as a site producing a fraction of what it should.
+    return total / _MODEL_SUBSAMPLES if n else None
 
 
 def build_library(
@@ -203,7 +218,15 @@ def build_library(
     w_epochs = series_epochs(weather.times) if weather.times else None
     floor_w = max(_RATIO_MODEL_FLOOR_W, _RATIO_MODEL_FLOOR_FRAC * layout.total_kwp * 1000.0) if layout else None
     for b in production:
-        if not _finite(getattr(b, "kwh", None)):
+        kwh = getattr(b, "kwh", None)
+        # Negative as well as non-finite: a meter that is reset, replaced or restored from an older
+        # backup writes one enormous negative hour into the recorder, and clamping it to zero would
+        # file a bright hour in the library as one where the sky gave nothing. The residual map
+        # already refuses those (solar/residual.py); the library refuses them on the same grounds.
+        if not _finite(kwh) or kwh < 0:
+            continue
+        # And the other side of the same meter accident: an hour above anything the panels can deliver.
+        if layout is not None and implausible_hour(kwh, b.start_ms, b.end_ms, layout.total_kwp):
             continue
         # A curtailed hour is what the inverter allowed, not what the sky gave: it has no place in a
         # library of actual production under similar conditions.
@@ -220,7 +243,7 @@ def build_library(
         if cloud is None:
             continue
         temp = _sample_series(weather.times, weather.temp, mid_ms, w_epochs)
-        watt = max(0.0, b.kwh * 1000.0)
+        watt = kwh * 1000.0
         ratio = None
         if layout is not None:
             model = _model_watts(b, weather, w_epochs, lat, lon, layout, inverter_max_w)

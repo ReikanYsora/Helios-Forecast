@@ -1,9 +1,12 @@
 """Solar position math.
 
 Pure functions, no Home Assistant imports. A simplified declination +
-equation-of-time model, validated against the NOAA SPA reference (mean altitude
-error 0.30 deg, mean azimuth error 0.36 deg over 376 samples across a year and
-eight latitudes): accurate enough for hourly PV and cheap enough to call per point.
+equation-of-time model. Measured against astral's own solar position, hourly
+through a whole year at eight latitudes from Singapore to Reykjavik: mean
+altitude error 0.16 to 0.45 deg per site, worst single hour 1.62 deg, at
+Anchorage. The error is largest at low sun and high latitude, which is where the
+forecast is smallest, so it is cheap enough to call per point and accurate
+enough for hourly PV.
 """
 
 from __future__ import annotations

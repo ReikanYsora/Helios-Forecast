@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Battery max discharge power (kW, optional)",
           "battery_min_soc": "Battery reserve, minimum state of charge (%, default 10)",
           "battery_efficiency": "Battery round-trip efficiency (%, default 90)",
-          "curtailment_entity": "Curtailment signal (binary sensor, input boolean or switch, optional)"
+          "curtailment_entity": "Curtailment signal (binary sensor, input boolean or switch, optional)",
+          "benchmark_enabled": "Contribute to the public accuracy benchmark (optional)"
         },
         "data_description": {
           "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off.",
           "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here.",
-          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap."
+          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap.",
+          "benchmark_enabled": "Sends what this installation predicts, once an hour, so it can be compared with what it really produced. The results are published openly at helios-ha.org/benchmark. Only your panel geometry, the predicted curve, the measured production and the reliability index travel: no entity names, no consumption, no other sensor, and your coordinates rounded to about a kilometre. Requires 2026.9.5 or newer, which is the version being measured. Off unless you turn it on."
         }
       },
       "line": {
@@ -54,8 +56,7 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Edit settings (location, inverter, production sensor, battery, curtailment signal)",
-          "lines": "Edit panel lines",
-          "benchmark": "Join the community benchmark"
+          "lines": "Edit panel lines"
         }
       },
       "settings": {
@@ -73,12 +74,14 @@
           "battery_max_discharge_kw": "Battery max discharge power (kW, optional)",
           "battery_min_soc": "Battery reserve, minimum state of charge (%, default 10)",
           "battery_efficiency": "Battery round-trip efficiency (%, default 90)",
-          "curtailment_entity": "Curtailment signal (binary sensor, input boolean or switch, optional)"
+          "curtailment_entity": "Curtailment signal (binary sensor, input boolean or switch, optional)",
+          "benchmark_enabled": "Contribute to the public accuracy benchmark (optional)"
         },
         "data_description": {
           "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off.",
           "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here.",
-          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap."
+          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap.",
+          "benchmark_enabled": "Sends what this installation predicts, once an hour, so it can be compared with what it really produced. The results are published openly at helios-ha.org/benchmark. Only your panel geometry, the predicted curve, the measured production and the reliability index travel: no entity names, no consumption, no other sensor, and your coordinates rounded to about a kilometre. Requires 2026.9.5 or newer, which is the version being measured. Off unless you turn it on."
         }
       },
       "lines": {
@@ -94,20 +97,6 @@
           "longitude": "Longitude override (optional)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: community benchmark",
-        "description": "An open measurement of how accurate Helios Forecast really is, on real installations, published as it goes. Would you like to take part? It happens here: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nGet a key in one click, with no account and no name, then paste it below. To stop everything, clear it.",
-        "data": {
-          "benchmark_enabled": "Contribute to the public accuracy benchmark (optional)",
-          "benchmark_key": "Benchmark key",
-          "benchmark_url": "Benchmark collector address"
-        },
-        "data_description": {
-          "benchmark_enabled": "Sends what this installation predicts, once an hour, so it can be compared with what it really produced. The results are published openly. Only your panel geometry, the predicted curve, the measured production and the reliability index are sent: no entity names, no consumption, no other sensor, and your coordinates rounded to about a kilometre. Off unless you turn it on.",
-          "benchmark_key": "The write key you were given when joining the benchmark. Nothing is sent without it.",
-          "benchmark_url": "Where the measurements are sent, shown so you know exactly where they go."
         }
       }
     }
@@ -229,10 +218,6 @@
       "title": "Battery efficiency out of range",
       "description": "{entry} has a round-trip efficiency of {value}. Enter a percentage from 50 to 100 (most home batteries sit around 90)."
     },
-    "benchmark_key": {
-      "title": "Benchmark key does not look like a key",
-      "description": "{entry} takes part in the community benchmark but its key is not one the collector issues. Paste the whole key from helios-ha.org/benchmark, or switch the benchmark off."
-    },
     "production_entity_missing": {
       "title": "Production sensor not found",
       "description": "The production sensor of {entry}, {entity}, does not exist. The forecast runs uncorrected until it does. Check the entity id, or pick the sensor again in the settings."
@@ -275,7 +260,18 @@
     },
     "benchmark_excluded": {
       "title": "Kept out of the benchmark figures ({reason})",
-      "description": "The community benchmark received the emissions of {entry} but keeps them out of the published figures. Reason {reason}: kwp means the declared peak power is missing, zero or typed in watts; night means the production sensor records energy at night, so it measures more than the panels. Correct the configuration and the installation is counted again within a day."
+      "description": "The public benchmark received the emissions of {entry} but keeps them out of the published figures. Reason {reason}: kwp means the declared peak power is missing, zero or typed in watts; night means the production sensor records energy at night, so it measures more than the panels. Correct the configuration and the installation is counted again within a day."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "No Helios Forecast installation with config entry id {entry_id}."
+    },
+    "service_no_installation": {
+      "message": "No Helios Forecast installation is set up."
+    },
+    "service_several_installations": {
+      "message": "Several Helios Forecast installations are set up; pass 'config_entry_id' to choose one."
     }
   }
 }

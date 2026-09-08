@@ -1,8 +1,9 @@
 """Diagnostics download for a config entry: what the check-up found, what the learning stands on.
 
-Home Assistant offers this file from the integration's page. It names no person and no address:
-the configuration is copied with its benchmark key blanked, and the rest is counts, coverages
-and the problem list, which is exactly what an issue report needs.
+Home Assistant offers this file from the integration's page, and the README invites people to attach
+it to a public issue, so it must stay safe to hand over: no person, no address, and no credential.
+Anything in the configuration whose name reads like a secret is masked here whatever it is, because
+a settings key outliving the code that wrote it is how one gets into such a file unnoticed.
 """
 
 from __future__ import annotations
@@ -13,15 +14,20 @@ from typing import Any, Dict
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .config import CONF_BENCHMARK_KEY
 from .const import DOMAIN
+
+
+_SECRET_HINTS = ("key", "token", "secret", "password")
+
+
+def _safe(name: str, value: Any) -> Any:
+    """Mask a setting whose name reads like a credential, whatever the setting turns out to be."""
+    return "**redacted**" if value and any(hint in name.lower() for hint in _SECRET_HINTS) else value
 
 
 async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigEntry) -> Dict[str, Any]:
     coordinator = hass.data.get(DOMAIN, {}).get(entry.entry_id)
-    config = {**entry.data, **entry.options}
-    if config.get(CONF_BENCHMARK_KEY):
-        config[CONF_BENCHMARK_KEY] = "**redacted**"
+    config = {k: _safe(k, v) for k, v in {**entry.data, **entry.options}.items()}
     out: Dict[str, Any] = {"config": config, "problems": [], "learning": {}, "consumption": {}, "reliability": None}
     if coordinator is None:
         return out

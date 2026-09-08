@@ -4,15 +4,17 @@ A 0..100 confidence score blending three measurable signals:
 
   - data maturity: how many days of production history back the learning (a fresh
     install corrects nothing; ~60 days is fully warmed up).
-  - recent skill: how close the model's predicted daily energy has been to the
-    real production over the last couple of weeks (the honest empirical signal).
+  - recent skill: how close the day-ahead prediction, recorded before the day
+    happened, came to what the meter then measured over the last couple of weeks.
   - today's predictability: a clear or steadily overcast sky is highly
     predictable; broken, variable cloud is intrinsically uncertain whatever the
     data, so we read the spread of today's daytime cloud forecast.
 
+A signal that cannot be measured contributes nothing rather than being shared out
+among the others, so the index is a floor: this much could be established.
+
 Pure functions, no Home Assistant, so the blend can be unit-tested on its own.
-The inputs are duck-typed: production buckets expose ``.start_ms`` + ``.kwh``,
-forecast points expose ``.t`` (UTC datetime) + ``.pv_w``.
+The inputs are duck-typed: production buckets expose ``.start_ms`` + ``.kwh``.
 """
 
 from __future__ import annotations
@@ -73,33 +75,22 @@ def daily_actual_kwh(production: list, tz: tzinfo) -> Dict[date, float]:
     return out
 
 
-def daily_predicted_kwh(points: list, tz: tzinfo, step_minutes: float = 60.0) -> Dict[date, float]:
-    """Predicted points summed to kWh per local calendar day (pv_w over one bucket of
-    ``step_minutes``, default hourly to match the archive series)."""
-    step_h = step_minutes / 60.0
-    out: Dict[date, float] = {}
-    for p in points:
-        if not _finite(getattr(p, "pv_w", None)):
-            continue
-        day = p.t.astimezone(tz).date()
-        out[day] = out.get(day, 0.0) + max(0.0, p.pv_w) * step_h / 1000.0
-    return out
-
-
 def data_maturity(production: list, tz: tzinfo) -> tuple[float, int]:
     """Fraction in [0, 1] of the maturity target, plus the distinct-day count."""
     days = len({_local_date(b.start_ms, tz) for b in production if _finite(getattr(b, "kwh", None))})
     return _clamp01(days / MATURITY_TARGET_DAYS), days
 
 
-def recent_skill(
-    points: list, production: list, now: datetime, tz: tzinfo, step_minutes: float = 60.0
-) -> Optional[float]:
-    """1 - mean relative daily error over the trailing window, or None when too few
-    comparable days. Today is excluded (still in progress). ``step_minutes`` is the
-    bucket duration of ``points`` (the archive series is hourly)."""
+def recent_skill(predicted: Dict[date, float], production: list, now: datetime, tz: tzinfo) -> Optional[float]:
+    """1 - mean relative daily error over the trailing window, or None when too few comparable days.
+
+    ``predicted`` holds what was forecast for each day before that day happened, kept by the
+    coordinator. Reconstructing it instead from the archive would measure nothing: the archive is
+    rebuilt every hour by the current model, whose residual map and analog library are fitted on the
+    very production being compared against, so the answer comes out near perfect whatever the real
+    skill. Today is excluded, still in progress.
+    """
     actual = daily_actual_kwh(production, tz)
-    predicted = daily_predicted_kwh(points, tz, step_minutes)
     today = now.astimezone(tz).date()
     errs: List[float] = []
     for day, act in actual.items():
@@ -190,22 +181,24 @@ def _horizon_decay(day_index: int) -> float:
 
 
 def _blend(maturity: float, skill: Optional[float], predict: Optional[float]) -> float:
-    parts = [(maturity, _W_MATURITY)]
-    if skill is not None:
-        parts.append((skill, _W_SKILL))
-    if predict is not None:
-        parts.append((predict, _W_PREDICT))
-    total_w = sum(w for _, w in parts)
-    if total_w <= 0:
-        return 0.0
-    return 100.0 * sum(v * w for v, w in parts) / total_w
+    """The three signals against the full weight, so a signal that could not be measured contributes
+    nothing rather than being shared out among the others.
+
+    Renormalising over the survivors made the index rise when a signal went missing, and the one that
+    goes missing is recent skill: it needs two comparable days in the trailing fortnight, which a
+    northern winter or a run of overcast does not always give. The index then climbed precisely when
+    there was least ground to trust it. What it says now is a floor: this much could be established.
+    """
+    parts = [(maturity, _W_MATURITY), (skill, _W_SKILL), (predict, _W_PREDICT)]
+    return 100.0 * sum(v * w for v, w in parts if v is not None) / (_W_MATURITY + _W_SKILL + _W_PREDICT)
 
 
-def compute_reliability(production: list, points: list, weather, now: datetime, tz: tzinfo) -> Reliability:
+def compute_reliability(
+    production: list, predicted: Dict[date, float], weather, now: datetime, tz: tzinfo
+) -> Reliability:
     """Blend the three signals into the overall index plus a per-horizon-day list."""
     maturity, days = data_maturity(production, tz)
-    # `points` here is the archive series, always built at an hourly step.
-    skill = recent_skill(points, production, now, tz, step_minutes=60.0)
+    skill = recent_skill(predicted, production, now, tz)
     predict = today_predictability(weather, now, tz)
 
     overall = _blend(maturity, skill, predict)

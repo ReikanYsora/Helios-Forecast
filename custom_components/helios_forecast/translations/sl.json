@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: vrsta panelov",
-        "description": "Ena napoved za eno vrsto panelov (skupino enako usmerjenih panelov). Za vsako dodatno vrsto znova dodajte integracijo. Pustite lokacijo prazno, da uporabite dom v Home Assistantu.",
+        "description": "Ena napoved za fotovoltaično napravo. Dodajte eno vrsto panelov na usmeritev; več vrst si deli edini senzor proizvodnje in omejitev razsmernika te naprave. Pustite lokacijo prazno, da se uporabi domača lokacija iz Home Assistanta.",
         "data": {
           "name": "Ime (npr. Južna streha)",
           "tilt": "Naklon (stopinje, 0 = ravno, 90 = navpično)",
@@ -14,26 +14,28 @@
           "latitude": "Zemljepisna širina (neobvezno)",
           "longitude": "Zemljepisna dolžina (neobvezno)",
           "inverter_max_kw": "Najv. izhodna moč razsmernika (kW, neobvezno)",
-          "production_entity": "Senzor proizvodnje PV (za naučeni popravek)",
+          "production_entity": "Senzor proizvedene sončne energije (kWh, za naučeni popravek)",
           "trend_anchor_hour": "Referenčna ura za današnji trend (0-23, privzeto 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Dodaj še eno vrsto panelov",
           "battery_capacity_kwh": "Uporabna zmogljivost baterije (kWh)",
           "battery_soc_entity": "Senzor stanja napolnjenosti baterije (%)",
           "battery_max_charge_kw": "Najv. moč polnjenja baterije (kW, izbirno)",
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
           "battery_min_soc": "Rezerva baterije, najmanjše stanje napolnjenosti (%, privzeto 10)",
           "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
-          "curtailment_entity": "Signal omejitve (binarni senzor, neobvezno)"
+          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)",
+          "benchmark_enabled": "Prispevajte k javni meritvi natančnosti (izbirno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
           "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
-          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika.",
+          "benchmark_enabled": "Enkrat na uro pošlje, kar ta naprava napoveduje, da se to lahko primerja s tem, kar je resnično proizvedla. Rezultati so odprto objavljeni na helios-ha.org/benchmark. Potujejo le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenega drugega senzorja, in vaše koordinate zaokrožene na približno kilometer. Zahteva različico 2026.9.5 ali novejšo, torej tisto, ki se meri. Izklopljeno, dokler tega ne vklopite."
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: dodatna vrsta panelov",
+        "description": "Vrsta panelov {index}: še ena skupina enako usmerjenih panelov v isti napravi (skupni senzor proizvodnje in razsmernik).",
         "data": {
           "tilt": "Naklon (stopinje, 0 = ravno, 90 = navpično)",
           "azimuth": "Azimut (stopinje od severa, 90 = vzhod, 180 = jug, 270 = zahod)",
@@ -42,7 +44,7 @@
           "tracker": "Sledilnik soncu",
           "latitude": "Zemljepisna širina za to linijo (izbirno)",
           "longitude": "Zemljepisna dolžina za to linijo (izbirno)",
-          "add_another": "Add another panel line"
+          "add_another": "Dodaj še eno vrsto panelov"
         }
       }
     }
@@ -51,21 +53,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Izberite, kaj želite urediti.",
         "menu_options": {
           "settings": "Uredi nastavitve (lokacija, razsmernik, senzor proizvodnje, baterija, signal omejitve)",
-          "lines": "Edit panel lines",
-          "benchmark": "Sodeluj v primerjavi skupnosti"
+          "lines": "Uredi vrste panelov"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: nastavitve",
         "description": "Skupna lokacija, omejitev razsmernika, senzor proizvodnje, referenčna ura, baterija in signal omejitve za vsako vrsto panelov v tem vnosu.",
         "data": {
           "latitude": "Zemljepisna širina (neobvezno)",
           "longitude": "Zemljepisna dolžina (neobvezno)",
           "inverter_max_kw": "Najv. izhodna moč razsmernika (kW, neobvezno)",
-          "production_entity": "Senzor proizvodnje PV (za naučeni popravek)",
+          "production_entity": "Senzor proizvedene sončne energije (kWh, za naučeni popravek)",
           "trend_anchor_hour": "Referenčna ura za današnji trend (0-23, privzeto 6)",
           "battery_capacity_kwh": "Uporabna zmogljivost baterije (kWh)",
           "battery_soc_entity": "Senzor stanja napolnjenosti baterije (%)",
@@ -73,17 +74,19 @@
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
           "battery_min_soc": "Rezerva baterije, najmanjše stanje napolnjenosti (%, privzeto 10)",
           "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
-          "curtailment_entity": "Signal omejitve (binarni senzor, neobvezno)"
+          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)",
+          "benchmark_enabled": "Prispevajte k javni meritvi natančnosti (izbirno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
           "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
-          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika.",
+          "benchmark_enabled": "Enkrat na uro pošlje, kar ta naprava napoveduje, da se to lahko primerja s tem, kar je resnično proizvedla. Rezultati so odprto objavljeni na helios-ha.org/benchmark. Potujejo le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenega drugega senzorja, in vaše koordinate zaokrožene na približno kilometer. Zahteva različico 2026.9.5 ali novejšo, torej tisto, ki se meri. Izklopljeno, dokler tega ne vklopite."
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: vrsta panelov {index}/{total}",
+        "description": "Uredite vrsto panelov {index} od {total} ali označite za dodajanje še ene.",
         "data": {
           "tilt": "Naklon (stopinje, 0 = ravno, 90 = navpično)",
           "azimuth": "Azimut (stopinje od severa, 90 = vzhod, 180 = jug, 270 = zahod)",
@@ -92,22 +95,8 @@
           "tracker": "Sledilnik soncu",
           "latitude": "Zemljepisna širina za to linijo (izbirno)",
           "longitude": "Zemljepisna dolžina za to linijo (izbirno)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: primerjava skupnosti",
-        "description": "Odprto merjenje dejanske natančnosti Helios Forecasta na resničnih napravah, objavljeno sproti. Želite sodelovati? Tukaj: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nPridobite ključ z enim klikom, brez računa in brez imena, in ga prilepite spodaj. Za ustavitev vsega ga izbrišite.",
-        "data": {
-          "benchmark_enabled": "Prispevaj k javni primerjavi natančnosti (izbirno)",
-          "benchmark_key": "Ključ primerjave",
-          "benchmark_url": "Naslov zbiralnika"
-        },
-        "data_description": {
-          "benchmark_enabled": "Enkrat na uro pošlje, kaj ta naprava napoveduje, da se lahko primerja z dejansko proizvodnjo. Rezultati so objavljeni javno. Poslani so le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenih drugih senzorjev, koordinate pa zaokrožene na približno kilometer. Izklopljeno, dokler tega ne vklopite.",
-          "benchmark_key": "Ključ za pisanje, ki ste ga prejeli ob pridružitvi primerjavi. Brez njega se nič ne pošlje.",
-          "benchmark_url": "Naslov, na katerega se pošiljajo meritve, prikazan, da veste, kam gredo."
+          "remove_this_line": "Odstrani to vrsto panelov",
+          "add_another": "Dodaj še eno vrsto panelov"
         }
       }
     }
@@ -128,7 +117,7 @@
       "description": "Vrne celotno napoved proizvodnje (od danes naprej, ena točka vsakih 15 minut, vsaka z napovedanimi vati in intervalom zaupanja P10/P90) kot podatke odgovora za uporabo v avtomatizacijah.",
       "fields": {
         "config_entry_id": {
-          "name": "Namestitev",
+          "name": "Naprava",
           "description": "Katero namestitev Helios Forecast prebrati. Neobvezno, kadar je konfigurirana samo ena."
         }
       }
@@ -138,7 +127,7 @@
       "description": "Vrne predvideno stanje napolnjenosti baterije za naslednjih 48 ur (ena točka vsakih 15 minut) kot podatke odgovora za uporabo v avtomatizacijah.",
       "fields": {
         "config_entry_id": {
-          "name": "Namestitev",
+          "name": "Naprava",
           "description": "Katero namestitev Helios Forecast prebrati. Neobvezno, kadar je konfigurirana samo ena."
         }
       }
@@ -229,10 +218,6 @@
       "title": "Izkoristek baterije zunaj območja",
       "description": "{entry} ima skupni izkoristek {value}. Vnesite odstotek od 50 do 100 (večina domačih baterij je okoli 90)."
     },
-    "benchmark_key": {
-      "title": "Ključ primerjave ni videti kot ključ",
-      "description": "{entry} sodeluje v primerjavi skupnosti, a njegov ključ ni ključ, ki ga izda zbiralnik. Prilepite celoten ključ s helios-ha.org/benchmark ali primerjavo izklopite."
-    },
     "production_entity_missing": {
       "title": "Senzor proizvodnje ni najden",
       "description": "Senzor proizvodnje {entry}, {entity}, ne obstaja. Napoved teče brez popravka, dokler se ne pojavi. Preverite ID entitete ali senzor znova izberite v nastavitvah."
@@ -274,8 +259,19 @@
       "description": "V nadzorni plošči Energija ima {source} podatke za {pct} % ur, ki jih pokriva najboljši vir ({best} %). Profil porabe se gradi samo iz ur, ki jih pokriva, zato ostaja pravilen, a sloni na manj zgodovine. Zanesljivejši senzor za ta tok izostri projekcijo baterije."
     },
     "benchmark_excluded": {
-      "title": "Izključena iz številk primerjave ({reason})",
-      "description": "Primerjava skupnosti prejema oddaje {entry}, a jih drži zunaj objavljenih številk. Razlog {reason}: kwp pomeni, da navedena vršna moč manjka, je nič ali vnesena v vatih; night pomeni, da senzor proizvodnje beleži energijo ponoči, torej meri več kot paneli. Popravite konfiguracijo in naprava bo v enem dnevu spet upoštevana."
+      "title": "Izvzeta iz številk meritve ({reason})",
+      "description": "Javna meritev prejema oddaje naprave {entry}, a jih ohranja zunaj objavljenih številk. Razlog {reason}: kwp pomeni, da deklarirana vršna moč manjka, je nič ali je vnesena v vatih; night pomeni, da senzor proizvodnje ponoči beleži energijo in torej meri več kot paneli. Popravite nastavitve in naprava se v enem dnevu spet šteje."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Ni naprave Helios Forecast z ID-jem vnosa {entry_id}."
+    },
+    "service_no_installation": {
+      "message": "Nastavljena ni nobena naprava Helios Forecast."
+    },
+    "service_several_installations": {
+      "message": "Nastavljenih je več naprav Helios Forecast; navedite 'config_entry_id', da izberete eno."
     }
   }
 }

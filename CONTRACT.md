@@ -45,11 +45,6 @@
 > curtailment signal entity. (e) The series split between archive and live points
 > is documented as implemented (section 3).
 >
-> Revision (2026-09-05, second): an entry can opt in to the **public accuracy
-> benchmark** (section 5). It changes nothing the card sees: no new entity, no new
-> command, no change to any series. The upload runs beside the refresh and its
-> failure is invisible to every other surface.
->
 > Revision (2026-09-06): (a) the integration **checks its own configuration**
 > (section 5) and publishes each problem as a Home Assistant repair issue; no
 > output surface changes, a wrong configuration simply says so where the user can
@@ -58,8 +53,17 @@
 > the hours every sparse Energy-dashboard source covers (section 5). (c) The analog
 > stage of the learning reads ratios to the physical model rather than watts
 > (section 5); same surfaces, same shapes. (d) A diagnostics download is offered on
-> the integration's page. (e) The benchmark collector answers each upload with its
-> verdict on the installation, which becomes a repair; still nothing the card sees.
+> the integration's page.
+>
+> Revision (2026-09-08): the largest change since the freeze. (a) The nine archived
+> series move from entity ids to ids the integration owns, and gain a section of
+> their own (section 2b): a series written from here must never be one the recorder
+> also compiles. (b) `predicted_power` and `predicted_energy` are **removed** from
+> section 2; they existed only to give that archive an entity to be named after, and
+> their live values duplicated `power_now` and `energy_this_hour`. (c) The seven
+> weather sensors lose their `state_class` for the same reason, and each carries a
+> `forecast` attribute (section 2). (d) Home Assistant **2025.11** is the minimum:
+> the archived metadata carries a unit class the recorder only stores from there.
 
 The integration owns one **config entry per installation**, holding one or more
 **panel lines** (a group of co-oriented panels each). Every surface below is scoped
@@ -124,10 +128,9 @@ residual-corrected**, so it tracks the site's real behaviour better than a raw
 model. The card does not depend on these entity names for its baseline layer.
 
 Only the everyday values are **enabled by default** (`power_now`, `energy_today_remaining`,
-`energy_day_1` = today, `energy_day_2` = tomorrow, `reliability`, the archive pair
-`predicted_power` / `predicted_energy`, whose long-term statistics back the card's
-past-forecast curve, the seven weather archive sensors and, when the battery block is
-configured, `predicted_battery_soc`). The rest of the set below is registered but
+`energy_day_1` = today, `energy_day_2` = tomorrow, `reliability`, the seven weather
+sensors and, when the battery block is configured, `predicted_battery_soc`). The rest
+of the set below is registered but
 **disabled by default**, so the recorder stays lean and each user enables the entities
 they actually automate on; enabling one later never loses its history.
 
@@ -138,8 +141,8 @@ Power, now / next hour:
 | Entity | State | Notes |
 |---|---|---|
 | `sensor.helios_forecast_power_now` | predicted PV power now, **W** | `device_class: power`, `state_class: measurement` |
-| `sensor.helios_forecast_power_now_low` | analog P10 (low-bound) power now, **W** | disabled by default; **0** with the sun below the horizon (known, not uncertain), `null` in daylight until the analog support is solid enough to publish a band |
-| `sensor.helios_forecast_power_now_high` | analog P90 (high-bound) power now, **W** | disabled by default; **0** with the sun below the horizon (known, not uncertain), `null` in daylight until the analog support is solid enough to publish a band |
+| `sensor.helios_forecast_power_now_low` | analog P10 (low-bound) power now, **W** | disabled by default; `null` until the analog support is solid enough to publish a band, which on an installation with no production history is always, night included; **0** at night once there is a band |
+| `sensor.helios_forecast_power_now_high` | analog P90 (high-bound) power now, **W** | disabled by default; `null` until the analog support is solid enough to publish a band, which on an installation with no production history is always, night included; **0** at night once there is a band |
 | `sensor.helios_forecast_power_next_hour` | predicted average power over the next hour, **W** | |
 
 Peak, per day over the 7-day horizon:
@@ -163,13 +166,10 @@ Energy, intraday:
 | `sensor.helios_forecast_energy_this_hour` | predicted production this hour, **kWh** | |
 | `sensor.helios_forecast_energy_next_hour` | predicted production next hour, **kWh** | |
 
-Archive (enabled by default: their long-term statistics are what backs the card's
-past-forecast curve, kept by HA well beyond Open-Meteo's rolling window):
-
-| Entity | State | Notes |
-|---|---|---|
-| `sensor.helios_forecast_predicted_power` | predicted PV power, **W** | `device_class: power`, `state_class: measurement`. Mirrors `power_now`; its purpose is the point the statistics import backfills from. |
-| `sensor.helios_forecast_predicted_energy` | predicted energy this hour, **kWh** | `state_class: measurement` (no `device_class`: kWh + `measurement` is only valid without the energy class, the entity-bound long-term statistics need a state class). |
+There is **no `predicted_power` / `predicted_energy` entity**. Both existed only to
+anchor the predicted-production archive to an entity id, and were removed in 2026.9.5
+along with that anchoring (section 2b). Their live value duplicated `power_now` and
+`energy_this_hour`; a dashboard that showed them uses those instead.
 
 Forecast quality:
 
@@ -186,8 +186,10 @@ Battery state of charge (2026.9.0, only when the battery block in section 5 is c
 | `sensor.helios_forecast_battery_min_soc` / `_battery_max_soc` | the projection's lowest / highest SoC over the 48 h window, **%** | `device_class: battery`, `state_class: measurement`, disabled by default, created with the SoC sensor; `unknown` while there is no projection |
 | `sensor.helios_forecast_battery_min_soc_time` / `_battery_max_soc_time` | when that low / high is reached | `device_class: timestamp`, disabled by default, same lifecycle |
 
-Weather archive (one sensor per Open-Meteo variable the model reads, enabled by default; their
-long-term statistics back the card's past weather):
+Weather (one sensor per Open-Meteo variable the model reads, enabled by default, showing the
+current hour). They carry **no `state_class`**, deliberately: their history is the archive of
+section 2b, which the integration writes itself, and a series written from here must never be one
+the recorder also compiles.
 
 | Entity | State |
 |---|---|
@@ -196,6 +198,10 @@ long-term statistics back the card's past weather):
 | `sensor.helios_forecast_temperature` | **°C** |
 | `sensor.helios_forecast_wind_speed` | **km/h** |
 | `sensor.helios_forecast_snow_depth` | **m** |
+
+Each of these also carries a `forecast` attribute: the forward-looking hourly series
+for that variable, as `{"datetime": <local ISO>, "<key>": <value>}` entries from local
+midnight today, mirroring the power sensor's own attribute so the two chart together.
 
 The forecast curve and the SoC curve are also exposed as **response services** for
 automations (the recommended path over scraping an attribute):
@@ -218,6 +224,63 @@ the detail series in section 3.
 are inherently low-confidence for solar (cloud predictability collapses), to be
 stated plainly in the docs. The Helios card's visible window is unchanged: **J-2
 to J+2**, exactly as today; the extra forecast days live only in the entities.
+
+## 2b. Long-term statistics: the archive the integration owns
+
+Two things the integration knows are worth keeping far longer than the source will
+serve them: the **past weather** (Open-Meteo only serves a rolling 60-day window) and
+the **past prediction** (what the model said for an hour that has since happened,
+which is what the card draws behind today). Both are written into Home Assistant's
+long-term statistics, which are never purged.
+
+They are written as **statistics of this integration**, not of an entity:
+
+| Statistic id | Series | Unit |
+|---|---|---|
+| `helios_forecast:<entry_id>_cloud_cover` | effective cloud cover | % |
+| `helios_forecast:<entry_id>_ghi` / `_direct` / `_diffuse` | horizontal irradiance | W/m2 |
+| `helios_forecast:<entry_id>_temperature` | temperature | °C |
+| `helios_forecast:<entry_id>_wind_speed` | wind speed | km/h |
+| `helios_forecast:<entry_id>_snow_depth` | snow depth | m |
+| `helios_forecast:<entry_id>_predicted_power` | predicted PV power | W |
+| `helios_forecast:<entry_id>_predicted_energy` | predicted energy for the hour | kWh |
+
+`<entry_id>` is the config entry's id, lowercased, so several installations in one
+Home Assistant never collide. Each series carries a readable name in its metadata,
+which is what the interface shows: there is no entity behind it to borrow one from.
+
+**Why not an entity id.** A statistic named after an entity belongs to the recorder,
+which compiles it from that entity's state every hour on its own schedule. Writing to
+it from the integration as well puts two writers on the same `(series, hour)` unique
+index. A collision there does not fail our write alone: it rolls back the recorder's
+**entire** hourly compile, so every other integration on the machine silently loses
+that hour of history. An integration-owned id has exactly one writer by construction.
+
+**One-time move.** Installations before 2026.9.5 hold this history under entity ids.
+
+It runs once Home Assistant has finished starting, as a background task, and never
+during setup: the recorder waits for that same event before it processes its queue,
+so a setup that waits on a recorder write waits on a start that is waiting on it, and
+Home Assistant cancels the entry after five minutes of that.
+
+Only a series the recorder owns is moved, which is one held under an entity id with
+`source: "recorder"`. Every hour read from it is copied onto the new id and then read
+back there by its own start time, and the old series is deleted only once every one
+of them answers. The check is on the hours and not on how many there are: the new id
+is already being filled by the integration's own backfill by then, so a count could
+be satisfied by hours the move never wrote. A series stored in a unit that cannot be
+converted into the one the archive uses is left exactly where it is, with an error in
+the log, rather than having its values relabelled.
+
+The move runs on **every** setup rather than behind a one-time marker, so an
+installation that skips a version, or is restored from an older backup, is repaired
+all the same; once there is nothing left to move it costs one metadata read.
+Short-term (5-minute) statistics are not carried over: integration-owned series are
+hourly by design in Home Assistant.
+
+Deleting the config entry clears these nine series. Nothing in Home Assistant could
+do it afterwards: its statistics validation only inspects series carrying an entity
+id, which is the same property that keeps the recorder off them.
 
 ## 3. Enhanced detail series (Helios-Forecast only): WebSocket API
 
@@ -349,18 +412,6 @@ orientation.
   export, a grid limit). Its hours are excluded from the learning as above.
 - Today-trend reference hour: the local hour at which today's outlook reference
   is frozen.
-- **Public accuracy benchmark (optional, off by default).** Its own step in the
-  options menu, holding a switch, a write key and the collector address, the last
-  shown read only and only stored when it is not the standard one. Switched on, the
-  entry posts once an hour what it currently predicts, the cloud cover behind it,
-  the production already measured over the last 72 hours, its panel geometry, its
-  country and its coordinates rounded to two decimals, under a hash of the entry.
-  Nothing else leaves the installation, and clearing the key stops it. The
-  collector answers each upload with `quality.excluded` (a reason code, or null),
-  its verdict on whether the installation's figures are plausible enough to be
-  published; a reason becomes a repair issue (below). This is a contract with the
-  collector, not with the card: no output surface above is affected, and an upload
-  that fails never reaches a forecast.
 - **Check-up (2026.9.3).** Every field above, every entity it names and the data
   they yield are verified at startup and after every refresh (`checkup.py`), and
   each problem is published as a Home Assistant repair issue under the
@@ -368,8 +419,8 @@ orientation.
   as translation placeholders; it is retired the moment the problem is gone.
   Repairs are the only surface: the entry stays loaded, the forecast keeps running,
   and no entity changes state or shape because of a finding. A diagnostics download
-  (config with the benchmark key blanked, the problem list, learning and consumption
-  counts, the reliability index) is offered on the integration's page.
+  (the configuration, the problem list, learning and consumption counts, the
+  reliability index) is offered on the integration's page.
 - **Battery SoC projection (2026.9.0, optional).** A separate block, off unless
   both the usable **capacity (kWh)** and a live **state-of-charge sensor (%)** are
   set; the reserve (min SoC %), round-trip efficiency (%) and charge / discharge
@@ -391,3 +442,10 @@ orientation.
   the forecast moves out.
 - **Card requirement:** none. The forecast is optional; with none configured the
   card shows no forecast curve and no forecast label, and is otherwise unchanged.
+- **Archived statistics are the integration's, never an entity's** (section 2b).
+  No entity this integration creates may carry a `state_class` on a key the
+  archive also writes: that hands the same series to two writers, and Home
+  Assistant answers a collision by rolling back its whole hourly compile, which
+  costs every other integration on the machine that hour of history. Anything
+  worth keeping beyond what an entity's own state gives goes to
+  `helios_forecast:<entry_id>_<series>`.

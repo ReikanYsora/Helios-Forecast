@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: paneellijn",
-        "description": "Eén prognose voor één paneellijn (een groep panelen met dezelfde oriëntatie). Voeg de integratie opnieuw toe voor elke extra lijn. Laat de locatie leeg om je Home Assistant-thuislocatie te gebruiken.",
+        "description": "Eén prognose voor een fotovoltaïsche installatie. Voeg per orientatie een paneellijn toe; meerdere lijnen delen de ene productiesensor en de omvormerlimiet van deze installatie. Laat de locatie leeg om uw Home Assistant-thuislocatie te gebruiken.",
         "data": {
           "name": "Naam (bijv. Zuiddak)",
           "tilt": "Hellingshoek (graden, 0 = plat, 90 = verticaal)",
@@ -14,26 +14,28 @@
           "latitude": "Breedtegraad (optioneel)",
           "longitude": "Lengtegraad (optioneel)",
           "inverter_max_kw": "Max. uitgangsvermogen omvormer (kW, optioneel)",
-          "production_entity": "PV-productiesensor (voor de aangeleerde correctie)",
+          "production_entity": "Sensor van de opgewekte PV-energie (kWh, voor de aangeleerde correctie)",
           "trend_anchor_hour": "Referentie-uur voor dagtrend (0-23, standaard 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Nog een paneellijn toevoegen",
           "battery_capacity_kwh": "Bruikbare batterijcapaciteit (kWh)",
           "battery_soc_entity": "Batterijladingssensor (%)",
           "battery_max_charge_kw": "Max. laadvermogen batterij (kW, optioneel)",
           "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
           "battery_min_soc": "Batterijreserve, minimale laadtoestand (%, standaard 10)",
           "battery_efficiency": "Retourrendement batterij (%, standaard 90)",
-          "curtailment_entity": "Beperkingssignaal (binaire sensor, optioneel)"
+          "curtailment_entity": "Beperkingssignaal (binaire sensor, input boolean of schakelaar, optioneel)",
+          "benchmark_enabled": "Bijdragen aan de openbare nauwkeurigheidsmeting (optioneel)"
         },
         "data_description": {
           "production_entity": "Een cumulatieve energiesensor (kWh), bijv. de totale productie van uw omvormer of energiemeter. Een vermogenssensor (W) werkt niet: die heeft geen langetermijn-somstatistieken, dus het leren en de betrouwbaarheidsindex blijven uit.",
           "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
-          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
+          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet.",
+          "benchmark_enabled": "Verstuurt eens per uur wat deze installatie voorspelt, zodat het vergeleken kan worden met wat ze werkelijk heeft opgewekt. De resultaten worden openbaar gepubliceerd op helios-ha.org/benchmark. Alleen de geometrie van uw panelen, de voorspelde curve, de gemeten opwekking en de betrouwbaarheidsindex gaan mee: geen entiteitsnamen, geen verbruik, geen andere sensor, en uw coördinaten afgerond op ongeveer een kilometer. Vereist 2026.9.5 of nieuwer, de versie die gemeten wordt. Uit tenzij u het aanzet."
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: extra paneellijn",
+        "description": "Paneellijn {index}: nog een groep panelen met dezelfde orientatie op dezelfde installatie (gedeelde productiesensor en omvormer).",
         "data": {
           "tilt": "Hellingshoek (graden, 0 = plat, 90 = verticaal)",
           "azimuth": "Azimut (graden vanaf noord, 90 = oost, 180 = zuid, 270 = west)",
@@ -42,7 +44,7 @@
           "tracker": "Zonnevolger",
           "latitude": "Breedtegraad voor deze lijn (optioneel)",
           "longitude": "Lengtegraad voor deze lijn (optioneel)",
-          "add_another": "Add another panel line"
+          "add_another": "Nog een paneellijn toevoegen"
         }
       }
     }
@@ -51,21 +53,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Kies wat u wilt bewerken.",
         "menu_options": {
           "settings": "Instellingen bewerken (locatie, omvormer, productiesensor, accu, beperkingssignaal)",
-          "lines": "Edit panel lines",
-          "benchmark": "Deelnemen aan de gemeenschapsbenchmark"
+          "lines": "Paneellijnen bewerken"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: instellingen",
         "description": "Gedeelde locatie, omvormerlimiet, productiesensor, referentie-uur, accu en beperkingssignaal voor elke paneelrij in deze invoer.",
         "data": {
           "latitude": "Breedtegraad (optioneel)",
           "longitude": "Lengtegraad (optioneel)",
           "inverter_max_kw": "Max. uitgangsvermogen omvormer (kW, optioneel)",
-          "production_entity": "PV-productiesensor (voor de aangeleerde correctie)",
+          "production_entity": "Sensor van de opgewekte PV-energie (kWh, voor de aangeleerde correctie)",
           "trend_anchor_hour": "Referentie-uur voor dagtrend (0-23, standaard 6)",
           "battery_capacity_kwh": "Bruikbare batterijcapaciteit (kWh)",
           "battery_soc_entity": "Batterijladingssensor (%)",
@@ -73,17 +74,19 @@
           "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
           "battery_min_soc": "Batterijreserve, minimale laadtoestand (%, standaard 10)",
           "battery_efficiency": "Retourrendement batterij (%, standaard 90)",
-          "curtailment_entity": "Beperkingssignaal (binaire sensor, optioneel)"
+          "curtailment_entity": "Beperkingssignaal (binaire sensor, input boolean of schakelaar, optioneel)",
+          "benchmark_enabled": "Bijdragen aan de openbare nauwkeurigheidsmeting (optioneel)"
         },
         "data_description": {
           "production_entity": "Een cumulatieve energiesensor (kWh), bijv. de totale productie van uw omvormer of energiemeter. Een vermogenssensor (W) werkt niet: die heeft geen langetermijn-somstatistieken, dus het leren en de betrouwbaarheidsindex blijven uit.",
           "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
-          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
+          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet.",
+          "benchmark_enabled": "Verstuurt eens per uur wat deze installatie voorspelt, zodat het vergeleken kan worden met wat ze werkelijk heeft opgewekt. De resultaten worden openbaar gepubliceerd op helios-ha.org/benchmark. Alleen de geometrie van uw panelen, de voorspelde curve, de gemeten opwekking en de betrouwbaarheidsindex gaan mee: geen entiteitsnamen, geen verbruik, geen andere sensor, en uw coördinaten afgerond op ongeveer een kilometer. Vereist 2026.9.5 of nieuwer, de versie die gemeten wordt. Uit tenzij u het aanzet."
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: paneellijn {index}/{total}",
+        "description": "Bewerk paneellijn {index} van {total}, of vink aan om er nog een toe te voegen.",
         "data": {
           "tilt": "Hellingshoek (graden, 0 = plat, 90 = verticaal)",
           "azimuth": "Azimut (graden vanaf noord, 90 = oost, 180 = zuid, 270 = west)",
@@ -92,22 +95,8 @@
           "tracker": "Zonnevolger",
           "latitude": "Breedtegraad voor deze lijn (optioneel)",
           "longitude": "Lengtegraad voor deze lijn (optioneel)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: gemeenschapsbenchmark",
-        "description": "Een open meting van hoe nauwkeurig Helios Forecast werkelijk is, op echte installaties, gaandeweg gepubliceerd. Wilt u meedoen? Dat gaat hier: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHaal met een klik een sleutel op, zonder account en zonder naam, en plak hem hieronder. Om alles te stoppen, wist u hem.",
-        "data": {
-          "benchmark_enabled": "Bijdragen aan de openbare nauwkeurigheidsbenchmark (optioneel)",
-          "benchmark_key": "Benchmarksleutel",
-          "benchmark_url": "Adres van de benchmarkverzamelaar"
-        },
-        "data_description": {
-          "benchmark_enabled": "Stuurt eenmaal per uur wat deze installatie voorspelt, zodat het vergeleken kan worden met wat ze werkelijk heeft geproduceerd. De resultaten worden openbaar gepubliceerd. Alleen de geometrie van uw panelen, de voorspelde curve, de gemeten productie en de betrouwbaarheidsindex worden verstuurd: geen entiteitsnamen, geen verbruik, geen andere sensoren, en uw coördinaten afgerond op ongeveer een kilometer. Uit tenzij u het inschakelt.",
-          "benchmark_key": "De schrijfsleutel die u kreeg bij deelname aan de benchmark. Zonder sleutel wordt er niets verstuurd.",
-          "benchmark_url": "Het adres waar de metingen naartoe gaan, getoond zodat u precies weet waarheen."
+          "remove_this_line": "Deze paneellijn verwijderen",
+          "add_another": "Nog een paneellijn toevoegen"
         }
       }
     }
@@ -229,10 +218,6 @@
       "title": "Accurendement buiten bereik",
       "description": "{entry} heeft een rondgangsrendement van {value}. Voer een percentage van 50 tot 100 in (de meeste thuisaccu's zitten rond 90)."
     },
-    "benchmark_key": {
-      "title": "De benchmarksleutel ziet er niet uit als een sleutel",
-      "description": "{entry} doet mee aan de communitybenchmark maar de sleutel is er geen die de collector uitgeeft. Plak de hele sleutel van helios-ha.org/benchmark, of zet de benchmark uit."
-    },
     "production_entity_missing": {
       "title": "Productiesensor niet gevonden",
       "description": "De productiesensor van {entry}, {entity}, bestaat niet. De voorspelling draait ongecorrigeerd tot hij er is. Controleer de entiteits-id, of kies de sensor opnieuw in de instellingen."
@@ -274,8 +259,19 @@
       "description": "In het energiedashboard heeft {source} gegevens voor {pct}% van de uren die de beste bron dekt ({best}%). Het verbruiksprofiel wordt alleen gebouwd uit de uren die hij dekt, dus het blijft juist maar steunt op minder geschiedenis. Een betrouwbaardere sensor voor die stroom maakt de accuprojectie scherper."
     },
     "benchmark_excluded": {
-      "title": "Buiten de benchmarkcijfers gehouden ({reason})",
-      "description": "De communitybenchmark ontvangt de emissies van {entry} maar houdt ze buiten de gepubliceerde cijfers. Reden {reason}: kwp betekent dat het opgegeven piekvermogen ontbreekt, nul is of in watt staat; night betekent dat de productiesensor 's nachts energie registreert, dus meer meet dan de panelen. Corrigeer de configuratie en de installatie telt binnen een dag weer mee."
+      "title": "Buiten de meetcijfers gehouden ({reason})",
+      "description": "De openbare meting ontvangt de emissies van {entry} maar houdt ze buiten de gepubliceerde cijfers. Reden {reason}: kwp betekent dat het opgegeven piekvermogen ontbreekt, nul is of in watt is ingevuld; night betekent dat de productiesensor 's nachts energie registreert en dus meer meet dan de panelen. Corrigeer de configuratie en de installatie telt binnen een dag weer mee."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Geen Helios Forecast-installatie met invoer-id {entry_id}."
+    },
+    "service_no_installation": {
+      "message": "Er is geen Helios Forecast-installatie ingesteld."
+    },
+    "service_several_installations": {
+      "message": "Er zijn meerdere Helios Forecast-installaties ingesteld; geef 'config_entry_id' op om er een te kiezen."
     }
   }
 }

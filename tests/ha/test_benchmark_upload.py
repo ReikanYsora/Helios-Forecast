@@ -9,11 +9,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.helios_forecast.config import (
-    CONF_BENCHMARK_ENABLED,
-    CONF_BENCHMARK_KEY,
-    CONF_BENCHMARK_URL,
-)
+from custom_components.helios_forecast.benchmark import DEFAULT_ENDPOINT, SCHEMA_VERSION
+from custom_components.helios_forecast.config import CONF_BENCHMARK_ENABLED
 from custom_components.helios_forecast.const import DOMAIN
 from custom_components.helios_forecast.coordinator import HeliosForecastCoordinator
 from custom_components.helios_forecast.reliability import Reliability
@@ -21,7 +18,7 @@ from custom_components.helios_forecast.reliability import Reliability
 pytestmark = pytest.mark.usefixtures("recorder_mock")
 
 _NOW = datetime(2026, 9, 5, 12, 30, tzinfo=timezone.utc)
-_ON = {CONF_BENCHMARK_ENABLED: True, CONF_BENCHMARK_KEY: "write-key", CONF_BENCHMARK_URL: "https://example.test/in"}
+_ON = {CONF_BENCHMARK_ENABLED: True}
 _RELIABILITY = Reliability(
     overall=50.0, data_maturity=0.4, recent_skill=None, today_predictability=None, days_learned=12, per_day=[]
 )
@@ -45,11 +42,14 @@ async def test_an_entry_that_did_not_opt_in_sends_nothing(hass, enable_custom_in
     assert upload.call_count == 0
 
 
-async def test_opted_in_without_a_key_sends_nothing(hass, enable_custom_integrations) -> None:
-    coordinator = _coordinator(hass, {CONF_BENCHMARK_ENABLED: True, CONF_BENCHMARK_KEY: "  "})
+async def test_the_switch_is_the_whole_of_it(hass, enable_custom_integrations) -> None:
+    """No key to hold and no address to type: an entry that says yes emits, full stop. What used to
+    stand between the two was a credential nobody could be asked to keep safe."""
+    coordinator = _coordinator(hass, {CONF_BENCHMARK_ENABLED: True})
     with patch("custom_components.helios_forecast.coordinator.async_upload", AsyncMock()) as upload:
         await _emit(hass, coordinator)
-    assert upload.call_count == 0
+    assert upload.call_count == 1
+    assert "key" not in str(upload.call_args.args).lower()
 
 
 async def test_one_emission_an_hour_however_often_the_forecast_refreshes(hass, enable_custom_integrations) -> None:
@@ -59,10 +59,11 @@ async def test_one_emission_an_hour_however_often_the_forecast_refreshes(hass, e
         await _emit(hass, coordinator, _NOW.replace(minute=59))
         await _emit(hass, coordinator, _NOW.replace(hour=13, minute=1))
     assert upload.call_count == 2
-    session, url, key, payload = upload.call_args.args
-    assert url == "https://example.test/in"
-    assert key == "write-key"
+    _session, url, payload = upload.call_args.args
+    assert url == DEFAULT_ENDPOINT
+    # The version the collector gates on, and the shape it is allowed to read.
     assert payload["model_version"]
+    assert payload["schema"] == SCHEMA_VERSION
     assert payload["site"]["latitude"] == 44.1
 
 

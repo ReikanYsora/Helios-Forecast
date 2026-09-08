@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: spjaldalína",
-        "description": "Ein spá fyrir eina spjaldalínu (hóp samstilltra spjalda). Bættu samþættingunni við aftur fyrir hverja viðbótarlínu. Skildu staðsetninguna eftir auða til að nota heimili Home Assistant.",
+        "description": "Ein spá fyrir sólarorkukerfi. Bættu við einni spjaldalínu fyrir hverja stefnu; margar línur deila eina framleiðsluskynjara kerfisins og invertermörkum. Skildu staðsetninguna eftir auða til að nota heimastaðsetningu Home Assistant.",
         "data": {
           "name": "Nafn (t.d. Suðurþak)",
           "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",
@@ -14,26 +14,28 @@
           "latitude": "Breiddargráða (valfrjálst)",
           "longitude": "Lengdargráða (valfrjálst)",
           "inverter_max_kw": "Hámarksafl invertara (kW, valfrjálst)",
-          "production_entity": "Skynjari sólarframleiðslu (fyrir lærða leiðréttingu)",
+          "production_entity": "Skynjari fyrir framleidda sólarorku (kWh, fyrir lærðu leiðréttinguna)",
           "trend_anchor_hour": "Viðmiðunarstund dagsleitni (0-23, sjálfgefið 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Bæta við annarri spjaldalínu",
           "battery_capacity_kwh": "Nýtanleg rafhlöðugeta (kWh)",
           "battery_soc_entity": "Skynjari fyrir hleðslustöðu rafhlöðu (%)",
           "battery_max_charge_kw": "Hámarks hleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_max_discharge_kw": "Hámarks afhleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_min_soc": "Varaforði rafhlöðu, lágmarks hleðslustaða (%, sjálfgefið 10)",
           "battery_efficiency": "Heildarnýtni rafhlöðu (%, sjálfgefið 90)",
-          "curtailment_entity": "Skerðingarmerki (tvíundarskynjari, valfrjálst)"
+          "curtailment_entity": "Skerðingarmerki (tvíundaskynjari, input boolean eða rofi, valfrjálst)",
+          "benchmark_enabled": "Leggðu þitt af mörkum í opinberri nákvæmnismælingu (valfrjálst)"
         },
         "data_description": {
           "production_entity": "Uppsafnaður orkuskynjari (kWh), t.d. heildarframleiðsla áriðils eða orkumælis. Aflskynjari (W) virkar ekki: hann hefur enga langtímasummutölfræði, svo lærdómurinn og áreiðanleikavísitalan yrðu áfram óvirk.",
           "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér.",
-          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins."
+          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins.",
+          "benchmark_enabled": "Sendir einu sinni á klukkustund það sem þetta kerfi spáir fyrir um, svo hægt sé að bera það saman við það sem það framleiddi í raun. Niðurstöður eru birtar opinberlega á helios-ha.org/benchmark. Aðeins rúmfræði spjaldanna, spáða ferillinn, mæld framleiðsla og áreiðanleikavísitalan ferðast: engin heiti eininga, engin notkun, enginn annar skynjari, og hnitin þín rúnnuð að um það bil kílómetra. Krefst 2026.9.5 eða nýrri, útgáfunnar sem er mæld. Slökkt þar til þú kveikir á því."
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: viðbótar spjaldalína",
+        "description": "Spjaldalína {index}: annar hópur spjalda með sömu stefnu í sama kerfi (sameiginlegur framleiðsluskynjari og inverter).",
         "data": {
           "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",
           "azimuth": "Áttarhorn (gráður frá norðri, 90 = austur, 180 = suður, 270 = vestur)",
@@ -42,7 +44,7 @@
           "tracker": "Sólarrakari",
           "latitude": "Breiddargráða fyrir þessa línu (valfrjálst)",
           "longitude": "Lengdargráða fyrir þessa línu (valfrjálst)",
-          "add_another": "Add another panel line"
+          "add_another": "Bæta við annarri spjaldalínu"
         }
       }
     }
@@ -51,21 +53,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Veldu hverju þú vilt breyta.",
         "menu_options": {
           "settings": "Breyta stillingum (staðsetning, áriðill, framleiðsluskynjari, rafhlaða, skerðingarmerki)",
-          "lines": "Edit panel lines",
-          "benchmark": "Taka þátt í samanburði samfélagsins"
+          "lines": "Breyta spjaldalínum"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: stillingar",
         "description": "Sameiginleg staðsetning, hámark áriðils, framleiðsluskynjari, viðmiðunartími, rafhlaða og skerðingarmerki fyrir hverja panelröð í þessari færslu.",
         "data": {
           "latitude": "Breiddargráða (valfrjálst)",
           "longitude": "Lengdargráða (valfrjálst)",
           "inverter_max_kw": "Hámarksafl invertara (kW, valfrjálst)",
-          "production_entity": "Skynjari sólarframleiðslu (fyrir lærða leiðréttingu)",
+          "production_entity": "Skynjari fyrir framleidda sólarorku (kWh, fyrir lærðu leiðréttinguna)",
           "trend_anchor_hour": "Viðmiðunarstund dagsleitni (0-23, sjálfgefið 6)",
           "battery_capacity_kwh": "Nýtanleg rafhlöðugeta (kWh)",
           "battery_soc_entity": "Skynjari fyrir hleðslustöðu rafhlöðu (%)",
@@ -73,17 +74,19 @@
           "battery_max_discharge_kw": "Hámarks afhleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_min_soc": "Varaforði rafhlöðu, lágmarks hleðslustaða (%, sjálfgefið 10)",
           "battery_efficiency": "Heildarnýtni rafhlöðu (%, sjálfgefið 90)",
-          "curtailment_entity": "Skerðingarmerki (tvíundarskynjari, valfrjálst)"
+          "curtailment_entity": "Skerðingarmerki (tvíundaskynjari, input boolean eða rofi, valfrjálst)",
+          "benchmark_enabled": "Leggðu þitt af mörkum í opinberri nákvæmnismælingu (valfrjálst)"
         },
         "data_description": {
           "production_entity": "Uppsafnaður orkuskynjari (kWh), t.d. heildarframleiðsla áriðils eða orkumælis. Aflskynjari (W) virkar ekki: hann hefur enga langtímasummutölfræði, svo lærdómurinn og áreiðanleikavísitalan yrðu áfram óvirk.",
           "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér.",
-          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins."
+          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins.",
+          "benchmark_enabled": "Sendir einu sinni á klukkustund það sem þetta kerfi spáir fyrir um, svo hægt sé að bera það saman við það sem það framleiddi í raun. Niðurstöður eru birtar opinberlega á helios-ha.org/benchmark. Aðeins rúmfræði spjaldanna, spáða ferillinn, mæld framleiðsla og áreiðanleikavísitalan ferðast: engin heiti eininga, engin notkun, enginn annar skynjari, og hnitin þín rúnnuð að um það bil kílómetra. Krefst 2026.9.5 eða nýrri, útgáfunnar sem er mæld. Slökkt þar til þú kveikir á því."
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: spjaldalína {index}/{total}",
+        "description": "Breyttu spjaldalínu {index} af {total}, eða hakaðu við til að bæta annarri við.",
         "data": {
           "tilt": "Halli (gráður, 0 = flatt, 90 = lóðrétt)",
           "azimuth": "Áttarhorn (gráður frá norðri, 90 = austur, 180 = suður, 270 = vestur)",
@@ -92,22 +95,8 @@
           "tracker": "Sólarrakari",
           "latitude": "Breiddargráða fyrir þessa línu (valfrjálst)",
           "longitude": "Lengdargráða fyrir þessa línu (valfrjálst)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: samanburður samfélagsins",
-        "description": "Opin mæling á því hversu nákvæmt Helios Forecast er í raun, á raunverulegum kerfum, birt jafnóðum. Viltu taka þátt? Hér er leiðin: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNáðu í lykil með einum smelli, án reiknings og án nafns, og límdu hann hér að neðan. Til að stöðva allt, eyddu honum.",
-        "data": {
-          "benchmark_enabled": "Taka þátt í opinberum nákvæmnisamanburði (valfrjálst)",
-          "benchmark_key": "Samanburðarlykill",
-          "benchmark_url": "Vistfang safnarans"
-        },
-        "data_description": {
-          "benchmark_enabled": "Sendir einu sinni á klukkustund það sem þessi uppsetning spáir, svo hægt sé að bera það saman við raunverulega framleiðslu. Niðurstöður eru birtar opinberlega. Aðeins rúmfræði spjaldanna, spáði ferillinn, mæld framleiðsla og áreiðanleikastuðullinn er sent: engin heiti eininga, engin notkun, engir aðrir skynjarar, og hnitin námunduð að um einum kílómetra. Slökkt þar til þú kveikir á því.",
-          "benchmark_key": "Skriflykillinn sem þú fékkst við þátttöku í samanburðinum. Án hans er ekkert sent.",
-          "benchmark_url": "Vistfangið sem mælingarnar eru sendar á, sýnt svo þú vitir nákvæmlega hvert."
+          "remove_this_line": "Fjarlægja þessa spjaldalínu",
+          "add_another": "Bæta við annarri spjaldalínu"
         }
       }
     }
@@ -128,7 +117,7 @@
       "description": "Skilar allri framleiðsluspánni (frá og með deginum í dag, einn punktur á 15 mínútna fresti, hver með spáðum vöttum og P10/P90 öryggisbili) sem svargögnum til notkunar í sjálfvirkni.",
       "fields": {
         "config_entry_id": {
-          "name": "Uppsetning",
+          "name": "Kerfi",
           "description": "Hvaða Helios Forecast uppsetningu á að lesa. Valfrjálst þegar aðeins ein er stillt."
         }
       }
@@ -138,7 +127,7 @@
       "description": "Skilar áætlaðri hleðslustöðu rafhlöðu fyrir næstu 48 klukkustundir (einn punktur á 15 mínútna fresti) sem svargögnum til notkunar í sjálfvirkni.",
       "fields": {
         "config_entry_id": {
-          "name": "Uppsetning",
+          "name": "Kerfi",
           "description": "Hvaða Helios Forecast uppsetningu á að lesa. Valfrjálst þegar aðeins ein er stillt."
         }
       }
@@ -229,10 +218,6 @@
       "title": "Nýtni rafhlöðu utan bils",
       "description": "{entry} hefur heildarnýtni upp á {value}. Sláðu inn prósentu frá 50 til 100 (flestar heimilisrafhlöður eru um 90)."
     },
-    "benchmark_key": {
-      "title": "Lykill viðmiðunarprófsins lítur ekki út eins og lykill",
-      "description": "{entry} tekur þátt í viðmiðunarprófi samfélagsins en lykillinn er ekki einn þeirra sem safnarinn gefur út. Límdu allan lykilinn frá helios-ha.org/benchmark, eða slökktu á viðmiðunarprófinu."
-    },
     "production_entity_missing": {
       "title": "Framleiðsluskynjari fannst ekki",
       "description": "Framleiðsluskynjari {entry}, {entity}, er ekki til. Spáin keyrir óleiðrétt þar til hann er það. Athugaðu auðkenni einingarinnar, eða veldu skynjarann aftur í stillingunum."
@@ -274,8 +259,19 @@
       "description": "Í orkumælaborðinu hefur {source} gögn fyrir {pct} % af klukkustundunum sem besta uppsprettan nær yfir ({best} %). Notkunarsniðið er aðeins byggt á klukkustundunum sem hún nær yfir, svo það helst rétt en hvílir á minni sögu. Áreiðanlegri skynjari fyrir þetta flæði skerpir framreikning rafhlöðunnar."
     },
     "benchmark_excluded": {
-      "title": "Haldið utan við tölur viðmiðunarprófsins ({reason})",
-      "description": "Viðmiðunarpróf samfélagsins tekur við sendingum {entry} en heldur þeim utan við birtar tölur. Ástæða {reason}: kwp þýðir að uppgefið hámarksafl vantar, er núll eða var slegið inn í vöttum; night þýðir að framleiðsluskynjarinn skráir orku á nóttunni og mælir því meira en sellurnar. Leiðréttu stillingarnar og uppsetningin er talin með aftur innan dags."
+      "title": "Haldið utan við tölur mælingarinnar ({reason})",
+      "description": "Opinbera mælingin tekur við sendingum frá {entry} en heldur þeim utan birtra talna. Ástæða {reason}: kwp þýðir að uppgefið hámarksafl vantar, er núll eða slegið inn í vöttum; night þýðir að framleiðsluskynjarinn skráir orku að nóttu og mælir því meira en spjöldin. Lagfærðu stillingarnar og kerfið telst aftur með innan sólarhrings."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Ekkert Helios Forecast kerfi með færsluauðkennið {entry_id}."
+    },
+    "service_no_installation": {
+      "message": "Ekkert Helios Forecast kerfi er uppsett."
+    },
+    "service_several_installations": {
+      "message": "Mörg Helios Forecast kerfi eru uppsett; tilgreindu 'config_entry_id' til að velja eitt."
     }
   }
 }
