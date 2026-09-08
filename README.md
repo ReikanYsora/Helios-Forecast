@@ -46,7 +46,7 @@ Home Assistant already knows how to show it.
 on real installations, published as it goes: **[helios-ha.org/benchmark](https://helios-ha.org/benchmark)**.
 
 Taking part is one checkbox, in **Settings** > **Devices and services** > **Helios Forecast** >
-**Configure** > **Settings**, and it needs 2026.9.5 or newer. There is no key to ask for and no
+**Configure** > **Join the community benchmark**, and it needs 2026.9.5 or newer. There is no key to ask for and no
 account to create. What travels is the panel geometry, the predicted curve, the measured production
 and the reliability index, once an hour: no entity names, no consumption, no other sensor, and
 coordinates rounded to about a kilometre. Clear the box and it stops.

@@ -23,14 +23,12 @@
           "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
           "battery_min_soc": "Rezerva baterie, minimální stav nabití (%, výchozí 10)",
           "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)",
-          "curtailment_entity": "Signál omezení výkonu (binární senzor, input boolean nebo spínač, volitelné)",
-          "benchmark_enabled": "Přispět do veřejného měření přesnosti (volitelné)"
+          "curtailment_entity": "Signál omezení výkonu (binární senzor, input boolean nebo spínač, volitelné)"
         },
         "data_description": {
           "production_entity": "Kumulativní senzor energie (kWh), např. celková výroba střídače nebo elektroměru. Senzor výkonu (W) nebude fungovat: nemá dlouhodobé statistiky součtu, takže učení a index spolehlivosti by zůstaly vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
-          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače.",
-          "benchmark_enabled": "Jednou za hodinu odesílá to, co tato instalace předpovídá, aby to bylo možné porovnat s tím, co skutečně vyrobila. Výsledky jsou otevřeně zveřejňovány na helios-ha.org/benchmark. Putuje pouze geometrie panelů, předpovězená křivka, naměřená výroba a index spolehlivosti: žádné názvy entit, žádná spotřeba, žádný jiný senzor a souřadnice zaokrouhlené zhruba na kilometr. Vyžaduje verzi 2026.9.5 nebo novější, tedy tu měřenou. Vypnuto, dokud to nezapnete."
+          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
         }
       },
       "line": {
@@ -56,7 +54,8 @@
         "description": "Vyberte, co chcete upravit.",
         "menu_options": {
           "settings": "Upravit nastavení (poloha, střídač, senzor výroby, baterie, signál omezení)",
-          "lines": "Upravit linie panelů"
+          "lines": "Upravit linie panelů",
+          "benchmark": "Zapojit se do komunitního srovnání"
         }
       },
       "settings": {
@@ -74,14 +73,12 @@
           "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
           "battery_min_soc": "Rezerva baterie, minimální stav nabití (%, výchozí 10)",
           "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)",
-          "curtailment_entity": "Signál omezení výkonu (binární senzor, input boolean nebo spínač, volitelné)",
-          "benchmark_enabled": "Přispět do veřejného měření přesnosti (volitelné)"
+          "curtailment_entity": "Signál omezení výkonu (binární senzor, input boolean nebo spínač, volitelné)"
         },
         "data_description": {
           "production_entity": "Kumulativní senzor energie (kWh), např. celková výroba střídače nebo elektroměru. Senzor výkonu (W) nebude fungovat: nemá dlouhodobé statistiky součtu, takže učení a index spolehlivosti by zůstaly vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
-          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače.",
-          "benchmark_enabled": "Jednou za hodinu odesílá to, co tato instalace předpovídá, aby to bylo možné porovnat s tím, co skutečně vyrobila. Výsledky jsou otevřeně zveřejňovány na helios-ha.org/benchmark. Putuje pouze geometrie panelů, předpovězená křivka, naměřená výroba a index spolehlivosti: žádné názvy entit, žádná spotřeba, žádný jiný senzor a souřadnice zaokrouhlené zhruba na kilometr. Vyžaduje verzi 2026.9.5 nebo novější, tedy tu měřenou. Vypnuto, dokud to nezapnete."
+          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
         }
       },
       "lines": {
@@ -97,6 +94,16 @@
           "longitude": "Zeměpisná délka pro tuto linii (volitelné)",
           "remove_this_line": "Odebrat tuto linii panelů",
           "add_another": "Přidat další linii panelů"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: komunitní srovnání",
+        "description": "Otevřené měření skutečné přesnosti Helios Forecast na reálných instalacích, průběžně zveřejňované. Chcete se zapojit? Tudy: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNení třeba žádat o klíč ani zakládat účet: zaškrtněte pole níže a to je vše. Chcete-li skončit, zaškrtnutí zrušte.",
+        "data": {
+          "benchmark_enabled": "Přispět do veřejného měření přesnosti (volitelné)"
+        },
+        "data_description": {
+          "benchmark_enabled": "Jednou za hodinu odesílá to, co tato instalace předpovídá, aby to bylo možné porovnat s tím, co skutečně vyrobila. Výsledky jsou otevřeně zveřejňovány na helios-ha.org/benchmark. Putuje pouze geometrie panelů, předpovězená křivka, naměřená výroba a index spolehlivosti: žádné názvy entit, žádná spotřeba, žádný jiný senzor a souřadnice zaokrouhlené zhruba na kilometr. Vyžaduje verzi 2026.9.5 nebo novější, tedy tu měřenou. Vypnuto, dokud to nezapnete."
         }
       }
     }

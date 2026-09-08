@@ -90,6 +90,11 @@ SETTINGS_KEYS: Tuple[str, ...] = (
 )
 
 
+# The settings edited on the benchmark step rather than the settings form. Each step rewrites only the
+# keys its own form shows and carries the other's across, so saving one never silently clears the other.
+BENCHMARK_KEYS: Tuple[str, ...] = (CONF_BENCHMARK_ENABLED,)
+
+
 def split_line(user_input: Dict[str, Any]) -> Dict[str, Any]:
     """The per-line geometry fields of a submitted form (drops empty values)."""
     return {k: user_input[k] for k in LINE_KEYS if user_input.get(k) is not None}

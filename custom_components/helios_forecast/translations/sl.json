@@ -23,14 +23,12 @@
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
           "battery_min_soc": "Rezerva baterije, najmanjše stanje napolnjenosti (%, privzeto 10)",
           "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
-          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)",
-          "benchmark_enabled": "Prispevajte k javni meritvi natančnosti (izbirno)"
+          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
           "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
-          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika.",
-          "benchmark_enabled": "Enkrat na uro pošlje, kar ta naprava napoveduje, da se to lahko primerja s tem, kar je resnično proizvedla. Rezultati so odprto objavljeni na helios-ha.org/benchmark. Potujejo le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenega drugega senzorja, in vaše koordinate zaokrožene na približno kilometer. Zahteva različico 2026.9.5 ali novejšo, torej tisto, ki se meri. Izklopljeno, dokler tega ne vklopite."
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
         }
       },
       "line": {
@@ -56,7 +54,8 @@
         "description": "Izberite, kaj želite urediti.",
         "menu_options": {
           "settings": "Uredi nastavitve (lokacija, razsmernik, senzor proizvodnje, baterija, signal omejitve)",
-          "lines": "Uredi vrste panelov"
+          "lines": "Uredi vrste panelov",
+          "benchmark": "Sodeluj v primerjavi skupnosti"
         }
       },
       "settings": {
@@ -74,14 +73,12 @@
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
           "battery_min_soc": "Rezerva baterije, najmanjše stanje napolnjenosti (%, privzeto 10)",
           "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
-          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)",
-          "benchmark_enabled": "Prispevajte k javni meritvi natančnosti (izbirno)"
+          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
           "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
-          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika.",
-          "benchmark_enabled": "Enkrat na uro pošlje, kar ta naprava napoveduje, da se to lahko primerja s tem, kar je resnično proizvedla. Rezultati so odprto objavljeni na helios-ha.org/benchmark. Potujejo le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenega drugega senzorja, in vaše koordinate zaokrožene na približno kilometer. Zahteva različico 2026.9.5 ali novejšo, torej tisto, ki se meri. Izklopljeno, dokler tega ne vklopite."
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
         }
       },
       "lines": {
@@ -97,6 +94,16 @@
           "longitude": "Zemljepisna dolžina za to linijo (izbirno)",
           "remove_this_line": "Odstrani to vrsto panelov",
           "add_another": "Dodaj še eno vrsto panelov"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: primerjava skupnosti",
+        "description": "Odprto merjenje dejanske natančnosti Helios Forecasta na resničnih napravah, objavljeno sproti. Želite sodelovati? Tukaj: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nKljuča ni treba zahtevati in računa ni treba ustvariti: označite spodnje polje in to je vse. Za prekinitev oznako odstranite.",
+        "data": {
+          "benchmark_enabled": "Prispevajte k javni meritvi natančnosti (izbirno)"
+        },
+        "data_description": {
+          "benchmark_enabled": "Enkrat na uro pošlje, kar ta naprava napoveduje, da se to lahko primerja s tem, kar je resnično proizvedla. Rezultati so odprto objavljeni na helios-ha.org/benchmark. Potujejo le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenega drugega senzorja, in vaše koordinate zaokrožene na približno kilometer. Zahteva različico 2026.9.5 ali novejšo, torej tisto, ki se meri. Izklopljeno, dokler tega ne vklopite."
         }
       }
     }

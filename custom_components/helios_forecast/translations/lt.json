@@ -23,14 +23,12 @@
           "battery_max_discharge_kw": "Maks. akumuliatoriaus iškrovimo galia (kW, neprivaloma)",
           "battery_min_soc": "Akumuliatoriaus rezervas, minimali įkrova (%, numatytoji 10)",
           "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)",
-          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)",
-          "benchmark_enabled": "Prisidėti prie viešo tikslumo matavimo (neprivaloma)"
+          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)"
         },
         "data_description": {
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
           "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
-          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą.",
-          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tuo, ką ji iš tikrųjų pagamino. Rezultatai skelbiami viešai adresu helios-ha.org/benchmark. Siunčiama tik skydelių geometrija, prognozuojama kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokio kito jutiklio, o koordinatės suapvalintos maždaug iki kilometro. Reikalinga 2026.9.5 arba naujesnė versija, būtent ji matuojama. Išjungta, kol neįjungsite."
+          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą."
         }
       },
       "line": {
@@ -56,7 +54,8 @@
         "description": "Pasirinkite, ką norite redaguoti.",
         "menu_options": {
           "settings": "Redaguoti nustatymus (vieta, inverteris, gamybos jutiklis, baterija, ribojimo signalas)",
-          "lines": "Redaguoti skydelių linijas"
+          "lines": "Redaguoti skydelių linijas",
+          "benchmark": "Dalyvauti bendruomenės palyginime"
         }
       },
       "settings": {
@@ -74,14 +73,12 @@
           "battery_max_discharge_kw": "Maks. akumuliatoriaus iškrovimo galia (kW, neprivaloma)",
           "battery_min_soc": "Akumuliatoriaus rezervas, minimali įkrova (%, numatytoji 10)",
           "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)",
-          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)",
-          "benchmark_enabled": "Prisidėti prie viešo tikslumo matavimo (neprivaloma)"
+          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)"
         },
         "data_description": {
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
           "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
-          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą.",
-          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tuo, ką ji iš tikrųjų pagamino. Rezultatai skelbiami viešai adresu helios-ha.org/benchmark. Siunčiama tik skydelių geometrija, prognozuojama kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokio kito jutiklio, o koordinatės suapvalintos maždaug iki kilometro. Reikalinga 2026.9.5 arba naujesnė versija, būtent ji matuojama. Išjungta, kol neįjungsite."
+          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą."
         }
       },
       "lines": {
@@ -97,6 +94,16 @@
           "longitude": "Ilguma šiai linijai (neprivaloma)",
           "remove_this_line": "Pašalinti šią skydelių liniją",
           "add_another": "Pridėti dar vieną skydelių liniją"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: bendruomenės palyginimas",
+        "description": "Atviras matavimas, kiek Helios Forecast iš tikrųjų tikslus, tikrose sistemose, skelbiamas nuolat. Norite dalyvauti? Štai čia: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNereikia nei prašyti rakto, nei kurti paskyros: pažymėkite žemiau esantį langelį ir viskas. Norėdami nutraukti, žymėjimą panaikinkite.",
+        "data": {
+          "benchmark_enabled": "Prisidėti prie viešo tikslumo matavimo (neprivaloma)"
+        },
+        "data_description": {
+          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tuo, ką ji iš tikrųjų pagamino. Rezultatai skelbiami viešai adresu helios-ha.org/benchmark. Siunčiama tik skydelių geometrija, prognozuojama kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokio kito jutiklio, o koordinatės suapvalintos maždaug iki kilometro. Reikalinga 2026.9.5 arba naujesnė versija, būtent ji matuojama. Išjungta, kol neįjungsite."
         }
       }
     }

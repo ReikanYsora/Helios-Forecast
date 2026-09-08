@@ -23,14 +23,12 @@
           "battery_max_discharge_kw": "Akun suurin purkausteho (kW, valinnainen)",
           "battery_min_soc": "Akun varaus, vähimmäisvaraustila (%, oletus 10)",
           "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)",
-          "curtailment_entity": "Rajoitussignaali (binäärianturi, input boolean tai kytkin, valinnainen)",
-          "benchmark_enabled": "Osallistu julkiseen tarkkuusmittaukseen (valinnainen)"
+          "curtailment_entity": "Rajoitussignaali (binäärianturi, input boolean tai kytkin, valinnainen)"
         },
         "data_description": {
           "production_entity": "Kumulatiivinen energia-anturi (kWh), esim. invertterin tai energiamittarin kokonaistuotanto. Tehoanturi (W) ei toimi: sillä ei ole pitkän aikavälin summatilastoja, joten oppiminen ja luotettavuusindeksi jäisivät pois päältä.",
           "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
-          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta.",
-          "benchmark_enabled": "Lähettää kerran tunnissa sen, mitä tämä laitos ennustaa, jotta sitä voidaan verrata siihen, mitä se todella tuotti. Tulokset julkaistaan avoimesti osoitteessa helios-ha.org/benchmark. Mukana kulkevat vain paneelien geometria, ennustettu käyrä, mitattu tuotanto ja luotettavuusindeksi: ei entiteettien nimiä, ei kulutusta, ei muita antureita, ja koordinaattisi pyöristettynä noin kilometriin. Vaatii version 2026.9.5 tai uudemman, eli mitattavan version. Pois päältä, kunnes kytket sen päälle."
+          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
         }
       },
       "line": {
@@ -56,7 +54,8 @@
         "description": "Valitse, mitä haluat muokata.",
         "menu_options": {
           "settings": "Muokkaa asetuksia (sijainti, invertteri, tuotantoanturi, akku, rajoitussignaali)",
-          "lines": "Muokkaa paneelilinjoja"
+          "lines": "Muokkaa paneelilinjoja",
+          "benchmark": "Osallistu yhteisön vertailuun"
         }
       },
       "settings": {
@@ -74,14 +73,12 @@
           "battery_max_discharge_kw": "Akun suurin purkausteho (kW, valinnainen)",
           "battery_min_soc": "Akun varaus, vähimmäisvaraustila (%, oletus 10)",
           "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)",
-          "curtailment_entity": "Rajoitussignaali (binäärianturi, input boolean tai kytkin, valinnainen)",
-          "benchmark_enabled": "Osallistu julkiseen tarkkuusmittaukseen (valinnainen)"
+          "curtailment_entity": "Rajoitussignaali (binäärianturi, input boolean tai kytkin, valinnainen)"
         },
         "data_description": {
           "production_entity": "Kumulatiivinen energia-anturi (kWh), esim. invertterin tai energiamittarin kokonaistuotanto. Tehoanturi (W) ei toimi: sillä ei ole pitkän aikavälin summatilastoja, joten oppiminen ja luotettavuusindeksi jäisivät pois päältä.",
           "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
-          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta.",
-          "benchmark_enabled": "Lähettää kerran tunnissa sen, mitä tämä laitos ennustaa, jotta sitä voidaan verrata siihen, mitä se todella tuotti. Tulokset julkaistaan avoimesti osoitteessa helios-ha.org/benchmark. Mukana kulkevat vain paneelien geometria, ennustettu käyrä, mitattu tuotanto ja luotettavuusindeksi: ei entiteettien nimiä, ei kulutusta, ei muita antureita, ja koordinaattisi pyöristettynä noin kilometriin. Vaatii version 2026.9.5 tai uudemman, eli mitattavan version. Pois päältä, kunnes kytket sen päälle."
+          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
         }
       },
       "lines": {
@@ -97,6 +94,16 @@
           "longitude": "Pituusaste tälle linjalle (valinnainen)",
           "remove_this_line": "Poista tämä paneelilinja",
           "add_another": "Lisää toinen paneelilinja"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: yhteisön vertailu",
+        "description": "Avoin mittaus siitä, kuinka tarkka Helios Forecast todella on, oikeilla järjestelmillä, julkaistuna sitä mukaa. Haluatko osallistua? Täältä pääset: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nAvainta ei tarvitse pyytää eikä tiliä luoda: rastita alla oleva ruutu, siinä kaikki. Lopettaaksesi poista rasti.",
+        "data": {
+          "benchmark_enabled": "Osallistu julkiseen tarkkuusmittaukseen (valinnainen)"
+        },
+        "data_description": {
+          "benchmark_enabled": "Lähettää kerran tunnissa sen, mitä tämä laitos ennustaa, jotta sitä voidaan verrata siihen, mitä se todella tuotti. Tulokset julkaistaan avoimesti osoitteessa helios-ha.org/benchmark. Mukana kulkevat vain paneelien geometria, ennustettu käyrä, mitattu tuotanto ja luotettavuusindeksi: ei entiteettien nimiä, ei kulutusta, ei muita antureita, ja koordinaattisi pyöristettynä noin kilometriin. Vaatii version 2026.9.5 tai uudemman, eli mitattavan version. Pois päältä, kunnes kytket sen päälle."
         }
       }
     }

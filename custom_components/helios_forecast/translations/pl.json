@@ -23,14 +23,12 @@
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
           "battery_min_soc": "Rezerwa akumulatora, minimalny stan naładowania (%, domyślnie 10)",
           "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
-          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)",
-          "benchmark_enabled": "Wnieś wkład do publicznego testu dokładności (opcjonalnie)"
+          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)"
         },
         "data_description": {
           "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
           "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
-          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika.",
-          "benchmark_enabled": "Wysyła raz na godzinę to, co ta instalacja przewiduje, aby porównać to z tym, co naprawdę wyprodukowała. Wyniki są publikowane otwarcie na helios-ha.org/benchmark. Przesyłane są tylko geometria paneli, przewidywana krzywa, zmierzona produkcja i wskaźnik wiarygodności: żadnych nazw encji, żadnego zużycia, żadnego innego czujnika, a współrzędne zaokrąglone do około kilometra. Wymaga wersji 2026.9.5 lub nowszej, czyli tej mierzonej. Wyłączone, dopóki tego nie włączysz."
+          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
         }
       },
       "line": {
@@ -56,7 +54,8 @@
         "description": "Wybierz, co chcesz edytować.",
         "menu_options": {
           "settings": "Edytuj ustawienia (lokalizacja, falownik, czujnik produkcji, akumulator, sygnał ograniczenia)",
-          "lines": "Edytuj linie paneli"
+          "lines": "Edytuj linie paneli",
+          "benchmark": "Dołącz do testu społecznościowego"
         }
       },
       "settings": {
@@ -74,14 +73,12 @@
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
           "battery_min_soc": "Rezerwa akumulatora, minimalny stan naładowania (%, domyślnie 10)",
           "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
-          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)",
-          "benchmark_enabled": "Wnieś wkład do publicznego testu dokładności (opcjonalnie)"
+          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)"
         },
         "data_description": {
           "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
           "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
-          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika.",
-          "benchmark_enabled": "Wysyła raz na godzinę to, co ta instalacja przewiduje, aby porównać to z tym, co naprawdę wyprodukowała. Wyniki są publikowane otwarcie na helios-ha.org/benchmark. Przesyłane są tylko geometria paneli, przewidywana krzywa, zmierzona produkcja i wskaźnik wiarygodności: żadnych nazw encji, żadnego zużycia, żadnego innego czujnika, a współrzędne zaokrąglone do około kilometra. Wymaga wersji 2026.9.5 lub nowszej, czyli tej mierzonej. Wyłączone, dopóki tego nie włączysz."
+          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
         }
       },
       "lines": {
@@ -97,6 +94,16 @@
           "longitude": "Długość geograficzna dla tej linii (opcjonalnie)",
           "remove_this_line": "Usuń tę linię paneli",
           "add_another": "Dodaj kolejną linię paneli"
+        }
+      },
+      "benchmark": {
+        "title": "Helios Forecast: test społecznościowy",
+        "description": "Otwarty pomiar rzeczywistej dokładności Helios Forecast, na prawdziwych instalacjach, publikowany na bieżąco. Chcesz wziąć udział? Tędy: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNie trzeba prosić o klucz ani zakładać konta: zaznacz poniższe pole i to wszystko. Aby przerwać, odznacz je.",
+        "data": {
+          "benchmark_enabled": "Wnieś wkład do publicznego testu dokładności (opcjonalnie)"
+        },
+        "data_description": {
+          "benchmark_enabled": "Wysyła raz na godzinę to, co ta instalacja przewiduje, aby porównać to z tym, co naprawdę wyprodukowała. Wyniki są publikowane otwarcie na helios-ha.org/benchmark. Przesyłane są tylko geometria paneli, przewidywana krzywa, zmierzona produkcja i wskaźnik wiarygodności: żadnych nazw encji, żadnego zużycia, żadnego innego czujnika, a współrzędne zaokrąglone do około kilometra. Wymaga wersji 2026.9.5 lub nowszej, czyli tej mierzonej. Wyłączone, dopóki tego nie włączysz."
         }
       }
     }
