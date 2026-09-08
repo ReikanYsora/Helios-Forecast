@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
           "battery_min_soc": "Rezerva baterie, minimální stav nabití (%, výchozí 10)",
           "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)",
-          "curtailment_entity": "Signál omezení výkonu (binární senzor, input boolean nebo spínač, volitelné)"
+          "curtailment_entity": "Signál omezení výkonu (binární senzor, input boolean nebo spínač, volitelné)",
+          "benchmark_enabled": "Přispět do veřejného měření přesnosti (volitelné)"
         },
         "data_description": {
           "production_entity": "Kumulativní senzor energie (kWh), např. celková výroba střídače nebo elektroměru. Senzor výkonu (W) nebude fungovat: nemá dlouhodobé statistiky součtu, takže učení a index spolehlivosti by zůstaly vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
-          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
+          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače.",
+          "benchmark_enabled": "Jednou za hodinu odesílá to, co tato instalace předpovídá, aby to bylo možné porovnat s tím, co skutečně vyrobila. Výsledky jsou otevřeně zveřejňovány na helios-ha.org/benchmark. Putuje pouze geometrie panelů, předpovězená křivka, naměřená výroba a index spolehlivosti: žádné názvy entit, žádná spotřeba, žádný jiný senzor a souřadnice zaokrouhlené zhruba na kilometr. Není o co žádat a není co uchovávat. Vypnuto, dokud to nezapnete."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
           "battery_min_soc": "Rezerva baterie, minimální stav nabití (%, výchozí 10)",
           "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)",
-          "curtailment_entity": "Signál omezení výkonu (binární senzor, input boolean nebo spínač, volitelné)"
+          "curtailment_entity": "Signál omezení výkonu (binární senzor, input boolean nebo spínač, volitelné)",
+          "benchmark_enabled": "Přispět do veřejného měření přesnosti (volitelné)"
         },
         "data_description": {
           "production_entity": "Kumulativní senzor energie (kWh), např. celková výroba střídače nebo elektroměru. Senzor výkonu (W) nebude fungovat: nemá dlouhodobé statistiky součtu, takže učení a index spolehlivosti by zůstaly vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
-          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
+          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače.",
+          "benchmark_enabled": "Jednou za hodinu odesílá to, co tato instalace předpovídá, aby to bylo možné porovnat s tím, co skutečně vyrobila. Výsledky jsou otevřeně zveřejňovány na helios-ha.org/benchmark. Putuje pouze geometrie panelů, předpovězená křivka, naměřená výroba a index spolehlivosti: žádné názvy entit, žádná spotřeba, žádný jiný senzor a souřadnice zaokrouhlené zhruba na kilometr. Není o co žádat a není co uchovávat. Vypnuto, dokud to nezapnete."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Zdroj spotřeby {source} hlásí přerušovaně",
       "description": "V panelu Energie má {source} data pro {pct} % hodin, které pokrývá nejlepší zdroj ({best} %). Profil spotřeby se staví jen z hodin, které pokrývá, takže zůstává správný, ale opírá se o méně historie. Spolehlivější senzor pro tento tok zpřesní projekci baterie."
+    },
+    "benchmark_excluded": {
+      "title": "Vyřazena z čísel měření ({reason})",
+      "description": "Veřejné měření přijímá emise z {entry}, ale drží je mimo zveřejněná čísla. Důvod {reason}: kwp znamená, že deklarovaný špičkový výkon chybí, je nulový nebo zadaný ve wattech; night znamená, že senzor výroby zaznamenává energii v noci, měří tedy víc než panely. Opravte konfiguraci a instalace se během dne opět započítá."
     }
   },
   "exceptions": {

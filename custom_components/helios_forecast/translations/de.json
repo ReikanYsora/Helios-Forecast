@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
           "battery_min_soc": "Batteriereserve, minimaler Ladezustand (%, Standard 10)",
           "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
-          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)"
+          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)",
+          "benchmark_enabled": "Zum öffentlichen Genauigkeits-Benchmark beitragen (optional)"
         },
         "data_description": {
           "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
           "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
-          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt.",
+          "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit dem verglichen werden kann, was sie wirklich erzeugt hat. Die Ergebnisse werden offen auf helios-ha.org/benchmark veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Erzeugung und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, kein anderer Sensor, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Nichts zu beantragen, kein Schlüssel aufzubewahren. Aus, solange Sie es nicht einschalten."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
           "battery_min_soc": "Batteriereserve, minimaler Ladezustand (%, Standard 10)",
           "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
-          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)"
+          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)",
+          "benchmark_enabled": "Zum öffentlichen Genauigkeits-Benchmark beitragen (optional)"
         },
         "data_description": {
           "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
           "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
-          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt.",
+          "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit dem verglichen werden kann, was sie wirklich erzeugt hat. Die Ergebnisse werden offen auf helios-ha.org/benchmark veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Erzeugung und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, kein anderer Sensor, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Nichts zu beantragen, kein Schlüssel aufzubewahren. Aus, solange Sie es nicht einschalten."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Die Verbrauchsquelle {source} meldet nur zeitweise",
       "description": "Im Energie-Dashboard hat {source} Daten für {pct} % der Stunden, die die beste Quelle abdeckt ({best} %). Das Verbrauchsprofil wird nur aus den Stunden gebaut, die sie abdeckt, bleibt also richtig, stützt sich aber auf weniger Historie. Ein zuverlässigerer Sensor für diesen Fluss macht die Batterieprojektion schärfer."
+    },
+    "benchmark_excluded": {
+      "title": "Von den Benchmark-Zahlen ausgenommen ({reason})",
+      "description": "Der öffentliche Benchmark erhält die Emissionen von {entry}, hält sie aber aus den veröffentlichten Zahlen heraus. Grund {reason}: kwp bedeutet, dass die angegebene Spitzenleistung fehlt, null ist oder in Watt eingetragen wurde; night bedeutet, dass der Erzeugungssensor nachts Energie aufzeichnet und damit mehr misst als die Module. Korrigieren Sie die Konfiguration, und die Anlage wird binnen eines Tages wieder mitgezählt."
     }
   },
   "exceptions": {

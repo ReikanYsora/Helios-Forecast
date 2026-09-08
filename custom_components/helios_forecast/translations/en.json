@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Battery max discharge power (kW, optional)",
           "battery_min_soc": "Battery reserve, minimum state of charge (%, default 10)",
           "battery_efficiency": "Battery round-trip efficiency (%, default 90)",
-          "curtailment_entity": "Curtailment signal (binary sensor, input boolean or switch, optional)"
+          "curtailment_entity": "Curtailment signal (binary sensor, input boolean or switch, optional)",
+          "benchmark_enabled": "Contribute to the public accuracy benchmark (optional)"
         },
         "data_description": {
           "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off.",
           "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here.",
-          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap."
+          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap.",
+          "benchmark_enabled": "Sends what this installation predicts, once an hour, so it can be compared with what it really produced. The results are published openly at helios-ha.org/benchmark. Only your panel geometry, the predicted curve, the measured production and the reliability index travel: no entity names, no consumption, no other sensor, and your coordinates rounded to about a kilometre. Nothing to sign up for and no key to keep. Off unless you turn it on."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Battery max discharge power (kW, optional)",
           "battery_min_soc": "Battery reserve, minimum state of charge (%, default 10)",
           "battery_efficiency": "Battery round-trip efficiency (%, default 90)",
-          "curtailment_entity": "Curtailment signal (binary sensor, input boolean or switch, optional)"
+          "curtailment_entity": "Curtailment signal (binary sensor, input boolean or switch, optional)",
+          "benchmark_enabled": "Contribute to the public accuracy benchmark (optional)"
         },
         "data_description": {
           "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off.",
           "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here.",
-          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap."
+          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap.",
+          "benchmark_enabled": "Sends what this installation predicts, once an hour, so it can be compared with what it really produced. The results are published openly at helios-ha.org/benchmark. Only your panel geometry, the predicted curve, the measured production and the reliability index travel: no entity names, no consumption, no other sensor, and your coordinates rounded to about a kilometre. Nothing to sign up for and no key to keep. Off unless you turn it on."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Consumption source {source} reports intermittently",
       "description": "In the Energy dashboard, {source} has data for {pct}% of the hours the best source covers ({best}%). The consumption profile is built only from the hours it does cover, so it stays right but rests on less history. A more reliable sensor for that flow makes the battery projection sharper."
+    },
+    "benchmark_excluded": {
+      "title": "Kept out of the benchmark figures ({reason})",
+      "description": "The public benchmark received the emissions of {entry} but keeps them out of the published figures. Reason {reason}: kwp means the declared peak power is missing, zero or typed in watts; night means the production sensor records energy at night, so it measures more than the panels. Correct the configuration and the installation is counted again within a day."
     }
   },
   "exceptions": {

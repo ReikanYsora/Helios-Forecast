@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Akun suurin purkausteho (kW, valinnainen)",
           "battery_min_soc": "Akun varaus, vähimmäisvaraustila (%, oletus 10)",
           "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)",
-          "curtailment_entity": "Rajoitussignaali (binäärianturi, input boolean tai kytkin, valinnainen)"
+          "curtailment_entity": "Rajoitussignaali (binäärianturi, input boolean tai kytkin, valinnainen)",
+          "benchmark_enabled": "Osallistu julkiseen tarkkuusmittaukseen (valinnainen)"
         },
         "data_description": {
           "production_entity": "Kumulatiivinen energia-anturi (kWh), esim. invertterin tai energiamittarin kokonaistuotanto. Tehoanturi (W) ei toimi: sillä ei ole pitkän aikavälin summatilastoja, joten oppiminen ja luotettavuusindeksi jäisivät pois päältä.",
           "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
-          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
+          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta.",
+          "benchmark_enabled": "Lähettää kerran tunnissa sen, mitä tämä laitos ennustaa, jotta sitä voidaan verrata siihen, mitä se todella tuotti. Tulokset julkaistaan avoimesti osoitteessa helios-ha.org/benchmark. Mukana kulkevat vain paneelien geometria, ennustettu käyrä, mitattu tuotanto ja luotettavuusindeksi: ei entiteettien nimiä, ei kulutusta, ei muita antureita, ja koordinaattisi pyöristettynä noin kilometriin. Ei mitään haettavaa eikä avainta säilytettävänä. Pois päältä, kunnes kytket sen päälle."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Akun suurin purkausteho (kW, valinnainen)",
           "battery_min_soc": "Akun varaus, vähimmäisvaraustila (%, oletus 10)",
           "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)",
-          "curtailment_entity": "Rajoitussignaali (binäärianturi, input boolean tai kytkin, valinnainen)"
+          "curtailment_entity": "Rajoitussignaali (binäärianturi, input boolean tai kytkin, valinnainen)",
+          "benchmark_enabled": "Osallistu julkiseen tarkkuusmittaukseen (valinnainen)"
         },
         "data_description": {
           "production_entity": "Kumulatiivinen energia-anturi (kWh), esim. invertterin tai energiamittarin kokonaistuotanto. Tehoanturi (W) ei toimi: sillä ei ole pitkän aikavälin summatilastoja, joten oppiminen ja luotettavuusindeksi jäisivät pois päältä.",
           "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
-          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
+          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta.",
+          "benchmark_enabled": "Lähettää kerran tunnissa sen, mitä tämä laitos ennustaa, jotta sitä voidaan verrata siihen, mitä se todella tuotti. Tulokset julkaistaan avoimesti osoitteessa helios-ha.org/benchmark. Mukana kulkevat vain paneelien geometria, ennustettu käyrä, mitattu tuotanto ja luotettavuusindeksi: ei entiteettien nimiä, ei kulutusta, ei muita antureita, ja koordinaattisi pyöristettynä noin kilometriin. Ei mitään haettavaa eikä avainta säilytettävänä. Pois päältä, kunnes kytket sen päälle."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Kulutuslähde {source} raportoi katkonaisesti",
       "description": "Energiakojelaudassa lähteellä {source} on tietoa {pct} %:lle tunneista, jotka paras lähde kattaa ({best} %). Kulutusprofiili rakennetaan vain sen kattamista tunneista, joten se pysyy oikeana mutta nojaa pienempään historiaan. Luotettavampi anturi tälle virralle tarkentaa akkuennustetta."
+    },
+    "benchmark_excluded": {
+      "title": "Pidetään mittauksen lukujen ulkopuolella ({reason})",
+      "description": "Julkinen mittaus vastaanottaa kohteen {entry} lähetykset mutta pitää ne julkaistujen lukujen ulkopuolella. Syy {reason}: kwp tarkoittaa, että ilmoitettu huipputeho puuttuu, on nolla tai on syötetty watteina; night tarkoittaa, että tuotantoanturi kirjaa energiaa yöllä ja mittaa siis enemmän kuin paneelit. Korjaa asetukset, niin laitos lasketaan taas mukaan vuorokauden sisällä."
     }
   },
   "exceptions": {

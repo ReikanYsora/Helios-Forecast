@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
           "battery_min_soc": "Rezerva baterije, najmanjše stanje napolnjenosti (%, privzeto 10)",
           "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
-          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)"
+          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)",
+          "benchmark_enabled": "Prispevajte k javni meritvi natančnosti (izbirno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
           "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
-          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika.",
+          "benchmark_enabled": "Enkrat na uro pošlje, kar ta naprava napoveduje, da se to lahko primerja s tem, kar je resnično proizvedla. Rezultati so odprto objavljeni na helios-ha.org/benchmark. Potujejo le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenega drugega senzorja, in vaše koordinate zaokrožene na približno kilometer. Ničesar ni treba zaprositi in nobenega ključa hraniti. Izklopljeno, dokler tega ne vklopite."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
           "battery_min_soc": "Rezerva baterije, najmanjše stanje napolnjenosti (%, privzeto 10)",
           "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
-          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)"
+          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)",
+          "benchmark_enabled": "Prispevajte k javni meritvi natančnosti (izbirno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
           "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
-          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika.",
+          "benchmark_enabled": "Enkrat na uro pošlje, kar ta naprava napoveduje, da se to lahko primerja s tem, kar je resnično proizvedla. Rezultati so odprto objavljeni na helios-ha.org/benchmark. Potujejo le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenega drugega senzorja, in vaše koordinate zaokrožene na približno kilometer. Ničesar ni treba zaprositi in nobenega ključa hraniti. Izklopljeno, dokler tega ne vklopite."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Vir porabe {source} poroča s prekinitvami",
       "description": "V nadzorni plošči Energija ima {source} podatke za {pct} % ur, ki jih pokriva najboljši vir ({best} %). Profil porabe se gradi samo iz ur, ki jih pokriva, zato ostaja pravilen, a sloni na manj zgodovine. Zanesljivejši senzor za ta tok izostri projekcijo baterije."
+    },
+    "benchmark_excluded": {
+      "title": "Izvzeta iz številk meritve ({reason})",
+      "description": "Javna meritev prejema oddaje naprave {entry}, a jih ohranja zunaj objavljenih številk. Razlog {reason}: kwp pomeni, da deklarirana vršna moč manjka, je nič ali je vnesena v vatih; night pomeni, da senzor proizvodnje ponoči beleži energijo in torej meri več kot paneli. Popravite nastavitve in naprava se v enem dnevu spet šteje."
     }
   },
   "exceptions": {

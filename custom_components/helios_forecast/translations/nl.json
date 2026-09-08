@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
           "battery_min_soc": "Batterijreserve, minimale laadtoestand (%, standaard 10)",
           "battery_efficiency": "Retourrendement batterij (%, standaard 90)",
-          "curtailment_entity": "Beperkingssignaal (binaire sensor, input boolean of schakelaar, optioneel)"
+          "curtailment_entity": "Beperkingssignaal (binaire sensor, input boolean of schakelaar, optioneel)",
+          "benchmark_enabled": "Bijdragen aan de openbare nauwkeurigheidsmeting (optioneel)"
         },
         "data_description": {
           "production_entity": "Een cumulatieve energiesensor (kWh), bijv. de totale productie van uw omvormer of energiemeter. Een vermogenssensor (W) werkt niet: die heeft geen langetermijn-somstatistieken, dus het leren en de betrouwbaarheidsindex blijven uit.",
           "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
-          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
+          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet.",
+          "benchmark_enabled": "Verstuurt eens per uur wat deze installatie voorspelt, zodat het vergeleken kan worden met wat ze werkelijk heeft opgewekt. De resultaten worden openbaar gepubliceerd op helios-ha.org/benchmark. Alleen de geometrie van uw panelen, de voorspelde curve, de gemeten opwekking en de betrouwbaarheidsindex gaan mee: geen entiteitsnamen, geen verbruik, geen andere sensor, en uw coördinaten afgerond op ongeveer een kilometer. Niets aan te vragen en geen sleutel te bewaren. Uit tenzij u het aanzet."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
           "battery_min_soc": "Batterijreserve, minimale laadtoestand (%, standaard 10)",
           "battery_efficiency": "Retourrendement batterij (%, standaard 90)",
-          "curtailment_entity": "Beperkingssignaal (binaire sensor, input boolean of schakelaar, optioneel)"
+          "curtailment_entity": "Beperkingssignaal (binaire sensor, input boolean of schakelaar, optioneel)",
+          "benchmark_enabled": "Bijdragen aan de openbare nauwkeurigheidsmeting (optioneel)"
         },
         "data_description": {
           "production_entity": "Een cumulatieve energiesensor (kWh), bijv. de totale productie van uw omvormer of energiemeter. Een vermogenssensor (W) werkt niet: die heeft geen langetermijn-somstatistieken, dus het leren en de betrouwbaarheidsindex blijven uit.",
           "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
-          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
+          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet.",
+          "benchmark_enabled": "Verstuurt eens per uur wat deze installatie voorspelt, zodat het vergeleken kan worden met wat ze werkelijk heeft opgewekt. De resultaten worden openbaar gepubliceerd op helios-ha.org/benchmark. Alleen de geometrie van uw panelen, de voorspelde curve, de gemeten opwekking en de betrouwbaarheidsindex gaan mee: geen entiteitsnamen, geen verbruik, geen andere sensor, en uw coördinaten afgerond op ongeveer een kilometer. Niets aan te vragen en geen sleutel te bewaren. Uit tenzij u het aanzet."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Verbruiksbron {source} rapporteert met tussenpozen",
       "description": "In het energiedashboard heeft {source} gegevens voor {pct}% van de uren die de beste bron dekt ({best}%). Het verbruiksprofiel wordt alleen gebouwd uit de uren die hij dekt, dus het blijft juist maar steunt op minder geschiedenis. Een betrouwbaardere sensor voor die stroom maakt de accuprojectie scherper."
+    },
+    "benchmark_excluded": {
+      "title": "Buiten de meetcijfers gehouden ({reason})",
+      "description": "De openbare meting ontvangt de emissies van {entry} maar houdt ze buiten de gepubliceerde cijfers. Reden {reason}: kwp betekent dat het opgegeven piekvermogen ontbreekt, nul is of in watt is ingevuld; night betekent dat de productiesensor 's nachts energie registreert en dus meer meet dan de panelen. Corrigeer de configuratie en de installatie telt binnen een dag weer mee."
     }
   },
   "exceptions": {

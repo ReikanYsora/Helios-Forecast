@@ -36,6 +36,12 @@ CONF_BATTERY_MAX_CHARGE_KW = "battery_max_charge_kw"
 CONF_BATTERY_MAX_DISCHARGE_KW = "battery_max_discharge_kw"
 CONF_BATTERY_MIN_SOC = "battery_min_soc"
 CONF_BATTERY_EFFICIENCY = "battery_efficiency"
+# Opt-in accuracy benchmark, off by default. Switched on, the entry posts what it predicted, once an
+# hour, to a collector that scores it against what the installation really produced. The payload and
+# the reasons for it live in benchmark.py; nothing leaves the installation while this is off. One
+# boolean and nothing else: it sits on the settings form with everything else, so there is no second
+# form whose keys the first has to carry over, which is how the opt-in used to get dropped.
+CONF_BENCHMARK_ENABLED = "benchmark_enabled"
 DEFAULT_BATTERY_MIN_SOC = 10.0
 DEFAULT_BATTERY_EFFICIENCY = 90.0
 # Per-array keys.
@@ -80,6 +86,7 @@ SETTINGS_KEYS: Tuple[str, ...] = (
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_EFFICIENCY,
     CONF_CURTAILMENT_ENTITY,
+    CONF_BENCHMARK_ENABLED,
 )
 
 
@@ -186,6 +193,11 @@ def learning_from_config(data: Dict[str, Any]) -> Optional[str]:
 def curtailment_entity_from_config(data: Dict[str, Any]) -> Optional[str]:
     """The optional curtailment signal entity, or None."""
     return data.get(CONF_CURTAILMENT_ENTITY) or None
+
+
+def benchmark_enabled_from_config(data: Dict[str, Any]) -> bool:
+    """Whether this entry takes part in the public accuracy benchmark. Off unless explicitly on."""
+    return bool(data.get(CONF_BENCHMARK_ENABLED))
 
 
 def trend_anchor_hour_from_config(data: Dict[str, Any]) -> int:

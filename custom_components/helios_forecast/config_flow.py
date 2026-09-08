@@ -28,6 +28,7 @@ from .config import (
     CONF_BATTERY_MAX_DISCHARGE_KW,
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_SOC_ENTITY,
+    CONF_BENCHMARK_ENABLED,
     CONF_CURTAILMENT_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
@@ -178,6 +179,11 @@ def _settings_fields(
     # Curtailment signal: on while the inverter is held back for a reason the sky cannot explain, so those
     # hours are not learned as low production (zero export, grid limits; a full battery is detected without it).
     _optional(fields, CONF_CURTAILMENT_ENTITY, _CURTAIL_ENTITY, s.get(CONF_CURTAILMENT_ENTITY))
+    # Taking part in the public accuracy benchmark. One switch and nothing else: there is no key to
+    # ask for and no address to type, so it belongs on this form rather than on a step of its own,
+    # and no form has to carry another's fields across a save. What travels, and why it has to be
+    # written down at the moment it is predicted rather than reconstructed later, is in benchmark.py.
+    fields[vol.Optional(CONF_BENCHMARK_ENABLED, default=bool(s.get(CONF_BENCHMARK_ENABLED, False)))] = _BOOL
     return fields
 
 

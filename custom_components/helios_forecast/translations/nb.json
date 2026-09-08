@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Maks. utladningseffekt for batteri (kW, valgfritt)",
           "battery_min_soc": "Batterireserve, minimalt ladenivå (%, standard 10)",
           "battery_efficiency": "Batteriets rundturs-virkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begrensningssignal (binær sensor, input boolean eller bryter, valgfritt)"
+          "curtailment_entity": "Begrensningssignal (binær sensor, input boolean eller bryter, valgfritt)",
+          "benchmark_enabled": "Bidra til den offentlige nøyaktighetsmålingen (valgfritt)"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), f.eks. inverterens eller strømmålerens totale produksjon. En effektsensor (W) fungerer ikke: den har ingen langtidsstatistikk for summen, så læringen og pålitelighetsindeksen ville forbli av.",
           "battery_soc_entity": "Fyll inn kapasiteten og denne sensoren for å slå på ladenivåprojeksjonen. Husforbruket hentes fra Energi-dashbordet ditt, så det trengs ingen sensor her.",
-          "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket."
+          "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket.",
+          "benchmark_enabled": "Sender én gang i timen hva dette anlegget forutsier, slik at det kan sammenlignes med hva det virkelig produserte. Resultatene publiseres åpent på helios-ha.org/benchmark. Bare panelenes geometri, den forutsagte kurven, den målte produksjonen og pålitelighetsindeksen sendes: ingen entitetsnavn, intet forbruk, ingen annen sensor, og koordinatene dine avrundet til omtrent en kilometer. Ingenting å søke om og ingen nøkkel å ta vare på. Av inntil du slår det på."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Maks. utladningseffekt for batteri (kW, valgfritt)",
           "battery_min_soc": "Batterireserve, minimalt ladenivå (%, standard 10)",
           "battery_efficiency": "Batteriets rundturs-virkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begrensningssignal (binær sensor, input boolean eller bryter, valgfritt)"
+          "curtailment_entity": "Begrensningssignal (binær sensor, input boolean eller bryter, valgfritt)",
+          "benchmark_enabled": "Bidra til den offentlige nøyaktighetsmålingen (valgfritt)"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), f.eks. inverterens eller strømmålerens totale produksjon. En effektsensor (W) fungerer ikke: den har ingen langtidsstatistikk for summen, så læringen og pålitelighetsindeksen ville forbli av.",
           "battery_soc_entity": "Fyll inn kapasiteten og denne sensoren for å slå på ladenivåprojeksjonen. Husforbruket hentes fra Energi-dashbordet ditt, så det trengs ingen sensor her.",
-          "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket."
+          "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket.",
+          "benchmark_enabled": "Sender én gang i timen hva dette anlegget forutsier, slik at det kan sammenlignes med hva det virkelig produserte. Resultatene publiseres åpent på helios-ha.org/benchmark. Bare panelenes geometri, den forutsagte kurven, den målte produksjonen og pålitelighetsindeksen sendes: ingen entitetsnavn, intet forbruk, ingen annen sensor, og koordinatene dine avrundet til omtrent en kilometer. Ingenting å søke om og ingen nøkkel å ta vare på. Av inntil du slår det på."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Forbrukskilden {source} rapporterer bare av og til",
       "description": "I energidashbordet har {source} data for {pct} % av timene den beste kilden dekker ({best} %). Forbruksprofilen bygges bare av timene den dekker, så den forblir riktig, men hviler på mindre historikk. En mer pålitelig sensor for den strømmen gjør batteriframskrivingen skarpere."
+    },
+    "benchmark_excluded": {
+      "title": "Holdt utenfor målingens tall ({reason})",
+      "description": "Den offentlige målingen mottar emisjonene fra {entry}, men holder dem utenfor de publiserte tallene. Årsak {reason}: kwp betyr at den oppgitte topplasten mangler, er null eller lagt inn i watt; night betyr at produksjonssensoren registrerer energi om natten og dermed måler mer enn panelene. Rett konfigurasjonen, så telles anlegget med igjen innen et døgn."
     }
   },
   "exceptions": {

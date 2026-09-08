@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Maks. akumuliatoriaus iškrovimo galia (kW, neprivaloma)",
           "battery_min_soc": "Akumuliatoriaus rezervas, minimali įkrova (%, numatytoji 10)",
           "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)",
-          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)"
+          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)",
+          "benchmark_enabled": "Prisidėti prie viešo tikslumo matavimo (neprivaloma)"
         },
         "data_description": {
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
           "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
-          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą."
+          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą.",
+          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tuo, ką ji iš tikrųjų pagamino. Rezultatai skelbiami viešai adresu helios-ha.org/benchmark. Siunčiama tik skydelių geometrija, prognozuojama kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokio kito jutiklio, o koordinatės suapvalintos maždaug iki kilometro. Nieko nereikia prašyti ir nereikia saugoti rakto. Išjungta, kol neįjungsite."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Maks. akumuliatoriaus iškrovimo galia (kW, neprivaloma)",
           "battery_min_soc": "Akumuliatoriaus rezervas, minimali įkrova (%, numatytoji 10)",
           "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)",
-          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)"
+          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)",
+          "benchmark_enabled": "Prisidėti prie viešo tikslumo matavimo (neprivaloma)"
         },
         "data_description": {
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
           "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
-          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą."
+          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą.",
+          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tuo, ką ji iš tikrųjų pagamino. Rezultatai skelbiami viešai adresu helios-ha.org/benchmark. Siunčiama tik skydelių geometrija, prognozuojama kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokio kito jutiklio, o koordinatės suapvalintos maždaug iki kilometro. Nieko nereikia prašyti ir nereikia saugoti rakto. Išjungta, kol neįjungsite."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Vartojimo šaltinis {source} praneša su pertrūkiais",
       "description": "Energijos skydelyje {source} turi duomenis {pct} % valandų, kurias apima geriausias šaltinis ({best} %). Vartojimo profilis sudaromas tik iš valandų, kurias jis apima, todėl lieka teisingas, bet remiasi mažesne istorija. Patikimesnis šio srauto jutiklis patikslina baterijos projekciją."
+    },
+    "benchmark_excluded": {
+      "title": "Neįtraukta į matavimo rodiklius ({reason})",
+      "description": "Viešas matavimas gauna {entry} siuntas, bet laiko jas už paskelbtų rodiklių ribų. Priežastis {reason}: kwp reiškia, kad deklaruota didžiausia galia trūksta, yra nulis arba įvesta vatais; night reiškia, kad gamybos jutiklis naktį registruoja energiją, taigi matuoja daugiau nei skydeliai. Pataisykite konfigūraciją ir sistema per parą vėl bus įskaičiuota."
     }
   },
   "exceptions": {

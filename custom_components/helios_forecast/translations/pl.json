@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
           "battery_min_soc": "Rezerwa akumulatora, minimalny stan naładowania (%, domyślnie 10)",
           "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
-          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)"
+          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)",
+          "benchmark_enabled": "Wnieś wkład do publicznego testu dokładności (opcjonalnie)"
         },
         "data_description": {
           "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
           "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
-          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
+          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika.",
+          "benchmark_enabled": "Wysyła raz na godzinę to, co ta instalacja przewiduje, aby porównać to z tym, co naprawdę wyprodukowała. Wyniki są publikowane otwarcie na helios-ha.org/benchmark. Przesyłane są tylko geometria paneli, przewidywana krzywa, zmierzona produkcja i wskaźnik wiarygodności: żadnych nazw encji, żadnego zużycia, żadnego innego czujnika, a współrzędne zaokrąglone do około kilometra. Nic do wnioskowania i żadnego klucza do przechowywania. Wyłączone, dopóki tego nie włączysz."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
           "battery_min_soc": "Rezerwa akumulatora, minimalny stan naładowania (%, domyślnie 10)",
           "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
-          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)"
+          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)",
+          "benchmark_enabled": "Wnieś wkład do publicznego testu dokładności (opcjonalnie)"
         },
         "data_description": {
           "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
           "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
-          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
+          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika.",
+          "benchmark_enabled": "Wysyła raz na godzinę to, co ta instalacja przewiduje, aby porównać to z tym, co naprawdę wyprodukowała. Wyniki są publikowane otwarcie na helios-ha.org/benchmark. Przesyłane są tylko geometria paneli, przewidywana krzywa, zmierzona produkcja i wskaźnik wiarygodności: żadnych nazw encji, żadnego zużycia, żadnego innego czujnika, a współrzędne zaokrąglone do około kilometra. Nic do wnioskowania i żadnego klucza do przechowywania. Wyłączone, dopóki tego nie włączysz."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Źródło zużycia {source} raportuje z przerwami",
       "description": "W panelu Energia {source} ma dane dla {pct}% godzin, które pokrywa najlepsze źródło ({best}%). Profil zużycia jest budowany tylko z godzin, które pokrywa, więc pozostaje poprawny, ale opiera się na mniejszej historii. Bardziej niezawodny czujnik dla tego przepływu wyostrza projekcję baterii."
+    },
+    "benchmark_excluded": {
+      "title": "Wyłączona z wyników testu ({reason})",
+      "description": "Publiczny test otrzymuje emisje z {entry}, ale trzyma je poza publikowanymi wynikami. Powód {reason}: kwp oznacza, że zadeklarowana moc szczytowa jest brakująca, zerowa lub wpisana w watach; night oznacza, że czujnik produkcji rejestruje energię nocą, więc mierzy więcej niż panele. Popraw konfigurację, a instalacja zostanie ponownie policzona w ciągu doby."
     }
   },
   "exceptions": {

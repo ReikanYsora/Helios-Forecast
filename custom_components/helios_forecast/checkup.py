@@ -242,6 +242,23 @@ def _check_battery_config(data: Dict[str, Any]) -> List[Problem]:
 # --- the entities the configuration points at ------------------------------------------------
 
 
+# --- the benchmark collector's verdict --------------------------------------------------------
+
+
+def check_benchmark_quality(quality: Optional[Dict[str, Any]]) -> List[Problem]:
+    """What the collector answered about this installation: excluded from the public figures, and why.
+
+    The owner hears it from their own instance rather than from the site, because the reason is
+    always something only they can change.
+    """
+    if not isinstance(quality, dict):
+        return []
+    reason = quality.get("excluded")
+    if not reason:
+        return []
+    return [Problem("benchmark_excluded", WARNING, {"reason": str(reason)}, str(reason))]
+
+
 def check_entities(
     data: Dict[str, Any],
     production: Optional[EntitySnapshot],

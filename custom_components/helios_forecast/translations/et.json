@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Aku maksimaalne tühjenemisvõimsus (kW, valikuline)",
           "battery_min_soc": "Aku reserv, minimaalne laetus (%, vaikimisi 10)",
           "battery_efficiency": "Aku edasi-tagasi kasutegur (%, vaikimisi 90)",
-          "curtailment_entity": "Piiramise signaal (binaarandur, input boolean või lüliti, valikuline)"
+          "curtailment_entity": "Piiramise signaal (binaarandur, input boolean või lüliti, valikuline)",
+          "benchmark_enabled": "Panusta avalikku täpsusmõõtmisse (valikuline)"
         },
         "data_description": {
           "production_entity": "Kumulatiivne energiaandur (kWh), nt inverteri või energiaarvesti kogutoodang. Võimsusandur (W) ei tööta: sellel puudub pikaajaline summastatistika, nii et õppimine ja usaldusväärsuse indeks jääksid välja.",
           "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
-          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi."
+          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi.",
+          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegelikult toodetuga. Tulemused avaldatakse avalikult aadressil helios-ha.org/benchmark. Liiguvad ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: ei ühtegi olemi nime, ei tarbimist, ei muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Midagi pole taotleda ega võtit hoida. Väljas, kuni te selle sisse lülitate."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Aku maksimaalne tühjenemisvõimsus (kW, valikuline)",
           "battery_min_soc": "Aku reserv, minimaalne laetus (%, vaikimisi 10)",
           "battery_efficiency": "Aku edasi-tagasi kasutegur (%, vaikimisi 90)",
-          "curtailment_entity": "Piiramise signaal (binaarandur, input boolean või lüliti, valikuline)"
+          "curtailment_entity": "Piiramise signaal (binaarandur, input boolean või lüliti, valikuline)",
+          "benchmark_enabled": "Panusta avalikku täpsusmõõtmisse (valikuline)"
         },
         "data_description": {
           "production_entity": "Kumulatiivne energiaandur (kWh), nt inverteri või energiaarvesti kogutoodang. Võimsusandur (W) ei tööta: sellel puudub pikaajaline summastatistika, nii et õppimine ja usaldusväärsuse indeks jääksid välja.",
           "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
-          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi."
+          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi.",
+          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegelikult toodetuga. Tulemused avaldatakse avalikult aadressil helios-ha.org/benchmark. Liiguvad ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: ei ühtegi olemi nime, ei tarbimist, ei muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Midagi pole taotleda ega võtit hoida. Väljas, kuni te selle sisse lülitate."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Tarbimisallikas {source} teatab katkendlikult",
       "description": "Energia armatuurlaual on allikal {source} andmed {pct}% tundide kohta, mida katab parim allikas ({best}%). Tarbimisprofiil ehitatakse ainult tundidest, mida see katab, seega jääb see õigeks, kuid toetub väiksemale ajaloole. Usaldusväärsem andur selle voo jaoks muudab aku projektsiooni täpsemaks."
+    },
+    "benchmark_excluded": {
+      "title": "Hoitakse mõõtmise arvudest välja ({reason})",
+      "description": "Avalik mõõtmine võtab vastu {entry} saadetised, kuid hoiab need avaldatud arvudest väljas. Põhjus {reason}: kwp tähendab, et deklareeritud tippvõimsus puudub, on null või sisestatud vattides; night tähendab, et tootmisandur salvestab energiat öösel ja mõõdab seega rohkem kui paneelid. Parandage seadistus ja paigaldis loetakse ööpäeva jooksul taas kaasa."
     }
   },
   "exceptions": {

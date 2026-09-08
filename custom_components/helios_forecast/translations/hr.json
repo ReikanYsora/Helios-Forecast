@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Maks. snaga pražnjenja baterije (kW, neobavezno)",
           "battery_min_soc": "Rezerva baterije, minimalno stanje napunjenosti (%, zadano 10)",
           "battery_efficiency": "Učinkovitost punog ciklusa baterije (%, zadano 90)",
-          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)"
+          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)",
+          "benchmark_enabled": "Doprinesite javnom mjerenju točnosti (neobavezno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbroja, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Ispunite kapacitet i ovaj senzor da biste uključili projekciju stanja napunjenosti. Potrošnja kuće uzima se s vaše Energetske nadzorne ploče, senzor ovdje nije potreban.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
+          "benchmark_enabled": "Jednom na sat šalje ono što ova instalacija predviđa, kako bi se moglo usporediti s onim što je stvarno proizvela. Rezultati se objavljuju otvoreno na helios-ha.org/benchmark. Putuju samo geometrija panela, predviđena krivulja, izmjerena proizvodnja i indeks pouzdanosti: nikakvi nazivi entiteta, nikakva potrošnja, nikakav drugi senzor, a vaše koordinate zaokružene na otprilike kilometar. Ništa se ne traži i nema ključa za čuvanje. Isključeno dok ga ne uključite."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Maks. snaga pražnjenja baterije (kW, neobavezno)",
           "battery_min_soc": "Rezerva baterije, minimalno stanje napunjenosti (%, zadano 10)",
           "battery_efficiency": "Učinkovitost punog ciklusa baterije (%, zadano 90)",
-          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)"
+          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)",
+          "benchmark_enabled": "Doprinesite javnom mjerenju točnosti (neobavezno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbroja, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Ispunite kapacitet i ovaj senzor da biste uključili projekciju stanja napunjenosti. Potrošnja kuće uzima se s vaše Energetske nadzorne ploče, senzor ovdje nije potreban.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
+          "benchmark_enabled": "Jednom na sat šalje ono što ova instalacija predviđa, kako bi se moglo usporediti s onim što je stvarno proizvela. Rezultati se objavljuju otvoreno na helios-ha.org/benchmark. Putuju samo geometrija panela, predviđena krivulja, izmjerena proizvodnja i indeks pouzdanosti: nikakvi nazivi entiteta, nikakva potrošnja, nikakav drugi senzor, a vaše koordinate zaokružene na otprilike kilometar. Ništa se ne traži i nema ključa za čuvanje. Isključeno dok ga ne uključite."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Izvor potrošnje {source} prijavljuje s prekidima",
       "description": "Na nadzornoj ploči Energija {source} ima podatke za {pct} % sati koje pokriva najbolji izvor ({best} %). Profil potrošnje gradi se samo od sati koje pokriva, pa ostaje točan, ali počiva na manje povijesti. Pouzdaniji senzor za taj tok izoštrava projekciju baterije."
+    },
+    "benchmark_excluded": {
+      "title": "Izuzeta iz brojki mjerenja ({reason})",
+      "description": "Javno mjerenje prima emisije s {entry} ali ih drži izvan objavljenih brojki. Razlog {reason}: kwp znači da deklarirana vršna snaga nedostaje, jednaka je nuli ili je unesena u vatima; night znači da senzor proizvodnje bilježi energiju noću, dakle mjeri više od panela. Ispravite konfiguraciju i instalacija se unutar dana ponovno broji."
     }
   },
   "exceptions": {

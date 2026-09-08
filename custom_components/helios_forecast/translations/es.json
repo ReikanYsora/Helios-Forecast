@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Potencia máx. de descarga de la batería (kW, opcional)",
           "battery_min_soc": "Reserva de la batería, estado de carga mínimo (%, predeterminado 10)",
           "battery_efficiency": "Eficiencia de ciclo completo de la batería (%, predeterminado 90)",
-          "curtailment_entity": "Señal de recorte (sensor binario, input boolean o interruptor, opcional)"
+          "curtailment_entity": "Señal de recorte (sensor binario, input boolean o interruptor, opcional)",
+          "benchmark_enabled": "Contribuir al banco de pruebas público de precisión (opcional)"
         },
         "data_description": {
           "production_entity": "Un sensor de energía acumulada (kWh), p. ej. la producción total de su inversor o contador. Un sensor de potencia (W) no funcionará: no tiene estadísticas de suma a largo plazo, así que el aprendizaje y el índice de fiabilidad quedarían inactivos.",
           "battery_soc_entity": "Rellena la capacidad y este sensor para activar la proyección del estado de carga. El consumo del hogar se toma de tu panel de Energía, aquí no hace falta ningún sensor.",
-          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor."
+          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor.",
+          "benchmark_enabled": "Envía lo que esta instalación prevé, una vez por hora, para compararlo con lo que realmente produjo. Los resultados se publican abiertamente en helios-ha.org/benchmark. Solo viajan la geometría de sus paneles, la curva prevista, la producción medida y el índice de fiabilidad: ningún nombre de entidad, ningún consumo, ningún otro sensor, y sus coordenadas redondeadas a aproximadamente un kilómetro. Nada que solicitar y ninguna clave que guardar. Desactivado mientras no lo active."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Potencia máx. de descarga de la batería (kW, opcional)",
           "battery_min_soc": "Reserva de la batería, estado de carga mínimo (%, predeterminado 10)",
           "battery_efficiency": "Eficiencia de ciclo completo de la batería (%, predeterminado 90)",
-          "curtailment_entity": "Señal de recorte (sensor binario, input boolean o interruptor, opcional)"
+          "curtailment_entity": "Señal de recorte (sensor binario, input boolean o interruptor, opcional)",
+          "benchmark_enabled": "Contribuir al banco de pruebas público de precisión (opcional)"
         },
         "data_description": {
           "production_entity": "Un sensor de energía acumulada (kWh), p. ej. la producción total de su inversor o contador. Un sensor de potencia (W) no funcionará: no tiene estadísticas de suma a largo plazo, así que el aprendizaje y el índice de fiabilidad quedarían inactivos.",
           "battery_soc_entity": "Rellena la capacidad y este sensor para activar la proyección del estado de carga. El consumo del hogar se toma de tu panel de Energía, aquí no hace falta ningún sensor.",
-          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor."
+          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor.",
+          "benchmark_enabled": "Envía lo que esta instalación prevé, una vez por hora, para compararlo con lo que realmente produjo. Los resultados se publican abiertamente en helios-ha.org/benchmark. Solo viajan la geometría de sus paneles, la curva prevista, la producción medida y el índice de fiabilidad: ningún nombre de entidad, ningún consumo, ningún otro sensor, y sus coordenadas redondeadas a aproximadamente un kilómetro. Nada que solicitar y ninguna clave que guardar. Desactivado mientras no lo active."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "La fuente de consumo {source} informa de forma intermitente",
       "description": "En el panel de Energía, {source} tiene datos para el {pct} % de las horas que cubre la mejor fuente ({best} %). El perfil de consumo se construye solo con las horas que cubre, así que sigue siendo correcto pero se apoya en menos historial. Un sensor más fiable para ese flujo afina la proyección de la batería."
+    },
+    "benchmark_excluded": {
+      "title": "Excluida de las cifras del banco de pruebas ({reason})",
+      "description": "El banco de pruebas público recibe las emisiones de {entry} pero las mantiene fuera de las cifras publicadas. Motivo {reason}: kwp significa que la potencia pico declarada falta, es cero o está introducida en vatios; night significa que el sensor de producción registra energía de noche, por lo que mide más que los paneles. Corrija la configuración y la instalación vuelve a contarse en un día."
     }
   },
   "exceptions": {

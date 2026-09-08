@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
           "battery_min_soc": "Akkumulátor tartalék, minimális töltöttségi szint (%, alapértelmezett 10)",
           "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)",
-          "curtailment_entity": "Korlátozási jel (bináris érzékelő, input boolean vagy kapcsoló, opcionális)"
+          "curtailment_entity": "Korlátozási jel (bináris érzékelő, input boolean vagy kapcsoló, opcionális)",
+          "benchmark_enabled": "Hozzájárulás a nyilvános pontosságméréshez (opcionális)"
         },
         "data_description": {
           "production_entity": "Kumulatív energiaérzékelő (kWh), pl. az inverter vagy a fogyasztásmérő teljes termelése. Teljesítményérzékelő (W) nem működik: nincs hosszú távú összegstatisztikája, így a tanulás és a megbízhatósági index kikapcsolva maradna.",
           "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre.",
-          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel."
+          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel.",
+          "benchmark_enabled": "Óránként egyszer elküldi, amit ez a rendszer előrejelez, hogy összevethető legyen azzal, amit valóban termelt. Az eredmények nyilvánosan megjelennek a helios-ha.org/benchmark címen. Csak a panelek geometriája, az előrejelzett görbe, a mért termelés és a megbízhatósági index utazik: semmilyen entitásnév, semmilyen fogyasztás, semmilyen más érzékelő, és a koordinátái körülbelül egy kilométerre kerekítve. Nincs mit igényelni és nincs kulcs, amit meg kell őrizni. Kikapcsolva, amíg be nem kapcsolja."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
           "battery_min_soc": "Akkumulátor tartalék, minimális töltöttségi szint (%, alapértelmezett 10)",
           "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)",
-          "curtailment_entity": "Korlátozási jel (bináris érzékelő, input boolean vagy kapcsoló, opcionális)"
+          "curtailment_entity": "Korlátozási jel (bináris érzékelő, input boolean vagy kapcsoló, opcionális)",
+          "benchmark_enabled": "Hozzájárulás a nyilvános pontosságméréshez (opcionális)"
         },
         "data_description": {
           "production_entity": "Kumulatív energiaérzékelő (kWh), pl. az inverter vagy a fogyasztásmérő teljes termelése. Teljesítményérzékelő (W) nem működik: nincs hosszú távú összegstatisztikája, így a tanulás és a megbízhatósági index kikapcsolva maradna.",
           "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre.",
-          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel."
+          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel.",
+          "benchmark_enabled": "Óránként egyszer elküldi, amit ez a rendszer előrejelez, hogy összevethető legyen azzal, amit valóban termelt. Az eredmények nyilvánosan megjelennek a helios-ha.org/benchmark címen. Csak a panelek geometriája, az előrejelzett görbe, a mért termelés és a megbízhatósági index utazik: semmilyen entitásnév, semmilyen fogyasztás, semmilyen más érzékelő, és a koordinátái körülbelül egy kilométerre kerekítve. Nincs mit igényelni és nincs kulcs, amit meg kell őrizni. Kikapcsolva, amíg be nem kapcsolja."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "A(z) {source} fogyasztási forrás szakaszosan jelent",
       "description": "Az Energia irányítópulton a(z) {source} az órák {pct}%-ára rendelkezik adattal, amelyeket a legjobb forrás lefed ({best}%). A fogyasztási profil csak az általa lefedett órákból épül, így helyes marad, de kevesebb előzményre támaszkodik. Egy megbízhatóbb érzékelő ehhez az áramláshoz élesebbé teszi az akkumulátor-vetítést."
+    },
+    "benchmark_excluded": {
+      "title": "Kimarad a mérés számaiból ({reason})",
+      "description": "A nyilvános mérés fogadja a(z) {entry} küldeményeit, de kihagyja őket a közzétett számokból. Ok {reason}: a kwp azt jelenti, hogy a megadott csúcsteljesítmény hiányzik, nulla vagy wattban van megadva; a night azt jelenti, hogy a termelésérzékelő éjjel is rögzít energiát, tehát többet mér a paneleknél. Javítsa a beállítást, és a rendszer egy napon belül újra beleszámít."
     }
   },
   "exceptions": {

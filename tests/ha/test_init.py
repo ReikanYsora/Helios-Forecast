@@ -100,7 +100,9 @@ async def test_a_settings_key_no_version_reads_is_cleared_from_the_entry(hass, m
     await _setup(hass, monkeypatch, entry=entry)
 
     assert "benchmark_key" not in entry.data
-    assert "benchmark_enabled" not in entry.options
+    # But the choice to take part is not a retired setting: an installation that said yes keeps
+    # saying yes across the update, without being asked again.
+    assert {**entry.data, **entry.options}["benchmark_enabled"] is True
     assert entry.data["latitude"] == 48.85
 
     from custom_components.helios_forecast.diagnostics import async_get_config_entry_diagnostics

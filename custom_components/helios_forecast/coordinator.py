@@ -29,22 +29,28 @@ from homeassistant.core import CoreState, HomeAssistant, callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.loader import async_get_integration
 from homeassistant.util import dt as dt_util
 
 from .config import (
     battery_from_config,
+    benchmark_enabled_from_config,
     inverter_max_w_from_config,
     layout_from_config,
     learning_from_config,
+    lines_from_config,
     location_from_config,
     trend_anchor_hour_from_config,
     curtailment_entity_from_config,
+    CONF_BATTERY_CAPACITY_KWH,
     CONF_BATTERY_SOC_ENTITY,
+    CONF_INVERTER_MAX_KW,
 )
 from .checkup import (
     EntitySnapshot,
     Problem,
     check_config,
+    check_benchmark_quality,
     check_consumption_coverage,
     check_entities,
     check_production_history,
@@ -54,6 +60,7 @@ from .archive import metadata as archive_metadata
 from .analog import build_library, enrich_archive_points, enrich_points
 from .curtailment import flag_curtailed, on_intervals_from_states
 from .battery import BatterySocPoint, project_battery_soc
+from .benchmark import DEFAULT_ENDPOINT, async_upload, build_payload
 from .consumption import ConsumptionProfile, build_consumption_profile, consumption_sources
 from .trend import TodayTrend, TrendReference, compute_trend, should_capture
 from .const import DOMAIN
@@ -176,6 +183,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         self._day_ahead_loaded = False
         # Last-logged reason the battery SoC projection was skipped, so _battery_off() warns once per reason.
         self._battery_off_logged: Optional[str] = None
+        # Benchmark: the hour whose prediction was last handed to the collector, this integration's
+        # own version string (read once from the manifest, and what the collector gates on), and the
+        # collector's latest verdict on this installation, which the check-up turns into a repair.
+        self._last_upload_hour: Optional[datetime] = None
+        self._version: Optional[str] = None
+        self._benchmark_quality: Optional[Dict[str, Any]] = None
         # The check-up (checkup.py): the problems found by the latest pass, the repair issues published
         # for them, and whether the production history could be read this refresh (a fetch that failed is
         # not a silent meter).
@@ -484,6 +497,64 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         if profile is not None:
             self._consumption_profile = profile
         return self._consumption_profile
+
+    async def _maybe_upload_benchmark(self, data, lat, lon, points, reliability, now_utc) -> None:
+        """Hand this hour's prediction to the benchmark collector, when the entry opted in.
+
+        Started beside the refresh instead of inside it: a collector that is slow, unreachable or
+        gone must never hold up a forecast. Once an hour, whatever the refresh rate. The whole thing
+        is wrapped: an optional upload has no business failing a forecast, so anything that goes
+        wrong on the way out is a debug line and nothing more (see benchmark.py).
+        """
+        if not benchmark_enabled_from_config(data):
+            return
+        hour = now_utc.replace(minute=0, second=0, microsecond=0)
+        if self._last_upload_hour == hour:
+            return
+        self._last_upload_hour = hour
+        try:
+            await self._upload_benchmark(data, lat, lon, points, reliability, now_utc)
+        except Exception as err:  # noqa: BLE001 - see the docstring
+            _LOGGER.debug("Benchmark emission skipped: %s", err)
+
+    async def _upload_benchmark(self, data, lat, lon, points, reliability, now_utc) -> None:
+        """Assemble this hour's emission and hand it to a background task."""
+        if self._version is None:
+            integration = await async_get_integration(self.hass, DOMAIN)
+            self._version = str(integration.version)
+        payload = build_payload(
+            entry_id=self.entry.entry_id,
+            version=self._version,
+            emitted_at=now_utc,
+            latitude=lat,
+            longitude=lon,
+            lines=lines_from_config(data),
+            country=self.hass.config.country,
+            inverter_max_kw=data.get(CONF_INVERTER_MAX_KW),
+            points=points,
+            reliability=reliability,
+            production=self._production_buckets,
+            has_battery=bool(data.get(CONF_BATTERY_CAPACITY_KWH) and data.get(CONF_BATTERY_SOC_ENTITY)),
+            has_curtailment_signal=bool(curtailment_entity_from_config(data)),
+        )
+        session = async_get_clientsession(self.hass)
+        self.entry.async_create_background_task(
+            self.hass, self._upload_and_note(session, DEFAULT_ENDPOINT, payload), name=f"{DOMAIN}-benchmark-upload"
+        )
+
+    async def _upload_and_note(self, session, url, payload) -> None:
+        """Send the emission and keep what the collector said of this installation: an exclusion from
+        the public figures is a configuration problem the owner should hear about from here, not from
+        the site."""
+        answer = await async_upload(session, url, payload)
+        if not isinstance(answer, dict) or "quality" not in answer:
+            return
+        quality = answer.get("quality") if isinstance(answer.get("quality"), dict) else {}
+        if quality == self._benchmark_quality:
+            return
+        self._benchmark_quality = quality
+        kept = [p for p in self.problems if p.key != "benchmark_excluded"]
+        self._publish_problems(kept + check_benchmark_quality(quality))
 
     async def _record_day_ahead(self, now: datetime, summary) -> Dict[date, float]:
         """Write down tomorrow's predicted total, once, and return the recent days already written.

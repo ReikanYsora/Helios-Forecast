@@ -118,8 +118,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 # Settings an earlier build stored and nothing reads any more. One of them was a write credential,
 # and the diagnostics download hands the configuration over as it stands, so they are cleared from
-# the entry rather than filtered on the way out: what is not stored cannot leak.
-_RETIRED_SETTINGS = ("benchmark_enabled", "benchmark_url", "benchmark_key")
+# the entry rather than filtered on the way out: what is not stored cannot leak. The opt-in itself is
+# NOT among them: an installation that chose to take part keeps that choice across the update.
+_RETIRED_SETTINGS = ("benchmark_url", "benchmark_key")
 
 
 def _drop_retired_keys(hass: HomeAssistant, entry: ConfigEntry) -> None:

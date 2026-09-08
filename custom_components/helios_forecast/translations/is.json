@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Hámarks afhleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_min_soc": "Varaforði rafhlöðu, lágmarks hleðslustaða (%, sjálfgefið 10)",
           "battery_efficiency": "Heildarnýtni rafhlöðu (%, sjálfgefið 90)",
-          "curtailment_entity": "Skerðingarmerki (tvíundaskynjari, input boolean eða rofi, valfrjálst)"
+          "curtailment_entity": "Skerðingarmerki (tvíundaskynjari, input boolean eða rofi, valfrjálst)",
+          "benchmark_enabled": "Leggðu þitt af mörkum í opinberri nákvæmnismælingu (valfrjálst)"
         },
         "data_description": {
           "production_entity": "Uppsafnaður orkuskynjari (kWh), t.d. heildarframleiðsla áriðils eða orkumælis. Aflskynjari (W) virkar ekki: hann hefur enga langtímasummutölfræði, svo lærdómurinn og áreiðanleikavísitalan yrðu áfram óvirk.",
           "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér.",
-          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins."
+          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins.",
+          "benchmark_enabled": "Sendir einu sinni á klukkustund það sem þetta kerfi spáir fyrir um, svo hægt sé að bera það saman við það sem það framleiddi í raun. Niðurstöður eru birtar opinberlega á helios-ha.org/benchmark. Aðeins rúmfræði spjaldanna, spáða ferillinn, mæld framleiðsla og áreiðanleikavísitalan ferðast: engin heiti eininga, engin notkun, enginn annar skynjari, og hnitin þín rúnnuð að um það bil kílómetra. Ekkert að sækja um og enginn lykill til að geyma. Slökkt þar til þú kveikir á því."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Hámarks afhleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_min_soc": "Varaforði rafhlöðu, lágmarks hleðslustaða (%, sjálfgefið 10)",
           "battery_efficiency": "Heildarnýtni rafhlöðu (%, sjálfgefið 90)",
-          "curtailment_entity": "Skerðingarmerki (tvíundaskynjari, input boolean eða rofi, valfrjálst)"
+          "curtailment_entity": "Skerðingarmerki (tvíundaskynjari, input boolean eða rofi, valfrjálst)",
+          "benchmark_enabled": "Leggðu þitt af mörkum í opinberri nákvæmnismælingu (valfrjálst)"
         },
         "data_description": {
           "production_entity": "Uppsafnaður orkuskynjari (kWh), t.d. heildarframleiðsla áriðils eða orkumælis. Aflskynjari (W) virkar ekki: hann hefur enga langtímasummutölfræði, svo lærdómurinn og áreiðanleikavísitalan yrðu áfram óvirk.",
           "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér.",
-          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins."
+          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins.",
+          "benchmark_enabled": "Sendir einu sinni á klukkustund það sem þetta kerfi spáir fyrir um, svo hægt sé að bera það saman við það sem það framleiddi í raun. Niðurstöður eru birtar opinberlega á helios-ha.org/benchmark. Aðeins rúmfræði spjaldanna, spáða ferillinn, mæld framleiðsla og áreiðanleikavísitalan ferðast: engin heiti eininga, engin notkun, enginn annar skynjari, og hnitin þín rúnnuð að um það bil kílómetra. Ekkert að sækja um og enginn lykill til að geyma. Slökkt þar til þú kveikir á því."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "Notkunaruppsprettan {source} skilar með hléum",
       "description": "Í orkumælaborðinu hefur {source} gögn fyrir {pct} % af klukkustundunum sem besta uppsprettan nær yfir ({best} %). Notkunarsniðið er aðeins byggt á klukkustundunum sem hún nær yfir, svo það helst rétt en hvílir á minni sögu. Áreiðanlegri skynjari fyrir þetta flæði skerpir framreikning rafhlöðunnar."
+    },
+    "benchmark_excluded": {
+      "title": "Haldið utan við tölur mælingarinnar ({reason})",
+      "description": "Opinbera mælingin tekur við sendingum frá {entry} en heldur þeim utan birtra talna. Ástæða {reason}: kwp þýðir að uppgefið hámarksafl vantar, er núll eða slegið inn í vöttum; night þýðir að framleiðsluskynjarinn skráir orku að nóttu og mælir því meira en spjöldin. Lagfærðu stillingarnar og kerfið telst aftur með innan sólarhrings."
     }
   },
   "exceptions": {

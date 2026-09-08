@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Puissance de décharge max de la batterie (kW, optionnel)",
           "battery_min_soc": "Réserve batterie, état de charge minimum (%, défaut 10)",
           "battery_efficiency": "Rendement aller-retour de la batterie (%, défaut 90)",
-          "curtailment_entity": "Signal de bridage (capteur binaire, input boolean ou interrupteur, optionnel)"
+          "curtailment_entity": "Signal de bridage (capteur binaire, input boolean ou interrupteur, optionnel)",
+          "benchmark_enabled": "Contribuer au benchmark public de précision (facultatif)"
         },
         "data_description": {
           "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs.",
           "battery_soc_entity": "Renseignez la capacité et ce capteur pour activer la projection d'état de charge. La consommation de la maison vient de votre tableau de bord Énergie, aucun capteur n'est requis ici.",
-          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur."
+          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur.",
+          "benchmark_enabled": "Envoie ce que cette installation prévoit, une fois par heure, pour le comparer à ce qu'elle a réellement produit. Les résultats sont publiés ouvertement sur helios-ha.org/benchmark. Seuls la géométrie de vos panneaux, la courbe prévue, la production mesurée et l'indice de fiabilité circulent : aucun nom d'entité, aucune consommation, aucun autre capteur, et vos coordonnées arrondies au kilomètre environ. Rien à demander, aucune clé à conserver. Désactivé tant que vous ne l'activez pas."
         }
       },
       "line": {
@@ -72,12 +74,14 @@
           "battery_max_discharge_kw": "Puissance de décharge max de la batterie (kW, optionnel)",
           "battery_min_soc": "Réserve batterie, état de charge minimum (%, défaut 10)",
           "battery_efficiency": "Rendement aller-retour de la batterie (%, défaut 90)",
-          "curtailment_entity": "Signal de bridage (capteur binaire, input boolean ou interrupteur, optionnel)"
+          "curtailment_entity": "Signal de bridage (capteur binaire, input boolean ou interrupteur, optionnel)",
+          "benchmark_enabled": "Contribuer au benchmark public de précision (facultatif)"
         },
         "data_description": {
           "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs.",
           "battery_soc_entity": "Renseignez la capacité et ce capteur pour activer la projection d'état de charge. La consommation de la maison vient de votre tableau de bord Énergie, aucun capteur n'est requis ici.",
-          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur."
+          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur.",
+          "benchmark_enabled": "Envoie ce que cette installation prévoit, une fois par heure, pour le comparer à ce qu'elle a réellement produit. Les résultats sont publiés ouvertement sur helios-ha.org/benchmark. Seuls la géométrie de vos panneaux, la courbe prévue, la production mesurée et l'indice de fiabilité circulent : aucun nom d'entité, aucune consommation, aucun autre capteur, et vos coordonnées arrondies au kilomètre environ. Rien à demander, aucune clé à conserver. Désactivé tant que vous ne l'activez pas."
         }
       },
       "lines": {
@@ -253,6 +257,10 @@
     "consumption_source_sparse": {
       "title": "La source de consommation {source} rapporte par intermittence",
       "description": "Dans le tableau de bord Énergie, {source} a des données pour {pct} % des heures que couvre la meilleure source ({best} %). Le profil de consommation n'est construit qu'avec les heures qu'elle couvre, il reste donc juste mais repose sur moins d'historique. Un capteur plus fiable pour ce flux affine la projection de la batterie."
+    },
+    "benchmark_excluded": {
+      "title": "Écartée des chiffres du benchmark ({reason})",
+      "description": "Le benchmark public reçoit les émissions de {entry} mais les tient hors des chiffres publiés. Raison {reason} : kwp signifie que la puissance crête déclarée est absente, nulle ou saisie en watts ; night signifie que le capteur de production enregistre de l'énergie la nuit, donc qu'il mesure plus que les panneaux. Corrigez la configuration et l'installation est de nouveau comptée sous un jour."
     }
   },
   "exceptions": {
