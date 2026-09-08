@@ -246,8 +246,14 @@ async def test_hour_rollover_triggers_off_cycle_refresh(hass, monkeypatch) -> No
     monkeypatch.setattr(coordinator, "async_request_refresh", refresh_mock)
 
     now = dt_util.utcnow()
-    next_hour = (now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)).replace(second=5)
-    async_fire_time_changed(hass, next_hour)
-    await hass.async_block_till_done()
+    top_of_hour = now.replace(minute=0, second=5, microsecond=0) + timedelta(hours=1)
 
+    # Not on the hour: that is the second every weather model publishes and every scheduler fires,
+    # and asking there is what fills a log with "Open-Meteo returned no weather data".
+    async_fire_time_changed(hass, top_of_hour)
+    await hass.async_block_till_done()
+    refresh_mock.assert_not_awaited()
+
+    async_fire_time_changed(hass, top_of_hour.replace(minute=7, second=0))
+    await hass.async_block_till_done()
     refresh_mock.assert_awaited_once()

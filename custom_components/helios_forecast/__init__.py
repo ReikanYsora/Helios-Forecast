@@ -45,9 +45,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     coordinator = HeliosForecastCoordinator(hass, entry)
 
-    # Refresh right after each hour boundary: the archive only rebuilds inside a refresh (once an
+    # Refresh once the hour has rolled over: the archive only rebuilds inside a refresh (once an
     # hour, see coordinator._last_archive_hour), so without this nudge the just-elapsed hour stays
     # served from the unclamped live series for up to 30 minutes.
+    #
+    # A few minutes past, not on the hour. Weather models publish on the hour and so does every
+    # scheduled task there is, so an installation asking at HH:00:05 asks in the worst second of the
+    # hour, every hour, and all of them ask together. That is what the "Open-Meteo returned no
+    # weather data" line at HH:00:09 in the logs is: not a quota, twenty of these requests back to
+    # back answer without one refusal, but the one moment the provider is least able to answer.
+    # Nothing here is urgent to the second: it rebuilds an hour that has already finished.
     from homeassistant.core import callback
     from homeassistant.helpers.event import async_track_time_change
 
@@ -55,7 +62,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     def _hour_rolled_over(_now) -> None:
         hass.async_create_task(coordinator.async_request_refresh())
 
-    entry.async_on_unload(async_track_time_change(hass, _hour_rolled_over, minute=0, second=5))
+    entry.async_on_unload(async_track_time_change(hass, _hour_rolled_over, minute=7, second=0))
 
     # Re-project the battery SoC the moment its source entity comes back from unavailable/unknown
     # rather than waiting for the 30-minute tick: battery integrations are often briefly unavailable

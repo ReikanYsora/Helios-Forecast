@@ -160,6 +160,15 @@ outweighed the few that carry the day's production, and the fallback drifted tow
 whatever the model does at low sun. It is now weighted by the energy of each hour, so
 it says what the installation does over a day rather than over a list of hours.
 
+### Fixed: the hourly refresh no longer asks the weather service on the hour
+
+The archive of the elapsed hour is rebuilt by a refresh armed for the hour boundary, and it asked
+at five seconds past. Weather models publish on the hour and so does every scheduled task there is,
+so every installation asked in the least answerable second of the hour, all of them together, and
+the log filled with "Open-Meteo returned no weather data" a few seconds later. It is not a quota:
+twenty of these requests back to back answer without a single refusal. The refresh now runs seven
+minutes past, which nothing about rebuilding a finished hour makes urgent.
+
 ### Fixed: the seventh day of the forecast, everywhere west of Greenwich
 
 Open-Meteo answers whole UTC days while the forecast horizon is built on your local
