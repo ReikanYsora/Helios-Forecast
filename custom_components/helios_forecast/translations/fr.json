@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Aucune installation Helios Forecast ne porte l'identifiant d'entrée '{entry_id}'."
+      "message": "Aucune installation Helios Forecast ne porte l'identifiant d'entrée {entry_id}."
     },
     "service_no_installation": {
       "message": "Aucune installation Helios Forecast n'est configurée."

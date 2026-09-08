@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Intet Helios Forecast-anlæg med post-id '{entry_id}'."
+      "message": "Intet Helios Forecast-anlæg med post-id {entry_id}."
     },
     "service_no_installation": {
       "message": "Der er ikke opsat noget Helios Forecast-anlæg."

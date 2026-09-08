@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Nėra Helios Forecast sistemos su įrašo ID '{entry_id}'."
+      "message": "Nėra Helios Forecast sistemos su įrašo ID {entry_id}."
     },
     "service_no_installation": {
       "message": "Nesukonfigūruota nė viena Helios Forecast sistema."

@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Нема Helios Forecast инсталације са идентификатором уноса '{entry_id}'."
+      "message": "Нема Helios Forecast инсталације са идентификатором уноса {entry_id}."
     },
     "service_no_installation": {
       "message": "Није подешена ниједна Helios Forecast инсталација."

@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Δεν υπάρχει εγκατάσταση Helios Forecast με αναγνωριστικό καταχώρισης '{entry_id}'."
+      "message": "Δεν υπάρχει εγκατάσταση Helios Forecast με αναγνωριστικό καταχώρισης {entry_id}."
     },
     "service_no_installation": {
       "message": "Δεν έχει ρυθμιστεί καμία εγκατάσταση Helios Forecast."

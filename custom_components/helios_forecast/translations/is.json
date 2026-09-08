@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Ekkert Helios Forecast kerfi með færsluauðkennið '{entry_id}'."
+      "message": "Ekkert Helios Forecast kerfi með færsluauðkennið {entry_id}."
     },
     "service_no_installation": {
       "message": "Ekkert Helios Forecast kerfi er uppsett."

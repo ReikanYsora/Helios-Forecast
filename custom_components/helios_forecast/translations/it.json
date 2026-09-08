@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Nessun impianto Helios Forecast con l'identificativo di voce '{entry_id}'."
+      "message": "Nessun impianto Helios Forecast con l'identificativo di voce {entry_id}."
     },
     "service_no_installation": {
       "message": "Nessun impianto Helios Forecast è configurato."

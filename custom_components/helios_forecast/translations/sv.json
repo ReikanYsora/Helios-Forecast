@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Ingen Helios Forecast-anläggning med post-ID '{entry_id}'."
+      "message": "Ingen Helios Forecast-anläggning med post-ID {entry_id}."
     },
     "service_no_installation": {
       "message": "Ingen Helios Forecast-anläggning är konfigurerad."

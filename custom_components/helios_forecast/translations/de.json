@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Keine Helios-Forecast-Anlage mit der Eintrags-ID '{entry_id}'."
+      "message": "Keine Helios-Forecast-Anlage mit der Eintrags-ID {entry_id}."
     },
     "service_no_installation": {
       "message": "Es ist keine Helios-Forecast-Anlage eingerichtet."

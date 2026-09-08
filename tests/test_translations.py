@@ -80,6 +80,21 @@ def test_nothing_ships_as_untranslated_english() -> None:
         assert not untranslated, f"{path.name}: still English -> {untranslated}"
 
 
+def test_no_placeholder_sits_inside_single_quotes() -> None:
+    """A rule of Home Assistant's own validator, which only runs in CI.
+
+    Single quotes have a meaning of their own in the format Home Assistant renders these with, so a
+    placeholder wrapped in them does not resolve. It is the kind of thing no local suite would catch
+    and that fails the release check instead, in whichever language it slipped into.
+    """
+    for path in [_STRINGS, *_TRANSLATIONS]:
+        flat = _flat(json.loads(path.read_text(encoding="utf-8")))
+        for key, text in flat.items():
+            if not isinstance(text, str):
+                continue
+            assert not re.search(r"'\{\w+\}'", text), f"{path.name}: {key} -> {text}"
+
+
 if __name__ == "__main__":
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):

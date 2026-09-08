@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Žiadna inštalácia Helios Forecast s identifikátorom záznamu '{entry_id}'."
+      "message": "Žiadna inštalácia Helios Forecast s identifikátorom záznamu {entry_id}."
     },
     "service_no_installation": {
       "message": "Nie je nastavená žiadna inštalácia Helios Forecast."

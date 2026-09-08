@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Ei Helios Forecast -laitosta tunnuksella '{entry_id}'."
+      "message": "Ei Helios Forecast -laitosta tunnuksella {entry_id}."
     },
     "service_no_installation": {
       "message": "Yhtään Helios Forecast -laitosta ei ole määritetty."

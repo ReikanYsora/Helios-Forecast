@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "No Helios Forecast installation with config entry id '{entry_id}'."
+      "message": "No Helios Forecast installation with config entry id {entry_id}."
     },
     "service_no_installation": {
       "message": "No Helios Forecast installation is set up."

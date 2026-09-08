@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Nicio instalație Helios Forecast cu identificatorul de intrare '{entry_id}'."
+      "message": "Nicio instalație Helios Forecast cu identificatorul de intrare {entry_id}."
     },
     "service_no_installation": {
       "message": "Nu este configurată nicio instalație Helios Forecast."

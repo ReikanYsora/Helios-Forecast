@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Нет установки Helios Forecast с идентификатором записи '{entry_id}'."
+      "message": "Нет установки Helios Forecast с идентификатором записи {entry_id}."
     },
     "service_no_installation": {
       "message": "Ни одна установка Helios Forecast не настроена."

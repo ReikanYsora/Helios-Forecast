@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Nincs Helios Forecast rendszer '{entry_id}' bejegyzésazonosítóval."
+      "message": "Nincs Helios Forecast rendszer {entry_id} bejegyzésazonosítóval."
     },
     "service_no_installation": {
       "message": "Nincs beállítva Helios Forecast rendszer."

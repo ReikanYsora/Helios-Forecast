@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Ühtegi Helios Forecasti paigaldist kirje ID-ga '{entry_id}' ei ole."
+      "message": "Ühtegi Helios Forecasti paigaldist kirje ID-ga {entry_id} ei ole."
     },
     "service_no_installation": {
       "message": "Ühtegi Helios Forecasti paigaldist ei ole seadistatud."

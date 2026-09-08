@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Ingen Helios Forecast-anlegg med oppførings-ID '{entry_id}'."
+      "message": "Ingen Helios Forecast-anlegg med oppførings-ID {entry_id}."
     },
     "service_no_installation": {
       "message": "Det er ikke satt opp noe Helios Forecast-anlegg."

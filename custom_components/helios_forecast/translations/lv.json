@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Nav nevienas Helios Forecast iekārtas ar ieraksta ID '{entry_id}'."
+      "message": "Nav nevienas Helios Forecast iekārtas ar ieraksta ID {entry_id}."
     },
     "service_no_installation": {
       "message": "Nav iestatīta neviena Helios Forecast iekārta."

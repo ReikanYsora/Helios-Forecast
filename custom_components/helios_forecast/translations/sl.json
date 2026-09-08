@@ -257,7 +257,7 @@
   },
   "exceptions": {
     "service_unknown_entry": {
-      "message": "Ni naprave Helios Forecast z ID-jem vnosa '{entry_id}'."
+      "message": "Ni naprave Helios Forecast z ID-jem vnosa {entry_id}."
     },
     "service_no_installation": {
       "message": "Nastavljena ni nobena naprava Helios Forecast."
