@@ -53,6 +53,20 @@ def _rows(start: datetime, count: int = _HOURS) -> list[dict]:
     ]
 
 
+def test_every_metadata_key_is_a_column_the_recorder_can_store() -> None:
+    """The recorder builds its row with StatisticsMeta(**metadata).
+
+    An unmapped key raises there, on the recorder thread, where the per-task guard swallows it into a
+    logged traceback: no series is created and the whole archive writes nothing while looking healthy.
+    That is what a key newer than the declared minimum Home Assistant does, so the set is pinned here.
+    """
+    from homeassistant.components.recorder.db_schema import StatisticsMeta
+
+    meta = archive.metadata("helios_forecast:entry_temperature", "\u00b0C", "Temperature")
+    columns = {column.name for column in StatisticsMeta.__table__.columns}
+    assert set(meta) <= columns
+
+
 async def _write_owned(hass, statistic_id: str, unit: str, start: datetime, count: int) -> None:
     """Rows already at the destination when the move runs: the coordinator's own backfill writes the
     trailing window to these ids from _initial_statistics_archive, before the started event fires."""
@@ -213,12 +227,14 @@ async def test_the_move_waits_for_the_copy_instead_of_trusting_the_queue(hass, m
     real_read = archive._read
     late = {"calls": 0}
 
-    async def _slow_to_appear(hass_, statistic_id, units=None):
+    async def _slow_to_appear(hass_, statistic_id, units=None, **window):
         if ":" in statistic_id:
             late["calls"] += 1
+            # The read-back looks only at the hours it copied, never at the whole series.
+            assert window["start"] is not None and window["end"] is not None
             if late["calls"] < 3:  # the copy is not visible yet on the first two looks
                 return []
-        return await real_read(hass_, statistic_id, units)
+        return await real_read(hass_, statistic_id, units, **window)
 
     monkeypatch.setattr(archive, "_read", _slow_to_appear)
     monkeypatch.setattr(archive, "_POLL", 0.01)
@@ -228,6 +244,29 @@ async def test_the_move_waits_for_the_copy_instead_of_trusting_the_queue(hass, m
     assert late["calls"] >= 3
     assert len(await _read(hass, external_statistic_id(entry.entry_id, "direct"))) == _HOURS
     assert await _read(hass, entity_id) == []
+
+
+async def test_an_empty_legacy_series_is_the_one_dropped(hass, monkeypatch) -> None:
+    """A metadata row with no hours behind it is cleared without a copy: the only branch of the move
+    that deletes anything it has not first read back. It has to clear the old id and nothing else."""
+    entry = _entry(hass)
+    entity_id = _register(hass, entry, "direct", "helios_direct_irradiance")
+    await _write_legacy(hass, entity_id, "W/m\u00b2", datetime(2026, 8, 1, tzinfo=_UTC))
+
+    real_read = archive._read
+
+    async def _reads_empty(hass_, statistic_id, units=None, **window):
+        return [] if statistic_id == entity_id else await real_read(hass_, statistic_id, units, **window)
+
+    cleared: list = []
+    monkeypatch.setattr(archive, "_read", _reads_empty)
+    monkeypatch.setattr(
+        type(archive.get_instance(hass)), "async_clear_statistics", lambda _self, ids: cleared.extend(ids)
+    )
+
+    await archive.async_migrate(hass, entry)
+
+    assert cleared == [entity_id]
 
 
 async def test_every_archived_series_has_a_valid_statistic_id(hass) -> None:

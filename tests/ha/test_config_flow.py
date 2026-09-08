@@ -13,6 +13,7 @@ from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.helios_forecast.config import (
     CONF_ARRAYS,
+    CONF_BATTERY_SOC_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
     CONF_LATITUDE,
@@ -39,6 +40,33 @@ async def test_user_flow_single_line(recorder_mock, hass: HomeAssistant, enable_
     assert len(result["data"][CONF_ARRAYS]) == 1
     assert result["data"][CONF_ARRAYS][0][CONF_KWP] == 4.0
     assert result["data"][CONF_ARRAYS][0][CONF_TRACKER] == "none"
+
+
+async def test_clearing_a_setting_on_the_options_form_actually_clears_it(
+    recorder_mock, hass: HomeAssistant, enable_custom_integrations
+) -> None:
+    """Everything that reads the configuration merges the entry's data over its options, so a value
+    typed at install time sits in data and an options save can only shadow it. Left as two stores, a
+    field the user empties keeps its old value and there is no way to reach it from the interface."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_LATITUDE: 48.85,
+            CONF_LONGITUDE: 2.35,
+            CONF_BATTERY_SOC_ENTITY: "sensor.old_soc",
+            CONF_ARRAYS: [{"azimuth": 180.0, "tilt": 30.0, "kwp": 3.0, "tracker": "none"}],
+        },
+    )
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "settings"})
+    await hass.config_entries.options.async_configure(result["flow_id"], {CONF_LATITUDE: 48.85, CONF_LONGITUDE: 2.35})
+    await hass.async_block_till_done()
+
+    merged = {**entry.data, **entry.options}
+    assert CONF_BATTERY_SOC_ENTITY not in merged
+    assert merged[CONF_ARRAYS]  # and the panel lines are still there
 
 
 async def test_user_flow_add_another_loops_to_second_line(
@@ -86,8 +114,8 @@ async def test_options_settings_step_keeps_lines_untouched(
         {"inverter_max_kw": 8.0, "trend_anchor_hour": 6, "battery_min_soc": 10, "battery_efficiency": 90},
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    assert result["data"][CONF_INVERTER_MAX_KW] == 8.0
-    assert result["data"][CONF_ARRAYS] == [_LINE_A, _LINE_B]
+    assert entry.data[CONF_INVERTER_MAX_KW] == 8.0
+    assert entry.data[CONF_ARRAYS] == [_LINE_A, _LINE_B]
 
 
 async def test_options_lines_step_edits_and_removes(
@@ -115,7 +143,7 @@ async def test_options_lines_step_edits_and_removes(
         result["flow_id"], {**_LINE_B, "remove_this_line": True, "add_another": False}
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    arrays = result["data"][CONF_ARRAYS]
+    arrays = entry.data[CONF_ARRAYS]
     assert len(arrays) == 1
     assert arrays[0]["tilt"] == 45
 
@@ -135,7 +163,7 @@ async def test_options_lines_step_removing_every_line_keeps_existing(
         result["flow_id"], {**_LINE_B, "remove_this_line": True, "add_another": False}
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    assert result["data"][CONF_ARRAYS] == [_LINE_A, _LINE_B]
+    assert entry.data[CONF_ARRAYS] == [_LINE_A, _LINE_B]
 
 
 async def test_options_lines_step_can_append_a_new_line(
@@ -155,7 +183,7 @@ async def test_options_lines_step_can_append_a_new_line(
 
     result = await hass.config_entries.options.async_configure(result["flow_id"], {**_LINE_B, "add_another": False})
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    assert len(result["data"][CONF_ARRAYS]) == 2
+    assert len(entry.data[CONF_ARRAYS]) == 2
 
 
 async def test_options_settings_step_decimal_latitude_longitude_roundtrip(
@@ -182,8 +210,8 @@ async def test_options_settings_step_decimal_latitude_longitude_roundtrip(
         },
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    assert result["data"][CONF_LATITUDE] == 45.7597
-    assert result["data"][CONF_LONGITUDE] == 4.8422
+    assert entry.data[CONF_LATITUDE] == 45.7597
+    assert entry.data[CONF_LONGITUDE] == 4.8422
 
 
 async def test_options_lines_step_per_line_coordinate_override(
@@ -214,5 +242,5 @@ async def test_options_lines_step_per_line_coordinate_override(
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
 
-    layout = layout_from_config(result["data"])
+    layout = layout_from_config(entry.data)
     assert layout.coords == [None, (43.2965, 5.3698)]

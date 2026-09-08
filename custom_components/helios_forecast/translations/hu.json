@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: panelsor",
-        "description": "Egy előrejelzés egy panelsorhoz (azonos tájolású panelek csoportja). Minden további sorhoz add hozzá újra az integrációt. Hagyd üresen a helyet a Home Assistant otthoni helyének használatához.",
+        "description": "Egy előrejelzés egy napelemes rendszerhez. Adjon hozzá tájolásonként egy panelsort; több sor osztozik a rendszer egyetlen termelésérzékelőjén és inverterkorlátján. Hagyja üresen a helyet a Home Assistant otthoni helyének használatához.",
         "data": {
           "name": "Név (pl. Déli tető)",
           "tilt": "Dőlésszög (fok, 0 = vízszintes, 90 = függőleges)",
@@ -14,16 +14,16 @@
           "latitude": "Szélességi fok (opcionális)",
           "longitude": "Hosszúsági fok (opcionális)",
           "inverter_max_kw": "Inverter maximális teljesítménye (kW, opcionális)",
-          "production_entity": "PV termelés érzékelő (a tanult korrekcióhoz)",
+          "production_entity": "Megtermelt napenergia érzékelője (kWh, a tanult korrekcióhoz)",
           "trend_anchor_hour": "Mai trend referenciaórája (0-23, alapértelmezett 6)",
-          "add_another": "Add another panel line",
+          "add_another": "További panelsor hozzáadása",
           "battery_capacity_kwh": "Hasznos akkumulátorkapacitás (kWh)",
           "battery_soc_entity": "Akkumulátor töltöttségi szint érzékelő (%)",
           "battery_max_charge_kw": "Max. akkumulátor töltési teljesítmény (kW, opcionális)",
           "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
           "battery_min_soc": "Akkumulátor tartalék, minimális töltöttségi szint (%, alapértelmezett 10)",
           "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)",
-          "curtailment_entity": "Korlátozási jel (bináris érzékelő, opcionális)"
+          "curtailment_entity": "Korlátozási jel (bináris érzékelő, input boolean vagy kapcsoló, opcionális)"
         },
         "data_description": {
           "production_entity": "Kumulatív energiaérzékelő (kWh), pl. az inverter vagy a fogyasztásmérő teljes termelése. Teljesítményérzékelő (W) nem működik: nincs hosszú távú összegstatisztikája, így a tanulás és a megbízhatósági index kikapcsolva maradna.",
@@ -32,8 +32,8 @@
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: további panelsor",
+        "description": "{index}. panelsor: az azonos tájolású panelek egy további csoportja ugyanazon a rendszeren (közös termelésérzékelő és inverter).",
         "data": {
           "tilt": "Dőlésszög (fok, 0 = vízszintes, 90 = függőleges)",
           "azimuth": "Azimut (fok északtól, 90 = kelet, 180 = dél, 270 = nyugat)",
@@ -42,7 +42,7 @@
           "tracker": "Napkövető",
           "latitude": "Szélességi fok ehhez a sorhoz (opcionális)",
           "longitude": "Hosszúsági fok ehhez a sorhoz (opcionális)",
-          "add_another": "Add another panel line"
+          "add_another": "További panelsor hozzáadása"
         }
       }
     }
@@ -51,20 +51,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Válassza ki, mit szeretne szerkeszteni.",
         "menu_options": {
           "settings": "Beállítások szerkesztése (hely, inverter, termelésérzékelő, akkumulátor, korlátozási jel)",
-          "lines": "Edit panel lines"
+          "lines": "Panelsorok szerkesztése"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: beállítások",
         "description": "Közös hely, inverterkorlát, termelésérzékelő, referenciaóra, akkumulátor és korlátozási jel a bejegyzés minden panelsorához.",
         "data": {
           "latitude": "Szélességi fok (opcionális)",
           "longitude": "Hosszúsági fok (opcionális)",
           "inverter_max_kw": "Inverter maximális teljesítménye (kW, opcionális)",
-          "production_entity": "PV termelés érzékelő (a tanult korrekcióhoz)",
+          "production_entity": "Megtermelt napenergia érzékelője (kWh, a tanult korrekcióhoz)",
           "trend_anchor_hour": "Mai trend referenciaórája (0-23, alapértelmezett 6)",
           "battery_capacity_kwh": "Hasznos akkumulátorkapacitás (kWh)",
           "battery_soc_entity": "Akkumulátor töltöttségi szint érzékelő (%)",
@@ -72,7 +72,7 @@
           "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
           "battery_min_soc": "Akkumulátor tartalék, minimális töltöttségi szint (%, alapértelmezett 10)",
           "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)",
-          "curtailment_entity": "Korlátozási jel (bináris érzékelő, opcionális)"
+          "curtailment_entity": "Korlátozási jel (bináris érzékelő, input boolean vagy kapcsoló, opcionális)"
         },
         "data_description": {
           "production_entity": "Kumulatív energiaérzékelő (kWh), pl. az inverter vagy a fogyasztásmérő teljes termelése. Teljesítményérzékelő (W) nem működik: nincs hosszú távú összegstatisztikája, így a tanulás és a megbízhatósági index kikapcsolva maradna.",
@@ -81,8 +81,8 @@
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: panelsor {index}/{total}",
+        "description": "Szerkessze a(z) {index}. panelsort a(z) {total} közül, vagy jelölje be egy továbbihoz.",
         "data": {
           "tilt": "Dőlésszög (fok, 0 = vízszintes, 90 = függőleges)",
           "azimuth": "Azimut (fok északtól, 90 = kelet, 180 = dél, 270 = nyugat)",
@@ -91,8 +91,8 @@
           "tracker": "Napkövető",
           "latitude": "Szélességi fok ehhez a sorhoz (opcionális)",
           "longitude": "Hosszúsági fok ehhez a sorhoz (opcionális)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
+          "remove_this_line": "Panelsor eltávolítása",
+          "add_another": "További panelsor hozzáadása"
         }
       }
     }
@@ -113,7 +113,7 @@
       "description": "Visszaadja a teljes termelési előrejelzést (a mai naptól kezdve, 15 percenként egy pont, mindegyik az előre jelzett wattokkal és a P10/P90 megbízhatósági sávval) válaszadatként, automatizálásokban való használatra.",
       "fields": {
         "config_entry_id": {
-          "name": "Telepítés",
+          "name": "Rendszer",
           "description": "Melyik Helios Forecast telepítést olvassa be. Nem kötelező, ha csak egy van beállítva."
         }
       }
@@ -123,7 +123,7 @@
       "description": "Visszaadja az akkumulátor előre jelzett töltöttségi szintjét a következő 48 órára (15 percenként egy pont) válaszadatként, automatizálásokban való használatra.",
       "fields": {
         "config_entry_id": {
-          "name": "Telepítés",
+          "name": "Rendszer",
           "description": "Melyik Helios Forecast telepítést olvassa be. Nem kötelező, ha csak egy van beállítva."
         }
       }
@@ -253,6 +253,17 @@
     "consumption_source_sparse": {
       "title": "A(z) {source} fogyasztási forrás szakaszosan jelent",
       "description": "Az Energia irányítópulton a(z) {source} az órák {pct}%-ára rendelkezik adattal, amelyeket a legjobb forrás lefed ({best}%). A fogyasztási profil csak az általa lefedett órákból épül, így helyes marad, de kevesebb előzményre támaszkodik. Egy megbízhatóbb érzékelő ehhez az áramláshoz élesebbé teszi az akkumulátor-vetítést."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Nincs Helios Forecast rendszer '{entry_id}' bejegyzésazonosítóval."
+    },
+    "service_no_installation": {
+      "message": "Nincs beállítva Helios Forecast rendszer."
+    },
+    "service_several_installations": {
+      "message": "Több Helios Forecast rendszer van beállítva; adja meg a 'config_entry_id' értéket egy kiválasztásához."
     }
   }
 }

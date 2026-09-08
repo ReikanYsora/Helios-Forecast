@@ -42,18 +42,21 @@ from .config import (
     _VALID_TRACKERS,
 )
 from .solar.geometry import sun_position
-from .solar.residual import ProductionBucket
+from .solar.residual import ABOVE_PANELS_RATIO, ProductionBucket
 
 ERROR = "error"
 WARNING = "warning"
 
-# Bounds. A home line above 100 kWp is a value typed in watts; an inverter limit more than three
-# times the peak power is the same mistake on the other field, and one below a quarter of it is a
-# limit that would clip most of the day (possible, so a warning). Panel coordinates far from the home
-# or a configured location far from Home Assistant's are almost always a typo in a decimal.
+# Bounds. A home line above 100 kWp is a value typed in watts; an inverter limit far above the peak
+# power is the same mistake on the other field, and one below a quarter of it is a limit that would
+# clip most of the day (possible, so a warning). The upper ratio is deliberately wide: a hybrid
+# inverter is sized for the house rather than for the array, so three kilowatts of panels behind a
+# ten-kilowatt battery inverter is an ordinary installation and must not be called an error, while
+# the mistake this catches is a factor of a thousand. Panel coordinates far from the home or a
+# configured location far from Home Assistant's are almost always a typo in a decimal.
 KWP_MIN = 0.05
 KWP_MAX = 100.0
-CAP_RATIO_MAX = 3.0
+CAP_RATIO_MAX = 10.0
 CAP_RATIO_MIN = 0.25
 LINE_DISTANCE_MAX_KM = 20.0
 LOCATION_DISTANCE_MAX_KM = 50.0
@@ -67,7 +70,8 @@ BATTERY_C_RATE_MAX = 3.0
 NIGHT_ALTITUDE_DEG = -6.0
 NIGHT_KWH_FLOOR = 0.5
 NIGHT_SHARE = 0.03
-ABOVE_PANELS_RATIO = 1.3
+# ABOVE_PANELS_RATIO comes from the learning itself (solar/residual.py), which drops such an hour:
+# the owner is told about exactly the hours their learning refused, and the two cannot drift apart.
 ABOVE_PANELS_HOURS = 3
 STALE_DAYS = 3
 # A consumption source that covers less than half the hours the best-covered one does dilutes the

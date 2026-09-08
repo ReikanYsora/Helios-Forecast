@@ -33,7 +33,7 @@
       },
       "line": {
         "title": "Helios Forecast: ligne de panneaux supplémentaire",
-        "description": "Ligne de panneaux {index} : un autre groupe de panneaux de même orientation sur la même installation (capteur de production et onduleur partagés).",
+        "description": "Ligne de panneaux {index} : un autre groupe de panneaux de même orientation sur la même installation (capteur de production et onduleur communs).",
         "data": {
           "tilt": "Inclinaison (degrés, 0 = à plat, 90 = vertical)",
           "azimuth": "Azimut (degrés depuis le nord, 90 = est, 180 = sud, 270 = ouest)",
@@ -51,7 +51,7 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choisissez ce que vous voulez modifier.",
+        "description": "Choisissez ce que vous souhaitez modifier.",
         "menu_options": {
           "settings": "Modifier les réglages (position, onduleur, capteur de production, batterie, signal de bridage)",
           "lines": "Modifier les lignes de panneaux"
@@ -82,7 +82,7 @@
       },
       "lines": {
         "title": "Helios Forecast: ligne de panneaux {index}/{total}",
-        "description": "Modifiez la ligne de panneaux {index} sur {total}, ou cochez pour en ajouter une.",
+        "description": "Modifiez la ligne de panneaux {index} sur {total}, ou cochez pour en ajouter une autre.",
         "data": {
           "tilt": "Inclinaison (degrés, 0 = à plat, 90 = vertical)",
           "azimuth": "Azimut (degrés depuis le nord, 90 = est, 180 = sud, 270 = ouest)",
@@ -253,6 +253,17 @@
     "consumption_source_sparse": {
       "title": "La source de consommation {source} rapporte par intermittence",
       "description": "Dans le tableau de bord Énergie, {source} a des données pour {pct} % des heures que couvre la meilleure source ({best} %). Le profil de consommation n'est construit qu'avec les heures qu'elle couvre, il reste donc juste mais repose sur moins d'historique. Un capteur plus fiable pour ce flux affine la projection de la batterie."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Aucune installation Helios Forecast ne porte l'identifiant d'entrée '{entry_id}'."
+    },
+    "service_no_installation": {
+      "message": "Aucune installation Helios Forecast n'est configurée."
+    },
+    "service_several_installations": {
+      "message": "Plusieurs installations Helios Forecast sont configurées ; indiquez 'config_entry_id' pour en choisir une."
     }
   }
 }

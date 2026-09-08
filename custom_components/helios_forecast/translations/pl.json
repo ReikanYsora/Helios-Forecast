@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: linia paneli",
-        "description": "Jedna prognoza dla jednej linii paneli (grupy paneli o tej samej orientacji). Dodaj integrację ponownie dla każdej kolejnej linii. Pozostaw lokalizację pustą, aby użyć adresu domowego Home Assistant.",
+        "description": "Jedna prognoza dla instalacji fotowoltaicznej. Dodaj po jednej linii paneli na każdą orientację; kilka linii dzieli jeden czujnik produkcji i limit falownika tej instalacji. Pozostaw lokalizację pustą, aby użyć adresu domowego Home Assistant.",
         "data": {
           "name": "Nazwa (np. Dach południowy)",
           "tilt": "Nachylenie (stopnie, 0 = poziomo, 90 = pionowo)",
@@ -14,16 +14,16 @@
           "latitude": "Szerokość geograficzna (opcjonalnie)",
           "longitude": "Długość geograficzna (opcjonalnie)",
           "inverter_max_kw": "Maksymalna moc falownika (kW, opcjonalnie)",
-          "production_entity": "Czujnik produkcji PV (do uczonej korekcji)",
+          "production_entity": "Czujnik wyprodukowanej energii z fotowoltaiki (kWh, do wyuczonej korekty)",
           "trend_anchor_hour": "Godzina odniesienia trendu dziennego (0-23, domyślnie 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Dodaj kolejną linię paneli",
           "battery_capacity_kwh": "Pojemność użytkowa akumulatora (kWh)",
           "battery_soc_entity": "Czujnik stanu naładowania akumulatora (%)",
           "battery_max_charge_kw": "Maks. moc ładowania akumulatora (kW, opcjonalnie)",
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
           "battery_min_soc": "Rezerwa akumulatora, minimalny stan naładowania (%, domyślnie 10)",
           "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
-          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, opcjonalny)"
+          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)"
         },
         "data_description": {
           "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
@@ -32,8 +32,8 @@
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: dodatkowa linia paneli",
+        "description": "Linia paneli {index}: kolejna grupa paneli o tej samej orientacji w tej samej instalacji (wspólny czujnik produkcji i falownik).",
         "data": {
           "tilt": "Nachylenie (stopnie, 0 = poziomo, 90 = pionowo)",
           "azimuth": "Azymut (stopnie od północy, 90 = wschód, 180 = południe, 270 = zachód)",
@@ -42,7 +42,7 @@
           "tracker": "Tracker słoneczny",
           "latitude": "Szerokość geograficzna dla tej linii (opcjonalnie)",
           "longitude": "Długość geograficzna dla tej linii (opcjonalnie)",
-          "add_another": "Add another panel line"
+          "add_another": "Dodaj kolejną linię paneli"
         }
       }
     }
@@ -51,20 +51,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Wybierz, co chcesz edytować.",
         "menu_options": {
           "settings": "Edytuj ustawienia (lokalizacja, falownik, czujnik produkcji, akumulator, sygnał ograniczenia)",
-          "lines": "Edit panel lines"
+          "lines": "Edytuj linie paneli"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: ustawienia",
         "description": "Wspólna lokalizacja, limit falownika, czujnik produkcji, godzina odniesienia, akumulator i sygnał ograniczenia dla każdej linii paneli w tym wpisie.",
         "data": {
           "latitude": "Szerokość geograficzna (opcjonalnie)",
           "longitude": "Długość geograficzna (opcjonalnie)",
           "inverter_max_kw": "Maksymalna moc falownika (kW, opcjonalnie)",
-          "production_entity": "Czujnik produkcji PV (do uczonej korekcji)",
+          "production_entity": "Czujnik wyprodukowanej energii z fotowoltaiki (kWh, do wyuczonej korekty)",
           "trend_anchor_hour": "Godzina odniesienia trendu dziennego (0-23, domyślnie 6)",
           "battery_capacity_kwh": "Pojemność użytkowa akumulatora (kWh)",
           "battery_soc_entity": "Czujnik stanu naładowania akumulatora (%)",
@@ -72,7 +72,7 @@
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
           "battery_min_soc": "Rezerwa akumulatora, minimalny stan naładowania (%, domyślnie 10)",
           "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
-          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, opcjonalny)"
+          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)"
         },
         "data_description": {
           "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
@@ -81,8 +81,8 @@
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: linia paneli {index}/{total}",
+        "description": "Edytuj linię paneli {index} z {total} lub zaznacz, aby dodać kolejną.",
         "data": {
           "tilt": "Nachylenie (stopnie, 0 = poziomo, 90 = pionowo)",
           "azimuth": "Azymut (stopnie od północy, 90 = wschód, 180 = południe, 270 = zachód)",
@@ -91,8 +91,8 @@
           "tracker": "Tracker słoneczny",
           "latitude": "Szerokość geograficzna dla tej linii (opcjonalnie)",
           "longitude": "Długość geograficzna dla tej linii (opcjonalnie)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
+          "remove_this_line": "Usuń tę linię paneli",
+          "add_another": "Dodaj kolejną linię paneli"
         }
       }
     }
@@ -253,6 +253,17 @@
     "consumption_source_sparse": {
       "title": "Źródło zużycia {source} raportuje z przerwami",
       "description": "W panelu Energia {source} ma dane dla {pct}% godzin, które pokrywa najlepsze źródło ({best}%). Profil zużycia jest budowany tylko z godzin, które pokrywa, więc pozostaje poprawny, ale opiera się na mniejszej historii. Bardziej niezawodny czujnik dla tego przepływu wyostrza projekcję baterii."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Brak instalacji Helios Forecast o identyfikatorze wpisu '{entry_id}'."
+    },
+    "service_no_installation": {
+      "message": "Nie skonfigurowano żadnej instalacji Helios Forecast."
+    },
+    "service_several_installations": {
+      "message": "Skonfigurowano kilka instalacji Helios Forecast; podaj 'config_entry_id', aby wybrać jedną."
     }
   }
 }

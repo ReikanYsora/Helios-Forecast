@@ -96,8 +96,13 @@ def compute_pv_power_weighted(
     sample: WeatherSample,
     layout: PvLayout,
 ) -> float:
-    """Forecast PV percentage (0..100) summed across arrays, weighted by kWp share. Thin wrapper over
-    ``compute_pv_power_per_array`` so the two never diverge."""
+    """Forecast PV percentage (0..100) summed across arrays, weighted by kWp share.
+
+    No inverter cap of any kind: it sums the per-array percentages, and clipping happens on watts,
+    which this does not have. The forecast and the two learners each apply their caps around the
+    per-array call instead, so this one is the uncapped reference the tests replicate the model
+    from, and not a shape any of them uses.
+    """
     pcts = compute_pv_power_per_array(moment, home_lat, home_lon, sample, layout)
     orientations = layout.orientations
     if not orientations or len(pcts) != len(orientations):

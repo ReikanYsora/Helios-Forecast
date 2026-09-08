@@ -275,11 +275,11 @@ class HeliosForecastSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorE
 class HeliosWeatherSensor(CoordinatorEntity[HeliosForecastCoordinator], SensorEntity):
     """An archived Open-Meteo weather value, read from the current-hour snapshot.
 
-    The long-term history of these entities is written to HA statistics by the
-    coordinator (see write_weather_statistics), which is what keeps it available
-    beyond Open-Meteo's rolling 60-day window. Each also carries a `forecast`
-    attribute (the forward-looking hourly series) for charting, mirroring the
-    power sensor.
+    These entities carry no state class and no long-term history of their own. The past weather is
+    kept as statistics the integration owns, under ids of its own rather than under an entity id
+    (archive.py), which is what keeps it beyond Open-Meteo's rolling 60-day window without the
+    recorder compiling the same series from its side. Each also carries a `forecast` attribute (the
+    forward-looking hourly series) for charting, mirroring the power sensor.
     """
 
     _attr_has_entity_name = True

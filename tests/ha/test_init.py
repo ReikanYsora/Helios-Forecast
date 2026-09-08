@@ -12,6 +12,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 from homeassistant.config_entries import ConfigEntryState, current_entry
+from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
+from homeassistant.core import CoreState
 from homeassistant.const import Platform
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
@@ -43,6 +45,68 @@ async def _setup(hass, monkeypatch, data=None, entry: MockConfigEntry | None = N
     finally:
         current_entry.reset(token)
     return entry
+
+
+async def test_the_archive_migration_waits_for_home_assistant_to_have_started(hass, monkeypatch) -> None:
+    """Never during setup. The recorder blocks its own queue until the started event, so a setup that
+    waits on a recorder write waits on a start that is waiting on it, and the entry is cancelled
+    after five minutes of that."""
+    calls: list = []
+
+    async def _migrate(_hass, _entry) -> None:
+        calls.append(True)
+
+    monkeypatch.setattr(archive_mod, "async_migrate", _migrate)
+    hass.set_state(CoreState.starting)
+
+    await _setup(hass, monkeypatch)
+    await hass.async_block_till_done()
+    assert not calls  # nothing has run yet
+
+    hass.bus.async_fire(EVENT_HOMEASSISTANT_STARTED)
+    await hass.async_block_till_done()
+    assert calls == [True]
+
+
+async def test_deleting_the_entry_takes_its_archived_series_with_it(hass, monkeypatch) -> None:
+    """The archived series belong to the integration rather than to an entity, which is what keeps
+    the recorder off them and also means Home Assistant has nothing that could offer to clean them
+    up: its statistics validation only looks at series carrying an entity id."""
+    from custom_components.helios_forecast import async_remove_entry
+    from custom_components.helios_forecast.statistics import ARCHIVED_SERIES, external_statistic_id
+
+    entry = await _setup(hass, monkeypatch)
+    cleared: list = []
+    monkeypatch.setattr(
+        "homeassistant.components.recorder.get_instance",
+        lambda _hass: type("I", (), {"async_clear_statistics": staticmethod(cleared.extend)})(),
+    )
+
+    await async_remove_entry(hass, entry)
+
+    assert set(cleared) == {external_statistic_id(entry.entry_id, key) for key, _u, _n in ARCHIVED_SERIES}
+
+
+async def test_a_settings_key_no_version_reads_is_cleared_from_the_entry(hass, monkeypatch) -> None:
+    """An earlier build stored a write credential in the entry. Nothing reads it now, and the
+    diagnostics download hands the configuration over as it stands, so it has to go from the entry."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={"latitude": 48.85, "longitude": 2.35, "benchmark_key": "live-write-credential"},
+        options={"benchmark_enabled": True},
+        entry_id="retired_keys_entry",
+    )
+    entry.add_to_hass(hass)
+    await _setup(hass, monkeypatch, entry=entry)
+
+    assert "benchmark_key" not in entry.data
+    assert "benchmark_enabled" not in entry.options
+    assert entry.data["latitude"] == 48.85
+
+    from custom_components.helios_forecast.diagnostics import async_get_config_entry_diagnostics
+
+    report = await async_get_config_entry_diagnostics(hass, entry)
+    assert "live-write-credential" not in str(report)
 
 
 async def test_setup_entry_registers_coordinator_and_forwards_sensor_platform(hass, monkeypatch) -> None:
@@ -171,7 +235,7 @@ async def test_no_soc_listener_registered_without_battery_soc_entity(hass, monke
 async def test_hour_rollover_triggers_off_cycle_refresh(hass, monkeypatch) -> None:
     """The archive (past-forecast curve) only rebuilds once an hour, but that check only
     runs inside a refresh: without this listener, the just-elapsed hour could sit up to 30
-    minutes past its own boundary still served unclamped. #52
+    minutes past its own boundary still served unclamped.
     """
     entry = await _setup(hass, monkeypatch)
     coordinator = hass.data[DOMAIN][entry.entry_id]

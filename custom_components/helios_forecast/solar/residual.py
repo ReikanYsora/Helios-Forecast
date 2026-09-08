@@ -38,6 +38,10 @@ RECENCY_HALF_LIFE_MS = 30 * 24 * 3_600_000
 CONF_W0 = 4
 M_MIN = 0.2
 M_MAX = 2.5
+# An hour above this multiple of the nameplate did not come from the panels: a meter replaced or
+# restored from an older backup files one enormous hour. The check-up warns the owner on the same
+# threshold, reading it from here, so the guard and the warning cannot drift apart.
+ABOVE_PANELS_RATIO = 1.3
 MIN_TOTAL_WEIGHT = 3
 MODEL_KWH_FLOOR = 0.05
 LEARN_SUBSAMPLES = 4
@@ -77,6 +81,7 @@ class SkyResidualInput:
     lon: float
     layout: PvLayout
     production: Optional[List[ProductionBucket]]
+    inverter_max_w: float
     cloud_times: List[float]  # epoch ms, ascending
     cloud: List[Optional[float]]  # %, None where the model left an hour missing
     shortwave: List[float]
@@ -90,6 +95,19 @@ class SkyResidualInput:
 
 def _dt(ms: float) -> datetime:
     return datetime.fromtimestamp(ms / 1000.0, tz=timezone.utc)
+
+
+def implausible_hour(kwh: float, start_ms: float, end_ms: float, total_kwp: float) -> bool:
+    """Whether an hour is above anything the panels can physically deliver.
+
+    The map aggregates ratios as a weighted mean, so one such hour drags the whole 60-day correction
+    towards the ceiling, silently, for the two months it stays in the window. The negative side is
+    refused on the same grounds; this is the other half of the same guard.
+    """
+    hours = (end_ms - start_ms) / 3_600_000.0
+    if hours <= 0 or total_kwp <= 0:
+        return False
+    return kwh / hours > ABOVE_PANELS_RATIO * total_kwp
 
 
 def sample_sky_residual(sky_map: SkyResidualMap, az_deg: float, alt_deg: float) -> float:
@@ -125,9 +143,8 @@ def sample_sky_residual(sky_map: SkyResidualMap, az_deg: float, alt_deg: float) 
 
 def capped_model_kwh(pcts: List[float], layout: PvLayout, k: float, snow: float) -> float:
     """Per-array watts (share of ``k``), each clipped at its own inverter cap before summing, then
-    converted to kWh. Mirrors forecast.py's per-array-cap-then-sum shape so the learned ratio sees the
-    same hardware-clipped production the forecast-generation path applies, instead of conflating
-    inverter clipping with weather bias near solar noon."""
+    converted to kWh. Mirrors forecast.py's per-array-cap-then-sum shape. The entry-level cap is not
+    applied here: callers add it around this result, the way forecast.py clips the summed watts."""
     orientations = layout.orientations
     if not orientations or len(pcts) != len(orientations):
         return max(0.0, pcts[0] * k * snow) / 1000.0
@@ -158,6 +175,8 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
         kwh = bucket.kwh
         if not math.isfinite(kwh) or kwh < 0:
             continue
+        if implausible_hour(kwh, bucket.start_ms, bucket.end_ms, inp.layout.total_kwp):
+            continue
         mid = (bucket.start_ms + bucket.end_ms) / 2
         sun = sun_position(_dt(mid), inp.lat, inp.lon)
         if sun.altitude <= 0:
@@ -183,11 +202,17 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
             if sun_position(moment, inp.lat, inp.lon).altitude <= 0:
                 continue
             pcts = compute_pv_power_per_array(moment, inp.lat, inp.lon, sample, inp.layout)
-            w_sum_kwh += capped_model_kwh(pcts, inp.layout, k, snow_factor)
+            # The entry-level cap on top of the per-array ones, exactly as the forecast path applies
+            # them. Left off, a DC-oversized array teaches the map that the sky is dimmer than it is
+            # around noon, and the map then takes that off every cloudy hour that never clips.
+            w_sum_kwh += min(inp.inverter_max_w, capped_model_kwh(pcts, inp.layout, k, snow_factor) * 1000.0) / 1000.0
             w_n += 1
         if w_n == 0:
             continue
-        model_kwh = w_sum_kwh / w_n
+        # Over the whole bucket, night subsamples included: the meter measured the whole hour, so
+        # dividing by the sun-up count alone would compare two different quantities and drag every
+        # hour that straddles sunrise or sunset.
+        model_kwh = w_sum_kwh / LEARN_SUBSAMPLES
         if model_kwh < MODEL_KWH_FLOOR:
             continue
 
@@ -213,8 +238,12 @@ def build_sky_residual_map(inp: SkyResidualInput) -> Optional[SkyResidualMap]:
 
         sum_w[idx] += w
         sum_wr[idx] += w * ratio
-        global_sum_w += w
-        global_sum_wr += w * ratio
+        # The global fallback is weighted by the hour's energy on top of that, so it says what the
+        # installation does over a day rather than over a list of hours. Counted one for one, the
+        # many small hours around sunrise outweigh the few that carry the production.
+        gw = w * model_kwh
+        global_sum_w += gw
+        global_sum_wr += gw * ratio
 
     if global_sum_w < MIN_TOTAL_WEIGHT:
         return None

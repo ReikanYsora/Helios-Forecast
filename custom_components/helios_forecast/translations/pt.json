@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: linha de painéis",
-        "description": "Uma previsão para uma linha de painéis (um grupo de painéis com a mesma orientação). Adicione novamente a integração para cada linha adicional. Deixe a localização em branco para usar a casa do seu Home Assistant.",
+        "description": "Uma previsão para uma instalação fotovoltaica. Adicione uma linha de painéis por orientação; várias linhas partilham o único sensor de produção e o limite do inversor desta instalação. Deixe a localização em branco para usar a do seu Home Assistant.",
         "data": {
           "name": "Nome (p. ex. Telhado sul)",
           "tilt": "Inclinação (graus, 0 = plano, 90 = vertical)",
@@ -14,16 +14,16 @@
           "latitude": "Latitude (opcional)",
           "longitude": "Longitude (opcional)",
           "inverter_max_kw": "Potência máxima do inversor (kW, opcional)",
-          "production_entity": "Sensor de produção fotovoltaica (para a correção aprendida)",
+          "production_entity": "Sensor da energia produzida pelos painéis (kWh, para a correção aprendida)",
           "trend_anchor_hour": "Hora de referência da tendência do dia (0-23, predefinição 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Adicionar outra linha de painéis",
           "battery_capacity_kwh": "Capacidade útil da bateria (kWh)",
           "battery_soc_entity": "Sensor de estado de carga da bateria (%)",
           "battery_max_charge_kw": "Potência máx. de carga da bateria (kW, opcional)",
           "battery_max_discharge_kw": "Potência máx. de descarga da bateria (kW, opcional)",
           "battery_min_soc": "Reserva da bateria, estado de carga mínimo (%, predefinição 10)",
           "battery_efficiency": "Eficiência de ida e volta da bateria (%, predefinição 90)",
-          "curtailment_entity": "Sinal de limitação (sensor binário, opcional)"
+          "curtailment_entity": "Sinal de limitação (sensor binário, input boolean ou interruptor, opcional)"
         },
         "data_description": {
           "production_entity": "Um sensor de energia acumulada (kWh), p. ex. a produção total do inversor ou do contador. Um sensor de potência (W) não funciona: não tem estatísticas de soma a longo prazo, pelo que a aprendizagem e o índice de fiabilidade ficariam inativos.",
@@ -32,8 +32,8 @@
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: linha de painéis adicional",
+        "description": "Linha de painéis {index}: outro grupo de painéis com a mesma orientação na mesma instalação (sensor de produção e inversor partilhados).",
         "data": {
           "tilt": "Inclinação (graus, 0 = plano, 90 = vertical)",
           "azimuth": "Azimute (graus a partir do norte, 90 = este, 180 = sul, 270 = oeste)",
@@ -42,7 +42,7 @@
           "tracker": "Seguidor solar",
           "latitude": "Latitude para esta linha (opcional)",
           "longitude": "Longitude para esta linha (opcional)",
-          "add_another": "Add another panel line"
+          "add_another": "Adicionar outra linha de painéis"
         }
       }
     }
@@ -51,20 +51,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Escolha o que pretende editar.",
         "menu_options": {
           "settings": "Editar definições (localização, inversor, sensor de produção, bateria, sinal de limitação)",
-          "lines": "Edit panel lines"
+          "lines": "Editar as linhas de painéis"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: definições",
         "description": "Localização, limite do inversor, sensor de produção, hora de referência, bateria e sinal de limitação partilhados por todas as linhas de painéis desta entrada.",
         "data": {
           "latitude": "Latitude (opcional)",
           "longitude": "Longitude (opcional)",
           "inverter_max_kw": "Potência máxima do inversor (kW, opcional)",
-          "production_entity": "Sensor de produção fotovoltaica (para a correção aprendida)",
+          "production_entity": "Sensor da energia produzida pelos painéis (kWh, para a correção aprendida)",
           "trend_anchor_hour": "Hora de referência da tendência do dia (0-23, predefinição 6)",
           "battery_capacity_kwh": "Capacidade útil da bateria (kWh)",
           "battery_soc_entity": "Sensor de estado de carga da bateria (%)",
@@ -72,7 +72,7 @@
           "battery_max_discharge_kw": "Potência máx. de descarga da bateria (kW, opcional)",
           "battery_min_soc": "Reserva da bateria, estado de carga mínimo (%, predefinição 10)",
           "battery_efficiency": "Eficiência de ida e volta da bateria (%, predefinição 90)",
-          "curtailment_entity": "Sinal de limitação (sensor binário, opcional)"
+          "curtailment_entity": "Sinal de limitação (sensor binário, input boolean ou interruptor, opcional)"
         },
         "data_description": {
           "production_entity": "Um sensor de energia acumulada (kWh), p. ex. a produção total do inversor ou do contador. Um sensor de potência (W) não funciona: não tem estatísticas de soma a longo prazo, pelo que a aprendizagem e o índice de fiabilidade ficariam inativos.",
@@ -81,8 +81,8 @@
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: linha de painéis {index}/{total}",
+        "description": "Edite a linha de painéis {index} de {total}, ou assinale para adicionar outra.",
         "data": {
           "tilt": "Inclinação (graus, 0 = plano, 90 = vertical)",
           "azimuth": "Azimute (graus a partir do norte, 90 = este, 180 = sul, 270 = oeste)",
@@ -91,8 +91,8 @@
           "tracker": "Seguidor solar",
           "latitude": "Latitude para esta linha (opcional)",
           "longitude": "Longitude para esta linha (opcional)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
+          "remove_this_line": "Remover esta linha de painéis",
+          "add_another": "Adicionar outra linha de painéis"
         }
       }
     }
@@ -253,6 +253,17 @@
     "consumption_source_sparse": {
       "title": "A fonte de consumo {source} reporta de forma intermitente",
       "description": "No painel de Energia, {source} tem dados para {pct}% das horas que a melhor fonte cobre ({best}%). O perfil de consumo é construído apenas com as horas que ela cobre, por isso continua certo mas assenta em menos histórico. Um sensor mais fiável para esse fluxo torna a projeção da bateria mais precisa."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Nenhuma instalação Helios Forecast com o identificador de entrada '{entry_id}'."
+    },
+    "service_no_installation": {
+      "message": "Não há nenhuma instalação Helios Forecast configurada."
+    },
+    "service_several_installations": {
+      "message": "Estão configuradas várias instalações Helios Forecast; indique 'config_entry_id' para escolher uma."
     }
   }
 }

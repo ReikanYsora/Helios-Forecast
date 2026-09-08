@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: skydelių linija",
-        "description": "Viena prognozė vienai skydelių linijai (vienodos orientacijos skydelių grupei). Kiekvienai papildomai linijai pridėkite integraciją iš naujo. Palikite vietą tuščią, kad būtų naudojama jūsų Home Assistant namų vieta.",
+        "description": "Viena prognozė vienai saulės elektrinei. Pridėkite po vieną skydelių liniją kiekvienai orientacijai; kelios linijos naudoja tą patį gamybos jutiklį ir inverterio ribą. Palikite vietą tuščią, kad būtų naudojama Home Assistant namų vieta.",
         "data": {
           "name": "Pavadinimas (pvz., Pietinis stogas)",
           "tilt": "Pasvirimas (laipsniais, 0 = horizontaliai, 90 = vertikaliai)",
@@ -14,16 +14,16 @@
           "latitude": "Platuma (nebūtina)",
           "longitude": "Ilguma (nebūtina)",
           "inverter_max_kw": "Didžiausia inverterio galia (kW, nebūtina)",
-          "production_entity": "PV gamybos jutiklis (išmoktai korekcijai)",
+          "production_entity": "Pagamintos saulės energijos jutiklis (kWh, išmoktai korekcijai)",
           "trend_anchor_hour": "Šios dienos tendencijos atskaitos valanda (0-23, numatyta 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Pridėti dar vieną skydelių liniją",
           "battery_capacity_kwh": "Naudojama akumuliatoriaus talpa (kWh)",
           "battery_soc_entity": "Akumuliatoriaus įkrovos jutiklis (%)",
           "battery_max_charge_kw": "Maks. akumuliatoriaus įkrovimo galia (kW, neprivaloma)",
           "battery_max_discharge_kw": "Maks. akumuliatoriaus iškrovimo galia (kW, neprivaloma)",
           "battery_min_soc": "Akumuliatoriaus rezervas, minimali įkrova (%, numatytoji 10)",
           "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)",
-          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, neprivaloma)"
+          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)"
         },
         "data_description": {
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
@@ -32,8 +32,8 @@
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: papildoma skydelių linija",
+        "description": "Skydelių linija {index}: dar viena vienodos orientacijos skydelių grupė toje pačioje sistemoje (bendras gamybos jutiklis ir inverteris).",
         "data": {
           "tilt": "Pasvirimas (laipsniais, 0 = horizontaliai, 90 = vertikaliai)",
           "azimuth": "Azimutas (laipsniais nuo šiaurės, 90 = rytai, 180 = pietūs, 270 = vakarai)",
@@ -42,7 +42,7 @@
           "tracker": "Saulės sekiklis",
           "latitude": "Platuma šiai linijai (neprivaloma)",
           "longitude": "Ilguma šiai linijai (neprivaloma)",
-          "add_another": "Add another panel line"
+          "add_another": "Pridėti dar vieną skydelių liniją"
         }
       }
     }
@@ -51,20 +51,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Pasirinkite, ką norite redaguoti.",
         "menu_options": {
           "settings": "Redaguoti nustatymus (vieta, inverteris, gamybos jutiklis, baterija, ribojimo signalas)",
-          "lines": "Edit panel lines"
+          "lines": "Redaguoti skydelių linijas"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: nustatymai",
         "description": "Bendra vieta, inverterio riba, gamybos jutiklis, atskaitos valanda, baterija ir ribojimo signalas kiekvienai šio įrašo plokščių eilei.",
         "data": {
           "latitude": "Platuma (nebūtina)",
           "longitude": "Ilguma (nebūtina)",
           "inverter_max_kw": "Didžiausia inverterio galia (kW, nebūtina)",
-          "production_entity": "PV gamybos jutiklis (išmoktai korekcijai)",
+          "production_entity": "Pagamintos saulės energijos jutiklis (kWh, išmoktai korekcijai)",
           "trend_anchor_hour": "Šios dienos tendencijos atskaitos valanda (0-23, numatyta 6)",
           "battery_capacity_kwh": "Naudojama akumuliatoriaus talpa (kWh)",
           "battery_soc_entity": "Akumuliatoriaus įkrovos jutiklis (%)",
@@ -72,7 +72,7 @@
           "battery_max_discharge_kw": "Maks. akumuliatoriaus iškrovimo galia (kW, neprivaloma)",
           "battery_min_soc": "Akumuliatoriaus rezervas, minimali įkrova (%, numatytoji 10)",
           "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)",
-          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, neprivaloma)"
+          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)"
         },
         "data_description": {
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
@@ -81,8 +81,8 @@
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: skydelių linija {index}/{total}",
+        "description": "Redaguokite skydelių liniją {index} iš {total} arba pažymėkite, kad pridėtumėte dar vieną.",
         "data": {
           "tilt": "Pasvirimas (laipsniais, 0 = horizontaliai, 90 = vertikaliai)",
           "azimuth": "Azimutas (laipsniais nuo šiaurės, 90 = rytai, 180 = pietūs, 270 = vakarai)",
@@ -91,8 +91,8 @@
           "tracker": "Saulės sekiklis",
           "latitude": "Platuma šiai linijai (neprivaloma)",
           "longitude": "Ilguma šiai linijai (neprivaloma)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
+          "remove_this_line": "Pašalinti šią skydelių liniją",
+          "add_another": "Pridėti dar vieną skydelių liniją"
         }
       }
     }
@@ -113,7 +113,7 @@
       "description": "Grąžina visą gamybos prognozę (nuo šiandien, po vieną tašką kas 15 minučių, kiekvienas su prognozuojamais vatais ir P10/P90 pasikliovimo intervalu) kaip atsako duomenis, naudoti automatizacijose.",
       "fields": {
         "config_entry_id": {
-          "name": "Įdiegimas",
+          "name": "Sistema",
           "description": "Kurią Helios Forecast įdiegtį nuskaityti. Nebūtina, kai sukonfigūruota tik viena."
         }
       }
@@ -123,7 +123,7 @@
       "description": "Grąžina prognozuojamą akumuliatoriaus įkrovą kitoms 48 valandoms (po vieną tašką kas 15 minučių) kaip atsako duomenis, naudoti automatizacijose.",
       "fields": {
         "config_entry_id": {
-          "name": "Įdiegimas",
+          "name": "Sistema",
           "description": "Kurią Helios Forecast įdiegtį nuskaityti. Nebūtina, kai sukonfigūruota tik viena."
         }
       }
@@ -253,6 +253,17 @@
     "consumption_source_sparse": {
       "title": "Vartojimo šaltinis {source} praneša su pertrūkiais",
       "description": "Energijos skydelyje {source} turi duomenis {pct} % valandų, kurias apima geriausias šaltinis ({best} %). Vartojimo profilis sudaromas tik iš valandų, kurias jis apima, todėl lieka teisingas, bet remiasi mažesne istorija. Patikimesnis šio srauto jutiklis patikslina baterijos projekciją."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Nėra Helios Forecast sistemos su įrašo ID '{entry_id}'."
+    },
+    "service_no_installation": {
+      "message": "Nesukonfigūruota nė viena Helios Forecast sistema."
+    },
+    "service_several_installations": {
+      "message": "Sukonfigūruotos kelios Helios Forecast sistemos; nurodykite 'config_entry_id', kad pasirinktumėte vieną."
     }
   }
 }

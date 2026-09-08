@@ -13,7 +13,7 @@ import asyncio
 import math
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from functools import partial
 from typing import Any, Dict, List, Optional, Set
 
@@ -59,7 +59,7 @@ from .trend import TodayTrend, TrendReference, compute_trend, should_capture
 from .const import DOMAIN
 from .forecast import ForecastPoint, build_forecast_series
 from .openmeteo import WeatherSeries, fetch_weather
-from .reliability import Reliability, compute_reliability
+from .reliability import SKILL_WINDOW_DAYS, Reliability, compute_reliability
 from .statistics import (
     ARCHIVED_SERIES,
     FORECAST_ENERGY_KEY,
@@ -80,7 +80,9 @@ from .solar.residual import (
 from .summary import ForecastSummary, summarize
 
 # The interface has no entity to borrow a name from for these series, so the metadata carries one.
-_SERIES_NAMES: Dict[str, str] = {key: name for key, _unit, name in ARCHIVED_SERIES}
+# The unit and the name every archived series is written with, taken from the one list the
+# migration also reads, so a series cannot be written under one unit and moved under another.
+_SERIES: Dict[str, tuple[str, str]] = {key: (unit, name) for key, unit, name in ARCHIVED_SERIES}
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -148,9 +150,13 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # The UTC hour the archive was last recomputed. The 60-day past curve only changes at its
         # trailing hour, so it is rebuilt once an hour rather than on every 30-minute refresh.
         self._last_archive_hour: Optional[datetime] = None
-        # The UTC hour up to which the weather statistics have been written. A refresh then imports only
-        # the new hours; the full 60-day backfill (self-heal) runs once at startup.
+        # How far the weather archive is considered settled: the newest hour written, less the window
+        # it keeps re-offering, so it deliberately lags what has been written. A refresh imports only
+        # the hours after it; the full 60-day backfill (self-heal) runs once at startup.
         self._last_weather_stat_hour: Optional[datetime] = None
+        # When the weather series in hand was actually fetched. A refresh that reuses an older series
+        # knows the past only up to here, so the archive stops there instead of at the wall clock.
+        self._weather_fetched_at: Optional[datetime] = None
         # Home consumption profile for the SoC projection; rebuilt hourly by _consumption_profile_for.
         self._consumption_profile: Optional[ConsumptionProfile] = None
         self._last_consumption_hour: Optional[datetime] = None
@@ -162,6 +168,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         self._trend_store: Store = Store(hass, 1, f"{DOMAIN}.{entry.entry_id}.trend")
         self._trend_ref: Optional[TrendReference] = None
         self._trend_loaded = False
+        # What was predicted for each recent day, written down before that day happened. The only way
+        # the skill term measures anything: the archive is rebuilt every hour by a model fitted on the
+        # very production it would be compared against.
+        self._skill_store: Store = Store(hass, 1, f"{DOMAIN}.{entry.entry_id}.day_ahead")
+        self._day_ahead: Dict[date, float] = {}
+        self._day_ahead_loaded = False
         # Last-logged reason the battery SoC projection was skipped, so _battery_off() warns once per reason.
         self._battery_off_logged: Optional[str] = None
         # The check-up (checkup.py): the problems found by the latest pass, the repair issues published
@@ -213,9 +225,9 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         return problems
 
     @callback
-    def _publish_problems(self, problems: List[Problem]) -> None:
+    def _publish_problems(self, problems: List[Problem], *, retire: bool = True) -> None:
         self.problems = list(problems)
-        self._issue_ids = repairs.sync(self.hass, self.entry, self.problems, self._issue_ids)
+        self._issue_ids = repairs.sync(self.hass, self.entry, self.problems, self._issue_ids, retire=retire)
 
     @callback
     def clear_problems(self) -> None:
@@ -233,15 +245,23 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         # The configuration is judged before anything is fetched, so a wrong field shows up even when the
         # weather service is down; the data checks join the list as the refresh reads each source.
         problems = self._check_configuration(data)
-        self._publish_problems(problems)
+        # Adds only: the data checks have not run yet, and retiring on a partial list would delete
+        # every issue they raised and create it again at the end of this same refresh.
+        self._publish_problems(problems, retire=False)
 
-        # One combined window: 60 past days feed the learning, 7 future the forecast.
+        # One combined window: 60 past days feed the learning, the future days the forecast. Open-Meteo
+        # answers whole UTC days while the horizon below runs on local midnights, so west of Greenwich
+        # the last local day ends after the final UTC hour of a FORECAST_DAYS window; one day of slack
+        # covers every offset, and build_forecast_series stops at the weather either way.
         try:
-            weather = await fetch_weather(session, lat, lon, past_days=LEARN_DAYS, forecast_days=FORECAST_DAYS)
-            # A transient empty response should not blank the forecast: reuse the last good
-            # fetch so the model still runs. The data is only ~30 min old and the
-            # next refresh recovers; a first-ever empty response (no prior fetch) still fails.
-            if weather is None and self.weather_series is not None:
+            weather = await fetch_weather(session, lat, lon, past_days=LEARN_DAYS, forecast_days=FORECAST_DAYS + 1)
+            if weather is not None:
+                self._weather_fetched_at = dt_util.utcnow()
+            # A transient empty response should not blank the forecast: reuse the last good fetch so
+            # the model still runs, for as long as the service stays silent. What that series does not
+            # gain is knowledge of the hours since, which is why the archive is bounded by the fetch
+            # instant above; a first-ever empty response (no prior fetch) still fails.
+            elif self.weather_series is not None:
                 _LOGGER.warning("Open-Meteo returned no weather data; reusing the last successful fetch")
                 weather = self.weather_series
         except Exception as err:  # noqa: BLE001 - any transport error becomes a retry
@@ -251,7 +271,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             raise UpdateFailed("Open-Meteo returned no weather data")
 
         now = dt_util.now()  # local-aware, drives the local-day boundaries
-        residual_map = await self._build_residual_map(data, lat, lon, layout, weather, now)
+        residual_map = await self._build_residual_map(data, lat, lon, layout, cap, weather, now)
         production_entity = learning_from_config(data)
         if production_entity and self._production_history_read:
             problems += check_production_history(
@@ -290,8 +310,13 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             enrich_archive_points, [p for p in points if p.t < now], analog_library, weather, lat, lon
         )
 
+        # The sensors read the same curve the card draws: clamped up to now, raw after it. "Now" always
+        # falls inside a step that began in the past, so power_now used to answer from a raw elapsed
+        # point while the card showed the clamped one for that very instant, and on a shaded roof the
+        # two disagreed by the whole height of the learned ceiling.
+        served = self.elapsed_points + [p for p in points if p.t >= now]
         summary = await self.hass.async_add_executor_job(
-            partial(summarize, points, now=now, tz=dt_util.DEFAULT_TIME_ZONE, step_minutes=STEP_MINUTES)
+            partial(summarize, served, now=now, tz=dt_util.DEFAULT_TIME_ZONE, step_minutes=STEP_MINUTES)
         )
 
         now_utc = dt_util.utcnow()
@@ -314,11 +339,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             self.write_forecast_statistics()
             self._last_archive_hour = archive_hour
 
-        # Reliability index: blends learning maturity, recent predicted-vs-actual skill and today's
-        # cloud predictability. Reuses the production history already fetched for the residual map and
-        # the hourly archive points, so no extra recorder or model work.
+        # Reliability index: blends learning maturity, day-ahead-versus-measured skill and today's
+        # cloud predictability. Reuses the production history already fetched for the residual map, so
+        # no extra recorder work.
+        day_ahead = await self._record_day_ahead(now, summary)
         reliability = await self.hass.async_add_executor_job(
-            compute_reliability, self._production_buckets, self.archive_points, weather, now, dt_util.DEFAULT_TIME_ZONE
+            compute_reliability, self._production_buckets, day_ahead, weather, now, dt_util.DEFAULT_TIME_ZONE
         )
 
         trend = await self._today_trend(data, now, summary)
@@ -459,6 +485,33 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             self._consumption_profile = profile
         return self._consumption_profile
 
+    async def _record_day_ahead(self, now: datetime, summary) -> Dict[date, float]:
+        """Write down tomorrow's predicted total, once, and return the recent days already written.
+
+        Recorded the first time a day is seen as tomorrow, so the entry is always made before that day
+        starts and can never have been fitted on it. The lead time therefore varies with when Home
+        Assistant happens to be running, which is fine: what matters is that the prediction is older
+        than the measurement it is scored against.
+        """
+        if not self._day_ahead_loaded:
+            stored = await self._skill_store.async_load()
+            for key, value in (stored or {}).get("days", {}).items():
+                try:
+                    self._day_ahead[date.fromisoformat(key)] = float(value)
+                except (TypeError, ValueError):
+                    continue
+            self._day_ahead_loaded = True
+
+        tomorrow = now.date() + timedelta(days=1)
+        if tomorrow not in self._day_ahead and len(summary.days) > 1:
+            self._day_ahead[tomorrow] = summary.days[1].energy_kwh
+            oldest = now.date() - timedelta(days=SKILL_WINDOW_DAYS + 1)
+            self._day_ahead = {d: kwh for d, kwh in self._day_ahead.items() if d >= oldest}
+            await self._skill_store.async_save(
+                {"days": {d.isoformat(): kwh for d, kwh in sorted(self._day_ahead.items())}}
+            )
+        return self._day_ahead
+
     async def _today_trend(self, data, now, summary) -> TodayTrend:
         """Today's predicted total versus its frozen daily reference (default 06:00).
 
@@ -468,14 +521,20 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         current = summary.days[0].energy_kwh if summary.days else 0.0
 
         if not self._trend_loaded:
-            stored = await self._trend_store.async_load()
-            if stored and stored.get("date") and stored.get("captured_at"):
-                self._trend_ref = TrendReference(
-                    date=stored["date"],
-                    kwh=float(stored["kwh"]),
-                    captured_at=dt_util.parse_datetime(stored["captured_at"]),
-                )
+            stored = await self._trend_store.async_load() or {}
             self._trend_loaded = True
+            # A store file is not something a user can go and repair, so anything unreadable in it
+            # starts the day over rather than raising out of every refresh and failing the setup.
+            try:
+                if stored.get("date") and stored.get("captured_at"):
+                    self._trend_ref = TrendReference(
+                        date=str(stored["date"]),
+                        kwh=float(stored["kwh"]),
+                        captured_at=dt_util.parse_datetime(str(stored["captured_at"])),
+                    )
+            except (KeyError, TypeError, ValueError):
+                _LOGGER.warning("Ignored an unreadable today-trend reference; today's trend starts over")
+                self._trend_ref = None
 
         anchor = trend_anchor_hour_from_config(data)
         if should_capture(self._trend_ref, today_date, now, anchor):
@@ -505,20 +564,31 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         if weather is None:
             return
 
-        cutoff = now.replace(minute=0, second=0, microsecond=0)
+        # The series knows the past up to the moment it was fetched and no further. On a refresh that
+        # reused an older series, the hours since are its forecast, not the observed record, and writing
+        # them would also carry the mark past hours nobody has measured yet.
+        known_until = min(now, self._weather_fetched_at) if self._weather_fetched_at is not None else now
+        cutoff = known_until.replace(minute=0, second=0, microsecond=0)
         since = None if (full or self._last_weather_stat_hour is None) else self._last_weather_stat_hour
+        newest: Optional[datetime] = None
         for field in WEATHER_FIELDS:
             rows = hourly_statistics(weather.times, getattr(weather, field.attr), cutoff, since=since)
             if not rows:
                 continue
+            newest = max(newest, rows[-1]["start"]) if newest else rows[-1]["start"]
+            unit, name = _SERIES[field.key]
             metadata: StatisticMetaData = archive_metadata(
-                external_statistic_id(self.entry.entry_id, field.key), field.unit, _SERIES_NAMES[field.key]
+                external_statistic_id(self.entry.entry_id, field.key), unit, name
             )
             async_add_external_statistics(self.hass, metadata, rows)
-        # The mark stops short of the trailing window and never moves backwards (see
-        # ARCHIVE_RETRY_HOURS), so an hour the weather service has not published yet is offered again
-        # on the next refresh instead of being left behind by the one that has.
-        mark = cutoff - timedelta(hours=ARCHIVE_RETRY_HOURS)
+        if newest is None:
+            return
+        # The mark follows the newest hour actually written, stops short of it by the trailing window
+        # and never moves backwards (see ARCHIVE_RETRY_HOURS), so an hour the weather service has not
+        # published yet is offered again on the next refresh instead of being left behind by the one
+        # that has. Taken from the clock instead, a machine whose time runs ahead strands it in the
+        # future and the archive then writes nothing at all until real time catches up.
+        mark = newest - timedelta(hours=ARCHIVE_RETRY_HOURS)
         if self._last_weather_stat_hour is None or mark > self._last_weather_stat_hour:
             self._last_weather_stat_hour = mark
 
@@ -549,24 +619,26 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
     def write_forecast_statistics(self) -> None:
         """Copy the predicted-production rows into this integration's own long-term statistics.
 
-        Idempotent: re-importing the trailing window every refresh backfills on install and
-        self-heals downtime gaps. Like the weather archive these are integration-owned series, with
-        no entity behind them, which is why they survived the removal of the two archive sensors.
+        Idempotent, and deliberately whole: the sixty-day window is rebuilt and re-imported rather
+        than appended to, which backfills on install and closes any gap left by downtime. The write is
+        an upsert, so re-offering an hour costs an update and never a duplicate. Runs at most once an
+        hour, with the archive rebuild it follows, not on every refresh. Like the weather archive
+        these are integration-owned series with no entity behind them, which is why they survived the
+        removal of the two archive sensors.
         """
         rows_by_key = self._forecast_stat_rows
         if not rows_by_key:
             return
 
-        for key, unit in ((FORECAST_POWER_KEY, "W"), (FORECAST_ENERGY_KEY, "kWh")):
+        for key in (FORECAST_POWER_KEY, FORECAST_ENERGY_KEY):
             rows = rows_by_key.get(key)
             if not rows:
                 continue
-            metadata: StatisticMetaData = archive_metadata(
-                external_statistic_id(self.entry.entry_id, key), unit, _SERIES_NAMES[key]
-            )
+            unit, name = _SERIES[key]
+            metadata: StatisticMetaData = archive_metadata(external_statistic_id(self.entry.entry_id, key), unit, name)
             async_add_external_statistics(self.hass, metadata, rows)
 
-    async def _build_residual_map(self, data, lat, lon, layout, weather, now):
+    async def _build_residual_map(self, data, lat, lon, layout, cap, weather, now):
         """Learn the actual/model residual from the recorder's production history."""
         self._production_buckets = []
         self._production_history_read = False
@@ -603,6 +675,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
                 lon=lon,
                 layout=layout,
                 production=production,
+                inverter_max_w=cap,
                 cloud_times=[t.timestamp() * 1000.0 for t in weather.times],
                 cloud=weather.cloud,
                 shortwave=weather.shortwave,

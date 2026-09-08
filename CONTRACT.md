@@ -54,6 +54,16 @@
 > stage of the learning reads ratios to the physical model rather than watts
 > (section 5); same surfaces, same shapes. (d) A diagnostics download is offered on
 > the integration's page.
+>
+> Revision (2026-09-08): the largest change since the freeze. (a) The nine archived
+> series move from entity ids to ids the integration owns, and gain a section of
+> their own (section 2b): a series written from here must never be one the recorder
+> also compiles. (b) `predicted_power` and `predicted_energy` are **removed** from
+> section 2; they existed only to give that archive an entity to be named after, and
+> their live values duplicated `power_now` and `energy_this_hour`. (c) The seven
+> weather sensors lose their `state_class` for the same reason, and each carries a
+> `forecast` attribute (section 2). (d) Home Assistant **2025.11** is the minimum:
+> the archived metadata carries a unit class the recorder only stores from there.
 
 The integration owns one **config entry per installation**, holding one or more
 **panel lines** (a group of co-oriented panels each). Every surface below is scoped
@@ -131,8 +141,8 @@ Power, now / next hour:
 | Entity | State | Notes |
 |---|---|---|
 | `sensor.helios_forecast_power_now` | predicted PV power now, **W** | `device_class: power`, `state_class: measurement` |
-| `sensor.helios_forecast_power_now_low` | analog P10 (low-bound) power now, **W** | disabled by default; **0** with the sun below the horizon (known, not uncertain), `null` in daylight until the analog support is solid enough to publish a band |
-| `sensor.helios_forecast_power_now_high` | analog P90 (high-bound) power now, **W** | disabled by default; **0** with the sun below the horizon (known, not uncertain), `null` in daylight until the analog support is solid enough to publish a band |
+| `sensor.helios_forecast_power_now_low` | analog P10 (low-bound) power now, **W** | disabled by default; `null` until the analog support is solid enough to publish a band, which on an installation with no production history is always, night included; **0** at night once there is a band |
+| `sensor.helios_forecast_power_now_high` | analog P90 (high-bound) power now, **W** | disabled by default; `null` until the analog support is solid enough to publish a band, which on an installation with no production history is always, night included; **0** at night once there is a band |
 | `sensor.helios_forecast_power_next_hour` | predicted average power over the next hour, **W** | |
 
 Peak, per day over the 7-day horizon:
@@ -189,6 +199,10 @@ the recorder also compiles.
 | `sensor.helios_forecast_wind_speed` | **km/h** |
 | `sensor.helios_forecast_snow_depth` | **m** |
 
+Each of these also carries a `forecast` attribute: the forward-looking hourly series
+for that variable, as `{"datetime": <local ISO>, "<key>": <value>}` entries from local
+midnight today, mirroring the power sensor's own attribute so the two chart together.
+
 The forecast curve and the SoC curve are also exposed as **response services** for
 automations (the recommended path over scraping an attribute):
 
@@ -243,13 +257,30 @@ index. A collision there does not fail our write alone: it rolls back the record
 that hour of history. An integration-owned id has exactly one writer by construction.
 
 **One-time move.** Installations before 2026.9.5 hold this history under entity ids.
-It is moved on setup: every archived hour is copied onto the new id, read back and
-counted, and the old series is deleted only once the new one is verified to hold at
-least as many hours. The move runs on **every** setup rather than behind a one-time
-marker, so an installation that skips a version, or is restored from an older backup,
-is repaired all the same; once there is nothing left to move it costs one metadata
-read. Short-term (5-minute) statistics are not carried over: integration-owned series
-are hourly by design in Home Assistant.
+
+It runs once Home Assistant has finished starting, as a background task, and never
+during setup: the recorder waits for that same event before it processes its queue,
+so a setup that waits on a recorder write waits on a start that is waiting on it, and
+Home Assistant cancels the entry after five minutes of that.
+
+Only a series the recorder owns is moved, which is one held under an entity id with
+`source: "recorder"`. Every hour read from it is copied onto the new id and then read
+back there by its own start time, and the old series is deleted only once every one
+of them answers. The check is on the hours and not on how many there are: the new id
+is already being filled by the integration's own backfill by then, so a count could
+be satisfied by hours the move never wrote. A series stored in a unit that cannot be
+converted into the one the archive uses is left exactly where it is, with an error in
+the log, rather than having its values relabelled.
+
+The move runs on **every** setup rather than behind a one-time marker, so an
+installation that skips a version, or is restored from an older backup, is repaired
+all the same; once there is nothing left to move it costs one metadata read.
+Short-term (5-minute) statistics are not carried over: integration-owned series are
+hourly by design in Home Assistant.
+
+Deleting the config entry clears these nine series. Nothing in Home Assistant could
+do it afterwards: its statistics validation only inspects series carrying an entity
+id, which is the same property that keeps the recorder off them.
 
 ## 3. Enhanced detail series (Helios-Forecast only): WebSocket API
 

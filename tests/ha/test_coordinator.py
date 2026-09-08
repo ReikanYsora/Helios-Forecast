@@ -5,6 +5,8 @@
 from __future__ import annotations
 
 import logging
+import math
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock
 
@@ -16,6 +18,9 @@ import custom_components.helios_forecast.coordinator as coordinator_mod
 from custom_components.helios_forecast.const import DOMAIN
 from custom_components.helios_forecast.coordinator import HeliosForecastCoordinator
 from custom_components.helios_forecast.statistics import WEATHER_FIELDS as _WEATHER_FIELDS
+from custom_components.helios_forecast.statistics import external_statistic_id
+from custom_components.helios_forecast.checkup import Problem
+from custom_components.helios_forecast.consumption import ConsumptionProfile
 from custom_components.helios_forecast.summary import DayForecast, ForecastSummary
 
 from _weather import make_weather_series
@@ -59,6 +64,98 @@ async def test_update_data_success_populates_everything(hass, monkeypatch) -> No
     assert coordinator.data is not None
     assert coordinator.data.points
     assert coordinator.weather_series is weather
+
+
+async def test_the_day_ahead_prediction_is_written_down_once_and_survives_a_restart(hass, monkeypatch, freezer) -> None:
+    """The skill term is only worth anything if the prediction predates the measurement, so tomorrow's
+    total is recorded the first time it is seen and never rewritten with a better-informed one."""
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    monkeypatch.setattr(coordinator_mod, "fetch_weather", AsyncMock(return_value=make_weather_series(dt_util.utcnow())))
+
+    await coordinator.async_refresh()
+    tomorrow = dt_util.now().date() + timedelta(days=1)
+    assert tomorrow in coordinator._day_ahead
+    first = coordinator._day_ahead[tomorrow]
+
+    # Later the same day the forecast has moved on; the record must not follow it.
+    freezer.move_to(dt_util.utcnow() + timedelta(hours=6))
+    await coordinator.async_refresh()
+    assert coordinator._day_ahead[tomorrow] == first
+
+    # And a fresh coordinator, as after a restart, reads it back rather than starting blank.
+    revived = HeliosForecastCoordinator(hass, entry)
+    await revived.async_refresh()
+    assert revived._day_ahead[tomorrow] == first
+
+
+async def test_a_stale_weather_series_archives_nothing_it_cannot_know(hass, monkeypatch, freezer) -> None:
+    """Open-Meteo answers nothing for hours at a time; the refresh then reuses the last good series.
+
+    That series knows the past only up to the moment it was fetched. Archiving past it writes a
+    forecast into the observed record, and moves the high-water mark over hours nobody measured, so
+    the real values never land when the service comes back.
+    """
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    start = dt_util.utcnow()
+    weather = make_weather_series(start)
+    monkeypatch.setattr(coordinator_mod, "fetch_weather", AsyncMock(side_effect=[weather, None]))
+    # Only the weather archive is at stake: the predicted-production archive carries no mark and is
+    # rebuilt whole every hour, so a pass over stale inputs is overwritten as soon as the service is back.
+    weather_ids = {external_statistic_id(entry.entry_id, field.key) for field in _WEATHER_FIELDS}
+    written: list = []
+    monkeypatch.setattr(
+        coordinator_mod,
+        "async_add_external_statistics",
+        lambda _h, meta, rows: written.append((meta["statistic_id"], rows)),
+    )
+
+    await coordinator.async_refresh()
+    mark_after_the_good_fetch = coordinator._last_weather_stat_hour
+    written.clear()
+
+    freezer.move_to(start + timedelta(hours=8))
+    await coordinator.async_refresh()
+
+    assert coordinator.last_update_success  # the reuse path, not a failed refresh
+    assert coordinator._last_weather_stat_hour == mark_after_the_good_fetch
+    assert not [row for sid, rows in written if sid in weather_ids for row in rows if row["start"] >= start]
+
+    # And the half that matters: once the service answers again, every hour the outage covered lands.
+    written.clear()
+    recovered = make_weather_series(dt_util.utcnow())
+    monkeypatch.setattr(coordinator_mod, "fetch_weather", AsyncMock(return_value=recovered))
+    await coordinator.async_refresh()
+
+    hours = {row["start"] for sid, rows in written if sid in weather_ids for row in rows}
+    missed = start.replace(minute=0, second=0, microsecond=0)
+    while missed < dt_util.utcnow().replace(minute=0, second=0, microsecond=0):
+        assert missed in hours, missed
+        missed += timedelta(hours=1)
+
+
+async def test_the_local_horizon_is_covered_by_real_weather_west_of_greenwich(hass, monkeypatch) -> None:
+    """The horizon runs on local midnights, the weather window on whole UTC days.
+
+    West of Greenwich the local horizon ends after the last UTC hour the service answers, so the
+    request has to reach a day further or the last local day is forecast from weather nobody has.
+    """
+    await hass.config.async_set_time_zone("America/Los_Angeles")
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+
+    async def _fetch(session, lat, lon, *, past_days=0, forecast_days=7):
+        return make_weather_series(dt_util.utcnow(), past_days=past_days, forecast_days=forecast_days)
+
+    monkeypatch.setattr(coordinator_mod, "fetch_weather", _fetch)
+    await coordinator.async_refresh()
+
+    points = coordinator.data.points
+    horizon_end = dt_util.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(
+        days=coordinator_mod.FORECAST_DAYS
+    )
+    assert points[-1].t >= horizon_end - timedelta(minutes=15)
 
 
 async def test_transient_empty_response_reuses_last_good_weather(hass, monkeypatch, caplog) -> None:
@@ -109,7 +206,7 @@ async def test_fetch_exception_becomes_update_failed(hass, monkeypatch) -> None:
 
 
 async def test_battery_off_missing_config_logs_once_at_info(hass, caplog) -> None:
-    """#50: no battery configured is a normal PV-only setup, not a misconfiguration -
+    """No battery configured is a normal PV-only setup, not a misconfiguration:
     it belongs at INFO, not WARNING, and every restart otherwise nags for nothing."""
     entry = _entry(hass)
     coordinator = HeliosForecastCoordinator(hass, entry)
@@ -248,8 +345,8 @@ async def test_consumption_profile_source_fetch_failure_logs_and_uses_remaining_
                 {"type": "solar", "stat_energy_from": "sensor.solar_production"},
                 {
                     "type": "grid",
-                    "stat_energy_from": "sensor.grid_import",
-                    "stat_energy_to": "sensor.grid_export",
+                    "flow_from": [{"stat_energy_from": "sensor.grid_import"}],
+                    "flow_to": [{"stat_energy_to": "sensor.grid_export"}],
                 },
             ]
         }
@@ -350,7 +447,7 @@ async def test_build_residual_map_none_without_production_entity(hass) -> None:
     from custom_components.helios_forecast.solar.power import PvLayout
 
     layout = PvLayout(orientations=[], shares=[], coords=[], total_kwp=0.0, caps=[])
-    result = await coordinator._build_residual_map({}, 45.0, 5.0, layout, weather, now)
+    result = await coordinator._build_residual_map({}, 45.0, 5.0, layout, math.inf, weather, now)
 
     assert result is None
     assert coordinator._production_buckets == []
@@ -366,7 +463,7 @@ async def test_build_residual_map_none_when_production_history_empty(hass, caplo
 
     layout = PvLayout(orientations=[], shares=[], coords=[], total_kwp=0.0, caps=[])
     with caplog.at_level(logging.WARNING, logger=coordinator_mod._LOGGER.name):
-        result = await coordinator._build_residual_map(entry.data, 45.0, 5.0, layout, weather, now)
+        result = await coordinator._build_residual_map(entry.data, 45.0, 5.0, layout, math.inf, weather, now)
 
     assert result is None
     assert "learning is off" in caplog.text
@@ -390,15 +487,140 @@ async def test_write_weather_statistics_needs_no_entity(hass, monkeypatch) -> No
     coordinator.write_weather_statistics(now_utc, full=True)
 
     # No sensor entity is registered, and that no longer matters: the series belong to the
-    # integration, so the backfill lands and the high-water mark advances.
-    # The mark stops short of the trailing window the archive keeps re-offering.
-    assert coordinator._last_weather_stat_hour == now_utc.replace(minute=0, second=0, microsecond=0) - timedelta(
-        hours=coordinator_mod.ARCHIVE_RETRY_HOURS
-    )
+    # integration, so the backfill lands and the high-water mark advances. It sits behind the newest
+    # hour written, by the window the archive keeps re-offering; the newest completed hour is the one
+    # before the current one, which is where the import stops.
+    newest = now_utc.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1)
+    assert coordinator._last_weather_stat_hour == newest - timedelta(hours=coordinator_mod.ARCHIVE_RETRY_HOURS)
     assert {meta["statistic_id"] for meta, _rows in written} == {
         external_statistic_id(entry.entry_id, field.key) for field in WEATHER_FIELDS
     }
     assert all(meta["source"] == DOMAIN and meta["name"] for meta, _rows in written)
+
+
+async def test_write_forecast_statistics_writes_both_series_under_their_own_ids(hass, monkeypatch) -> None:
+    """The only writer of the predicted-production history since the two archive sensors were
+    removed, so nothing else would show that it stopped, wrote elsewhere, or mislabelled its units."""
+    from custom_components.helios_forecast.statistics import (
+        FORECAST_ENERGY_KEY,
+        FORECAST_POWER_KEY,
+        external_statistic_id,
+    )
+
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    hour = dt_util.utcnow().replace(minute=0, second=0, microsecond=0)
+    coordinator._forecast_stat_rows = {
+        FORECAST_POWER_KEY: [{"start": hour, "mean": 1500.0, "min": 1500.0, "max": 1500.0}],
+        FORECAST_ENERGY_KEY: [{"start": hour, "mean": 1.5, "min": 1.5, "max": 1.5}],
+    }
+
+    written: list = []
+    monkeypatch.setattr(
+        coordinator_mod, "async_add_external_statistics", lambda _h, meta, rows: written.append((meta, rows))
+    )
+    coordinator.write_forecast_statistics()
+
+    by_id = {meta["statistic_id"]: (meta, rows) for meta, rows in written}
+    power = by_id[external_statistic_id(entry.entry_id, FORECAST_POWER_KEY)]
+    energy = by_id[external_statistic_id(entry.entry_id, FORECAST_ENERGY_KEY)]
+    assert power[0]["unit_of_measurement"] == "W" and energy[0]["unit_of_measurement"] == "kWh"
+    assert power[1][0]["mean"] == 1500.0 and energy[1][0]["mean"] == 1.5
+    assert all(meta["source"] == DOMAIN and meta["name"] for meta, _rows in written)
+
+
+async def test_a_refresh_does_not_retire_and_recreate_the_issues_it_is_about_to_publish(hass, monkeypatch) -> None:
+    """Retiring an issue and creating it again destroys the registry entry, and with it the user's
+    decision to ignore it. On a thirty-minute refresh that happens forty-eight times a day."""
+    from homeassistant.helpers import issue_registry as ir
+
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    monkeypatch.setattr(coordinator_mod, "fetch_weather", AsyncMock(return_value=make_weather_series(dt_util.utcnow())))
+    # A problem the data checks find, so it is published by the second pass and not the first.
+    monkeypatch.setattr(coordinator, "_check_configuration", lambda _data: [])
+    data_problem = Problem("production_at_night", "error", {"entity": "sensor.meter", "kwh": "3.0"}, "meter")
+    monkeypatch.setattr(coordinator_mod, "check_consumption_coverage", lambda _c: [data_problem])
+    coordinator._consumption_profile = ConsumptionProfile(slot_w={}, hour_w={}, overall_w=0.0, samples=0, coverage={})
+
+    await coordinator.async_refresh()
+    published = set(coordinator._issue_ids)
+    assert published
+
+    deleted: list = []
+    monkeypatch.setattr(ir, "async_delete_issue", lambda _h, _d, issue_id: deleted.append(issue_id))
+    await coordinator.async_refresh()
+
+    assert not (published & set(deleted))
+
+
+async def test_a_trend_store_missing_a_field_does_not_break_every_refresh(hass, monkeypatch) -> None:
+    """A store file that is valid JSON with a key missing must not raise out of the refresh: that
+    fails the config entry setup, and the file is not something a user can go and repair."""
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    monkeypatch.setattr(coordinator_mod, "fetch_weather", AsyncMock(return_value=make_weather_series(dt_util.utcnow())))
+    monkeypatch.setattr(
+        coordinator._trend_store,
+        "async_load",
+        AsyncMock(return_value={"date": "2026-09-08", "captured_at": "2026-09-08T06:00:00+00:00"}),
+    )
+
+    await coordinator.async_refresh()
+
+    assert coordinator.last_update_success
+
+
+async def test_the_weather_mark_follows_the_data_not_the_clock(hass, monkeypatch) -> None:
+    """The mark must not run past the hours the service has actually published.
+
+    Open-Meteo publishes a past hour with a delay, and a wide delay is normal: taken from the clock,
+    the mark leaps over everything the response did not carry, and those hours are then never
+    written. This is the defect ARCHIVE_RETRY_HOURS addresses, one window further out.
+    """
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    now = dt_util.utcnow()
+    behind = make_weather_series(now)
+    # The service is twelve hours behind: everything after that is missing from the response.
+    last = now.replace(minute=0, second=0, microsecond=0) - timedelta(hours=12)
+    keep = sum(1 for t in behind.times if t <= last)
+    for attr in ("times", "cloud", "shortwave", "direct", "diffuse", "temp", "wind", "snow", "cloud_spread"):
+        del getattr(behind, attr)[keep:]
+    monkeypatch.setattr(coordinator_mod, "fetch_weather", AsyncMock(return_value=behind))
+
+    await coordinator.async_refresh()
+
+    assert coordinator._last_weather_stat_hour == last - timedelta(hours=coordinator_mod.ARCHIVE_RETRY_HOURS)
+
+
+async def test_power_now_reads_the_curve_the_card_draws(hass, monkeypatch) -> None:
+    """ "Now" always sits inside a step that began in the past, and the elapsed stretch exists twice:
+    raw, meaning what the forecast said at the time, and clamped by the learned ceiling, which is what
+    the card draws. Reading the raw one made the headline sensor and the card disagree, by the whole
+    height of the ceiling on a shaded roof, for the same instant on the same screen."""
+    entry = _entry(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    monkeypatch.setattr(coordinator_mod, "fetch_weather", AsyncMock(return_value=make_weather_series(dt_util.utcnow())))
+
+    def _untouched(points, *_args, **_kwargs):
+        return list(points)
+
+    def _clamped(points, *_args, **_kwargs):
+        # Stands in for the learned ceiling: whatever the physics said, the site never does this much.
+        return [replace(p, pv_w=p.pv_w + 500.0) for p in points]
+
+    monkeypatch.setattr(coordinator_mod, "enrich_archive_points", _untouched)
+    await coordinator.async_refresh()
+    raw_today = coordinator.data.summary.days[0].energy_kwh
+
+    monkeypatch.setattr(coordinator_mod, "enrich_archive_points", _clamped)
+    await coordinator.async_refresh()
+
+    assert coordinator.elapsed_points  # there is an elapsed stretch to disagree about
+    # Today's figures move with the clamped copy, which is the proof the sensors read it and not the
+    # raw elapsed points beside it.
+    assert coordinator.data.summary.days[0].energy_kwh > raw_today
 
 
 # --- curtailment flagging ------------------------------------------------------------------

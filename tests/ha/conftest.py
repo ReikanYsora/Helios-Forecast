@@ -1,16 +1,16 @@
 """Shared fixtures for the Home-Assistant-coupled test group.
 
-Separate from the flat `tests/` suite on purpose: those tests exercise pure,
-stdlib-only computation and CI runs them with a bare `pip install pytest`, by
-design (see .github/workflows/tests.yml). This group needs the real Home
-Assistant test harness (`pytest-homeassistant-custom-component`), which is
-heavy and not part of that fast job.
+Separate from the flat `tests/` suite on purpose: those exercise pure,
+stdlib-only computation, while this group needs the real Home Assistant test
+harness (`pytest-homeassistant-custom-component`), which is heavy. CI runs both
+groups as two jobs and requires both (see .github/workflows/tests.yml).
 
-`importorskip` makes the whole group skip cleanly, not fail, when the harness
-isn't installed, so the bare CI job keeps passing untouched. Run this group
-locally with the harness installed and `-o asyncio_mode=auto` (the harness's
-own fixtures assume it): `pip install pytest-homeassistant-custom-component`,
-then `pytest -o asyncio_mode=auto tests/ha`.
+`importorskip` makes the group skip cleanly rather than fail on a machine
+without the harness. That is a convenience for the pure job and for a quick
+local run, never a licence to ship on the pure suite alone: a skip here hides
+every test of the recorder, the config entry and the archive migration. Run it
+locally with `-o asyncio_mode=auto`, which the harness's own fixtures assume:
+`pytest -o asyncio_mode=auto tests/ha`.
 """
 
 import pytest

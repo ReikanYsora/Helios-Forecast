@@ -268,6 +268,26 @@ def test_residual_map_scales_pv_w_but_not_pv_raw_w() -> None:
     assert abs(p.pv_w - 2.0 * p.pv_raw_w) < 1e-6
 
 
+def test_the_curve_stops_where_the_weather_stops() -> None:
+    """A horizon reaching past the weather must end, not repeat the last sample forwards.
+
+    Open-Meteo answers whole UTC days while the horizon is built on local midnights, so at any
+    negative offset the tail of the last day sits past the final sample. Held forward it looks
+    like an ordinary forecast, with correct sun geometry on top of one frozen hour.
+    """
+    weather = _constant_weather()  # 2026-06-21 00:00 .. 2026-06-22 00:00 UTC, hourly
+    layout = _single_south_layout()
+    start = datetime(2026, 6, 21, 0, tzinfo=timezone.utc)
+
+    points = build_forecast_series(
+        weather, layout, _LAT, _LON, start=start, end=start + timedelta(days=2), step_minutes=60
+    )
+
+    # The last sample describes the hour that begins on it, so that hour is the last one forecast.
+    assert points[-1].t == weather.times[-1]
+    assert len(points) == 25
+
+
 if __name__ == "__main__":
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):

@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: panellinje",
-        "description": "Én prognose for én panellinje (en gruppe af ens orienterede paneler). Tilføj integrationen igen for hver ekstra linje. Lad placeringen være tom for at bruge dit Home Assistant-hjem.",
+        "description": "Én prognose for et solcelleanlæg. Tilføj en panellinje pr. orientering; flere linjer deler anlæggets ene produktionssensor og invertergrænse. Lad placeringen stå tom for at bruge din Home Assistant-hjemmeadresse.",
         "data": {
           "name": "Navn (f.eks. Sydtag)",
           "tilt": "Hældning (grader, 0 = flad, 90 = lodret)",
@@ -14,16 +14,16 @@
           "latitude": "Breddegrad (valgfrit)",
           "longitude": "Længdegrad (valgfrit)",
           "inverter_max_kw": "Inverterens maksimale effekt (kW, valgfrit)",
-          "production_entity": "Sensor for solcelleproduktion (til den lærte korrektion)",
+          "production_entity": "Sensor for produceret solcelleenergi (kWh, til den lærte korrektion)",
           "trend_anchor_hour": "Referencetime for dagens tendens (0-23, standard 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Tilføj endnu en panellinje",
           "battery_capacity_kwh": "Brugbar batterikapacitet (kWh)",
           "battery_soc_entity": "Sensor for batteriets ladetilstand (%)",
           "battery_max_charge_kw": "Maks. ladeeffekt for batteri (kW, valgfrit)",
           "battery_max_discharge_kw": "Maks. afladningseffekt for batteri (kW, valgfrit)",
           "battery_min_soc": "Batterireserve, minimal ladetilstand (%, standard 10)",
           "battery_efficiency": "Batteriets rundtursvirkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begrænsningssignal (binær sensor, valgfri)"
+          "curtailment_entity": "Begrænsningssignal (binær sensor, input boolean eller kontakt, valgfri)"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), f.eks. din inverters eller elmålers samlede produktion. En effektsensor (W) virker ikke: den har ingen langtidsstatistik for summen, så læringen og pålidelighedsindekset ville forblive slået fra.",
@@ -32,8 +32,8 @@
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: yderligere panellinje",
+        "description": "Panellinje {index}: endnu en gruppe ensrettede paneler i samme anlæg (fælles produktionssensor og inverter).",
         "data": {
           "tilt": "Hældning (grader, 0 = flad, 90 = lodret)",
           "azimuth": "Azimut (grader fra nord, 90 = øst, 180 = syd, 270 = vest)",
@@ -42,7 +42,7 @@
           "tracker": "Solfølger",
           "latitude": "Breddegrad for denne linje (valgfrit)",
           "longitude": "Længdegrad for denne linje (valgfrit)",
-          "add_another": "Add another panel line"
+          "add_another": "Tilføj endnu en panellinje"
         }
       }
     }
@@ -51,20 +51,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Vælg hvad der skal redigeres.",
         "menu_options": {
           "settings": "Rediger indstillinger (placering, inverter, produktionssensor, batteri, begrænsningssignal)",
-          "lines": "Edit panel lines"
+          "lines": "Rediger panellinjer"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: indstillinger",
         "description": "Fælles placering, inverterloft, produktionssensor, referencetime, batteri og begrænsningssignal for hver panelrække i denne post.",
         "data": {
           "latitude": "Breddegrad (valgfrit)",
           "longitude": "Længdegrad (valgfrit)",
           "inverter_max_kw": "Inverterens maksimale effekt (kW, valgfrit)",
-          "production_entity": "Sensor for solcelleproduktion (til den lærte korrektion)",
+          "production_entity": "Sensor for produceret solcelleenergi (kWh, til den lærte korrektion)",
           "trend_anchor_hour": "Referencetime for dagens tendens (0-23, standard 6)",
           "battery_capacity_kwh": "Brugbar batterikapacitet (kWh)",
           "battery_soc_entity": "Sensor for batteriets ladetilstand (%)",
@@ -72,7 +72,7 @@
           "battery_max_discharge_kw": "Maks. afladningseffekt for batteri (kW, valgfrit)",
           "battery_min_soc": "Batterireserve, minimal ladetilstand (%, standard 10)",
           "battery_efficiency": "Batteriets rundtursvirkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begrænsningssignal (binær sensor, valgfri)"
+          "curtailment_entity": "Begrænsningssignal (binær sensor, input boolean eller kontakt, valgfri)"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), f.eks. din inverters eller elmålers samlede produktion. En effektsensor (W) virker ikke: den har ingen langtidsstatistik for summen, så læringen og pålidelighedsindekset ville forblive slået fra.",
@@ -81,8 +81,8 @@
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: panellinje {index}/{total}",
+        "description": "Rediger panellinje {index} af {total}, eller sæt flueben for at tilføje endnu en.",
         "data": {
           "tilt": "Hældning (grader, 0 = flad, 90 = lodret)",
           "azimuth": "Azimut (grader fra nord, 90 = øst, 180 = syd, 270 = vest)",
@@ -91,8 +91,8 @@
           "tracker": "Solfølger",
           "latitude": "Breddegrad for denne linje (valgfrit)",
           "longitude": "Længdegrad for denne linje (valgfrit)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
+          "remove_this_line": "Fjern denne panellinje",
+          "add_another": "Tilføj endnu en panellinje"
         }
       }
     }
@@ -113,7 +113,7 @@
       "description": "Returnerer hele produktionsprognosen (fra i dag og frem, ét punkt hvert 15. minut, hver med de forudsagte watt og P10/P90-konfidensbåndet) som svardata til brug i automatiseringer.",
       "fields": {
         "config_entry_id": {
-          "name": "Installation",
+          "name": "Anlæg",
           "description": "Hvilken Helios Forecast-installation der skal læses. Valgfrit, når kun én er konfigureret."
         }
       }
@@ -123,7 +123,7 @@
       "description": "Returnerer den forventede ladetilstand for batteriet for de næste 48 timer (ét punkt hvert 15. minut) som svardata til brug i automatiseringer.",
       "fields": {
         "config_entry_id": {
-          "name": "Installation",
+          "name": "Anlæg",
           "description": "Hvilken Helios Forecast-installation der skal læses. Valgfrit, når kun én er konfigureret."
         }
       }
@@ -253,6 +253,17 @@
     "consumption_source_sparse": {
       "title": "Forbrugskilden {source} rapporterer kun af og til",
       "description": "I energidashboardet har {source} data for {pct} % af de timer, den bedste kilde dækker ({best} %). Forbrugsprofilen bygges kun af de timer, den dækker, så den forbliver rigtig, men hviler på mindre historik. En mere pålidelig sensor for den strøm gør batterifremskrivningen skarpere."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Intet Helios Forecast-anlæg med post-id '{entry_id}'."
+    },
+    "service_no_installation": {
+      "message": "Der er ikke opsat noget Helios Forecast-anlæg."
+    },
+    "service_several_installations": {
+      "message": "Der er opsat flere Helios Forecast-anlæg; angiv 'config_entry_id' for at vælge et."
     }
   }
 }

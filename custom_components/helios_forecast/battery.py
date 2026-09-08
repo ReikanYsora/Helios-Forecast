@@ -63,7 +63,10 @@ def project_battery_soc(
     side_eff = math.sqrt(config.efficiency)
     end = now + timedelta(hours=horizon_hours)
 
-    soc_wh = min(cap_wh, max(min_wh, start_soc_frac * cap_wh))
+    # The charge the battery actually holds, not the reserve. A battery sitting under its reserve,
+    # after an outage or a manual discharge, was read up to it and the whole chart then started
+    # above the level the house can see on the inverter.
+    soc_wh = min(cap_wh, max(0.0, start_soc_frac * cap_wh))
     out: List[BatterySocPoint] = []
     # One point per real instant, in real order. The forecast series is built on the local clock, so
     # on the day daylight saving moves the clock forward it names four quarter-hours that never
@@ -91,8 +94,10 @@ def project_battery_soc(
             terminal_wh = min(net_w, config.max_charge_w) * dt_h
             soc_wh = min(cap_wh, soc_wh + terminal_wh * side_eff)
         else:
-            # Deficit discharges it, capped by the discharge power and the usable charge above the reserve.
+            # Deficit discharges it, capped by the discharge power and the usable charge above the
+            # reserve. Below the reserve there is nothing to draw and the level holds where it is:
+            # floored to the reserve instead, the projection would hand back energy that is not there.
             terminal_wh = min(-net_w, config.max_discharge_w) * dt_h
-            soc_wh = max(min_wh, soc_wh - terminal_wh / side_eff)
+            soc_wh -= min(terminal_wh / side_eff, max(0.0, soc_wh - min_wh))
         out.append(BatterySocPoint(t=point.t, soc=round(soc_wh / cap_wh * 100.0, 2)))
     return out

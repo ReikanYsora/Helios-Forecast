@@ -89,7 +89,7 @@ async def test_ws_series_filters_by_start_and_end(hass, hass_ws_client) -> None:
 async def test_ws_series_uses_archive_up_to_its_own_last_point_then_live(hass, hass_ws_client) -> None:
     # Archive reaches well past midnight into today (14:00) - its own last point, not the
     # live series' start, is the switch-over instant. This matters because enrich_points()
-    # deliberately leaves the live series' already-elapsed points unclamped (#52): if the
+    # deliberately leaves the live series' already-elapsed points unclamped: if the
     # split still happened at midnight, today's own elapsed hours would come from those
     # raw live points instead of the archive's analog-clamped ones.
     midnight = datetime(2026, 6, 21, 0, tzinfo=_UTC)
@@ -118,7 +118,7 @@ async def test_ws_series_uses_archive_up_to_its_own_last_point_then_live(hass, h
 
 async def test_ws_series_serves_the_elapsed_stretch_clamped_then_live(hass, hass_ws_client) -> None:
     # Between the archive's last hour and now, the live series only has raw (unclamped) points, which
-    # is what drew a nameplate-high plateau right before "now" (#52). The coordinator keeps a clamped
+    # is what drew a nameplate-high plateau right before "now". The coordinator keeps a clamped
     # copy of that stretch; the series takes it, then the live points strictly after it.
     midnight = datetime(2026, 6, 21, 0, tzinfo=_UTC)
     archive = [ForecastPoint(t=midnight + timedelta(hours=h), pv_w=10.0 * h, pv_raw_w=10.0 * h) for h in range(13)]

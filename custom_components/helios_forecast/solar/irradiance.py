@@ -65,12 +65,19 @@ class PvContext:
 
 
 def cell_temperature_c(air_temp_c: float, ghi_wm2: float, wind_ms: float) -> float:
-    """Cell temperature in degC, NaN when air temperature is not finite."""
+    """Cell temperature in degC, NaN when air temperature is not finite.
+
+    Wind carries away the heat the sun put into the panel, so it works against that rise and cannot
+    take the panel below the air around it. Subtracted from the air temperature instead, an overcast
+    windy hour returned a cell several degrees colder than ambient and the derate below turned it
+    into a production bonus, at the hours with the least sun in them.
+    """
     if not math.isfinite(air_temp_c):
         return math.nan
     g = max(0.0, ghi_wm2)
     w = max(0.0, wind_ms) if math.isfinite(wind_ms) else 0.0
-    return air_temp_c + (NOCT_CELL_C - NOCT_AIR_REF_C) / NOCT_IRRADIANCE * g - WIND_COOLING_K * w
+    rise = (NOCT_CELL_C - NOCT_AIR_REF_C) / NOCT_IRRADIANCE * g - WIND_COOLING_K * w
+    return air_temp_c + max(0.0, rise)
 
 
 def thermal_derating(cell_temp_c: float) -> float:
@@ -92,6 +99,29 @@ def snow_cover_factor(snow_depth_m: Optional[float], air_temp_c: Optional[float]
 def _supplied(value: Optional[float]) -> TypeGuard[float]:
     """True when an optional irradiance field is present and non-negative."""
     return value is not None and value >= 0
+
+
+# Everything between the plane of the array and the meter that the optics above do not model:
+# soiling, mismatch, wiring, connections, availability, and the inverter's own conversion. PVWatts'
+# defaults, 14 % system losses on a 96 % inverter, give 0.825. Measured on the fleet by leaving one
+# installation out at a time, the constant asked for is 0.827, which is the same number: without it
+# the bare model over-promises by about 40 % and every installation pays for it until its own
+# learning has absorbed the difference.
+SYSTEM_LOSS_FACTOR = 0.825
+
+# Incidence-angle modifier on the beam component. Glass reflects more of the beam the further it is
+# from the normal, which no transposition accounts for. The ASHRAE form with b0 = 0.05 is the
+# standard value for a glazed module; the fleet's own four days preferred 0.10, by about one W/kWp
+# out of eighty-eight, which is not enough to leave the textbook figure behind. Revisit it on thirty
+# clean days rather than on four.
+IAM_B0 = 0.05
+
+
+def _incidence_modifier(cos_theta: float) -> float:
+    """Share of the beam that gets through the glass at this incidence, 1 head-on and 0 edge-on."""
+    if cos_theta <= 0.0:
+        return 0.0
+    return max(0.0, min(1.0, 1.0 - IAM_B0 * (1.0 / cos_theta - 1.0)))
 
 
 def compute_pv_power(
@@ -149,7 +179,7 @@ def compute_pv_power(
             direct_fraction = max(0.0, min(0.85, (k_cloud - 0.25) / 0.75 * 0.85))
         diffuse_fraction = 1.0 - direct_fraction
 
-        direct_poa = 0.0 if shading else ghi_eff * direct_fraction * r_b
+        direct_poa = 0.0 if shading else ghi_eff * direct_fraction * r_b * _incidence_modifier(cos_theta)
         diffuse_poa = ghi_eff * diffuse_fraction * (1.0 + math.cos(beta)) / 2.0
         ground_poa = ghi_eff * 0.2 * (1.0 - math.cos(beta)) / 2.0
 
@@ -165,4 +195,4 @@ def compute_pv_power(
         t_cell = cell_temperature_c(ctx.air_temp_c, poa_eff, ctx.wind_ms if ctx.wind_ms is not None else 0.0)
         p_stc *= thermal_derating(t_cell)
 
-    return max(0.0, min(100.0, p_stc * 100.0))
+    return max(0.0, min(100.0, p_stc * SYSTEM_LOSS_FACTOR * 100.0))

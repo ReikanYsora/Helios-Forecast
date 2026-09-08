@@ -47,6 +47,17 @@ def test_a_sound_configuration_has_no_problem() -> None:
     assert check_config(_config(), *HOME) == []
 
 
+def test_a_hybrid_inverter_sized_for_the_house_is_not_called_a_mistake() -> None:
+    """A battery inverter is sized for the house, not for the array, so a small roof behind a big
+    hybrid is an ordinary installation. Told it is an error every time it opens the page, the owner
+    learns to ignore the check-up, and the mistake it exists to catch is a factor of a thousand."""
+    data = _config(arrays=[_line(kwp=3.0)], inverter_max_kw=10.0)
+    assert "inverter_cap_unit" not in {p.key for p in check_config(data, *HOME)}
+    # The real mistake, a limit typed in watts, still is one.
+    data["inverter_max_kw"] = 10_000.0
+    assert "inverter_cap_unit" in {p.key for p in check_config(data, *HOME)}
+
+
 def test_no_line_is_an_error() -> None:
     problems = check_config(_config(arrays=[]), *HOME)
     assert _keys(problems) == ["no_lines"]

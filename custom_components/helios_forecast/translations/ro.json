@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: linie de panouri",
-        "description": "O prognoză pentru o linie de panouri (un grup de panouri cu aceeași orientare). Adăugați integrarea din nou pentru fiecare linie suplimentară. Lăsați locația necompletată pentru a folosi domiciliul din Home Assistant.",
+        "description": "O previziune pentru o instalație fotovoltaică. Adăugați câte o linie de panouri pentru fiecare orientare; mai multe linii împart unicul senzor de producție și limita invertorului acestei instalații. Lăsați locația goală pentru a folosi domiciliul din Home Assistant.",
         "data": {
           "name": "Nume (de ex. Acoperiș sud)",
           "tilt": "Înclinare (grade, 0 = orizontal, 90 = vertical)",
@@ -14,16 +14,16 @@
           "latitude": "Latitudine (opțional)",
           "longitude": "Longitudine (opțional)",
           "inverter_max_kw": "Putere maximă invertor (kW, opțional)",
-          "production_entity": "Senzor producție fotovoltaică (pentru corecția învățată)",
+          "production_entity": "Senzor de energie produsă de panouri (kWh, pentru corecția învățată)",
           "trend_anchor_hour": "Ora de referință pentru tendința zilei (0-23, implicit 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Adaugă altă linie de panouri",
           "battery_capacity_kwh": "Capacitate utilă a bateriei (kWh)",
           "battery_soc_entity": "Senzor pentru starea de încărcare a bateriei (%)",
           "battery_max_charge_kw": "Putere max. de încărcare a bateriei (kW, opțional)",
           "battery_max_discharge_kw": "Putere max. de descărcare a bateriei (kW, opțional)",
           "battery_min_soc": "Rezerva bateriei, stare de încărcare minimă (%, implicit 10)",
           "battery_efficiency": "Randamentul dus-întors al bateriei (%, implicit 90)",
-          "curtailment_entity": "Semnal de limitare (senzor binar, opțional)"
+          "curtailment_entity": "Semnal de limitare (senzor binar, input boolean sau comutator, opțional)"
         },
         "data_description": {
           "production_entity": "Un senzor de energie cumulată (kWh), de ex. producția totală a invertorului sau a contorului. Un senzor de putere (W) nu va funcționa: nu are statistici de sumă pe termen lung, așa că învățarea și indicele de fiabilitate ar rămâne inactive.",
@@ -32,8 +32,8 @@
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: linie de panouri suplimentară",
+        "description": "Linia de panouri {index}: încă un grup de panouri cu aceeași orientare din aceeași instalație (senzor de producție și invertor comune).",
         "data": {
           "tilt": "Înclinare (grade, 0 = orizontal, 90 = vertical)",
           "azimuth": "Azimut (grade de la nord, 90 = est, 180 = sud, 270 = vest)",
@@ -42,7 +42,7 @@
           "tracker": "Urmăritor solar",
           "latitude": "Latitudine pentru această linie (opțional)",
           "longitude": "Longitudine pentru această linie (opțional)",
-          "add_another": "Add another panel line"
+          "add_another": "Adaugă altă linie de panouri"
         }
       }
     }
@@ -51,20 +51,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Alegeți ce doriți să editați.",
         "menu_options": {
           "settings": "Editați setările (locație, invertor, senzor de producție, baterie, semnal de limitare)",
-          "lines": "Edit panel lines"
+          "lines": "Editează liniile de panouri"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: setări",
         "description": "Locație, plafon al invertorului, senzor de producție, oră de referință, baterie și semnal de limitare partajate de toate liniile de panouri din această intrare.",
         "data": {
           "latitude": "Latitudine (opțional)",
           "longitude": "Longitudine (opțional)",
           "inverter_max_kw": "Putere maximă invertor (kW, opțional)",
-          "production_entity": "Senzor producție fotovoltaică (pentru corecția învățată)",
+          "production_entity": "Senzor de energie produsă de panouri (kWh, pentru corecția învățată)",
           "trend_anchor_hour": "Ora de referință pentru tendința zilei (0-23, implicit 6)",
           "battery_capacity_kwh": "Capacitate utilă a bateriei (kWh)",
           "battery_soc_entity": "Senzor pentru starea de încărcare a bateriei (%)",
@@ -72,7 +72,7 @@
           "battery_max_discharge_kw": "Putere max. de descărcare a bateriei (kW, opțional)",
           "battery_min_soc": "Rezerva bateriei, stare de încărcare minimă (%, implicit 10)",
           "battery_efficiency": "Randamentul dus-întors al bateriei (%, implicit 90)",
-          "curtailment_entity": "Semnal de limitare (senzor binar, opțional)"
+          "curtailment_entity": "Semnal de limitare (senzor binar, input boolean sau comutator, opțional)"
         },
         "data_description": {
           "production_entity": "Un senzor de energie cumulată (kWh), de ex. producția totală a invertorului sau a contorului. Un senzor de putere (W) nu va funcționa: nu are statistici de sumă pe termen lung, așa că învățarea și indicele de fiabilitate ar rămâne inactive.",
@@ -81,8 +81,8 @@
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: linie de panouri {index}/{total}",
+        "description": "Editați linia de panouri {index} din {total} sau bifați pentru a adăuga alta.",
         "data": {
           "tilt": "Înclinare (grade, 0 = orizontal, 90 = vertical)",
           "azimuth": "Azimut (grade de la nord, 90 = est, 180 = sud, 270 = vest)",
@@ -91,8 +91,8 @@
           "tracker": "Urmăritor solar",
           "latitude": "Latitudine pentru această linie (opțional)",
           "longitude": "Longitudine pentru această linie (opțional)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
+          "remove_this_line": "Elimină această linie de panouri",
+          "add_another": "Adaugă altă linie de panouri"
         }
       }
     }
@@ -253,6 +253,17 @@
     "consumption_source_sparse": {
       "title": "Sursa de consum {source} raportează intermitent",
       "description": "În panoul Energie, {source} are date pentru {pct}% din orele pe care le acoperă cea mai bună sursă ({best}%). Profilul de consum este construit doar din orele pe care le acoperă, deci rămâne corect, dar se sprijină pe mai puțin istoric. Un senzor mai fiabil pentru acel flux face proiecția bateriei mai precisă."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Nicio instalație Helios Forecast cu identificatorul de intrare '{entry_id}'."
+    },
+    "service_no_installation": {
+      "message": "Nu este configurată nicio instalație Helios Forecast."
+    },
+    "service_several_installations": {
+      "message": "Sunt configurate mai multe instalații Helios Forecast; indicați 'config_entry_id' pentru a alege una."
     }
   }
 }

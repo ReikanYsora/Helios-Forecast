@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: línia panelov",
-        "description": "Jedna predpoveď pre jednu líniu panelov (skupinu rovnako orientovaných panelov). Pre každú ďalšiu líniu pridajte integráciu znova. Ak chcete použiť domov v Home Assistant, nechajte polohu prázdnu.",
+        "description": "Jedna predpoveď pre fotovoltickú inštaláciu. Pridajte jednu líniu panelov na orientáciu; viac línií zdieľa jediný senzor výroby a limit meniča tejto inštalácie. Ponechajte polohu prázdnu, ak chcete použiť domov z Home Assistant.",
         "data": {
           "name": "Názov (napr. Južná strecha)",
           "tilt": "Sklon (stupne, 0 = naplocho, 90 = zvislo)",
@@ -14,16 +14,16 @@
           "latitude": "Zemepisná šírka (voliteľné)",
           "longitude": "Zemepisná dĺžka (voliteľné)",
           "inverter_max_kw": "Maximálny výkon meniča (kW, voliteľné)",
-          "production_entity": "Senzor výroby FV (pre naučenú korekciu)",
+          "production_entity": "Senzor vyrobenej energie z fotovoltiky (kWh, pre naučenú korekciu)",
           "trend_anchor_hour": "Referenčná hodina dnešného trendu (0-23, predvolene 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Pridať ďalšiu líniu panelov",
           "battery_capacity_kwh": "Využiteľná kapacita batérie (kWh)",
           "battery_soc_entity": "Senzor stavu nabitia batérie (%)",
           "battery_max_charge_kw": "Max. nabíjací výkon batérie (kW, voliteľné)",
           "battery_max_discharge_kw": "Max. vybíjací výkon batérie (kW, voliteľné)",
           "battery_min_soc": "Rezerva batérie, minimálny stav nabitia (%, predvolené 10)",
           "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)",
-          "curtailment_entity": "Signál obmedzenia (binárny senzor, voliteľné)"
+          "curtailment_entity": "Signál obmedzenia výkonu (binárny senzor, input boolean alebo spínač, voliteľné)"
         },
         "data_description": {
           "production_entity": "Kumulatívny senzor energie (kWh), napr. celková výroba striedača alebo elektromera. Senzor výkonu (W) nebude fungovať: nemá dlhodobé štatistiky súčtu, takže učenie a index spoľahlivosti by zostali vypnuté.",
@@ -32,8 +32,8 @@
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: ďalšia línia panelov",
+        "description": "Línia panelov {index}: ďalšia skupina rovnako orientovaných panelov v tej istej inštalácii (spoločný senzor výroby a menič).",
         "data": {
           "tilt": "Sklon (stupne, 0 = naplocho, 90 = zvislo)",
           "azimuth": "Azimut (stupne od severu, 90 = východ, 180 = juh, 270 = západ)",
@@ -42,7 +42,7 @@
           "tracker": "Sledovač slnka",
           "latitude": "Zemepisná šírka pre túto líniu (voliteľné)",
           "longitude": "Zemepisná dĺžka pre túto líniu (voliteľné)",
-          "add_another": "Add another panel line"
+          "add_another": "Pridať ďalšiu líniu panelov"
         }
       }
     }
@@ -51,20 +51,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Vyberte, čo chcete upraviť.",
         "menu_options": {
           "settings": "Upraviť nastavenia (poloha, striedač, senzor výroby, batéria, signál obmedzenia)",
-          "lines": "Edit panel lines"
+          "lines": "Upraviť línie panelov"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: nastavenia",
         "description": "Spoločná poloha, limit striedača, senzor výroby, referenčná hodina, batéria a signál obmedzenia pre každý rad panelov v tomto zázname.",
         "data": {
           "latitude": "Zemepisná šírka (voliteľné)",
           "longitude": "Zemepisná dĺžka (voliteľné)",
           "inverter_max_kw": "Maximálny výkon meniča (kW, voliteľné)",
-          "production_entity": "Senzor výroby FV (pre naučenú korekciu)",
+          "production_entity": "Senzor vyrobenej energie z fotovoltiky (kWh, pre naučenú korekciu)",
           "trend_anchor_hour": "Referenčná hodina dnešného trendu (0-23, predvolene 6)",
           "battery_capacity_kwh": "Využiteľná kapacita batérie (kWh)",
           "battery_soc_entity": "Senzor stavu nabitia batérie (%)",
@@ -72,7 +72,7 @@
           "battery_max_discharge_kw": "Max. vybíjací výkon batérie (kW, voliteľné)",
           "battery_min_soc": "Rezerva batérie, minimálny stav nabitia (%, predvolené 10)",
           "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)",
-          "curtailment_entity": "Signál obmedzenia (binárny senzor, voliteľné)"
+          "curtailment_entity": "Signál obmedzenia výkonu (binárny senzor, input boolean alebo spínač, voliteľné)"
         },
         "data_description": {
           "production_entity": "Kumulatívny senzor energie (kWh), napr. celková výroba striedača alebo elektromera. Senzor výkonu (W) nebude fungovať: nemá dlhodobé štatistiky súčtu, takže učenie a index spoľahlivosti by zostali vypnuté.",
@@ -81,8 +81,8 @@
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: línia panelov {index}/{total}",
+        "description": "Upravte líniu panelov {index} z {total} alebo zaškrtnite pre pridanie ďalšej.",
         "data": {
           "tilt": "Sklon (stupne, 0 = naplocho, 90 = zvislo)",
           "azimuth": "Azimut (stupne od severu, 90 = východ, 180 = juh, 270 = západ)",
@@ -91,8 +91,8 @@
           "tracker": "Sledovač slnka",
           "latitude": "Zemepisná šírka pre túto líniu (voliteľné)",
           "longitude": "Zemepisná dĺžka pre túto líniu (voliteľné)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
+          "remove_this_line": "Odstrániť túto líniu panelov",
+          "add_another": "Pridať ďalšiu líniu panelov"
         }
       }
     }
@@ -253,6 +253,17 @@
     "consumption_source_sparse": {
       "title": "Zdroj spotreby {source} hlási prerušovane",
       "description": "V paneli Energia má {source} údaje pre {pct} % hodín, ktoré pokrýva najlepší zdroj ({best} %). Profil spotreby sa stavia len z hodín, ktoré pokrýva, takže zostáva správny, ale opiera sa o menej histórie. Spoľahlivejší senzor pre tento tok spresní projekciu batérie."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Žiadna inštalácia Helios Forecast s identifikátorom záznamu '{entry_id}'."
+    },
+    "service_no_installation": {
+      "message": "Nie je nastavená žiadna inštalácia Helios Forecast."
+    },
+    "service_several_installations": {
+      "message": "Je nastavených viac inštalácií Helios Forecast; zadajte 'config_entry_id' na výber jednej."
     }
   }
 }

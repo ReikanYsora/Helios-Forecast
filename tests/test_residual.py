@@ -9,6 +9,7 @@ forecast assembly applies the ratio.
 from __future__ import annotations
 
 import json
+import math
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -31,6 +32,7 @@ from custom_components.helios_forecast.solar.residual import (  # noqa: E402
     ProductionBucket,
     SkyResidualInput,
     SkyResidualMap,
+    ABOVE_PANELS_RATIO,
     capped_model_kwh,
     _dt,
     _nearest_cloud_idx,
@@ -130,6 +132,7 @@ def _input(buckets: list[ProductionBucket], **over) -> SkyResidualInput:
         lon=_LON,
         layout=_layout(),
         production=buckets,
+        inverter_max_w=math.inf,
         cloud_times=times,
         cloud=w["cloud"],
         shortwave=w["shortwave"],
@@ -162,13 +165,90 @@ def test_ratio_one_when_production_matches_model() -> None:
     assert abs(sky_map.global_ratio - 1.0) < 1e-9
 
 
+def _low_sun_buckets() -> list[ProductionBucket]:
+    """Early and late hours, where the model is small enough that several times it is still an hour
+    the panels could physically have delivered. At midday the plausibility guard bites first."""
+    buckets = []
+    for day in (20, 21, 22):
+        for hour in (5, 18):
+            start = datetime(2026, 6, day, hour, tzinfo=timezone.utc).timestamp() * 1000.0
+            buckets.append(ProductionBucket(start_ms=start, end_ms=start + 3_600_000, kwh=0.0))
+    return buckets
+
+
 def test_ratio_clamped_high() -> None:
-    buckets = _midday_buckets()
+    buckets = _low_sun_buckets()
     inp0 = _input(buckets)
     over = [ProductionBucket(b.start_ms, b.end_ms, 5.0 * _model_kwh(b, inp0)) for b in buckets]
+    # Still a possible hour on this roof, so the ceiling is what limits it and not the guard.
+    assert all(b.kwh < ABOVE_PANELS_RATIO * inp0.layout.total_kwp for b in over)
     sky_map = build_sky_residual_map(_input(over))
     assert sky_map is not None
     assert sky_map.global_ratio == M_MAX  # 5x clamps to the ceiling
+
+
+_ENTRY_CAP_W = 2000.0  # 2 kW on the 5 kWp array, so the clip bites around noon
+
+
+def _entry_capped_model_kwh(bucket: ProductionBucket, inp: SkyResidualInput, cap_w: float) -> float:
+    """The build's per-bucket model with the entry-level inverter cap applied, subsample by subsample.
+
+    Clipping the hourly mean is not the same thing: the sun moves inside the hour, so the cap binds on
+    some subsamples and not on others.
+    """
+    k = inp.layout.total_kwp * 10.0
+    mid = (bucket.start_ms + bucket.end_ms) / 2
+    ci = _nearest_cloud_idx(inp.cloud_times, mid)
+    sample = WeatherSample(
+        cloud=inp.cloud[ci],
+        ghi=inp.shortwave[ci],
+        direct=inp.direct[ci],
+        diffuse=inp.diffuse[ci],
+        temp=inp.temp[ci],
+        wind=inp.wind[ci],
+    )
+    snow = snow_cover_factor(inp.snow[ci], inp.temp[ci])
+    total, n = 0.0, 0
+    for s in range(LEARN_SUBSAMPLES):
+        sub_t = bucket.start_ms + (s + 0.5) * (bucket.end_ms - bucket.start_ms) / LEARN_SUBSAMPLES
+        moment = _dt(sub_t)
+        pcts = compute_pv_power_per_array(moment, inp.lat, inp.lon, sample, inp.layout)
+        total += min(cap_w, capped_model_kwh(pcts, inp.layout, k, snow) * 1000.0) / 1000.0
+        n += 1
+    return total / n
+
+
+def test_the_learning_applies_the_entry_level_inverter_cap() -> None:
+    """A DC-oversized array clips at the inverter around noon. The forecast path applies that cap, so
+    the learning has to as well, or it reads the clip as a sky the model got wrong and pays for it
+    again on every cloudy hour that never clips."""
+    buckets = _midday_buckets()
+    inp0 = _input(buckets, inverter_max_w=_ENTRY_CAP_W)
+    # Production is exactly the clipped model: the sky was right, only the inverter got in the way.
+    clipped = [ProductionBucket(b.start_ms, b.end_ms, _entry_capped_model_kwh(b, inp0, _ENTRY_CAP_W)) for b in buckets]
+
+    sky_map = build_sky_residual_map(_input(clipped, inverter_max_w=_ENTRY_CAP_W))
+
+    assert sky_map is not None
+    assert abs(sky_map.global_ratio - 1.0) < 1e-9
+
+
+def test_one_impossible_hour_does_not_move_the_learning() -> None:
+    """A meter that is replaced, or restored from an older backup, files one enormous hour. The map
+    aggregates ratios as a weighted mean, so a single such hour drags the whole 60-day correction."""
+    buckets = _midday_buckets()
+    inp0 = _input(buckets)
+    matched = [ProductionBucket(b.start_ms, b.end_ms, _model_kwh(b, inp0)) for b in buckets]
+    clean = build_sky_residual_map(_input(matched))
+    assert clean is not None and abs(clean.global_ratio - 1.0) < 1e-9
+
+    # One hour at 900 kWh on a 5 kWp roof: about 180 times what the panels can physically deliver.
+    spiked = list(matched)
+    spiked[3] = ProductionBucket(matched[3].start_ms, matched[3].end_ms, 900.0)
+    sky_map = build_sky_residual_map(_input(spiked))
+
+    assert sky_map is not None
+    assert abs(sky_map.global_ratio - 1.0) < 1e-9
 
 
 def _capped_layout() -> PvLayout:
@@ -242,7 +322,7 @@ def test_build_applies_per_array_cap_to_the_model() -> None:
 
 
 def test_build_survives_missing_cloud_hours() -> None:
-    # Regression for issue #14: Open-Meteo can leave a cloud hour as None, and _clamp_pct used to
+    # Open-Meteo can leave a cloud hour as None, which _clamp_pct used to
     # crash on it (math.isfinite(None) -> TypeError). The build must instead treat the gap as clear
     # (0 %) and still produce a map.
     buckets = _midday_buckets()

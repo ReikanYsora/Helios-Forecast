@@ -25,21 +25,18 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
+from datetime import datetime, timedelta
 from functools import partial
 from typing import Any, Dict, List, Optional
 
 from homeassistant.components.recorder import get_instance
 from homeassistant.components.recorder.models import StatisticMetaData
 from homeassistant.components.recorder.statistics import (
+    UNIT_CLASS_TO_UNIT_CONVERTER,
     async_add_external_statistics,
     get_metadata,
     statistics_during_period,
 )
-
-try:
-    from homeassistant.components.recorder.statistics import UNIT_CLASS_TO_UNIT_CONVERTER
-except ImportError:  # pragma: no cover - older HA cores name the map differently
-    UNIT_CLASS_TO_UNIT_CONVERTER = {}
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
@@ -115,9 +112,11 @@ def metadata(statistic_id: str, unit: str, name: str) -> StatisticMetaData:
     """Metadata for one integration-owned series.
 
     mean_type and unit_class are declared statically (not added after the literal) so both the
-    runtime and static API scanners see them. has_mean stays for cores that predate mean_type, where
-    the extra key is ignored. The name is what the interface shows: these series have no entity to
-    borrow a name from.
+    runtime and static API scanners see them, and has_mean stays beside mean_type because the
+    recorder still reads it. Every key here has to be a statistics_meta column: the recorder builds
+    its row with StatisticsMeta(**metadata), which raises on anything else and takes the whole
+    archive down with it, hence the minimum Home Assistant this integration declares. The name is
+    what the interface shows: these series have no entity to borrow a name from.
     """
     return {
         "has_mean": True,
@@ -216,6 +215,10 @@ async def _move(
 
     rows = await _read(hass, legacy_id, units)
     if not rows:
+        # A metadata row with no hours behind it: nothing to move, and the entry has to go or the
+        # migration retries it on every start. The only branch that deletes without copying, hence
+        # the log line: a machine where it fires leaves a trace instead of a silent zero.
+        _LOGGER.info("Dropped the empty statistics entry of %s, it held no hours", legacy_id)
         instance.async_clear_statistics([legacy_id])
         return 0
 
@@ -253,13 +256,13 @@ def _conversion(legacy: StatisticMetaData, unit: str) -> Optional[Dict[str, str]
     hour and its snow depth in feet, and a user may also have changed a series' unit by hand. Copying
     those values under this integration's own unit would relabel 68 degrees Fahrenheit as 68 degrees
     Celsius and then delete the only copy, so a series whose unit cannot be converted is left where it
-    is instead. An empty mapping means no conversion is possible at all, which for these quantities
-    also means none can happen.
+    is instead. An empty mapping is returned for a quantity the recorder has no converter for at all
+    (irradiance), where a read can only hand back what is stored.
     """
     stored = legacy.get("unit_of_measurement")
     raw_class = legacy.get("unit_class") or UNIT_CLASSES.get(unit)
     unit_class: str = str(raw_class) if raw_class else ""
-    converter = UNIT_CLASS_TO_UNIT_CONVERTER.get(unit_class) if unit_class and UNIT_CLASS_TO_UNIT_CONVERTER else None
+    converter = UNIT_CLASS_TO_UNIT_CONVERTER.get(unit_class) if unit_class else None
     if converter is None or unit not in converter.VALID_UNITS:
         # Nothing can convert this quantity, so the recorder hands the values back exactly as stored
         # and they are only usable if the unit already matches.
@@ -280,27 +283,40 @@ async def _wait_for(hass: HomeAssistant, statistic_id: str, wanted: set) -> set:
     The copy is committed by the recorder on its own thread, and asking that thread when it is done
     has a hole in it: it answers "queue empty" from the moment it takes the import off the queue,
     which is before the rows are written. So the wait is the read-back itself, which is in any case
-    the only thing that has to be true before the old series can go.
+    the only thing that has to be true before the old series can go. It reads only the window it
+    copied: the rest of the destination proves nothing here and rescanning it once a second competes
+    with the very commit being waited on.
     """
     deadline = time.monotonic() + _COMMIT_TIMEOUT
+    start = dt_util.utc_from_timestamp(min(wanted))
+    end = dt_util.utc_from_timestamp(max(wanted)) + timedelta(hours=1)
     while True:
-        missing = wanted - {row["start"] for row in await _read(hass, statistic_id)}
+        missing = wanted - {row["start"] for row in await _read(hass, statistic_id, start=start, end=end)}
         if not missing or time.monotonic() >= deadline:
             return missing
         await asyncio.sleep(_POLL)
 
 
-async def _read(hass: HomeAssistant, statistic_id: str, units: Optional[Dict[str, str]] = None) -> List[Dict[str, Any]]:
-    """Every hour ever archived under `statistic_id`, oldest first.
+async def _read(
+    hass: HomeAssistant,
+    statistic_id: str,
+    units: Optional[Dict[str, str]] = None,
+    *,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
+) -> List[Dict[str, Any]]:
+    """The hours archived under `statistic_id` over [start, end), oldest first, or all of them.
 
     `units` asks the recorder to convert as it reads, which is how a legacy series stored in another
     unit reaches the archive as a value and not as a relabelling. Empty or None reads it as stored.
+    The window matters for the read-back: bounding it to the hours actually copied keeps the guard off
+    the rest of the series, which it re-read on every poll while the recorder was still committing.
     """
     result = await get_instance(hass).async_add_executor_job(
         statistics_during_period,
         hass,
-        dt_util.utc_from_timestamp(0),
-        None,
+        start if start is not None else dt_util.utc_from_timestamp(0),
+        end,
         {statistic_id},
         "hour",
         units or None,

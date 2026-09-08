@@ -18,7 +18,19 @@ function cellTemperatureC(airTempC, ghiWm2, windMs)
     if (!isFinite(airTempC)) { return NaN; }
     const g = Math.max(0, ghiWm2);
     const w = isFinite(windMs) ? Math.max(0, windMs) : 0;
-    return airTempC + (NOCT_CELL_C - NOCT_AIR_REF_C) / NOCT_IRRADIANCE * g - WIND_COOLING_K * w;
+    // Wind works against the heat the sun put in; it cannot take the panel below the air.
+    const rise = (NOCT_CELL_C - NOCT_AIR_REF_C) / NOCT_IRRADIANCE * g - WIND_COOLING_K * w;
+    return airTempC + Math.max(0, rise);
+}
+
+// See solar/irradiance.py for what these two stand for.
+const SYSTEM_LOSS_FACTOR = 0.825;
+const IAM_B0 = 0.05;
+
+function incidenceModifier(cosTheta)
+{
+    if (cosTheta <= 0) { return 0; }
+    return Math.max(0, Math.min(1, 1 - IAM_B0 * (1 / cosTheta - 1)));
 }
 
 function thermalDerating(cellTempC)
@@ -82,7 +94,7 @@ function computePvPower(date, lat, lon, cloudCoverPct, panel, ctx)
         if (hasSplit) { directFraction = ctx.directWm2 / (ctx.directWm2 + ctx.diffuseWm2); }
         else { directFraction = Math.max(0, Math.min(0.85, (kCloud - 0.25) / 0.75 * 0.85)); }
         const diffuseFraction = 1 - directFraction;
-        const directPoa  = ctx?.shading ? 0 : ghiEff * directFraction * Rb;
+        const directPoa  = ctx?.shading ? 0 : ghiEff * directFraction * Rb * incidenceModifier(cosTheta);
         const diffusePoa = ghiEff * diffuseFraction * (1 + Math.cos(beta)) / 2;
         const groundPoa  = ghiEff * 0.2 * (1 - Math.cos(beta)) / 2;
         if (ctx?.poaWm2 != null && ctx.poaWm2 >= 0)
@@ -97,7 +109,7 @@ function computePvPower(date, lat, lon, cloudCoverPct, panel, ctx)
         const tCell = cellTemperatureC(ctx.airTempC, poaEff, ctx.windMs ?? 0);
         pStc *= thermalDerating(tCell);
     }
-    return Math.max(0, Math.min(100, pStc * 100));
+    return Math.max(0, Math.min(100, pStc * SYSTEM_LOSS_FACTOR * 100));
 }
 
 // ---- scenarios -------------------------------------------------------------

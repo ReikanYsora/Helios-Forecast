@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: linija panela",
-        "description": "Jedna prognoza za jednu liniju panela (skupinu jednako orijentiranih panela). Dodajte integraciju ponovno za svaku dodatnu liniju. Ostavite lokaciju praznom da biste koristili lokaciju vašeg Home Assistanta.",
+        "description": "Jedna prognoza za fotonaponsku instalaciju. Dodajte jednu liniju panela po orijentaciji; više linija dijeli jedini senzor proizvodnje i ograničenje pretvarača ove instalacije. Ostavite lokaciju praznom za korištenje kućne lokacije iz Home Assistanta.",
         "data": {
           "name": "Naziv (npr. Južni krov)",
           "tilt": "Nagib (stupnjevi, 0 = ravno, 90 = okomito)",
@@ -14,16 +14,16 @@
           "latitude": "Zemljopisna širina (neobavezno)",
           "longitude": "Zemljopisna dužina (neobavezno)",
           "inverter_max_kw": "Maksimalna izlazna snaga izmjenjivača (kW, neobavezno)",
-          "production_entity": "Senzor PV proizvodnje (za naučenu korekciju)",
+          "production_entity": "Senzor proizvedene energije iz panela (kWh, za naučenu korekciju)",
           "trend_anchor_hour": "Referentni sat za današnji trend (0-23, zadano 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Dodaj još jednu liniju panela",
           "battery_capacity_kwh": "Iskoristivi kapacitet baterije (kWh)",
           "battery_soc_entity": "Senzor stanja napunjenosti baterije (%)",
           "battery_max_charge_kw": "Maks. snaga punjenja baterije (kW, neobavezno)",
           "battery_max_discharge_kw": "Maks. snaga pražnjenja baterije (kW, neobavezno)",
           "battery_min_soc": "Rezerva baterije, minimalno stanje napunjenosti (%, zadano 10)",
           "battery_efficiency": "Učinkovitost punog ciklusa baterije (%, zadano 90)",
-          "curtailment_entity": "Signal ograničenja (binarni senzor, neobavezno)"
+          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbroja, pa bi učenje i indeks pouzdanosti ostali isključeni.",
@@ -32,8 +32,8 @@
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: dodatna linija panela",
+        "description": "Linija panela {index}: još jedna skupina jednako orijentiranih panela u istoj instalaciji (zajednički senzor proizvodnje i pretvarač).",
         "data": {
           "tilt": "Nagib (stupnjevi, 0 = ravno, 90 = okomito)",
           "azimuth": "Azimut (stupnjevi od sjevera, 90 = istok, 180 = jug, 270 = zapad)",
@@ -42,7 +42,7 @@
           "tracker": "Praćenje Sunca",
           "latitude": "Zemljopisna širina za ovu liniju (opcionalno)",
           "longitude": "Zemljopisna dužina za ovu liniju (opcionalno)",
-          "add_another": "Add another panel line"
+          "add_another": "Dodaj još jednu liniju panela"
         }
       }
     }
@@ -51,20 +51,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Odaberite što želite urediti.",
         "menu_options": {
           "settings": "Uredi postavke (lokacija, pretvarač, senzor proizvodnje, baterija, signal ograničenja)",
-          "lines": "Edit panel lines"
+          "lines": "Uredi linije panela"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: postavke",
         "description": "Zajednička lokacija, granica pretvarača, senzor proizvodnje, referentni sat, baterija i signal ograničenja za svaki red panela u ovom unosu.",
         "data": {
           "latitude": "Zemljopisna širina (neobavezno)",
           "longitude": "Zemljopisna dužina (neobavezno)",
           "inverter_max_kw": "Maksimalna izlazna snaga izmjenjivača (kW, neobavezno)",
-          "production_entity": "Senzor PV proizvodnje (za naučenu korekciju)",
+          "production_entity": "Senzor proizvedene energije iz panela (kWh, za naučenu korekciju)",
           "trend_anchor_hour": "Referentni sat za današnji trend (0-23, zadano 6)",
           "battery_capacity_kwh": "Iskoristivi kapacitet baterije (kWh)",
           "battery_soc_entity": "Senzor stanja napunjenosti baterije (%)",
@@ -72,7 +72,7 @@
           "battery_max_discharge_kw": "Maks. snaga pražnjenja baterije (kW, neobavezno)",
           "battery_min_soc": "Rezerva baterije, minimalno stanje napunjenosti (%, zadano 10)",
           "battery_efficiency": "Učinkovitost punog ciklusa baterije (%, zadano 90)",
-          "curtailment_entity": "Signal ograničenja (binarni senzor, neobavezno)"
+          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbroja, pa bi učenje i indeks pouzdanosti ostali isključeni.",
@@ -81,8 +81,8 @@
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: linija panela {index}/{total}",
+        "description": "Uredite liniju panela {index} od {total} ili označite za dodavanje još jedne.",
         "data": {
           "tilt": "Nagib (stupnjevi, 0 = ravno, 90 = okomito)",
           "azimuth": "Azimut (stupnjevi od sjevera, 90 = istok, 180 = jug, 270 = zapad)",
@@ -91,8 +91,8 @@
           "tracker": "Praćenje Sunca",
           "latitude": "Zemljopisna širina za ovu liniju (opcionalno)",
           "longitude": "Zemljopisna dužina za ovu liniju (opcionalno)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
+          "remove_this_line": "Ukloni ovu liniju panela",
+          "add_another": "Dodaj još jednu liniju panela"
         }
       }
     }
@@ -253,6 +253,17 @@
     "consumption_source_sparse": {
       "title": "Izvor potrošnje {source} prijavljuje s prekidima",
       "description": "Na nadzornoj ploči Energija {source} ima podatke za {pct} % sati koje pokriva najbolji izvor ({best} %). Profil potrošnje gradi se samo od sati koje pokriva, pa ostaje točan, ali počiva na manje povijesti. Pouzdaniji senzor za taj tok izoštrava projekciju baterije."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Nema Helios Forecast instalacije s identifikatorom unosa '{entry_id}'."
+    },
+    "service_no_installation": {
+      "message": "Nije postavljena nijedna Helios Forecast instalacija."
+    },
+    "service_several_installations": {
+      "message": "Postavljeno je više Helios Forecast instalacija; navedite 'config_entry_id' za odabir jedne."
     }
   }
 }

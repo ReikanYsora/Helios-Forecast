@@ -19,7 +19,7 @@ Home Assistant already knows how to show it.
 [![Release](https://img.shields.io/github/v/release/ReikanYsora/Helios-Forecast?display_name=tag&style=for-the-badge&color=e0a106)](https://github.com/ReikanYsora/Helios-Forecast/releases)
 [![HACS Default](https://img.shields.io/badge/HACS-Default-e0a106.svg?style=for-the-badge)](https://github.com/hacs/default)
 [![Validate](https://img.shields.io/github/actions/workflow/status/ReikanYsora/Helios-Forecast/validate.yml?style=for-the-badge&label=validate&color=e0a106)](https://github.com/ReikanYsora/Helios-Forecast/actions/workflows/validate.yml)
-[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2025.1%2B-e0a106.svg?style=for-the-badge&logo=home-assistant&logoColor=white)](https://www.home-assistant.io/)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2025.11%2B-e0a106.svg?style=for-the-badge&logo=home-assistant&logoColor=white)](https://www.home-assistant.io/)
 [![License](https://img.shields.io/github/license/ReikanYsora/Helios-Forecast?style=for-the-badge&color=blue)](https://www.gnu.org/licenses/gpl-3.0)
 [![Stars](https://img.shields.io/github/stars/ReikanYsora/Helios-Forecast?style=for-the-badge&color=e0a106)](https://github.com/ReikanYsora/Helios-Forecast/stargazers)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=000000)](https://www.buymeacoffee.com/reikanysora)
@@ -217,9 +217,11 @@ that is on while the inverter is being held back.
 > the battery, and learns nightly discharge as production.
 
 It also publishes a **reliability score**, which reflects how much history backs
-the learning, how accurate it has been recently, and how predictable today's sky
-is. A forecast that tells you when to doubt it is worth more than one that does
-not.
+the learning, how close yesterday's forecast came to what the meter then measured,
+and how predictable today's sky is. It is a floor rather than a grade: a signal it
+cannot measure counts for nothing rather than being shared out among the others, so
+the number never rises because something went missing. A forecast that tells you
+when to doubt it is worth more than one that does not.
 
 Everything runs on your server. No account, no API key, no browser-side maths.
 
@@ -281,7 +283,7 @@ documented and frozen, so a change on either side cannot silently break the othe
 | [CHANGELOG.md](CHANGELOG.md) | What changed, release by release |
 | [helios-ha.org](https://helios-ha.org/helios-forecast/) | The full entity list and how it all fits together |
 
-Requires Home Assistant **2025.1.0** or later.
+Requires Home Assistant **2025.11.0** or later: the archive writes its own long-term statistics series, whose metadata carries a unit class the recorder only stores from that release.
 
 Found a bug, or is a forecast off? [Open an issue](https://github.com/ReikanYsora/Helios-Forecast/issues).
 Feedback is very welcome, and it is what shapes the roadmap.

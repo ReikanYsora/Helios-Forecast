@@ -106,10 +106,20 @@ def test_forecast_statistics_power_and_energy() -> None:
     rows = forecast_statistics(pts)
     # NaN point dropped, two rows each for power and energy.
     assert [r["start"] for r in rows[FORECAST_POWER_KEY]] == [_h(10), _h(11)]
-    assert rows[FORECAST_POWER_KEY][0] == {"start": _h(10), "mean": 2000.0, "min": 2000.0, "max": 2000.0}
-    # Energy is the hour's Wh expressed in kWh: 2000 W over 1 h = 2.0 kWh.
-    assert rows[FORECAST_ENERGY_KEY][0]["mean"] == 2.0
+    # The samples are instants, so the hour from 10:00 averages 2000 W and 0 W: filing 2000 as the
+    # hour's mean would claim the site held its opening power for the whole hour.
+    assert rows[FORECAST_POWER_KEY][0] == {"start": _h(10), "mean": 1000.0, "min": 0.0, "max": 2000.0}
+    # Energy is that mean over one hour, in kWh.
+    assert rows[FORECAST_ENERGY_KEY][0]["mean"] == 1.0
+    # The last hour has no successor and keeps its own value.
+    assert rows[FORECAST_POWER_KEY][1]["mean"] == 0.0
     assert rows[FORECAST_ENERGY_KEY][1]["mean"] == 0.0
+
+
+def test_forecast_statistics_leaves_an_hour_with_a_gap_after_it_on_its_own_value() -> None:
+    # A hole in the series must not average across it: 09:00 and 11:00 are not consecutive hours.
+    rows = forecast_statistics([_Pt(_h(9), 800.0), _Pt(_h(11), 0.0)])
+    assert rows[FORECAST_POWER_KEY][0]["mean"] == 800.0
 
 
 def test_forecast_statistics_clamps_negative() -> None:

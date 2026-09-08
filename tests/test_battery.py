@@ -66,6 +66,34 @@ def test_reserve_floor_holds() -> None:
     assert soc[0].soc == 20.0
 
 
+def test_a_battery_below_its_reserve_is_projected_from_the_charge_it_holds() -> None:
+    """A reserve is where discharging stops, not a floor the charge is assumed to be at. Read up to
+    it, the projection starts the chart above the level the house is actually looking at, and every
+    hour after it inherits energy the battery does not have."""
+    soc = project_battery_soc(
+        _config(min_soc_frac=0.2), 0.05, _points([0.0, 0.0]), _flat_load(1000.0), now=_NOW, tz=_UTC
+    )
+    assert soc[0].soc == 5.0  # not 20.0
+    assert soc[1].soc == 5.0  # and it does not discharge below itself either
+
+
+def test_a_battery_below_its_reserve_still_charges() -> None:
+    # Nothing about being under the reserve stops the sun putting energy back in.
+    soc = project_battery_soc(_config(min_soc_frac=0.2), 0.05, _points([4000.0]), _flat_load(0.0), now=_NOW, tz=_UTC)
+    assert soc[0].soc > 5.0
+
+
+def test_the_load_is_read_at_the_local_hour_of_each_step() -> None:
+    """The consumption profile is keyed by local weekday and hour, and the forecast points are UTC.
+    Dropping the conversion reads the wrong slot at every offset but zero."""
+    berlin = ZoneInfo("Europe/Berlin")
+    # 12:00 UTC in January is 13:00 in Berlin: 400 W there, and a wall at the UTC hour it must not read.
+    profile = ConsumptionProfile(slot_w={}, hour_w={13: 400.0, 12: 40_000.0}, overall_w=0.0, samples=1)
+    soc = project_battery_soc(_config(), 0.5, _points([0.0]), profile, now=_NOW, tz=berlin)
+    drawn = 400.0 * 0.25 / math.sqrt(0.9)
+    assert soc[0].soc == round((5000.0 - drawn) / 10000.0 * 100.0, 2)
+
+
 def test_full_capacity_caps() -> None:
     soc = _project([1_000_000.0], load_w=0.0)
     assert soc[0].soc == 100.0

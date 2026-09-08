@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from datetime import datetime, tzinfo
+from datetime import datetime, timedelta, tzinfo
 from typing import Dict, List, Optional
 
 from .const import DOMAIN
@@ -97,10 +97,10 @@ FORECAST_POWER_KEY = "predicted_power"
 FORECAST_ENERGY_KEY = "predicted_energy"
 
 
-# Every series this integration archives, as (key, unit, name). Both writers and the migration read
-# this one list, so a series can never be archived under one name and migrated under another. The
-# names are what the interface shows for a statistic that has no entity behind it; they mirror the
-# weather sensors' own names on purpose.
+# Every series this integration archives, as (key, unit, name). Both writers and the migration take
+# the unit and the name from this one list, so a series cannot be written under one and moved under
+# another. The names are what the interface shows for a statistic that has no entity behind it; they
+# mirror the weather sensors' own names on purpose.
 ARCHIVED_SERIES: tuple[tuple[str, str, str], ...] = (
     ("cloud_cover", "%", "Cloud cover"),
     ("ghi", "W/m²", "Global irradiance"),
@@ -135,19 +135,29 @@ def forecast_statistics(points: list) -> Dict[str, List[dict]]:
     """Per-hour statistic rows for the predicted-power and predicted-energy archive series.
 
     ``points`` is an iterable of hourly forecast points (objects with ``.t`` UTC datetime and
-    ``.pv_w`` watts). Each hour becomes one row; predicted energy is the hour's Wh expressed in kWh
-    (power in watts over one hour = that many Wh). Non-finite points are skipped.
+    ``.pv_w`` watts). Each hour becomes one row. The stored mean is the mean ACROSS the hour, taken
+    between the sample that opens it and the one that opens the next: the samples are instants, and
+    filing the opening instant as the hour's mean understates every morning hour and overstates
+    every afternoon one, most of all around sunrise and sunset where the curve moves fastest. The
+    energy row is that mean over one hour, so watts become watt-hours. An hour with no successor,
+    the last of the window, keeps its own value. Non-finite points are skipped.
     """
     power: List[dict] = []
     energy: List[dict] = []
-    for p in points:
-        w = getattr(p, "pv_w", None)
-        if not isinstance(w, (int, float)) or not math.isfinite(w):
-            continue
-        w = float(max(0.0, w))
-        kwh = w / 1000.0
-        power.append({"start": p.t, "mean": w, "min": w, "max": w})
-        energy.append({"start": p.t, "mean": kwh, "min": kwh, "max": kwh})
+    usable = [
+        (p.t, float(max(0.0, w)))
+        for p in points
+        for w in (getattr(p, "pv_w", None),)
+        if isinstance(w, (int, float)) and math.isfinite(w)
+    ]
+    for i, (start, w) in enumerate(usable):
+        nxt = usable[i + 1] if i + 1 < len(usable) else None
+        # Only when the next sample really opens the next hour; a gap leaves the hour on its own value.
+        follows = nxt[1] if nxt is not None and (nxt[0] - start) == timedelta(hours=1) else w
+        mean = (w + follows) / 2.0
+        kwh = mean / 1000.0
+        power.append({"start": start, "mean": mean, "min": min(w, follows), "max": max(w, follows)})
+        energy.append({"start": start, "mean": kwh, "min": kwh, "max": kwh})
     return {FORECAST_POWER_KEY: power, FORECAST_ENERGY_KEY: energy}
 
 

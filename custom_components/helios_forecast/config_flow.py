@@ -132,8 +132,9 @@ def _line_fields(
     _optional(fields, CONF_LINE_INVERTER_MAX_KW, _INVERTER, arr.get(CONF_LINE_INVERTER_MAX_KW))
     fields[vol.Required(CONF_TRACKER, default=arr.get(CONF_TRACKER, TRACKER_NONE))] = _TRACKER
     # Optional per-line location override, for a line far enough from the entry's home coordinates
-    # (e.g. a detached outbuilding) that it needs its own sun geometry. Suggested with the entry's
-    # home coordinates so the field never comes up blank, but it is only stored once actually set.
+    # (e.g. a detached outbuilding) that it needs its own sun geometry. Pre-filled with the entry's
+    # home coordinates so the field never comes up blank, which does mean an untouched form hands
+    # them straight back and the line then carries its own copy of the home position.
     _optional(fields, CONF_LATITUDE, _LATITUDE, arr.get(CONF_LATITUDE, home_lat))
     _optional(fields, CONF_LONGITUDE, _LONGITUDE, arr.get(CONF_LONGITUDE, home_lon))
     if allow_remove:
@@ -242,6 +243,17 @@ class HeliosForecastOptionsFlow(OptionsFlow):
     def _current(self) -> dict[str, Any]:
         return {**self.config_entry.data, **self.config_entry.options}
 
+    def _save(self, data: dict[str, Any]) -> ConfigFlowResult:
+        """Write the whole configuration back as the entry's data, and leave its options empty.
+
+        Everything that reads the configuration merges data over options, so a setting typed at
+        install time lives in data and an options save could only ever shadow it: clearing a field
+        here left the old value in place, unreachable through the interface. Keeping one source of
+        truth is what makes an empty field mean empty.
+        """
+        self.hass.config_entries.async_update_entry(self.config_entry, data=data, options={})
+        return self.async_create_entry(title="", data={})
+
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         return self.async_show_menu(step_id="init", menu_options=["settings", "lines"])
 
@@ -250,8 +262,7 @@ class HeliosForecastOptionsFlow(OptionsFlow):
         current = self._current()
         if user_input is not None:
             # This form shows the installation settings only: a field left empty here is cleared.
-            data = merge_entry_data(split_settings(user_input), lines_from_config(current))
-            return self.async_create_entry(title="", data=data)
+            return self._save(merge_entry_data(split_settings(user_input), lines_from_config(current)))
         schema = vol.Schema(_settings_fields(self.hass.config.latitude, self.hass.config.longitude, settings=current))
         return self.async_show_form(step_id="settings", data_schema=schema)
 
@@ -268,8 +279,7 @@ class HeliosForecastOptionsFlow(OptionsFlow):
                 return await self.async_step_lines()
             # Never let the entry end up with zero lines (e.g. every line removed).
             lines = self._lines or existing
-            data = merge_entry_data(split_settings(current), lines)
-            return self.async_create_entry(title="", data=data)
+            return self._save(merge_entry_data(split_settings(current), lines))
 
         editing_existing = self._index < len(existing)
         arr = existing[self._index] if editing_existing else None

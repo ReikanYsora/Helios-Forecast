@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: paneļu līnija",
-        "description": "Viena prognoze vienai paneļu līnijai (vienādi orientētu paneļu grupai). Katrai papildu līnijai pievienojiet integrāciju vēlreiz. Atstājiet atrašanās vietu tukšu, lai izmantotu jūsu Home Assistant mājas atrašanās vietu.",
+        "description": "Viena prognoze vienai saules elektrostacijai. Pievienojiet vienu paneļu līniju katram virzienam; vairākas līnijas izmanto vienu un to pašu ražošanas sensoru un invertora ierobežojumu. Atstājiet atrašanās vietu tukšu, lai izmantotu Home Assistant mājas atrašanās vietu.",
         "data": {
           "name": "Nosaukums (piem., Dienvidu jumts)",
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
@@ -14,16 +14,16 @@
           "latitude": "Platums (neobligāti)",
           "longitude": "Garums (neobligāti)",
           "inverter_max_kw": "Invertora maksimālā jauda (kW, neobligāti)",
-          "production_entity": "PV ražošanas sensors (apgūtajai korekcijai)",
+          "production_entity": "Saražotās saules enerģijas sensors (kWh, apgūtajai korekcijai)",
           "trend_anchor_hour": "Šodienas tendences atskaites stunda (0-23, noklusējums 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Pievienot vēl vienu paneļu līniju",
           "battery_capacity_kwh": "Izmantojamā akumulatora ietilpība (kWh)",
           "battery_soc_entity": "Akumulatora uzlādes līmeņa sensors (%)",
           "battery_max_charge_kw": "Maks. akumulatora uzlādes jauda (kW, neobligāti)",
           "battery_max_discharge_kw": "Maks. akumulatora izlādes jauda (kW, neobligāti)",
           "battery_min_soc": "Akumulatora rezerve, minimālais uzlādes līmenis (%, noklusējums 10)",
           "battery_efficiency": "Akumulatora cikla lietderības koeficients (%, noklusējums 90)",
-          "curtailment_entity": "Ierobežojuma signāls (binārais sensors, pēc izvēles)"
+          "curtailment_entity": "Ierobežošanas signāls (binārs sensors, input boolean vai slēdzis, neobligāts)"
         },
         "data_description": {
           "production_entity": "Kumulatīvs enerģijas sensors (kWh), piem., invertora vai skaitītāja kopējā ražošana. Jaudas sensors (W) nedarbosies: tam nav ilgtermiņa summas statistikas, tāpēc mācīšanās un uzticamības indekss paliktu izslēgti.",
@@ -32,8 +32,8 @@
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: papildu paneļu līnija",
+        "description": "Paneļu līnija {index}: vēl viena vienādi orientētu paneļu grupa tajā pašā iekārtā (kopīgs ražošanas sensors un invertors).",
         "data": {
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
           "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
@@ -42,7 +42,7 @@
           "tracker": "Saules sekotājs",
           "latitude": "Platums šai līnijai (neobligāti)",
           "longitude": "Garums šai līnijai (neobligāti)",
-          "add_another": "Add another panel line"
+          "add_another": "Pievienot vēl vienu paneļu līniju"
         }
       }
     }
@@ -51,20 +51,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Izvēlieties, ko rediģēt.",
         "menu_options": {
           "settings": "Rediģēt iestatījumus (atrašanās vieta, invertors, ražošanas sensors, baterija, ierobežojuma signāls)",
-          "lines": "Edit panel lines"
+          "lines": "Rediģēt paneļu līnijas"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: iestatījumi",
         "description": "Kopīga atrašanās vieta, invertora limits, ražošanas sensors, atsauces stunda, baterija un ierobežojuma signāls katrai šī ieraksta paneļu rindai.",
         "data": {
           "latitude": "Platums (neobligāti)",
           "longitude": "Garums (neobligāti)",
           "inverter_max_kw": "Invertora maksimālā jauda (kW, neobligāti)",
-          "production_entity": "PV ražošanas sensors (apgūtajai korekcijai)",
+          "production_entity": "Saražotās saules enerģijas sensors (kWh, apgūtajai korekcijai)",
           "trend_anchor_hour": "Šodienas tendences atskaites stunda (0-23, noklusējums 6)",
           "battery_capacity_kwh": "Izmantojamā akumulatora ietilpība (kWh)",
           "battery_soc_entity": "Akumulatora uzlādes līmeņa sensors (%)",
@@ -72,7 +72,7 @@
           "battery_max_discharge_kw": "Maks. akumulatora izlādes jauda (kW, neobligāti)",
           "battery_min_soc": "Akumulatora rezerve, minimālais uzlādes līmenis (%, noklusējums 10)",
           "battery_efficiency": "Akumulatora cikla lietderības koeficients (%, noklusējums 90)",
-          "curtailment_entity": "Ierobežojuma signāls (binārais sensors, pēc izvēles)"
+          "curtailment_entity": "Ierobežošanas signāls (binārs sensors, input boolean vai slēdzis, neobligāts)"
         },
         "data_description": {
           "production_entity": "Kumulatīvs enerģijas sensors (kWh), piem., invertora vai skaitītāja kopējā ražošana. Jaudas sensors (W) nedarbosies: tam nav ilgtermiņa summas statistikas, tāpēc mācīšanās un uzticamības indekss paliktu izslēgti.",
@@ -81,8 +81,8 @@
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: paneļu līnija {index}/{total}",
+        "description": "Rediģējiet paneļu līniju {index} no {total} vai atzīmējiet, lai pievienotu vēl vienu.",
         "data": {
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
           "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
@@ -91,8 +91,8 @@
           "tracker": "Saules sekotājs",
           "latitude": "Platums šai līnijai (neobligāti)",
           "longitude": "Garums šai līnijai (neobligāti)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
+          "remove_this_line": "Noņemt šo paneļu līniju",
+          "add_another": "Pievienot vēl vienu paneļu līniju"
         }
       }
     }
@@ -113,7 +113,7 @@
       "description": "Atgriež pilnu ražošanas prognozi (no šodienas, viens punkts ik pēc 15 minūtēm, katrs ar prognozētajiem vatiem un P10/P90 ticamības joslu) kā atbildes datus izmantošanai automatizācijās.",
       "fields": {
         "config_entry_id": {
-          "name": "Instalācija",
+          "name": "Iekārta",
           "description": "Kuru Helios Forecast instalāciju nolasīt. Nav obligāti, ja konfigurēta tikai viena."
         }
       }
@@ -123,7 +123,7 @@
       "description": "Atgriež prognozēto akumulatora uzlādes līmeni nākamajām 48 stundām (viens punkts ik pēc 15 minūtēm) kā atbildes datus izmantošanai automatizācijās.",
       "fields": {
         "config_entry_id": {
-          "name": "Instalācija",
+          "name": "Iekārta",
           "description": "Kuru Helios Forecast instalāciju nolasīt. Nav obligāti, ja konfigurēta tikai viena."
         }
       }
@@ -253,6 +253,17 @@
     "consumption_source_sparse": {
       "title": "Patēriņa avots {source} ziņo ar pārtraukumiem",
       "description": "Enerģijas panelī {source} ir dati par {pct} % stundu, kuras aptver labākais avots ({best} %). Patēriņa profils tiek veidots tikai no stundām, kuras tas aptver, tāpēc paliek pareizs, bet balstās uz mazāku vēsturi. Uzticamāks šīs plūsmas sensors padara akumulatora projekciju precīzāku."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Nav nevienas Helios Forecast iekārtas ar ieraksta ID '{entry_id}'."
+    },
+    "service_no_installation": {
+      "message": "Nav iestatīta neviena Helios Forecast iekārta."
+    },
+    "service_several_installations": {
+      "message": "Ir iestatītas vairākas Helios Forecast iekārtas; norādiet 'config_entry_id', lai izvēlētos vienu."
     }
   }
 }
