@@ -3,7 +3,7 @@ collector's verdict reaches the owner. The rules themselves are tested in tests/
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 from homeassistant.core import CoreState
@@ -14,8 +14,6 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 import custom_components.helios_forecast.coordinator as coordinator_mod
 from custom_components.helios_forecast.config import (
     CONF_ARRAYS,
-    CONF_BENCHMARK_ENABLED,
-    CONF_BENCHMARK_KEY,
     CONF_KWP,
     CONF_PRODUCTION_ENTITY,
 )
@@ -96,20 +94,6 @@ async def test_entities_are_judged_only_once_home_assistant_runs(hass, monkeypat
     await hass.async_block_till_done()
     assert "checkup_entry_production_entity_missing" not in _issues(hass)
     assert "checkup_entry_production_entity_kind" in _issues(hass)
-
-
-async def test_the_collector_verdict_becomes_a_warning(hass, monkeypatch, enable_custom_integrations) -> None:
-    data = {CONF_ARRAYS: [LINE], CONF_BENCHMARK_ENABLED: True, CONF_BENCHMARK_KEY: "k" * 43}
-    entry = _entry(hass, data)
-    with patch(
-        "custom_components.helios_forecast.coordinator.async_upload",
-        AsyncMock(return_value={"stored": True, "quality": {"excluded": "night"}}),
-    ):
-        await _refresh(hass, monkeypatch, entry)
-    assert "checkup_entry_benchmark_excluded_night" in _issues(hass)
-    issue = ir.async_get(hass).async_get_issue(DOMAIN, "checkup_entry_benchmark_excluded_night")
-    assert issue.severity == ir.IssueSeverity.WARNING
-    assert issue.translation_placeholders["reason"] == "night"
 
 
 async def test_removing_the_entry_clears_its_issues(hass, monkeypatch) -> None:

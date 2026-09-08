@@ -54,8 +54,7 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Editar definições (localização, inversor, sensor de produção, bateria, sinal de limitação)",
-          "lines": "Edit panel lines",
-          "benchmark": "Participar no teste comunitário"
+          "lines": "Edit panel lines"
         }
       },
       "settings": {
@@ -94,20 +93,6 @@
           "longitude": "Longitude para esta linha (opcional)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: teste comunitário",
-        "description": "Uma medição aberta da precisão real do Helios Forecast, em instalações reais, publicada à medida. Quer participar? É por aqui: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nObtenha uma chave num clique, sem conta e sem nome, e cole-a abaixo. Para parar tudo, apague-a.",
-        "data": {
-          "benchmark_enabled": "Contribuir para o teste público de precisão (opcional)",
-          "benchmark_key": "Chave do teste",
-          "benchmark_url": "Endereço do coletor"
-        },
-        "data_description": {
-          "benchmark_enabled": "Envia uma vez por hora o que esta instalação prevê, para comparar com o que realmente produziu. Os resultados são publicados abertamente. Apenas a geometria dos seus painéis, a curva prevista, a produção medida e o índice de fiabilidade são enviados: nenhum nome de entidade, nenhum consumo, nenhum outro sensor, e as suas coordenadas arredondadas a cerca de um quilómetro. Desativado enquanto não o ativar.",
-          "benchmark_key": "A chave de escrita que recebeu ao aderir ao teste. Sem ela nada é enviado.",
-          "benchmark_url": "O endereço para onde as medições são enviadas, mostrado para que saiba exatamente para onde vão."
         }
       }
     }
@@ -229,10 +214,6 @@
       "title": "Rendimento da bateria fora do intervalo",
       "description": "{entry} tem um rendimento de ida e volta de {value}. Introduza uma percentagem de 50 a 100 (a maioria das baterias domésticas anda à volta de 90)."
     },
-    "benchmark_key": {
-      "title": "A chave do benchmark não parece uma chave",
-      "description": "{entry} participa no benchmark da comunidade mas a sua chave não é uma das emitidas pelo coletor. Cole a chave inteira obtida em helios-ha.org/benchmark, ou desligue o benchmark."
-    },
     "production_entity_missing": {
       "title": "Sensor de produção não encontrado",
       "description": "O sensor de produção de {entry}, {entity}, não existe. A previsão corre sem correção até ele existir. Verifique o identificador da entidade, ou volte a escolher o sensor nas definições."
@@ -272,10 +253,6 @@
     "consumption_source_sparse": {
       "title": "A fonte de consumo {source} reporta de forma intermitente",
       "description": "No painel de Energia, {source} tem dados para {pct}% das horas que a melhor fonte cobre ({best}%). O perfil de consumo é construído apenas com as horas que ela cobre, por isso continua certo mas assenta em menos histórico. Um sensor mais fiável para esse fluxo torna a projeção da bateria mais precisa."
-    },
-    "benchmark_excluded": {
-      "title": "Excluída dos números do benchmark ({reason})",
-      "description": "O benchmark da comunidade recebe as emissões de {entry} mas mantém-nas fora dos números publicados. Motivo {reason}: kwp significa que a potência de pico declarada falta, é zero ou está em watts; night significa que o sensor de produção regista energia de noite, por isso mede mais do que os painéis. Corrija a configuração e a instalação volta a ser contada dentro de um dia."
     }
   }
 }

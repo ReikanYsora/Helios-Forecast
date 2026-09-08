@@ -29,7 +29,6 @@ from homeassistant.core import CoreState, HomeAssistant, callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from homeassistant.loader import async_get_integration
 from homeassistant.util import dt as dt_util
 
 from .config import (
@@ -40,19 +39,11 @@ from .config import (
     location_from_config,
     trend_anchor_hour_from_config,
     curtailment_entity_from_config,
-    lines_from_config,
-    CONF_BATTERY_CAPACITY_KWH,
     CONF_BATTERY_SOC_ENTITY,
-    CONF_BENCHMARK_ENABLED,
-    CONF_BENCHMARK_KEY,
-    CONF_BENCHMARK_URL,
-    CONF_INVERTER_MAX_KW,
 )
-from .benchmark import DEFAULT_ENDPOINT, async_upload, build_payload
 from .checkup import (
     EntitySnapshot,
     Problem,
-    check_benchmark_quality,
     check_config,
     check_consumption_coverage,
     check_entities,
@@ -173,17 +164,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         self._trend_loaded = False
         # Last-logged reason the battery SoC projection was skipped, so _battery_off() warns once per reason.
         self._battery_off_logged: Optional[str] = None
-        # The hour whose prediction was last handed to the benchmark collector, and this integration's
-        # version, read once from the manifest so every emission says which model produced it.
-        self._last_upload_hour: Optional[datetime] = None
-        self._version: Optional[str] = None
-        # The check-up (checkup.py): the problems found by the latest pass, the repair issues published for
-        # them, whether the production history could be read this refresh (a fetch that failed is not a
-        # silent meter), and the collector's latest verdict on this installation.
+        # The check-up (checkup.py): the problems found by the latest pass, the repair issues published
+        # for them, and whether the production history could be read this refresh (a fetch that failed is
+        # not a silent meter).
         self.problems: List[Problem] = []
         self._issue_ids: Set[str] = set()
         self._production_history_read = False
-        self._benchmark_quality: Optional[Dict[str, Any]] = None
 
     def _config(self) -> Dict[str, Any]:
         return {**self.entry.data, **self.entry.options}
@@ -339,9 +325,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         battery_soc = await self._project_battery_soc(data, points, now)
         if self._consumption_profile is not None:
             problems += check_consumption_coverage(self._consumption_profile.coverage)
-        problems += check_benchmark_quality(self._benchmark_quality)
         self._publish_problems(problems)
-        await self._maybe_upload_benchmark(data, lat, lon, points, reliability, now_utc)
 
         return ForecastData(
             points=points,
@@ -352,67 +336,6 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             trend=trend,
             battery_soc=battery_soc,
         )
-
-    async def _maybe_upload_benchmark(self, data, lat, lon, points, reliability, now_utc) -> None:
-        """Hand this hour's prediction to the benchmark collector, when the entry opted in.
-
-        Started beside the refresh instead of inside it: a collector that is slow, unreachable or
-        gone must never hold up a forecast. Once an hour, whatever the refresh rate. The whole
-        thing is wrapped: an optional upload has no business failing a forecast, so anything that
-        goes wrong on the way out is a debug line and nothing more (see benchmark.py).
-        """
-        if not data.get(CONF_BENCHMARK_ENABLED):
-            return
-        key = str(data.get(CONF_BENCHMARK_KEY) or "").strip()
-        if not key:
-            return
-        hour = now_utc.replace(minute=0, second=0, microsecond=0)
-        if self._last_upload_hour == hour:
-            return
-        self._last_upload_hour = hour
-        try:
-            await self._upload_benchmark(data, lat, lon, points, reliability, now_utc, key)
-        except Exception as err:  # noqa: BLE001 - see the docstring
-            _LOGGER.debug("Benchmark emission skipped: %s", err)
-
-    async def _upload_benchmark(self, data, lat, lon, points, reliability, now_utc, key) -> None:
-        """Assemble this hour's emission and hand it to a background task."""
-        if self._version is None:
-            integration = await async_get_integration(self.hass, DOMAIN)
-            self._version = str(integration.version)
-        payload = build_payload(
-            entry_id=self.entry.entry_id,
-            version=self._version,
-            emitted_at=now_utc,
-            latitude=lat,
-            longitude=lon,
-            lines=lines_from_config(data),
-            country=self.hass.config.country,
-            inverter_max_kw=data.get(CONF_INVERTER_MAX_KW),
-            points=points,
-            reliability=reliability,
-            production=self._production_buckets,
-            has_battery=bool(data.get(CONF_BATTERY_CAPACITY_KWH) and data.get(CONF_BATTERY_SOC_ENTITY)),
-            has_curtailment_signal=bool(curtailment_entity_from_config(data)),
-        )
-        url = str(data.get(CONF_BENCHMARK_URL) or "").strip() or DEFAULT_ENDPOINT
-        session = async_get_clientsession(self.hass)
-        self.entry.async_create_background_task(
-            self.hass, self._upload_and_note(session, url, key, payload), name=f"{DOMAIN}-benchmark-upload"
-        )
-
-    async def _upload_and_note(self, session, url, key, payload) -> None:
-        """Send the emission and keep what the collector said of this installation: an exclusion from the
-        public figures is a configuration problem the owner should hear about from here, not from the site."""
-        answer = await async_upload(session, url, key, payload)
-        if not isinstance(answer, dict) or "quality" not in answer:
-            return
-        quality = answer.get("quality") if isinstance(answer.get("quality"), dict) else {}
-        if quality == self._benchmark_quality:
-            return
-        self._benchmark_quality = quality
-        kept = [p for p in self.problems if p.key != "benchmark_excluded"]
-        self._publish_problems(kept + check_benchmark_quality(quality))
 
     async def _project_battery_soc(self, data, points, now) -> List[BatterySocPoint]:
         """Project the battery SoC over the next BATTERY_SOC_HORIZON_HOURS, or [] when the feature can't run.

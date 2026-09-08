@@ -54,8 +54,7 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Rediger innstillinger (plassering, inverter, produksjonssensor, batteri, begrensningssignal)",
-          "lines": "Edit panel lines",
-          "benchmark": "Delta i fellesskapets test"
+          "lines": "Edit panel lines"
         }
       },
       "settings": {
@@ -94,20 +93,6 @@
           "longitude": "Lengdegrad for denne linjen (valgfritt)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: fellesskapets test",
-        "description": "En åpen måling av hvor nøyaktig Helios Forecast faktisk er, på virkelige anlegg, publisert underveis. Vil du være med? Det skjer her: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHent en nøkkel med ett klikk, uten konto og uten navn, og lim den inn nedenfor. Slett den for å stoppe alt.",
-        "data": {
-          "benchmark_enabled": "Bidra til den offentlige nøyaktighetstesten (valgfritt)",
-          "benchmark_key": "Testnøkkel",
-          "benchmark_url": "Adresse til innsamleren"
-        },
-        "data_description": {
-          "benchmark_enabled": "Sender en gang i timen hva dette anlegget forutsier, slik at det kan sammenlignes med hva det faktisk produserte. Resultatene publiseres åpent. Bare panelenes geometri, den forutsagte kurven, den målte produksjonen og påliteligheten sendes: ingen entitetsnavn, intet forbruk, ingen andre sensorer, og koordinatene dine avrundet til omtrent en kilometer. Av til du slår det på.",
-          "benchmark_key": "Skrivenøkkelen du fikk da du ble med i testen. Uten den sendes ingenting.",
-          "benchmark_url": "Adressen målingene sendes til, vist så du vet nøyaktig hvor."
         }
       }
     }
@@ -229,10 +214,6 @@
       "title": "Batterivirkningsgrad utenfor området",
       "description": "{entry} har en rundturvirkningsgrad på {value}. Oppgi en prosent fra 50 til 100 (de fleste husbatterier ligger rundt 90)."
     },
-    "benchmark_key": {
-      "title": "Benchmark-nøkkelen ser ikke ut som en nøkkel",
-      "description": "{entry} deltar i fellesskapets benchmark, men nøkkelen er ikke en som innsamleren utsteder. Lim inn hele nøkkelen fra helios-ha.org/benchmark, eller slå av benchmarken."
-    },
     "production_entity_missing": {
       "title": "Produksjonssensor ikke funnet",
       "description": "Produksjonssensoren for {entry}, {entity}, finnes ikke. Varselet kjører ukorrigert til den gjør det. Sjekk entitets-id-en, eller velg sensoren på nytt i innstillingene."
@@ -272,10 +253,6 @@
     "consumption_source_sparse": {
       "title": "Forbrukskilden {source} rapporterer bare av og til",
       "description": "I energidashbordet har {source} data for {pct} % av timene den beste kilden dekker ({best} %). Forbruksprofilen bygges bare av timene den dekker, så den forblir riktig, men hviler på mindre historikk. En mer pålitelig sensor for den strømmen gjør batteriframskrivingen skarpere."
-    },
-    "benchmark_excluded": {
-      "title": "Holdt utenfor benchmarkens tall ({reason})",
-      "description": "Fellesskapets benchmark mottar sendingene fra {entry}, men holder dem utenfor de publiserte tallene. Årsak {reason}: kwp betyr at den oppgitte toppeffekten mangler, er null eller ble tastet i watt; night betyr at produksjonssensoren registrerer energi om natten og altså måler mer enn panelene. Rett konfigurasjonen, så telles anlegget med igjen innen en dag."
     }
   }
 }

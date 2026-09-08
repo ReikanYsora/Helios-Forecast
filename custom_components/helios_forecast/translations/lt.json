@@ -54,8 +54,7 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Redaguoti nustatymus (vieta, inverteris, gamybos jutiklis, baterija, ribojimo signalas)",
-          "lines": "Edit panel lines",
-          "benchmark": "Dalyvauti bendruomenės palyginime"
+          "lines": "Edit panel lines"
         }
       },
       "settings": {
@@ -94,20 +93,6 @@
           "longitude": "Ilguma šiai linijai (neprivaloma)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: bendruomenės palyginimas",
-        "description": "Atviras matavimas, kiek Helios Forecast iš tikrųjų tikslus, tikrose sistemose, skelbiamas nuolat. Norite dalyvauti? Štai čia: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nGaukite raktą vienu paspaudimu, be paskyros ir be vardo, ir įklijuokite jį žemiau. Norėdami viską sustabdyti, jį ištrinkite.",
-        "data": {
-          "benchmark_enabled": "Prisidėti prie viešojo tikslumo palyginimo (neprivaloma)",
-          "benchmark_key": "Palyginimo raktas",
-          "benchmark_url": "Rinktuvo adresas"
-        },
-        "data_description": {
-          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tikrąja gamyba. Rezultatai skelbiami viešai. Siunčiama tik plokščių geometrija, prognozuota kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokių kitų jutiklių, o koordinatės suapvalintos maždaug iki kilometro. Išjungta, kol neįjungsite.",
-          "benchmark_key": "Rašymo raktas, gautas prisijungiant prie palyginimo. Be jo nieko nesiunčiama.",
-          "benchmark_url": "Adresas, kuriuo siunčiami matavimai, rodomas, kad tiksliai žinotumėte, kur jie keliauja."
         }
       }
     }
@@ -229,10 +214,6 @@
       "title": "Baterijos naudingumo koeficientas už diapazono",
       "description": "{entry} viso ciklo naudingumo koeficientas yra {value}. Įveskite procentą nuo 50 iki 100 (dauguma namų baterijų yra apie 90)."
     },
-    "benchmark_key": {
-      "title": "Lyginamosios analizės raktas neatrodo kaip raktas",
-      "description": "{entry} dalyvauja bendruomenės lyginamojoje analizėje, bet jo raktas nėra rinktuvo išduotas raktas. Įklijuokite visą raktą iš helios-ha.org/benchmark arba išjunkite lyginamąją analizę."
-    },
     "production_entity_missing": {
       "title": "Gamybos jutiklis nerastas",
       "description": "{entry} gamybos jutiklio {entity} nėra. Prognozė veikia be pataisos, kol jis atsiras. Patikrinkite objekto ID arba iš naujo pasirinkite jutiklį nustatymuose."
@@ -272,10 +253,6 @@
     "consumption_source_sparse": {
       "title": "Vartojimo šaltinis {source} praneša su pertrūkiais",
       "description": "Energijos skydelyje {source} turi duomenis {pct} % valandų, kurias apima geriausias šaltinis ({best} %). Vartojimo profilis sudaromas tik iš valandų, kurias jis apima, todėl lieka teisingas, bet remiasi mažesne istorija. Patikimesnis šio srauto jutiklis patikslina baterijos projekciją."
-    },
-    "benchmark_excluded": {
-      "title": "Pašalinta iš lyginamosios analizės skaičių ({reason})",
-      "description": "Bendruomenės lyginamoji analizė gauna {entry} siuntas, bet laiko jas už skelbiamų skaičių. Priežastis {reason}: kwp reiškia, kad nurodyta pikinė galia trūksta, lygi nuliui arba įvesta vatais; night reiškia, kad gamybos jutiklis fiksuoja energiją naktį, taigi matuoja daugiau nei modulius. Pataisykite konfigūraciją ir įrenginys vėl bus skaičiuojamas per dieną."
     }
   }
 }

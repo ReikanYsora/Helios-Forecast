@@ -54,8 +54,7 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Upravit nastavení (poloha, střídač, senzor výroby, baterie, signál omezení)",
-          "lines": "Edit panel lines",
-          "benchmark": "Zapojit se do komunitního srovnání"
+          "lines": "Edit panel lines"
         }
       },
       "settings": {
@@ -94,20 +93,6 @@
           "longitude": "Zeměpisná délka pro tuto linii (volitelné)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: komunitní srovnání",
-        "description": "Otevřené měření skutečné přesnosti Helios Forecast na reálných instalacích, průběžně zveřejňované. Chcete se zapojit? Tudy: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nZískejte klíč jedním kliknutím, bez účtu a bez jména, a vložte ho níže. Chcete-li vše zastavit, smažte ho.",
-        "data": {
-          "benchmark_enabled": "Přispět do veřejného srovnávacího testu přesnosti (volitelné)",
-          "benchmark_key": "Klíč srovnávacího testu",
-          "benchmark_url": "Adresa sběrače"
-        },
-        "data_description": {
-          "benchmark_enabled": "Jednou za hodinu odešle, co tato instalace předpovídá, aby to šlo porovnat se skutečnou výrobou. Výsledky jsou zveřejňovány otevřeně. Odesílá se pouze geometrie panelů, předpovězená křivka, naměřená výroba a index spolehlivosti: žádné názvy entit, žádná spotřeba, žádné jiné senzory a souřadnice zaokrouhlené asi na kilometr. Vypnuto, dokud to nezapnete.",
-          "benchmark_key": "Zapisovací klíč, který jste dostali při zapojení do testu. Bez něj se nic neodesílá.",
-          "benchmark_url": "Adresa, kam se měření odesílají, zobrazená, abyste přesně věděli, kam míří."
         }
       }
     }
@@ -229,10 +214,6 @@
       "title": "Účinnost baterie mimo rozsah",
       "description": "{entry} má celkovou účinnost {value}. Zadejte procento od 50 do 100 (většina domácích baterií je kolem 90)."
     },
-    "benchmark_key": {
-      "title": "Klíč benchmarku nevypadá jako klíč",
-      "description": "{entry} se účastní komunitního benchmarku, ale jeho klíč není klíč vydaný kolektorem. Vložte celý klíč z helios-ha.org/benchmark, nebo benchmark vypněte."
-    },
     "production_entity_missing": {
       "title": "Senzor výroby nenalezen",
       "description": "Senzor výroby {entry}, {entity}, neexistuje. Předpověď běží bez korekce, dokud se neobjeví. Zkontrolujte ID entity nebo senzor znovu vyberte v nastavení."
@@ -272,10 +253,6 @@
     "consumption_source_sparse": {
       "title": "Zdroj spotřeby {source} hlásí přerušovaně",
       "description": "V panelu Energie má {source} data pro {pct} % hodin, které pokrývá nejlepší zdroj ({best} %). Profil spotřeby se staví jen z hodin, které pokrývá, takže zůstává správný, ale opírá se o méně historie. Spolehlivější senzor pro tento tok zpřesní projekci baterie."
-    },
-    "benchmark_excluded": {
-      "title": "Vyřazena z čísel benchmarku ({reason})",
-      "description": "Komunitní benchmark přijímá emise {entry}, ale drží je mimo zveřejněná čísla. Důvod {reason}: kwp znamená, že deklarovaný špičkový výkon chybí, je nulový nebo zadaný ve wattech; night znamená, že senzor výroby zaznamenává energii v noci, takže měří víc než panely. Opravte konfiguraci a instalace se do jednoho dne znovu započítá."
     }
   }
 }

@@ -20,7 +20,6 @@ from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFl
 from homeassistant.core import callback
 from homeassistant.helpers import selector
 
-from .benchmark import DEFAULT_ENDPOINT
 from .config import (
     CONF_AZIMUTH,
     CONF_BATTERY_CAPACITY_KWH,
@@ -29,10 +28,6 @@ from .config import (
     CONF_BATTERY_MAX_DISCHARGE_KW,
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_SOC_ENTITY,
-    BENCHMARK_KEYS,
-    CONF_BENCHMARK_ENABLED,
-    CONF_BENCHMARK_KEY,
-    CONF_BENCHMARK_URL,
     CONF_CURTAILMENT_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
@@ -102,12 +97,6 @@ _SOC_ENTITY = selector.EntitySelector(selector.EntitySelectorConfig(domain="sens
 _PERCENT = selector.NumberSelector(
     selector.NumberSelectorConfig(min=0, max=100, step=1, mode=_BOX, unit_of_measurement="%")
 )
-# Benchmark upload: the write key is the only secret this integration holds, so it is typed and
-# redisplayed as a password rather than sitting in clear in the form.
-# Shown, never typed: the address is there so a contributor can see exactly where the measurements
-# go, and a field that can be edited by hand is a broken upload waiting to happen.
-_ENDPOINT = selector.TextSelector(selector.TextSelectorConfig(type=selector.TextSelectorType.TEXT, read_only=True))
-_SECRET = selector.TextSelector(selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD))
 
 
 def _optional(fields: dict[Any, Any], key: str, sel: Any, suggested_value: Any) -> None:
@@ -191,20 +180,6 @@ def _settings_fields(
     return fields
 
 
-def _benchmark_fields(settings: dict[str, Any]) -> dict[Any, Any]:
-    """Taking part in the public benchmark: the switch, the key, and where to send it.
-
-    Off unless deliberately switched on and given a key. What it sends, and why it has to be sent at
-    the moment it is predicted rather than reconstructed later, is in benchmark.py.
-    """
-    fields: dict[Any, Any] = {
-        vol.Optional(CONF_BENCHMARK_ENABLED, default=bool(settings.get(CONF_BENCHMARK_ENABLED, False))): _BOOL
-    }
-    _optional(fields, CONF_BENCHMARK_KEY, _SECRET, settings.get(CONF_BENCHMARK_KEY))
-    fields[vol.Optional(CONF_BENCHMARK_URL, default=settings.get(CONF_BENCHMARK_URL) or DEFAULT_ENDPOINT)] = _ENDPOINT
-    return fields
-
-
 class HeliosForecastConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]  # HA passes `domain` to __init_subclass__
     """Config flow for Helios Solar Forecast: settings + one or more panel lines."""
 
@@ -268,39 +243,17 @@ class HeliosForecastOptionsFlow(OptionsFlow):
         return {**self.config_entry.data, **self.config_entry.options}
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        return self.async_show_menu(step_id="init", menu_options=["settings", "lines", "benchmark"])
+        return self.async_show_menu(step_id="init", menu_options=["settings", "lines"])
 
     async def async_step_settings(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Edit the entry-level settings, keeping the existing panel lines untouched."""
         current = self._current()
         if user_input is not None:
-            # This form shows the installation settings only: a field left empty here is cleared, while the
-            # benchmark block, edited on its own step, is carried over untouched.
-            kept = {k: v for k, v in split_settings(current).items() if k in BENCHMARK_KEYS}
-            data = merge_entry_data({**kept, **split_settings(user_input)}, lines_from_config(current))
+            # This form shows the installation settings only: a field left empty here is cleared.
+            data = merge_entry_data(split_settings(user_input), lines_from_config(current))
             return self.async_create_entry(title="", data=data)
         schema = vol.Schema(_settings_fields(self.hass.config.latitude, self.hass.config.longitude, settings=current))
         return self.async_show_form(step_id="settings", data_schema=schema)
-
-    async def async_step_benchmark(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Join the community benchmark, or leave it.
-
-        A menu of its own rather than a few fields at the bottom of the settings: taking part is a
-        decision, not a setting, and someone who has never heard of it should be able to find out
-        what it is without reading a form.
-        """
-        current = self._current()
-        if user_input is not None:
-            # The mirror of the settings step: the installation settings are carried over, the benchmark
-            # block is exactly what this form says, so a key cleared here is really gone.
-            kept = {k: v for k, v in split_settings(current).items() if k not in BENCHMARK_KEYS}
-            settings = {**kept, **split_settings(user_input)}
-            # The address is only written down when it is not the standard one. Storing the default
-            # would freeze it in every entry, and the day the collector moves nobody could follow.
-            if settings.get(CONF_BENCHMARK_URL) == DEFAULT_ENDPOINT:
-                settings.pop(CONF_BENCHMARK_URL, None)
-            return self.async_create_entry(title="", data=merge_entry_data(settings, lines_from_config(current)))
-        return self.async_show_form(step_id="benchmark", data_schema=vol.Schema(_benchmark_fields(current)))
 
     async def async_step_lines(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Walk the existing lines (edit / remove each), then optionally append new ones."""

@@ -63,6 +63,51 @@ and so on) rather than under a `sensor.` entity. History graphs of the weather
 sensors themselves now show the recorded states only, which is what those sensors
 are for.
 
+### Fixed: the migration converts what it moves, and checks the hours rather than counting them
+
+Home Assistant stores an entity-bound statistic in the unit the entity displayed, so
+an installation on the US customary system holds its temperature in Fahrenheit, its
+wind in miles per hour and its snow depth in feet. The move now names the unit it
+wants on every read, so those values are converted rather than relabelled, and a
+series whose unit cannot be converted is left exactly where it is with an error in
+the log. Naming the unit matters even when the stored one already matches: left
+unasked, the recorder converts to whatever the live entity happens to display.
+
+The check that runs before the old series is deleted is on the hours themselves, not
+on how many there are. The destination is already populated by the integration's own
+backfill by then, so a row count there could be satisfied entirely by hours the move
+never wrote.
+
+### Fixed: an hour the weather service publishes late no longer goes missing
+
+Open-Meteo publishes a past hour with a delay. The weather archive moved its
+high-water mark to the current hour as soon as anything at all had been written,
+while rows are only written for hours that carry a value, so a refresh with an older
+hour to write while the newest was still missing stepped over the gap and never came
+back to it. Until this release that hole was invisible, because the recorder compiled
+the same entities and the late hour arrived through the entity's own state. The mark
+now stops short of a trailing window, so the most recent hours are offered again on
+every refresh until they arrive.
+
+### Fixed: the battery projection loses an hour of house load on the clock changes
+
+The forecast curve is built on the local clock, so a local day always carries 96
+quarter-hour points whether that day is 23, 24 or 25 real hours long, and the battery
+projection charged each of them a quarter of an hour of real time. On the two
+changeover days it integrated the house load over an hour too little in autumn and an
+hour too much in spring: 0.7 kWh at a 700 W night load, about 7 points of state of
+charge on a 9.8 kWh battery. A step now lasts the real time to the next point, and on
+the spring day, where four quarter-hours name local times that never happen and land
+on the instants of the four that follow, one point per real instant is kept.
+
+### Fixed: a meter reset no longer teaches the learning that the sky went dark
+
+When an energy meter is reset, replaced, or restored from an older backup, Home
+Assistant writes one enormous negative hour into the recorder. The sky-residual map
+already refused those hours; the analog library clamped them to zero instead, which
+filed a bright hour as one where the sky gave nothing and dragged every later
+prediction under similar sun and cloud down with it. Both refuse a negative hour now.
+
 ### Removed: the `predicted_power` and `predicted_energy` entities
 
 Both existed for one reason: to give the predicted-production archive an entity to

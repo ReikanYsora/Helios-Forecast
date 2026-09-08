@@ -54,8 +54,7 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Einstellungen bearbeiten (Standort, Wechselrichter, Produktionssensor, Batterie, Abregelungssignal)",
-          "lines": "Edit panel lines",
-          "benchmark": "Am Community-Benchmark teilnehmen"
+          "lines": "Edit panel lines"
         }
       },
       "settings": {
@@ -94,20 +93,6 @@
           "longitude": "Längengrad für diese Linie (optional)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: Community-Benchmark",
-        "description": "Eine offene Messung der tatsächlichen Genauigkeit von Helios Forecast, an echten Anlagen, laufend veröffentlicht. Möchten Sie mitmachen? Hier entlang: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHolen Sie sich mit einem Klick einen Schlüssel, ohne Konto und ohne Namen, und fügen Sie ihn unten ein. Zum Beenden einfach löschen.",
-        "data": {
-          "benchmark_enabled": "Am öffentlichen Genauigkeits-Benchmark teilnehmen (optional)",
-          "benchmark_key": "Benchmark-Schlüssel",
-          "benchmark_url": "Adresse des Benchmark-Sammlers"
-        },
-        "data_description": {
-          "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit der tatsächlichen Produktion verglichen werden kann. Die Ergebnisse werden offen veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Produktion und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, keine anderen Sensoren, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Aus, solange Sie es nicht einschalten.",
-          "benchmark_key": "Der Schreibschlüssel, den Sie beim Beitritt zum Benchmark erhalten haben. Ohne ihn wird nichts gesendet.",
-          "benchmark_url": "Wohin die Messungen gesendet werden, angezeigt, damit Sie genau wissen, wo sie landen."
         }
       }
     }
@@ -229,10 +214,6 @@
       "title": "Batteriewirkungsgrad außerhalb des Bereichs",
       "description": "{entry} hat einen Round-Trip-Wirkungsgrad von {value}. Geben Sie einen Prozentwert von 50 bis 100 ein (die meisten Hausbatterien liegen um 90)."
     },
-    "benchmark_key": {
-      "title": "Der Benchmark-Schlüssel sieht nicht wie ein Schlüssel aus",
-      "description": "{entry} nimmt am Community-Benchmark teil, aber sein Schlüssel ist keiner, den der Collector ausgibt. Fügen Sie den ganzen Schlüssel von helios-ha.org/benchmark ein oder schalten Sie den Benchmark aus."
-    },
     "production_entity_missing": {
       "title": "Erzeugungssensor nicht gefunden",
       "description": "Der Erzeugungssensor von {entry}, {entity}, existiert nicht. Die Prognose läuft unkorrigiert, bis es ihn gibt. Prüfen Sie die Entitäts-ID oder wählen Sie den Sensor in den Einstellungen neu."
@@ -272,10 +253,6 @@
     "consumption_source_sparse": {
       "title": "Die Verbrauchsquelle {source} meldet nur zeitweise",
       "description": "Im Energie-Dashboard hat {source} Daten für {pct} % der Stunden, die die beste Quelle abdeckt ({best} %). Das Verbrauchsprofil wird nur aus den Stunden gebaut, die sie abdeckt, bleibt also richtig, stützt sich aber auf weniger Historie. Ein zuverlässigerer Sensor für diesen Fluss macht die Batterieprojektion schärfer."
-    },
-    "benchmark_excluded": {
-      "title": "Aus den Benchmark-Zahlen ausgeschlossen ({reason})",
-      "description": "Der Community-Benchmark empfängt die Emissionen von {entry}, hält sie aber aus den veröffentlichten Zahlen heraus. Grund {reason}: kwp bedeutet, dass die angegebene Spitzenleistung fehlt, null ist oder in Watt eingegeben wurde; night bedeutet, dass der Erzeugungssensor nachts Energie aufzeichnet, also mehr als die Module misst. Korrigieren Sie die Konfiguration, und die Anlage wird innerhalb eines Tages wieder gezählt."
     }
   }
 }

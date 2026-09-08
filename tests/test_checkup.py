@@ -13,7 +13,6 @@ from custom_components.helios_forecast.checkup import (  # noqa: E402
     ERROR,
     WARNING,
     EntitySnapshot,
-    check_benchmark_quality,
     check_config,
     check_consumption_coverage,
     check_entities,
@@ -142,15 +141,6 @@ def test_battery_block() -> None:
     assert _keys(absurd) == ["battery_capacity"]
 
 
-def test_benchmark_key_format_only_when_enabled() -> None:
-    assert check_config(_config(benchmark_enabled=False, benchmark_key="x"), *HOME) == []
-    assert _keys(check_config(_config(benchmark_enabled=True, benchmark_key="x"), *HOME)) == ["benchmark_key"]
-    assert check_config(_config(benchmark_enabled=True, benchmark_key="a" * 43), *HOME) == []
-
-
-# --- entities --------------------------------------------------------------------------------
-
-
 def test_production_entity_must_exist_and_be_a_cumulative_energy_sensor() -> None:
     data = _config()
     missing = EntitySnapshot("sensor.pv_energy", exists=False)
@@ -245,11 +235,3 @@ def test_sparse_consumption_source_is_named_with_its_share() -> None:
     assert problems[0].placeholders == {"source": "sensor.bat_out", "pct": "24", "best": "100"}
     assert check_consumption_coverage({"a": 1.0, "b": 0.6}) == []
     assert check_consumption_coverage({}) == []
-
-
-def test_benchmark_exclusion_becomes_a_warning() -> None:
-    assert check_benchmark_quality(None) == []
-    assert check_benchmark_quality({"excluded": None}) == []
-    problems = check_benchmark_quality({"excluded": "night"})
-    assert _keys(problems) == ["benchmark_excluded_night"]
-    assert problems[0].placeholders == {"reason": "night"}

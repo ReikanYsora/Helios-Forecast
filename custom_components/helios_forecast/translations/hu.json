@@ -54,8 +54,7 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Beállítások szerkesztése (hely, inverter, termelésérzékelő, akkumulátor, korlátozási jel)",
-          "lines": "Edit panel lines",
-          "benchmark": "Csatlakozás a közösségi méréshez"
+          "lines": "Edit panel lines"
         }
       },
       "settings": {
@@ -94,20 +93,6 @@
           "longitude": "Hosszúsági fok ehhez a sorhoz (opcionális)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: közösségi mérés",
-        "description": "Nyílt mérés arról, mennyire pontos valójában a Helios Forecast, valódi rendszereken, folyamatosan közzétéve. Szeretne részt venni? Erre tessék: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nSzerezzen kulcsot egy kattintással, fiók és név nélkül, majd illessze be alább. A leállításhoz törölje.",
-        "data": {
-          "benchmark_enabled": "Részvétel a nyilvános pontossági összehasonlításban (opcionális)",
-          "benchmark_key": "Összehasonlítási kulcs",
-          "benchmark_url": "A gyűjtő címe"
-        },
-        "data_description": {
-          "benchmark_enabled": "Óránként elküldi, amit ez a rendszer előrejelez, hogy összevethető legyen a valóban megtermelt energiával. Az eredmények nyilvánosan megjelennek. Csak a panelek geometriája, az előrejelzett görbe, a mért termelés és a megbízhatósági index kerül elküldésre: semmilyen entitásnév, semmilyen fogyasztás, semmilyen más érzékelő, a koordináták pedig körülbelül egy kilométerre kerekítve. Kikapcsolva, amíg be nem kapcsolja.",
-          "benchmark_key": "Az írási kulcs, amelyet a csatlakozáskor kapott. Nélküle semmi nem kerül elküldésre.",
-          "benchmark_url": "A cím, ahová a mérések mennek, megjelenítve, hogy pontosan tudja, hová kerülnek."
         }
       }
     }
@@ -229,10 +214,6 @@
       "title": "Az akkumulátor hatásfoka tartományon kívül",
       "description": "A(z) {entry} oda-vissza hatásfoka {value}. Adjon meg 50 és 100 közötti százalékot (a legtöbb otthoni akkumulátor 90 körül van)."
     },
-    "benchmark_key": {
-      "title": "A benchmark kulcsa nem tűnik kulcsnak",
-      "description": "A(z) {entry} részt vesz a közösségi benchmarkban, de a kulcsa nem a gyűjtő által kiadott kulcs. Illessze be a teljes kulcsot a helios-ha.org/benchmark oldalról, vagy kapcsolja ki a benchmarkot."
-    },
     "production_entity_missing": {
       "title": "A termelésérzékelő nem található",
       "description": "A(z) {entry} termelésérzékelője, {entity}, nem létezik. Az előrejelzés korrekció nélkül fut, amíg meg nem jelenik. Ellenőrizze az entitásazonosítót, vagy válassza ki újra az érzékelőt a beállításokban."
@@ -272,10 +253,6 @@
     "consumption_source_sparse": {
       "title": "A(z) {source} fogyasztási forrás szakaszosan jelent",
       "description": "Az Energia irányítópulton a(z) {source} az órák {pct}%-ára rendelkezik adattal, amelyeket a legjobb forrás lefed ({best}%). A fogyasztási profil csak az általa lefedett órákból épül, így helyes marad, de kevesebb előzményre támaszkodik. Egy megbízhatóbb érzékelő ehhez az áramláshoz élesebbé teszi az akkumulátor-vetítést."
-    },
-    "benchmark_excluded": {
-      "title": "Kizárva a benchmark számaiból ({reason})",
-      "description": "A közösségi benchmark megkapja a(z) {entry} kibocsátásait, de kívül tartja őket a közzétett számokon. Ok {reason}: a kwp azt jelenti, hogy a megadott csúcsteljesítmény hiányzik, nulla vagy wattban van megadva; a night azt jelenti, hogy a termelésérzékelő éjszaka energiát rögzít, tehát többet mér a paneleknél. Javítsa a beállítást, és a rendszer egy napon belül újra beszámít."
     }
   }
 }

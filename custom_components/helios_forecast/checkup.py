@@ -28,8 +28,6 @@ from .config import (
     CONF_BATTERY_MAX_DISCHARGE_KW,
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_SOC_ENTITY,
-    CONF_BENCHMARK_ENABLED,
-    CONF_BENCHMARK_KEY,
     CONF_CURTAILMENT_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
@@ -205,10 +203,6 @@ def check_config(data: Dict[str, Any], home_lat: float, home_lon: float) -> List
 
     problems.extend(_check_battery_config(data))
 
-    if data.get(CONF_BENCHMARK_ENABLED):
-        key = str(data.get(CONF_BENCHMARK_KEY) or "").strip()
-        if len(key) < 16 or " " in key:
-            problems.append(Problem("benchmark_key", ERROR))
     return problems
 
 
@@ -363,16 +357,3 @@ def check_consumption_coverage(coverage: Dict[str, float]) -> List[Problem]:
                 )
             )
     return problems
-
-
-# --- the benchmark collector's verdict --------------------------------------------------------
-
-
-def check_benchmark_quality(quality: Optional[Dict[str, Any]]) -> List[Problem]:
-    """What the collector answered about this installation: excluded from the public figures, and why."""
-    if not isinstance(quality, dict):
-        return []
-    reason = quality.get("excluded")
-    if not reason:
-        return []
-    return [Problem("benchmark_excluded", WARNING, {"reason": str(reason)}, str(reason))]

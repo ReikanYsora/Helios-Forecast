@@ -54,8 +54,7 @@
         "description": "Choisissez ce que vous voulez modifier.",
         "menu_options": {
           "settings": "Modifier les réglages (position, onduleur, capteur de production, batterie, signal de bridage)",
-          "lines": "Modifier les lignes de panneaux",
-          "benchmark": "Participer au benchmark communautaire"
+          "lines": "Modifier les lignes de panneaux"
         }
       },
       "settings": {
@@ -94,20 +93,6 @@
           "longitude": "Longitude pour cette ligne (optionnel)",
           "remove_this_line": "Supprimer cette ligne de panneaux",
           "add_another": "Ajouter une autre ligne de panneaux"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast : benchmark communautaire",
-        "description": "Une mesure ouverte de la précision réelle d'Helios Forecast, sur de vraies installations, publiée au fur et à mesure. Vous souhaitez y participer ? Ça se passe ici : [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nRécupérez une clé en un clic, sans compte et sans nom, puis collez-la ci-dessous. Pour tout arrêter, effacez-la.",
-        "data": {
-          "benchmark_enabled": "Contribuer au benchmark public de précision (optionnel)",
-          "benchmark_key": "Clé du benchmark",
-          "benchmark_url": "Adresse du collecteur de benchmark"
-        },
-        "data_description": {
-          "benchmark_enabled": "Envoie une fois par heure ce que cette installation prévoit, pour le comparer à ce qu'elle a réellement produit. Les résultats sont publiés ouvertement. Seuls la géométrie de vos panneaux, la courbe prévue, la production mesurée et l'indice de fiabilité sont envoyés : aucun nom d'entité, aucune consommation, aucun autre capteur, et vos coordonnées arrondies à environ un kilomètre. Inactif tant que vous ne l'activez pas.",
-          "benchmark_key": "La clé d'écriture qui vous a été remise en rejoignant le benchmark. Rien n'est envoyé sans elle.",
-          "benchmark_url": "L'adresse à laquelle les mesures sont envoyées, affichée pour que vous sachiez exactement où elles vont."
         }
       }
     }
@@ -229,10 +214,6 @@
       "title": "Rendement de batterie hors limites",
       "description": "{entry} a un rendement aller-retour de {value}. Saisissez un pourcentage de 50 à 100 (la plupart des batteries domestiques sont autour de 90)."
     },
-    "benchmark_key": {
-      "title": "La clé du benchmark ne ressemble pas à une clé",
-      "description": "{entry} participe au benchmark communautaire mais sa clé n'est pas une clé délivrée par le collecteur. Collez la clé entière obtenue sur helios-ha.org/benchmark, ou désactivez le benchmark."
-    },
     "production_entity_missing": {
       "title": "Capteur de production introuvable",
       "description": "Le capteur de production de {entry}, {entity}, n'existe pas. La prévision tourne sans correction tant qu'il manque. Vérifiez l'identifiant de l'entité, ou choisissez de nouveau le capteur dans les réglages."
@@ -272,10 +253,6 @@
     "consumption_source_sparse": {
       "title": "La source de consommation {source} rapporte par intermittence",
       "description": "Dans le tableau de bord Énergie, {source} a des données pour {pct} % des heures que couvre la meilleure source ({best} %). Le profil de consommation n'est construit qu'avec les heures qu'elle couvre, il reste donc juste mais repose sur moins d'historique. Un capteur plus fiable pour ce flux affine la projection de la batterie."
-    },
-    "benchmark_excluded": {
-      "title": "Écartée des chiffres du benchmark ({reason})",
-      "description": "Le benchmark communautaire reçoit les émissions de {entry} mais les tient à l'écart des chiffres publiés. Motif {reason} : kwp signifie que la puissance crête déclarée est absente, nulle ou saisie en watts ; night signifie que le capteur de production enregistre de l'énergie la nuit, il mesure donc plus que les panneaux. Corrigez la configuration et l'installation est de nouveau comptée sous un jour."
     }
   }
 }

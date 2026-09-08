@@ -54,8 +54,7 @@
         "description": "Choose what to edit.",
         "menu_options": {
           "settings": "Edit settings (location, inverter, production sensor, battery, curtailment signal)",
-          "lines": "Edit panel lines",
-          "benchmark": "Join the community benchmark"
+          "lines": "Edit panel lines"
         }
       },
       "settings": {
@@ -94,20 +93,6 @@
           "longitude": "Longitude override (optional)",
           "remove_this_line": "Remove this panel line",
           "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: community benchmark",
-        "description": "An open measurement of how accurate Helios Forecast really is, on real installations, published as it goes. Would you like to take part? It happens here: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nGet a key in one click, with no account and no name, then paste it below. To stop everything, clear it.",
-        "data": {
-          "benchmark_enabled": "Contribute to the public accuracy benchmark (optional)",
-          "benchmark_key": "Benchmark key",
-          "benchmark_url": "Benchmark collector address"
-        },
-        "data_description": {
-          "benchmark_enabled": "Sends what this installation predicts, once an hour, so it can be compared with what it really produced. The results are published openly. Only your panel geometry, the predicted curve, the measured production and the reliability index are sent: no entity names, no consumption, no other sensor, and your coordinates rounded to about a kilometre. Off unless you turn it on.",
-          "benchmark_key": "The write key you were given when joining the benchmark. Nothing is sent without it.",
-          "benchmark_url": "Where the measurements are sent, shown so you know exactly where they go."
         }
       }
     }
@@ -229,10 +214,6 @@
       "title": "Battery efficiency out of range",
       "description": "{entry} has a round-trip efficiency of {value}. Enter a percentage from 50 to 100 (most home batteries sit around 90)."
     },
-    "benchmark_key": {
-      "title": "Benchmark key does not look like a key",
-      "description": "{entry} takes part in the community benchmark but its key is not one the collector issues. Paste the whole key from helios-ha.org/benchmark, or switch the benchmark off."
-    },
     "production_entity_missing": {
       "title": "Production sensor not found",
       "description": "The production sensor of {entry}, {entity}, does not exist. The forecast runs uncorrected until it does. Check the entity id, or pick the sensor again in the settings."
@@ -272,10 +253,6 @@
     "consumption_source_sparse": {
       "title": "Consumption source {source} reports intermittently",
       "description": "In the Energy dashboard, {source} has data for {pct}% of the hours the best source covers ({best}%). The consumption profile is built only from the hours it does cover, so it stays right but rests on less history. A more reliable sensor for that flow makes the battery projection sharper."
-    },
-    "benchmark_excluded": {
-      "title": "Kept out of the benchmark figures ({reason})",
-      "description": "The community benchmark received the emissions of {entry} but keeps them out of the published figures. Reason {reason}: kwp means the declared peak power is missing, zero or typed in watts; night means the production sensor records energy at night, so it measures more than the panels. Correct the configuration and the installation is counted again within a day."
     }
   }
 }

@@ -32,12 +32,6 @@ CONF_BATTERY_CAPACITY_KWH = "battery_capacity_kwh"
 CONF_BATTERY_SOC_ENTITY = "battery_soc_entity"
 # Optional binary signal, on while the inverter is held back (zero export, grid limit): its hours are not learned.
 CONF_CURTAILMENT_ENTITY = "curtailment_entity"
-# Opt-in accuracy benchmark (off by default). When switched on, the entry posts what it predicted, once
-# an hour, to a collector that scores it against what the installation really produced. The payload and the
-# reasons for it live in benchmark.py; nothing leaves the installation while this is off.
-CONF_BENCHMARK_ENABLED = "benchmark_enabled"
-CONF_BENCHMARK_URL = "benchmark_url"
-CONF_BENCHMARK_KEY = "benchmark_key"
 CONF_BATTERY_MAX_CHARGE_KW = "battery_max_charge_kw"
 CONF_BATTERY_MAX_DISCHARGE_KW = "battery_max_discharge_kw"
 CONF_BATTERY_MIN_SOC = "battery_min_soc"
@@ -86,15 +80,7 @@ SETTINGS_KEYS: Tuple[str, ...] = (
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_EFFICIENCY,
     CONF_CURTAILMENT_ENTITY,
-    CONF_BENCHMARK_ENABLED,
-    CONF_BENCHMARK_URL,
-    CONF_BENCHMARK_KEY,
 )
-
-# The benchmark block is edited on a step of its own, so each options step must only rewrite the keys
-# its form shows and carry the others over: saving the installation settings used to drop the
-# benchmark opt-in and key on the floor.
-BENCHMARK_KEYS: Tuple[str, ...] = (CONF_BENCHMARK_ENABLED, CONF_BENCHMARK_URL, CONF_BENCHMARK_KEY)
 
 
 def split_line(user_input: Dict[str, Any]) -> Dict[str, Any]:
