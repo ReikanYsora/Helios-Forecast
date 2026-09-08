@@ -364,7 +364,12 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         battery_soc = await self._project_battery_soc(data, points, now)
         if self._consumption_profile is not None:
             problems += check_consumption_coverage(self._consumption_profile.coverage)
+        # The collector's verdict on this installation is re-stated on every refresh, not only on the
+        # upload that brought it: the publish below replaces the whole list, so a verdict added by the
+        # upload alone would be wiped by the next refresh half an hour later.
+        problems += check_benchmark_quality(self._benchmark_quality)
         self._publish_problems(problems)
+        await self._maybe_upload_benchmark(data, lat, lon, points, reliability, now_utc)
 
         return ForecastData(
             points=points,

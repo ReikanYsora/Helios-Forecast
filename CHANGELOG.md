@@ -5,6 +5,34 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.9.6
+
+The one line 2026.9.5 was missing. Everything that release fixed is in it and unchanged;
+what it could not do is take part in the benchmark it restarts.
+
+### Fixed: an installation that opted into the benchmark actually emits
+
+Putting the benchmark back without a key restored the uploader and the hour that gates it,
+but not the call that reaches them from the refresh. The switch saved, the settings showed
+it on, and nothing ever left: an opted-in installation stayed silent for good. Nothing was
+lost, since nothing had been sent, and the collector received no emission at all from this
+version. The call is back where it was.
+
+The tests around it were the reason nobody saw it. Every one of them called the upload hook
+directly, which says whether the hook works and nothing about whether anything calls it. They
+now drive a real refresh, and two of the three fail on the code as it shipped.
+
+### Fixed: the collector's verdict no longer disappears half an hour later
+
+When the benchmark keeps an installation out of the published figures, it says so in its
+answer and the integration raises it as a repair, so the owner hears about a configuration
+problem from here rather than from the website. That repair was published by the upload
+alone, while a refresh republishes the whole problem list from scratch: it was cleared at the
+next refresh and raised again at the next emission, once an hour. It is now restated on every
+refresh, so it stays up until the configuration is corrected.
+
+---
+
 ## 2026.9.5
 
 The release that stops taking the whole machine's statistics down with it. A

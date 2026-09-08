@@ -78,3 +78,61 @@ async def test_a_collector_having_a_bad_day_never_reaches_the_forecast(hass, ena
         await _emit(hass, coordinator)
     # The emission was attempted, the refresh returned, and the failure died in the upload.
     assert coordinator._last_upload_hour is not None
+
+
+# --- the wiring, not the method ------------------------------------------------------------------
+
+# Every test above calls the upload hook directly, which says whether the hook works and nothing
+# about whether anything calls it. It did not, in a shipped release: the method was restored without
+# the one line in the refresh that reaches it, and a whole round of the benchmark would have
+# collected nothing while every test here stayed green. These two drive a real refresh instead.
+
+
+async def _refresh(hass, monkeypatch, data):
+    """A full coordinator refresh, with only the weather service stubbed."""
+    from unittest.mock import AsyncMock as _AsyncMock
+
+    from homeassistant.util import dt as dt_util
+
+    import custom_components.helios_forecast.coordinator as coordinator_mod
+
+    from _weather import make_weather_series
+
+    entry = MockConfigEntry(domain=DOMAIN, data=data, entry_id="bench_wiring")
+    entry.add_to_hass(hass)
+    coordinator = HeliosForecastCoordinator(hass, entry)
+    monkeypatch.setattr(
+        coordinator_mod, "fetch_weather", _AsyncMock(return_value=make_weather_series(dt_util.utcnow()))
+    )
+    with patch("custom_components.helios_forecast.coordinator.async_upload", AsyncMock(return_value=None)) as upload:
+        await coordinator.async_refresh()
+        await hass.async_block_till_done()
+    assert coordinator.last_update_success
+    return coordinator, upload
+
+
+async def test_a_refresh_emits_for_an_entry_that_opted_in(hass, monkeypatch, enable_custom_integrations) -> None:
+    _coord, upload = await _refresh(hass, monkeypatch, _ON)
+    assert upload.call_count == 1, "a refresh must reach the benchmark upload"
+    _session, url, payload = upload.call_args.args
+    assert url == DEFAULT_ENDPOINT
+    assert payload["schema"] == SCHEMA_VERSION
+    assert payload["forecast"], "the emission must carry the curve the refresh just built"
+
+
+async def test_a_refresh_emits_nothing_for_an_entry_that_did_not(hass, monkeypatch, enable_custom_integrations) -> None:
+    _coord, upload = await _refresh(hass, monkeypatch, {})
+    assert upload.call_count == 0
+
+
+async def test_the_collectors_verdict_survives_the_next_refresh(hass, monkeypatch, enable_custom_integrations) -> None:
+    """The exclusion is a repair the owner must keep seeing. The refresh republishes the whole problem
+    list, so a verdict recorded only by the upload would vanish half an hour later."""
+    coordinator, _upload = await _refresh(hass, monkeypatch, _ON)
+    coordinator._benchmark_quality = {"excluded": "kwp"}
+
+    with patch("custom_components.helios_forecast.coordinator.async_upload", AsyncMock(return_value=None)):
+        await coordinator.async_refresh()
+        await hass.async_block_till_done()
+
+    assert any(p.key == "benchmark_excluded" for p in coordinator.problems)
