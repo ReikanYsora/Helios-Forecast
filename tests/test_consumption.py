@@ -29,7 +29,11 @@ def test_sources_signs_solar_grid_battery() -> None:
         "energy_sources": [
             {"type": "solar", "stat_energy_from": "sensor.pv"},
             {"type": "battery", "stat_energy_from": "sensor.bat_out", "stat_energy_to": "sensor.bat_in"},
-            {"type": "grid", "stat_energy_from": "sensor.import", "stat_energy_to": "sensor.export"},
+            {
+                "type": "grid",
+                "flow_from": [{"stat_energy_from": "sensor.import"}],
+                "flow_to": [{"stat_energy_to": "sensor.export"}],
+            },
         ]
     }
     signed = consumption_sources(prefs).signed
@@ -42,7 +46,7 @@ def test_sources_signs_solar_grid_battery() -> None:
     }
 
 
-def test_sources_legacy_grid_flow_lists() -> None:
+def test_sources_grid_flow_lists() -> None:
     prefs = {
         "energy_sources": [
             {
@@ -59,7 +63,7 @@ def test_sources_missing_pieces_drop_out() -> None:
     assert consumption_sources(None).signed == {}
     assert consumption_sources({}).signed == {}
     # A grid source with only import configured yields just that id.
-    prefs = {"energy_sources": [{"type": "grid", "stat_energy_from": "sensor.import", "stat_energy_to": None}]}
+    prefs = {"energy_sources": [{"type": "grid", "flow_from": [{"stat_energy_from": "sensor.import"}], "flow_to": []}]}
     assert consumption_sources(prefs).signed == {"sensor.import": 1}
 
 

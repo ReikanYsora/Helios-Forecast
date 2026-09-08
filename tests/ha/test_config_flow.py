@@ -13,6 +13,7 @@ from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.helios_forecast.config import (
     CONF_ARRAYS,
+    CONF_BATTERY_SOC_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
     CONF_LATITUDE,
@@ -20,7 +21,6 @@ from custom_components.helios_forecast.config import (
     CONF_TRACKER,
     layout_from_config,
 )
-from custom_components.helios_forecast.benchmark import DEFAULT_ENDPOINT
 from custom_components.helios_forecast.const import DOMAIN
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -40,6 +40,33 @@ async def test_user_flow_single_line(recorder_mock, hass: HomeAssistant, enable_
     assert len(result["data"][CONF_ARRAYS]) == 1
     assert result["data"][CONF_ARRAYS][0][CONF_KWP] == 4.0
     assert result["data"][CONF_ARRAYS][0][CONF_TRACKER] == "none"
+
+
+async def test_clearing_a_setting_on_the_options_form_actually_clears_it(
+    recorder_mock, hass: HomeAssistant, enable_custom_integrations
+) -> None:
+    """Everything that reads the configuration merges the entry's data over its options, so a value
+    typed at install time sits in data and an options save can only shadow it. Left as two stores, a
+    field the user empties keeps its old value and there is no way to reach it from the interface."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            CONF_LATITUDE: 48.85,
+            CONF_LONGITUDE: 2.35,
+            CONF_BATTERY_SOC_ENTITY: "sensor.old_soc",
+            CONF_ARRAYS: [{"azimuth": 180.0, "tilt": 30.0, "kwp": 3.0, "tracker": "none"}],
+        },
+    )
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "settings"})
+    await hass.config_entries.options.async_configure(result["flow_id"], {CONF_LATITUDE: 48.85, CONF_LONGITUDE: 2.35})
+    await hass.async_block_till_done()
+
+    merged = {**entry.data, **entry.options}
+    assert CONF_BATTERY_SOC_ENTITY not in merged
+    assert merged[CONF_ARRAYS]  # and the panel lines are still there
 
 
 async def test_user_flow_add_another_loops_to_second_line(
@@ -68,36 +95,7 @@ async def test_options_init_shows_menu(recorder_mock, hass: HomeAssistant, enabl
 
     result = await hass.config_entries.options.async_init(entry.entry_id)
     assert result["type"] == FlowResultType.MENU
-    assert set(result["menu_options"]) == {"settings", "lines", "benchmark"}
-
-
-async def test_benchmark_step_joins_without_disturbing_the_installation(
-    recorder_mock, hass: HomeAssistant, enable_custom_integrations
-) -> None:
-    """Opting in must not quietly drop the settings or the panel lines it was not shown."""
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={CONF_ARRAYS: [_LINE_A, _LINE_B], CONF_INVERTER_MAX_KW: 5.0, "production_entity": "sensor.pv"},
-    )
-    entry.add_to_hass(hass)
-
-    result = await hass.config_entries.options.async_init(entry.entry_id)
-    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "benchmark"})
-    assert result["step_id"] == "benchmark"
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        {"benchmark_enabled": True, "benchmark_key": "a-key", "benchmark_url": DEFAULT_ENDPOINT},
-    )
-    assert result["type"] == FlowResultType.CREATE_ENTRY
-    data = result["data"]
-    assert data["benchmark_enabled"] is True
-    assert data["benchmark_key"] == "a-key"
-    assert data[CONF_INVERTER_MAX_KW] == 5.0
-    assert data["production_entity"] == "sensor.pv"
-    assert len(data[CONF_ARRAYS]) == 2
-    # The standard address is never written down, so the day the collector moves everyone follows.
-    assert "benchmark_url" not in data
+    assert set(result["menu_options"]) == {"settings", "lines"}
 
 
 async def test_options_settings_step_keeps_lines_untouched(
@@ -116,57 +114,8 @@ async def test_options_settings_step_keeps_lines_untouched(
         {"inverter_max_kw": 8.0, "trend_anchor_hour": 6, "battery_min_soc": 10, "battery_efficiency": 90},
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    assert result["data"][CONF_INVERTER_MAX_KW] == 8.0
-    assert result["data"][CONF_ARRAYS] == [_LINE_A, _LINE_B]
-
-
-async def test_options_settings_step_keeps_the_benchmark_opt_in_and_key(
-    recorder_mock, hass: HomeAssistant, enable_custom_integrations
-) -> None:
-    """The settings form does not show the benchmark block, so saving it must carry the block over:
-    2026.9.2 and 2026.9.3 dropped the opt-in and the key on every settings save."""
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={CONF_ARRAYS: [_LINE_A], CONF_INVERTER_MAX_KW: 5.0},
-        options={"benchmark_enabled": True, "benchmark_key": "k" * 43},
-    )
-    entry.add_to_hass(hass)
-
-    result = await hass.config_entries.options.async_init(entry.entry_id)
-    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "settings"})
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        {"inverter_max_kw": 6.0, "trend_anchor_hour": 6, "battery_min_soc": 10, "battery_efficiency": 90},
-    )
-    assert result["type"] == FlowResultType.CREATE_ENTRY
-    data = result["data"]
-    assert data["benchmark_enabled"] is True
-    assert data["benchmark_key"] == "k" * 43
-    assert data[CONF_INVERTER_MAX_KW] == 6.0
-    # A field left empty on the settings form is really cleared, as before.
-    assert "production_entity" not in data
-
-
-async def test_benchmark_step_clearing_the_key_really_clears_it(
-    recorder_mock, hass: HomeAssistant, enable_custom_integrations
-) -> None:
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        data={CONF_ARRAYS: [_LINE_A], "production_entity": "sensor.pv"},
-        options={"benchmark_enabled": True, "benchmark_key": "k" * 43},
-    )
-    entry.add_to_hass(hass)
-
-    result = await hass.config_entries.options.async_init(entry.entry_id)
-    result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "benchmark"})
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"], {"benchmark_enabled": False, "benchmark_url": DEFAULT_ENDPOINT}
-    )
-    assert result["type"] == FlowResultType.CREATE_ENTRY
-    data = result["data"]
-    assert data["benchmark_enabled"] is False
-    assert "benchmark_key" not in data
-    assert data["production_entity"] == "sensor.pv"
+    assert entry.data[CONF_INVERTER_MAX_KW] == 8.0
+    assert entry.data[CONF_ARRAYS] == [_LINE_A, _LINE_B]
 
 
 async def test_options_lines_step_edits_and_removes(
@@ -194,7 +143,7 @@ async def test_options_lines_step_edits_and_removes(
         result["flow_id"], {**_LINE_B, "remove_this_line": True, "add_another": False}
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    arrays = result["data"][CONF_ARRAYS]
+    arrays = entry.data[CONF_ARRAYS]
     assert len(arrays) == 1
     assert arrays[0]["tilt"] == 45
 
@@ -214,7 +163,7 @@ async def test_options_lines_step_removing_every_line_keeps_existing(
         result["flow_id"], {**_LINE_B, "remove_this_line": True, "add_another": False}
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    assert result["data"][CONF_ARRAYS] == [_LINE_A, _LINE_B]
+    assert entry.data[CONF_ARRAYS] == [_LINE_A, _LINE_B]
 
 
 async def test_options_lines_step_can_append_a_new_line(
@@ -234,7 +183,7 @@ async def test_options_lines_step_can_append_a_new_line(
 
     result = await hass.config_entries.options.async_configure(result["flow_id"], {**_LINE_B, "add_another": False})
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    assert len(result["data"][CONF_ARRAYS]) == 2
+    assert len(entry.data[CONF_ARRAYS]) == 2
 
 
 async def test_options_settings_step_decimal_latitude_longitude_roundtrip(
@@ -261,8 +210,8 @@ async def test_options_settings_step_decimal_latitude_longitude_roundtrip(
         },
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
-    assert result["data"][CONF_LATITUDE] == 45.7597
-    assert result["data"][CONF_LONGITUDE] == 4.8422
+    assert entry.data[CONF_LATITUDE] == 45.7597
+    assert entry.data[CONF_LONGITUDE] == 4.8422
 
 
 async def test_options_lines_step_per_line_coordinate_override(
@@ -293,5 +242,5 @@ async def test_options_lines_step_per_line_coordinate_override(
     )
     assert result["type"] == FlowResultType.CREATE_ENTRY
 
-    layout = layout_from_config(result["data"])
+    layout = layout_from_config(entry.data)
     assert layout.coords == [None, (43.2965, 5.3698)]

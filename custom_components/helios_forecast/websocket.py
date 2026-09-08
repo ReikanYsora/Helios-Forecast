@@ -60,9 +60,13 @@ def _bucket_average(values: list[Optional[float]]) -> Optional[float]:
 
 
 def _resample(points: list[ForecastPoint], resolution_min: int) -> list[dict[str, Any]]:
-    """Downsample into resolution_min-wide buckets aligned to the series' first point,
-    averaging pv_w / pv_raw_w / pv_p10 / pv_p90 (None values excluded from the average;
-    a bucket with no non-None values for a field stays None for that field)."""
+    """Downsample into resolution_min-wide buckets aligned to the series' first point.
+
+    Averages pv_w, pv_raw_w, pv_p10 and pv_p90, with None values left out of the average and a
+    bucket that has none for a field staying None for it. Drops ghi and cloud, which the native
+    resolution carries: they describe an instant, and a bucket wide enough to need resampling has
+    no single sky to report.
+    """
     if not points:
         return []
     origin = points[0].t
@@ -116,7 +120,7 @@ def ws_series(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
     # ceiling for up to an hour.
     live = coordinator.data.points
     archive = coordinator.archive_points
-    elapsed = getattr(coordinator, "elapsed_points", [])
+    elapsed = coordinator.elapsed_points
     covered_until = archive[-1].t + _ARCHIVE_STEP if archive else None
     series = list(archive)
     series.extend(p for p in elapsed if covered_until is None or p.t >= covered_until)

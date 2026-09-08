@@ -13,14 +13,16 @@ from custom_components.helios_forecast.openmeteo import WeatherSeries
 
 
 def make_weather_series(now_utc: datetime, *, past_days: int = 60, forecast_days: int = 7) -> WeatherSeries:
-    """An hourly WeatherSeries spanning [now - past_days, now + forecast_days], constant values.
+    """An hourly WeatherSeries with the window Open-Meteo actually returns, constant values.
 
-    Mirrors the real fetch_weather() shape (UTC-aware, top-of-hour times) closely enough for the
-    coordinator's orchestration to run end to end without asserting on the forecast numbers
-    themselves (that belongs to the other modules' own tests).
+    The service answers whole UTC days: from (today - past_days) 00:00 to (today + forecast_days - 1)
+    23:00, never a window rolling from the current instant. The difference is what makes a horizon
+    that overruns the weather reachable in a test at all, so the shape is copied exactly and the
+    values are left flat (the forecast numbers belong to the pure modules' own tests).
     """
-    start = (now_utc - timedelta(days=past_days)).replace(minute=0, second=0, microsecond=0)
-    end = now_utc + timedelta(days=forecast_days)
+    midnight = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
+    start = midnight - timedelta(days=past_days)
+    end = midnight + timedelta(days=forecast_days) - timedelta(hours=1)
     times = []
     t = start
     while t <= end:

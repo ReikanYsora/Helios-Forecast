@@ -17,11 +17,14 @@ from custom_components.helios_forecast.openmeteo import WeatherSeries  # noqa: E
 from custom_components.helios_forecast.reliability import (  # noqa: E402
     MATURITY_TARGET_DAYS,
     SKILL_MIN_DAY_KWH,
+    SKILL_WINDOW_DAYS,
+    _W_MATURITY,
+    _W_PREDICT,
+    _W_SKILL,
     _blend,
     _day_predictability,
     _horizon_decay,
     compute_reliability,
-    daily_predicted_kwh,
     data_maturity,
     recent_skill,
     today_predictability,
@@ -36,12 +39,6 @@ class _Bucket:
         self.kwh = kwh
 
 
-class _Pt:
-    def __init__(self, t, pv_w):
-        self.t = t
-        self.pv_w = pv_w
-
-
 def _day_ms(day: int) -> float:
     return datetime(2026, 6, day, 12, tzinfo=UTC).timestamp() * 1000.0
 
@@ -53,33 +50,31 @@ def test_data_maturity_counts_distinct_days() -> None:
     assert abs(frac - 2 / MATURITY_TARGET_DAYS) < 1e-9
 
 
+def _predicted(days, kwh) -> dict:
+    """What was written down for each of those days, the day before it happened."""
+    return {datetime(2026, 6, d, tzinfo=UTC).date(): kwh for d in days}
+
+
 def test_recent_skill_perfect_and_off() -> None:
     now = datetime(2026, 6, 10, 12, tzinfo=UTC)
-    # Actual 10 kWh on days 5..8; predicted hourly points summing to 10 kWh per day = perfect.
     prod = [_Bucket(datetime(2026, 6, d, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0) for d in range(5, 9)]
-    pts = [_Pt(datetime(2026, 6, d, 12, tzinfo=UTC), 10_000.0) for d in range(5, 9)]
-    assert recent_skill(pts, prod, now, UTC) == 1.0
+    assert recent_skill(_predicted(range(5, 9), 10.0), prod, now, UTC) == 1.0
     # Predict double -> 100% relative error -> skill 0.
-    pts_off = [_Pt(datetime(2026, 6, d, 12, tzinfo=UTC), 20_000.0) for d in range(5, 9)]
-    assert recent_skill(pts_off, prod, now, UTC) == 0.0
-
-
-def test_daily_predicted_kwh_scales_with_step_minutes() -> None:
-    # A bucket duration other than the hourly default must scale the kWh conversion,
-    # not silently assume 1 h per point.
-    day = datetime(2026, 6, 5, tzinfo=UTC).date()
-    pts = [_Pt(datetime(2026, 6, 5, 12, tzinfo=UTC), 4_000.0)]
-    hourly = daily_predicted_kwh(pts, UTC)
-    quarter_hourly = daily_predicted_kwh(pts, UTC, step_minutes=15.0)
-    assert hourly[day] == 4.0
-    assert quarter_hourly[day] == 1.0
+    assert recent_skill(_predicted(range(5, 9), 20.0), prod, now, UTC) == 0.0
 
 
 def test_recent_skill_none_when_too_few_days() -> None:
     now = datetime(2026, 6, 10, 12, tzinfo=UTC)
     prod = [_Bucket(datetime(2026, 6, 8, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0)]
-    pts = [_Pt(datetime(2026, 6, 8, 12, tzinfo=UTC), 10_000.0)]
-    assert recent_skill(pts, prod, now, UTC) is None
+    assert recent_skill(_predicted([8], 10.0), prod, now, UTC) is None
+
+
+def test_recent_skill_none_without_a_day_ahead_record() -> None:
+    # A fresh install, or one whose record was lost: no day was predicted before it happened, so
+    # there is nothing to score and the term must be absent rather than assumed good.
+    now = datetime(2026, 6, 10, 12, tzinfo=UTC)
+    prod = [_Bucket(datetime(2026, 6, d, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0) for d in range(5, 9)]
+    assert recent_skill({}, prod, now, UTC) is None
 
 
 def test_recent_skill_ignores_days_below_the_minimum_actual_kwh() -> None:
@@ -89,10 +84,10 @@ def test_recent_skill_ignores_days_below_the_minimum_actual_kwh() -> None:
     below_floor = SKILL_MIN_DAY_KWH / 2.0
     prod = [_Bucket(datetime(2026, 6, d, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0) for d in range(5, 8)]
     prod.append(_Bucket(datetime(2026, 6, 8, 12, tzinfo=UTC).timestamp() * 1000.0, below_floor))
-    pts = [_Pt(datetime(2026, 6, d, 12, tzinfo=UTC), 10_000.0) for d in range(5, 8)]
+    predicted = _predicted(range(5, 8), 10.0)
     # Wildly wrong prediction on the excluded day; if it were counted, skill would collapse.
-    pts.append(_Pt(datetime(2026, 6, 8, 12, tzinfo=UTC), 999_000.0))
-    assert recent_skill(pts, prod, now, UTC) == 1.0
+    predicted[datetime(2026, 6, 8, tzinfo=UTC).date()] = 999.0
+    assert recent_skill(predicted, prod, now, UTC) == 1.0
 
 
 def _weather_today(clouds, *, ghi=500.0) -> WeatherSeries:
@@ -151,8 +146,8 @@ def test_today_predictability_clear_vs_broken() -> None:
 def test_compute_reliability_shape_and_range() -> None:
     now = datetime(2026, 6, 10, 12, tzinfo=UTC)
     prod = [_Bucket(datetime(2026, 6, d, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0) for d in range(1, 9)]
-    pts = [_Pt(datetime(2026, 6, d, 12, tzinfo=UTC), 10_000.0) for d in range(1, 9)]
-    r = compute_reliability(prod, pts, _weather_today([10, 12, 11, 10, 13]), now, UTC)
+    predicted = _predicted(range(1, 9), 10.0)
+    r = compute_reliability(prod, predicted, _weather_today([10, 12, 11, 10, 13]), now, UTC)
     assert 0.0 <= r.overall <= 100.0
     assert r.days_learned == 8
     assert len(r.per_day) == 7
@@ -166,14 +161,86 @@ def test_compute_reliability_today_entry_matches_predict() -> None:
     # so the entry must equal the blend built with `predict` exactly.
     now = datetime(2026, 6, 10, 12, tzinfo=UTC)
     prod = [_Bucket(datetime(2026, 6, d, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0) for d in range(1, 9)]
-    pts = [_Pt(datetime(2026, 6, d, 12, tzinfo=UTC), 10_000.0) for d in range(1, 9)]
+    predicted = _predicted(range(1, 9), 10.0)
     weather = _weather_today([10, 12, 11, 10, 13])
-    r = compute_reliability(prod, pts, weather, now, UTC)
+    r = compute_reliability(prod, predicted, weather, now, UTC)
     maturity, _ = data_maturity(prod, UTC)
-    skill = recent_skill(pts, prod, now, UTC, step_minutes=60.0)
+    skill = recent_skill(predicted, prod, now, UTC)
     predict = today_predictability(weather, now, UTC)
     expected_today = round(_blend(maturity, skill, predict), 1)
     assert r.per_day[0] == expected_today
+
+
+def test_the_published_index_stands_on_these_numbers() -> None:
+    """The weights and windows of a number shown to users as a percentage. Changing one is a
+    deliberate recalibration, not a tidy-up, so it has to come through here."""
+    assert (MATURITY_TARGET_DAYS, SKILL_WINDOW_DAYS, SKILL_MIN_DAY_KWH) == (60, 14, 0.5)
+    assert (_W_MATURITY, _W_SKILL, _W_PREDICT) == (0.35, 0.45, 0.20)
+    assert _W_MATURITY + _W_SKILL + _W_PREDICT == 1.0
+    # Sixty days of history is what "fully warmed up" means, and half of it is half the term.
+    spread = [datetime(2026, 6, 1, 12, tzinfo=UTC) + timedelta(days=d) for d in range(60)]
+    assert data_maturity([_Bucket(t.timestamp() * 1000.0, 5.0) for t in spread], UTC)[0] == 1.0
+    assert data_maturity([_Bucket(t.timestamp() * 1000.0, 5.0) for t in spread[:30]], UTC)[0] == 0.5
+
+
+def test_today_is_not_scored_while_it_is_still_running() -> None:
+    """Half a day of production against a whole day's prediction reads as a large error, every
+    morning, on every installation."""
+    now = datetime(2026, 6, 10, 12, tzinfo=UTC)
+    days = list(range(5, 10))
+    prod = [_Bucket(datetime(2026, 6, d, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0) for d in days]
+    # Today has only started: two of the ten kWh are in, against a prediction of ten.
+    prod.append(_Bucket(datetime(2026, 6, 10, 9, tzinfo=UTC).timestamp() * 1000.0, 2.0))
+    assert recent_skill(_predicted(days + [10], 10.0), prod, now, UTC) == 1.0
+
+
+def test_a_day_older_than_the_window_is_not_scored() -> None:
+    """The window is what makes the term recent; widened, a summer month props up a December."""
+    now = datetime(2026, 6, 30, 12, tzinfo=UTC)
+    recent = list(range(28, 30))
+    prod = [_Bucket(datetime(2026, 6, d, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0) for d in recent]
+    # A day well outside the window, predicted wildly wrong. Counted, it would halve the skill.
+    prod.append(_Bucket(datetime(2026, 6, 1, 12, tzinfo=UTC).timestamp() * 1000.0, 10.0))
+    predicted = _predicted(recent, 10.0)
+    predicted[datetime(2026, 6, 1, tzinfo=UTC).date()] = 30.0
+    assert recent_skill(predicted, prod, now, UTC) == 1.0
+
+
+def test_predictability_reads_the_size_of_the_swing_not_only_its_sign() -> None:
+    """A cloud forecast that swings across the whole sky is not nearly as predictable as one that
+    wobbles by ten points, and the scale that separates them is part of the published number."""
+    day = datetime(2026, 6, 10, tzinfo=UTC).date()
+    # Standard deviation of 20 points, half the 40-point scale, so exactly half the signal is left.
+    swing = _day_predictability(_weather_today([30.0, 70.0, 30.0, 70.0]), day, UTC)
+    assert swing is not None and abs(swing - 0.5) < 1e-9
+
+
+def test_an_unanswered_ensemble_is_not_perfect_agreement() -> None:
+    """The ensemble call is best effort and its window does not always cover every hour. An hour it
+    said nothing about has no spread, which must not read as every model agreeing exactly."""
+    day = datetime(2026, 6, 10, tzinfo=UTC).date()
+    broken = [0.0, 90.0, 10.0, 95.0, 5.0]
+    unknown = _day_predictability(_weather_today_with_spread(broken, [None] * 5), day, UTC)
+    agreed = _day_predictability(_weather_today_with_spread(broken, [0.0] * 5), day, UTC)
+    variance_only = _day_predictability(_weather_today(broken), day, UTC)
+
+    assert unknown is not None and agreed is not None
+    assert unknown == variance_only  # the signal drops out
+    assert unknown < agreed  # rather than raising the score
+
+
+def test_a_missing_signal_never_raises_the_index() -> None:
+    """Recent skill is the only term that measures accuracy, and it is the one that goes missing on a
+    site with too few comparable days: a northern winter, a fortnight of overcast. Renormalised over
+    the survivors, its absence made the published index rise exactly when it should not be trusted."""
+    everything = _blend(1.0, 1.0, 1.0)
+    without_skill = _blend(1.0, None, 1.0)
+    without_predict = _blend(1.0, 1.0, None)
+
+    assert without_skill < everything
+    assert without_predict < everything
+    # What is left is what could actually be measured: maturity and predictability, 0.35 + 0.20.
+    assert abs(without_skill - 55.0) < 1e-9
 
 
 def test_horizon_decay_is_gentle() -> None:

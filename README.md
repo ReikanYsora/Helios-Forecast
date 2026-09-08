@@ -19,12 +19,40 @@ Home Assistant already knows how to show it.
 [![Release](https://img.shields.io/github/v/release/ReikanYsora/Helios-Forecast?display_name=tag&style=for-the-badge&color=e0a106)](https://github.com/ReikanYsora/Helios-Forecast/releases)
 [![HACS Default](https://img.shields.io/badge/HACS-Default-e0a106.svg?style=for-the-badge)](https://github.com/hacs/default)
 [![Validate](https://img.shields.io/github/actions/workflow/status/ReikanYsora/Helios-Forecast/validate.yml?style=for-the-badge&label=validate&color=e0a106)](https://github.com/ReikanYsora/Helios-Forecast/actions/workflows/validate.yml)
-[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2025.1%2B-e0a106.svg?style=for-the-badge&logo=home-assistant&logoColor=white)](https://www.home-assistant.io/)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2025.11%2B-e0a106.svg?style=for-the-badge&logo=home-assistant&logoColor=white)](https://www.home-assistant.io/)
 [![License](https://img.shields.io/github/license/ReikanYsora/Helios-Forecast?style=for-the-badge&color=blue)](https://www.gnu.org/licenses/gpl-3.0)
 [![Stars](https://img.shields.io/github/stars/ReikanYsora/Helios-Forecast?style=for-the-badge&color=e0a106)](https://github.com/ReikanYsora/Helios-Forecast/stargazers)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=000000)](https://www.buymeacoffee.com/reikanysora)
 
 </div>
+
+---
+
+> ### Update to 2026.9.5 as soon as you can
+>
+> Every version before this one could take an entire hour of long-term statistics down with it, and
+> not only its own: when the recorder's hourly compile hit the collision this integration caused, it
+> rolled the whole hour back, so **every integration on that machine silently lost that hour of
+> history**. It was not rare. On one instance, two hours of a single day kept 14 series out of 494.
+>
+> The cause was here since the first version and it is fixed at the root rather than worked around,
+> so nothing you can configure avoids it on an older version. Your archived history is moved to the
+> new series on the first start, hour by hour, and the old one is deleted only once every hour of it
+> has been read back at its new home. The [changelog](CHANGELOG.md) says exactly what it does.
+
+## The community benchmark, if you want in
+
+"Is it accurate?" deserves an answer with numbers behind it, so there is an open measurement running
+on real installations, published as it goes: **[helios-ha.org/benchmark](https://helios-ha.org/benchmark)**.
+
+Taking part is one checkbox, in **Settings** > **Devices and services** > **Helios Forecast** >
+**Configure** > **Settings**, and it needs 2026.9.5 or newer. There is no key to ask for and no
+account to create. What travels is the panel geometry, the predicted curve, the measured production
+and the reliability index, once an hour: no entity names, no consumption, no other sensor, and
+coordinates rounded to about a kilometre. Clear the box and it stops.
+
+The integration itself never needs any of this. It has no key, sends nothing of its own accord and
+computes everything on your machine, whether you take part or not.
 
 ---
 
@@ -217,9 +245,11 @@ that is on while the inverter is being held back.
 > the battery, and learns nightly discharge as production.
 
 It also publishes a **reliability score**, which reflects how much history backs
-the learning, how accurate it has been recently, and how predictable today's sky
-is. A forecast that tells you when to doubt it is worth more than one that does
-not.
+the learning, how close yesterday's forecast came to what the meter then measured,
+and how predictable today's sky is. It is a floor rather than a grade: a signal it
+cannot measure counts for nothing rather than being shared out among the others, so
+the number never rises because something went missing. A forecast that tells you
+when to doubt it is worth more than one that does not.
 
 Everything runs on your server. No account, no API key, no browser-side maths.
 
@@ -234,50 +264,6 @@ problem becomes a repair in Home Assistant (Settings, then Repairs, and the
 integration's own page), naming the value at fault and what to do about it, and it
 clears itself the moment the configuration is corrected. The integration's page
 also offers a diagnostics download for issue reports.
-
----
-
-## The public accuracy benchmark
-
-"Accurate" means nothing without proof, and proof is harder to get than it looks.
-A forecast can only be judged against what actually happened, and no provider
-serves its own past emissions: a prediction nobody recorded at the moment it was
-made cannot be recovered afterwards. So the measurement has to start before the
-claim, and it has to run for months.
-
-That recording is built in, off by default. It has its own entry in the options
-menu, next to the settings and the panel lines. Switched on there, your
-installation posts once an hour the curve it is currently predicting, together
-with the production it has already measured. A collector scores the two against
-each other once the day is over, beside two references, the bare physical model
-and yesterday's curve replayed as a forecast, and the results are published openly
-at [helios-ha.org/benchmark](https://helios-ha.org/benchmark). You can watch the
-benchmark fill up, day after day, including the days the forecast gets it wrong.
-The point is not a contest with other services: it is to know where the forecast
-is strong and where it is weak, so that each version can be measured against the
-last on the same installations.
-
-Taking part costs a click. There is no account and no name to give: the page hands
-you a key, you paste it into that menu, and that is all. What leaves your
-installation is fixed and deliberately small.
-
-- Your panel geometry, the predicted curve with the cloud cover behind it, the
-  production your meter has already recorded, and the reliability index.
-- Your coordinates rounded to about a kilometre, which no weather model can tell
-  apart from the exact spot and which is not an address, plus the country.
-- An opaque hash in place of any identity, so one installation can be followed
-  over time without the collector being told whose it is.
-
-No entity names, no consumption, no other sensor, nothing about the rest of the
-house. The whole payload is assembled in one file, `benchmark.py`, so you can
-read exactly what is sent rather than take our word for it. The upload runs beside
-the forecast and never inside it: a collector that is slow, unreachable or gone
-cannot delay or break anything, and clearing the key stops everything within the
-second.
-
-The benchmark is worth what its diversity is worth. Shaded roofs, unusual
-orientations, split arrays and difficult climates are the interesting cases, far
-more than another clear south facing roof.
 
 ---
 
@@ -325,7 +311,7 @@ documented and frozen, so a change on either side cannot silently break the othe
 | [CHANGELOG.md](CHANGELOG.md) | What changed, release by release |
 | [helios-ha.org](https://helios-ha.org/helios-forecast/) | The full entity list and how it all fits together |
 
-Requires Home Assistant **2025.1.0** or later.
+Requires Home Assistant **2025.11.0** or later: the archive writes its own long-term statistics series, whose metadata carries a unit class the recorder only stores from that release.
 
 Found a bug, or is a forecast off? [Open an issue](https://github.com/ReikanYsora/Helios-Forecast/issues).
 Feedback is very welcome, and it is what shapes the roadmap.

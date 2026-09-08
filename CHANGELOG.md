@@ -5,6 +5,330 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## 2026.9.5
+
+The release that stops taking the whole machine's statistics down with it. A
+Home Assistant instance running this integration was losing entire hours of
+long-term statistics, for every integration on it, not just this one. The cause
+was here, it had been here since the first version, and it is fixed at the root
+rather than worked around.
+
+### Fixed: the integration no longer breaks Home Assistant's hourly statistics
+
+Home Assistant knows two kinds of long-term statistics. A series named after an
+entity belongs to the recorder, which compiles it from that entity's state every
+hour on its own. A series named `domain:something` belongs to the integration
+that declares it, and the recorder never touches it.
+
+This integration archives nine series: the seven weather variables (Open-Meteo
+only serves a rolling 60-day window, the archive keeps them for good) and the
+predicted production for hours that have since happened (the past curve the card
+draws behind today). All nine were written under entity ids, on entities that
+also carried a `state_class`. So there were two writers on the same series: the
+recorder compiling the entity, and this integration importing the same hour. When
+they landed on the same hour, the duplicate violated the unique index, and Home
+Assistant rolls that back by abandoning the **entire** hourly compile, not just
+the offending row. Every other integration on the machine silently lost that hour
+of history too.
+
+It was not theoretical, and not rare. On the maintainer's own instance, two hours
+of 2026-09-06 kept 14 series out of 494: the nine written here, plus five belonging
+to another integration that already used its own ids. A healthy hour on the same
+instance holds 419. Everything else on that machine, every hour, was gone.
+
+The nine series are now written under this integration's own ids,
+`helios_forecast:<entry_id>_<series>`, which the recorder never compiles. One
+writer by construction, so the collision cannot happen rather than happening
+rarely. The seven weather sensors lose their `state_class` accordingly: they show
+the current hour, and their history is the archive, which no longer needs an
+entity to hang from.
+
+**Your history is moved, not dropped.** On the first start after the update, every
+archived hour is copied onto the new id, and each of those hours is then read back
+at the new id by its own start time. The old series is deleted only once every one
+of them answers. The check is on the hours themselves and not on how many there
+are: the new id is already being filled by the integration's own backfill by then,
+so a count could be satisfied entirely by hours the move never wrote, and the
+series deleted next would have been the only copy of the oldest of them. If
+anything does not line up, nothing is deleted, it is written to the log, and the
+next start tries again. It waits for Home Assistant to have finished starting and
+runs in the background, so it never holds the start up: on a 20 864-hour archive
+a Raspberry Pi 5 took about a minute, with everything else already running. And it
+runs on every start rather than once, so an installation that skips a version, or
+is restored from a backup taken before the update, is repaired all the same; once
+there is nothing left to move it costs a single metadata read. The one thing not
+carried over is the 5-minute short-term statistics, kept 10 days at most:
+integration-owned series are hourly by design in Home Assistant. The full
+long-term history is carried over whole.
+
+Where to find them afterwards: in a statistics or energy-date card, the archive
+appears under its readable name (Cloud cover, Global irradiance, Predicted power,
+and so on) rather than under a `sensor.` entity. History graphs of the weather
+sensors themselves now show the recorded states only, which is what those sensors
+are for.
+
+### Fixed: the migration converts what it moves, and checks the hours rather than counting them
+
+Home Assistant stores an entity-bound statistic in the unit the entity displayed, so
+an installation on the US customary system holds its temperature in Fahrenheit, its
+wind in miles per hour and its snow depth in feet. The move now names the unit it
+wants on every read, so those values are converted rather than relabelled, and a
+series whose unit cannot be converted is left exactly where it is with an error in
+the log. Naming the unit matters even when the stored one already matches: left
+unasked, the recorder converts to whatever the live entity happens to display.
+
+The check that runs before the old series is deleted is on the hours themselves, not
+on how many there are. The destination is already populated by the integration's own
+backfill by then, so a row count there could be satisfied entirely by hours the move
+never wrote.
+
+### Fixed: an hour the weather service publishes late no longer goes missing
+
+Open-Meteo publishes a past hour with a delay. The weather archive moved its
+high-water mark to the current hour as soon as anything at all had been written,
+while rows are only written for hours that carry a value, so a refresh with an older
+hour to write while the newest was still missing stepped over the gap and never came
+back to it. Until this release that hole was invisible, because the recorder compiled
+the same entities and the late hour arrived through the entity's own state. The mark
+now stops short of a trailing window, so the most recent hours are offered again on
+every refresh until they arrive.
+
+### Fixed: the battery projection loses an hour of house load on the clock changes
+
+The forecast curve is built on the local clock, so a local day always carries 96
+quarter-hour points whether that day is 23, 24 or 25 real hours long, and the battery
+projection charged each of them a quarter of an hour of real time. On the two
+changeover days it integrated the house load over an hour too little in autumn and an
+hour too much in spring: 0.7 kWh at a 700 W night load, about 7 points of state of
+charge on a 9.8 kWh battery. A step now lasts the real time to the next point, and on
+the spring day, where four quarter-hours name local times that never happen and land
+on the instants of the four that follow, one point per real instant is kept.
+
+### Fixed: a meter reset no longer teaches the learning that the sky went dark
+
+When an energy meter is reset, replaced, or restored from an older backup, Home
+Assistant writes one enormous negative hour into the recorder. The sky-residual map
+already refused those hours; the analog library clamped them to zero instead, which
+filed a bright hour as one where the sky gave nothing and dragged every later
+prediction under similar sun and cloud down with it. Both refuse a negative hour now.
+
+### Changed: two terms the physical model never had
+
+Measured against 1875 forecasts from 57 real installations, the bare physical model
+over-promised by about 40 %, systematically, everywhere. Two terms were missing from
+it.
+
+The first is everything between the plane of the array and the meter that no optical
+model covers: soiling, mismatch, wiring, connections, availability, and the inverter's
+own conversion. Fitted by leaving one installation out at a time, the fleet asks for a
+factor of 0.827; PVWatts' own defaults, 14 % system losses on a 96 % inverter, give
+0.825. That is the same number arrived at twice, so it ships as 0.825. On its own it
+takes the bare model's mean absolute error from 109 to 88 W per kWp and removes the
+bias entirely.
+
+The second is that glass reflects more of the sunbeam the further the sun is from
+square-on, which no transposition accounts for. After removing each installation's own
+constant bias, the residual error follows a repeatable curve with sun elevation that is
+the same on every roof, in every sky: about 0.63 below ten degrees rising to 1.25 above
+forty. The standard incidence-angle modifier for a glazed module carries that shape and
+takes the error to 84 W per kWp.
+
+What this means for you depends on how long the integration has been learning. On an
+installation with sixty days of production history the learned correction had already
+absorbed most of it, so the published forecast barely moves; what changes is that it
+now gets there from a model that is right, rather than from a correction compensating
+for one that is not. On a fresh install, on one with no production sensor, and on every
+sky the learning has not seen yet, the forecast is simply better from the first day.
+
+### Changed: `power_now` reads the same curve the card draws
+
+"Now" always falls inside a fifteen-minute step that began in the past, and that
+elapsed stretch exists twice: raw, meaning what the forecast said at the time, and
+clamped by what the site has actually been seen to produce, which is what the card
+draws. The sensor read the raw one. On a shaded roof, where the physical model cannot
+see the tree, the headline sensor and the card disagreed by the whole height of the
+learned ceiling, for the same instant on the same screen. The sensors now read the
+curve the card draws. On such an installation `sensor.helios_forecast_power_now` will
+read lower than before; that is the value the integration actually stands behind.
+
+### Changed: the learning's global fallback is weighted by energy
+
+The sky-residual map keeps a correction per sky cell and a global one for the cells it
+has not seen yet, which on a young installation is most of them. That global figure
+counted every hour the same, so the many small hours around sunrise and sunset
+outweighed the few that carry the day's production, and the fallback drifted towards
+whatever the model does at low sun. It is now weighted by the energy of each hour, so
+it says what the installation does over a day rather than over a list of hours.
+
+### Fixed: the hourly refresh no longer asks the weather service on the hour
+
+The archive of the elapsed hour is rebuilt by a refresh armed for the hour boundary, and it asked
+at five seconds past. Weather models publish on the hour and so does every scheduled task there is,
+so every installation asked in the least answerable second of the hour, all of them together, and
+the log filled with "Open-Meteo returned no weather data" a few seconds later. It is not a quota:
+twenty of these requests back to back answer without a single refusal. The refresh now runs seven
+minutes past, which nothing about rebuilding a finished hour makes urgent.
+
+### Fixed: the seventh day of the forecast, everywhere west of Greenwich
+
+Open-Meteo answers whole UTC days while the forecast horizon is built on your local
+midnights, so at a negative offset the tail of the last day ran past the final
+weather sample the service had sent. The curve did not stop there: it held that last
+sample and carried it forward, with the correct sun geometry on top, which looks
+exactly like an ordinary forecast. In Los Angeles the seventh day ran eight hours on
+one frozen weather hour and came out about a fifth too high, in the day sensor and in
+the energy handed to the Energy dashboard for those hours.
+
+The forecast now stops at the last hour the weather actually describes, and the
+request reaches a day further so your local horizon is covered at any offset. If you
+are in the Americas, expect `energy_day_7` to read lower than before. That is the
+correct figure.
+
+### Fixed: hours lost for good when Open-Meteo goes quiet
+
+Open-Meteo answering nothing is normal rather than an error, so a refresh reuses the
+last series it received and carries on. It also wrote the weather archive from it and
+moved its high-water mark on the clock, which filed a forecast as the observed record
+and, worse, carried the mark over hours nobody had measured. Past the six-hour retry
+window those hours were gone for good, even after the service came back. The archive
+now stops at the hour the series in hand was actually fetched, so a reused series
+freezes the mark instead of advancing it, and the recovery refresh writes every hour
+the outage covered.
+
+### Fixed: the learning no longer takes the inverter's ceiling for a dark sky
+
+The residual map compared your meter against a model that never saw the entry-level
+inverter limit, only the per-array ones, which an ordinary single-inverter
+installation does not have. An array oversized against its inverter therefore taught
+the map that the sky is dimmer than it is around noon, and the map took that off
+every cloudy hour that never clips: ten kilowatts of panels behind a six-kilowatt
+inverter learned 0.88 where the truth was 1.0.
+
+The same learning refused an impossibly negative hour but not an impossibly positive
+one, and it averages, so a single phantom hour from a replaced meter dragged the
+whole sixty-day correction to its ceiling. Both learners now drop an hour above what
+the panels can physically deliver, on the same threshold the check-up warns you on.
+
+### Fixed: what the reliability index was actually measuring
+
+Three things, each of which could only push the number up.
+
+Recent skill carries the largest weight and is the only term that measures accuracy.
+It compared the archived past forecast against the production that archive had been
+fitted to, so it came out near perfect whatever the model was really doing: an
+installation whose physics is wrong by a factor of two read a skill of 0.99.
+Tomorrow's predicted total is now written down before that day happens, and the skill
+is measured against those records. It needs a couple of days to appear on a fresh
+install.
+
+A signal that could not be computed was shared out among the others, so the index
+rose exactly when there was least ground to trust it, which is a northern winter or a
+run of overcast. It now divides by the full weight and reads as a floor: this much
+could be established.
+
+And when the cross-model ensemble call failed, the disagreement between models was
+filled with zero, which is what perfect agreement looks like. An unanswered hour now
+carries no value and the signal drops out.
+
+### Fixed: a battery below its reserve, and a panel cooler than the air
+
+A battery sitting under its configured reserve, after an outage or a manual
+discharge, was projected from the reserve rather than from the charge it actually
+holds, so the whole chart started above the level your inverter shows and every hour
+after it inherited energy that is not there.
+
+The wind term was subtracted from the air temperature rather than from the heat the
+sun puts into the panel, so an overcast windy hour put the cell several degrees below
+ambient and the thermal model turned that into a production bonus, at the hours with
+the least sun in them.
+
+### Fixed: the check-up no longer calls a hybrid inverter a mistake
+
+A battery inverter is sized for the house, not for the array, so three kilowatts of
+panels behind a ten-kilowatt hybrid is an ordinary installation. It was reported as
+an error every time you opened the page. The mistake that check exists to catch is a
+value typed in watts, a factor of a thousand, so the threshold is now wide enough to
+leave real installations alone.
+
+### Fixed: clearing a field in the options actually clears it
+
+Everything that reads the configuration merges the entry's stored data over its
+options, and the options form only ever wrote the options. A setting typed when you
+first installed the integration therefore lived in the data and could not be removed
+through the interface: emptying the battery entity field left the old entity driving
+the projection. The options form now writes the whole configuration back as the
+entry's data, so an empty field means empty.
+
+### Fixed: a refresh no longer undoes your decisions
+
+The configuration checks are published before anything is fetched, so a wrong field
+shows even when the weather service is down. That publish went through the same
+routine as the final one, which retires whatever is not in the list it is given, so
+every issue raised by the data checks was deleted and created again seconds later,
+in the same refresh. Deleting a repair issue throws away its registry entry, and with
+it your decision to ignore that one: forty-eight times a day on a thirty-minute
+refresh. The early publish only adds now.
+
+### Changed: Home Assistant 2025.11 is now the minimum
+
+The archived series carry a unit class in their metadata, which the recorder only
+stores from 2025.11. On anything older no integration-owned series could be created
+at all: the archive wrote nothing while looking healthy, and the migration then waited
+out its timeout on each of the nine series, every start. The manifest said 2025.1,
+which was simply not true of this release.
+
+### Changed: the predicted-production archive stores the hour, not its first instant
+
+The archived past forecast filed the modelled power at the top of each hour as that
+hour's average. It is now the average across the hour, taken between the sample that
+opens it and the one that opens the next. Morning hours were understated and
+afternoon hours overstated, most of all around sunrise and sunset where the curve
+moves fastest.
+
+### Changed: the benchmark asks for no key at all
+
+An earlier build stored a benchmark write key in the config entry. Nothing reads it
+any more: taking part is a box in the settings and nothing else, and the entry is
+cleaned of the key on the next start. Diagnostics now masks anything whose name reads
+like a credential, since that file is what this project invites you to attach to a
+public issue.
+
+The measurement itself starts over with this release and only accepts 2026.9.5 or
+newer, so the published averages describe the model rather than the gaps between
+versions. An installation that had already opted in stays opted in. What goes up is
+the predicted curve, the geometry of the installation and the production your meter
+measured, once an hour, under a hash of the config entry: no entity name, no
+consumption, no account, coordinates rounded to about a kilometre before they leave
+your machine. Results at helios-ha.org/benchmark.
+
+### Fixed: Korea gets the Korean weather model
+
+The regional model boxes overlap, and Korea's sits entirely inside Japan's. The rule
+that picked between them preferred whichever box the point sat most centrally inside,
+which near the small box's own edge is the vast one around it: Jeju island was
+forecast from the Japanese model. A box that wholly contains another candidate is now
+set aside in favour of the narrower one.
+
+### Removed: the `predicted_power` and `predicted_energy` entities
+
+Both existed for one reason: to give the predicted-production archive an entity to
+be named after. That is exactly what no longer happens, and their live value was a
+duplicate of `power_now` and `energy_this_hour` respectively. Rather than keep two
+entities that do nothing and carry a deprecation for a year, they are removed now.
+
+- `sensor.helios_forecast_predicted_power` is replaced by
+  **`sensor.helios_forecast_power_now`** (same value, same unit, same device class).
+- `sensor.helios_forecast_predicted_energy` is replaced by
+  **`sensor.helios_forecast_energy_this_hour`** (same value, same unit; it is
+  disabled by default, enable it from the integration's entity list).
+
+A dashboard or automation naming either of them needs that one edit. Their archived
+history is not lost: it is moved to `helios_forecast:<entry_id>_predicted_power` and
+`helios_forecast:<entry_id>_predicted_energy` like everything else, and their now
+empty registry entries are removed so no dead entity is left behind.
+
+---
+
 ## 2026.9.4
 
 ### Fixed: saving the settings no longer drops the benchmark opt-in and key

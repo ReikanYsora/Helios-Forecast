@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: paneeliliin",
-        "description": "Üks prognoos ühe paneeliliini kohta (ühesuunaliselt paigaldatud paneelide rühm). Lisa integratsioon uuesti iga täiendava liini jaoks. Jäta asukoht tühjaks, et kasutada oma Home Assistanti kodu asukohta.",
+        "description": "Üks prognoos ühele päikeseelektrijaamale. Lisage üks paneeliliin suuna kohta; mitu liini jagavad selle paigaldise ühte tootmisandurit ja inverteri piirangut. Jätke asukoht tühjaks, et kasutada Home Assistanti kodukohta.",
         "data": {
           "name": "Nimi (nt Lõunakatus)",
           "tilt": "Kalle (kraadides, 0 = lapik, 90 = vertikaalne)",
@@ -14,26 +14,28 @@
           "latitude": "Laiuskraad (valikuline)",
           "longitude": "Pikkuskraad (valikuline)",
           "inverter_max_kw": "Inverteri maksimaalne väljund (kW, valikuline)",
-          "production_entity": "PV tootmisandur (õpitava korrektsiooni jaoks)",
+          "production_entity": "Toodetud päikeseenergia andur (kWh, õpitud paranduse jaoks)",
           "trend_anchor_hour": "Tänase trendi võrdlustund (0-23, vaikimisi 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Lisa veel üks paneeliliin",
           "battery_capacity_kwh": "Aku kasutatav mahutavus (kWh)",
           "battery_soc_entity": "Aku laetuse andur (%)",
           "battery_max_charge_kw": "Aku maksimaalne laadimisvõimsus (kW, valikuline)",
           "battery_max_discharge_kw": "Aku maksimaalne tühjenemisvõimsus (kW, valikuline)",
           "battery_min_soc": "Aku reserv, minimaalne laetus (%, vaikimisi 10)",
           "battery_efficiency": "Aku edasi-tagasi kasutegur (%, vaikimisi 90)",
-          "curtailment_entity": "Piirangu signaal (binaarandur, valikuline)"
+          "curtailment_entity": "Piiramise signaal (binaarandur, input boolean või lüliti, valikuline)",
+          "benchmark_enabled": "Panusta avalikku täpsusmõõtmisse (valikuline)"
         },
         "data_description": {
           "production_entity": "Kumulatiivne energiaandur (kWh), nt inverteri või energiaarvesti kogutoodang. Võimsusandur (W) ei tööta: sellel puudub pikaajaline summastatistika, nii et õppimine ja usaldusväärsuse indeks jääksid välja.",
           "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
-          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi."
+          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi.",
+          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegelikult toodetuga. Tulemused avaldatakse avalikult aadressil helios-ha.org/benchmark. Liiguvad ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: ei ühtegi olemi nime, ei tarbimist, ei muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Nõuab versiooni 2026.9.5 või uuemat, see on mõõdetav versioon. Väljas, kuni te selle sisse lülitate."
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: täiendav paneeliliin",
+        "description": "Paneeliliin {index}: veel üks sama suunaga paneelide rühm samas paigaldises (ühine tootmisandur ja inverter).",
         "data": {
           "tilt": "Kalle (kraadides, 0 = lapik, 90 = vertikaalne)",
           "azimuth": "Asimuut (kraadid põhjast, 90 = ida, 180 = lõuna, 270 = lääs)",
@@ -42,7 +44,7 @@
           "tracker": "Päikese jälgija",
           "latitude": "Laiuskraad sellele reale (valikuline)",
           "longitude": "Pikkuskraad sellele reale (valikuline)",
-          "add_another": "Add another panel line"
+          "add_another": "Lisa veel üks paneeliliin"
         }
       }
     }
@@ -51,21 +53,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Valige, mida soovite muuta.",
         "menu_options": {
           "settings": "Muuda seadeid (asukoht, inverter, tootmisandur, aku, piirangu signaal)",
-          "lines": "Edit panel lines",
-          "benchmark": "Osale kogukonna võrdlustestis"
+          "lines": "Muuda paneeliliine"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: seaded",
         "description": "Ühine asukoht, inverteri piir, tootmisandur, võrdlustund, aku ja piirangu signaal selle kirje iga paneelirea jaoks.",
         "data": {
           "latitude": "Laiuskraad (valikuline)",
           "longitude": "Pikkuskraad (valikuline)",
           "inverter_max_kw": "Inverteri maksimaalne väljund (kW, valikuline)",
-          "production_entity": "PV tootmisandur (õpitava korrektsiooni jaoks)",
+          "production_entity": "Toodetud päikeseenergia andur (kWh, õpitud paranduse jaoks)",
           "trend_anchor_hour": "Tänase trendi võrdlustund (0-23, vaikimisi 6)",
           "battery_capacity_kwh": "Aku kasutatav mahutavus (kWh)",
           "battery_soc_entity": "Aku laetuse andur (%)",
@@ -73,17 +74,19 @@
           "battery_max_discharge_kw": "Aku maksimaalne tühjenemisvõimsus (kW, valikuline)",
           "battery_min_soc": "Aku reserv, minimaalne laetus (%, vaikimisi 10)",
           "battery_efficiency": "Aku edasi-tagasi kasutegur (%, vaikimisi 90)",
-          "curtailment_entity": "Piirangu signaal (binaarandur, valikuline)"
+          "curtailment_entity": "Piiramise signaal (binaarandur, input boolean või lüliti, valikuline)",
+          "benchmark_enabled": "Panusta avalikku täpsusmõõtmisse (valikuline)"
         },
         "data_description": {
           "production_entity": "Kumulatiivne energiaandur (kWh), nt inverteri või energiaarvesti kogutoodang. Võimsusandur (W) ei tööta: sellel puudub pikaajaline summastatistika, nii et õppimine ja usaldusväärsuse indeks jääksid välja.",
           "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
-          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi."
+          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi.",
+          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegelikult toodetuga. Tulemused avaldatakse avalikult aadressil helios-ha.org/benchmark. Liiguvad ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: ei ühtegi olemi nime, ei tarbimist, ei muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Nõuab versiooni 2026.9.5 või uuemat, see on mõõdetav versioon. Väljas, kuni te selle sisse lülitate."
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: paneeliliin {index}/{total}",
+        "description": "Muutke paneeliliini {index} / {total} või märkige, et lisada veel üks.",
         "data": {
           "tilt": "Kalle (kraadides, 0 = lapik, 90 = vertikaalne)",
           "azimuth": "Asimuut (kraadid põhjast, 90 = ida, 180 = lõuna, 270 = lääs)",
@@ -92,22 +95,8 @@
           "tracker": "Päikese jälgija",
           "latitude": "Laiuskraad sellele reale (valikuline)",
           "longitude": "Pikkuskraad sellele reale (valikuline)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: kogukonna võrdlustest",
-        "description": "Avatud mõõtmine sellest, kui täpne Helios Forecast tegelikult on, päris paigaldistel, jooksvalt avaldatud. Kas soovid osaleda? Siit läheb: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHangi võti ühe klikiga, ilma kontota ja ilma nimeta, ning kleebi see allapoole. Kõige peatamiseks kustuta see.",
-        "data": {
-          "benchmark_enabled": "Osale avalikus täpsuse võrdlustestis (valikuline)",
-          "benchmark_key": "Võrdlustesti võti",
-          "benchmark_url": "Koguja aadress"
-        },
-        "data_description": {
-          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegeliku toodanguga. Tulemused avaldatakse avalikult. Saadetakse ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: mitte ühtegi olemi nime, mitte mingit tarbimist, mitte ühtegi muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Väljas, kuni selle sisse lülitate.",
-          "benchmark_key": "Kirjutusvõti, mille saite võrdlustestiga liitudes. Ilma selleta ei saadeta midagi.",
-          "benchmark_url": "Aadress, kuhu mõõtmised saadetakse, kuvatud nii et tead täpselt kuhu."
+          "remove_this_line": "Eemalda see paneeliliin",
+          "add_another": "Lisa veel üks paneeliliin"
         }
       }
     }
@@ -229,10 +218,6 @@
       "title": "Aku kasutegur väljaspool vahemikku",
       "description": "{entry} täistsükli kasutegur on {value}. Sisestage protsent 50 kuni 100 (enamik koduakusid on umbes 90)."
     },
-    "benchmark_key": {
-      "title": "Võrdlusuuringu võti ei näe välja nagu võti",
-      "description": "{entry} osaleb kogukonna võrdlusuuringus, kuid selle võti ei ole koguja väljastatud. Kleepige kogu võti aadressilt helios-ha.org/benchmark või lülitage võrdlusuuring välja."
-    },
     "production_entity_missing": {
       "title": "Tootmisandurit ei leitud",
       "description": "{entry} tootmisandurit {entity} ei ole olemas. Prognoos töötab parandamata, kuni see tekib. Kontrollige olemi ID-d või valige andur seadetes uuesti."
@@ -274,8 +259,19 @@
       "description": "Energia armatuurlaual on allikal {source} andmed {pct}% tundide kohta, mida katab parim allikas ({best}%). Tarbimisprofiil ehitatakse ainult tundidest, mida see katab, seega jääb see õigeks, kuid toetub väiksemale ajaloole. Usaldusväärsem andur selle voo jaoks muudab aku projektsiooni täpsemaks."
     },
     "benchmark_excluded": {
-      "title": "Võrdlusuuringu arvudest välja jäetud ({reason})",
-      "description": "Kogukonna võrdlusuuring võtab {entry} saadetised vastu, kuid hoiab need avaldatud arvudest väljas. Põhjus {reason}: kwp tähendab, et deklareeritud tippvõimsus puudub, on null või sisestati vattides; night tähendab, et tootmisandur salvestab energiat öösel, seega mõõdab rohkem kui paneelid. Parandage seadistus ja seade loetakse päeva jooksul uuesti."
+      "title": "Hoitakse mõõtmise arvudest välja ({reason})",
+      "description": "Avalik mõõtmine võtab vastu {entry} saadetised, kuid hoiab need avaldatud arvudest väljas. Põhjus {reason}: kwp tähendab, et deklareeritud tippvõimsus puudub, on null või sisestatud vattides; night tähendab, et tootmisandur salvestab energiat öösel ja mõõdab seega rohkem kui paneelid. Parandage seadistus ja paigaldis loetakse ööpäeva jooksul taas kaasa."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Ühtegi Helios Forecasti paigaldist kirje ID-ga {entry_id} ei ole."
+    },
+    "service_no_installation": {
+      "message": "Ühtegi Helios Forecasti paigaldist ei ole seadistatud."
+    },
+    "service_several_installations": {
+      "message": "Seadistatud on mitu Helios Forecasti paigaldist; ühe valimiseks lisage 'config_entry_id'."
     }
   }
 }

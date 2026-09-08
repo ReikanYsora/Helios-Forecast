@@ -28,8 +28,6 @@ from .config import (
     CONF_BATTERY_MAX_DISCHARGE_KW,
     CONF_BATTERY_MIN_SOC,
     CONF_BATTERY_SOC_ENTITY,
-    CONF_BENCHMARK_ENABLED,
-    CONF_BENCHMARK_KEY,
     CONF_CURTAILMENT_ENTITY,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
@@ -44,18 +42,21 @@ from .config import (
     _VALID_TRACKERS,
 )
 from .solar.geometry import sun_position
-from .solar.residual import ProductionBucket
+from .solar.residual import ABOVE_PANELS_RATIO, ProductionBucket
 
 ERROR = "error"
 WARNING = "warning"
 
-# Bounds. A home line above 100 kWp is a value typed in watts; an inverter limit more than three
-# times the peak power is the same mistake on the other field, and one below a quarter of it is a
-# limit that would clip most of the day (possible, so a warning). Panel coordinates far from the home
-# or a configured location far from Home Assistant's are almost always a typo in a decimal.
+# Bounds. A home line above 100 kWp is a value typed in watts; an inverter limit far above the peak
+# power is the same mistake on the other field, and one below a quarter of it is a limit that would
+# clip most of the day (possible, so a warning). The upper ratio is deliberately wide: a hybrid
+# inverter is sized for the house rather than for the array, so three kilowatts of panels behind a
+# ten-kilowatt battery inverter is an ordinary installation and must not be called an error, while
+# the mistake this catches is a factor of a thousand. Panel coordinates far from the home or a
+# configured location far from Home Assistant's are almost always a typo in a decimal.
 KWP_MIN = 0.05
 KWP_MAX = 100.0
-CAP_RATIO_MAX = 3.0
+CAP_RATIO_MAX = 10.0
 CAP_RATIO_MIN = 0.25
 LINE_DISTANCE_MAX_KM = 20.0
 LOCATION_DISTANCE_MAX_KM = 50.0
@@ -69,7 +70,8 @@ BATTERY_C_RATE_MAX = 3.0
 NIGHT_ALTITUDE_DEG = -6.0
 NIGHT_KWH_FLOOR = 0.5
 NIGHT_SHARE = 0.03
-ABOVE_PANELS_RATIO = 1.3
+# ABOVE_PANELS_RATIO comes from the learning itself (solar/residual.py), which drops such an hour:
+# the owner is told about exactly the hours their learning refused, and the two cannot drift apart.
 ABOVE_PANELS_HOURS = 3
 STALE_DAYS = 3
 # A consumption source that covers less than half the hours the best-covered one does dilutes the
@@ -205,10 +207,6 @@ def check_config(data: Dict[str, Any], home_lat: float, home_lon: float) -> List
 
     problems.extend(_check_battery_config(data))
 
-    if data.get(CONF_BENCHMARK_ENABLED):
-        key = str(data.get(CONF_BENCHMARK_KEY) or "").strip()
-        if len(key) < 16 or " " in key:
-            problems.append(Problem("benchmark_key", ERROR))
     return problems
 
 
@@ -242,6 +240,23 @@ def _check_battery_config(data: Dict[str, Any]) -> List[Problem]:
 
 
 # --- the entities the configuration points at ------------------------------------------------
+
+
+# --- the benchmark collector's verdict --------------------------------------------------------
+
+
+def check_benchmark_quality(quality: Optional[Dict[str, Any]]) -> List[Problem]:
+    """What the collector answered about this installation: excluded from the public figures, and why.
+
+    The owner hears it from their own instance rather than from the site, because the reason is
+    always something only they can change.
+    """
+    if not isinstance(quality, dict):
+        return []
+    reason = quality.get("excluded")
+    if not reason:
+        return []
+    return [Problem("benchmark_excluded", WARNING, {"reason": str(reason)}, str(reason))]
 
 
 def check_entities(
@@ -363,16 +378,3 @@ def check_consumption_coverage(coverage: Dict[str, float]) -> List[Problem]:
                 )
             )
     return problems
-
-
-# --- the benchmark collector's verdict --------------------------------------------------------
-
-
-def check_benchmark_quality(quality: Optional[Dict[str, Any]]) -> List[Problem]:
-    """What the collector answered about this installation: excluded from the public figures, and why."""
-    if not isinstance(quality, dict):
-        return []
-    reason = quality.get("excluded")
-    if not reason:
-        return []
-    return [Problem("benchmark_excluded", WARNING, {"reason": str(reason)}, str(reason))]

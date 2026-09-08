@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: paneļu līnija",
-        "description": "Viena prognoze vienai paneļu līnijai (vienādi orientētu paneļu grupai). Katrai papildu līnijai pievienojiet integrāciju vēlreiz. Atstājiet atrašanās vietu tukšu, lai izmantotu jūsu Home Assistant mājas atrašanās vietu.",
+        "description": "Viena prognoze vienai saules elektrostacijai. Pievienojiet vienu paneļu līniju katram virzienam; vairākas līnijas izmanto vienu un to pašu ražošanas sensoru un invertora ierobežojumu. Atstājiet atrašanās vietu tukšu, lai izmantotu Home Assistant mājas atrašanās vietu.",
         "data": {
           "name": "Nosaukums (piem., Dienvidu jumts)",
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
@@ -14,26 +14,28 @@
           "latitude": "Platums (neobligāti)",
           "longitude": "Garums (neobligāti)",
           "inverter_max_kw": "Invertora maksimālā jauda (kW, neobligāti)",
-          "production_entity": "PV ražošanas sensors (apgūtajai korekcijai)",
+          "production_entity": "Saražotās saules enerģijas sensors (kWh, apgūtajai korekcijai)",
           "trend_anchor_hour": "Šodienas tendences atskaites stunda (0-23, noklusējums 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Pievienot vēl vienu paneļu līniju",
           "battery_capacity_kwh": "Izmantojamā akumulatora ietilpība (kWh)",
           "battery_soc_entity": "Akumulatora uzlādes līmeņa sensors (%)",
           "battery_max_charge_kw": "Maks. akumulatora uzlādes jauda (kW, neobligāti)",
           "battery_max_discharge_kw": "Maks. akumulatora izlādes jauda (kW, neobligāti)",
           "battery_min_soc": "Akumulatora rezerve, minimālais uzlādes līmenis (%, noklusējums 10)",
           "battery_efficiency": "Akumulatora cikla lietderības koeficients (%, noklusējums 90)",
-          "curtailment_entity": "Ierobežojuma signāls (binārais sensors, pēc izvēles)"
+          "curtailment_entity": "Ierobežošanas signāls (binārs sensors, input boolean vai slēdzis, neobligāts)",
+          "benchmark_enabled": "Sniegt ieguldījumu publiskajā precizitātes mērījumā (neobligāti)"
         },
         "data_description": {
           "production_entity": "Kumulatīvs enerģijas sensors (kWh), piem., invertora vai skaitītāja kopējā ražošana. Jaudas sensors (W) nedarbosies: tam nav ilgtermiņa summas statistikas, tāpēc mācīšanās un uzticamības indekss paliktu izslēgti.",
           "battery_soc_entity": "Aizpildiet ietilpību un šo sensoru, lai ieslēgtu uzlādes līmeņa prognozi. Mājas patēriņš tiek ņemts no Enerģijas paneļa, sensors šeit nav vajadzīgs.",
-          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita."
+          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita.",
+          "benchmark_enabled": "Reizi stundā nosūta to, ko šī iekārta prognozē, lai to varētu salīdzināt ar patiesi saražoto. Rezultāti tiek publicēti atklāti vietnē helios-ha.org/benchmark. Tiek nosūtīta tikai paneļu ģeometrija, prognozētā līkne, izmērītā ražošana un uzticamības indekss: nekādu entītiju nosaukumu, nekāda patēriņa, nekādu citu sensoru, un jūsu koordinātas noapaļotas līdz aptuveni kilometram. Nepieciešama versija 2026.9.5 vai jaunāka, tā ir mērītā versija. Izslēgts, kamēr to neieslēdzat."
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: papildu paneļu līnija",
+        "description": "Paneļu līnija {index}: vēl viena vienādi orientētu paneļu grupa tajā pašā iekārtā (kopīgs ražošanas sensors un invertors).",
         "data": {
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
           "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
@@ -42,7 +44,7 @@
           "tracker": "Saules sekotājs",
           "latitude": "Platums šai līnijai (neobligāti)",
           "longitude": "Garums šai līnijai (neobligāti)",
-          "add_another": "Add another panel line"
+          "add_another": "Pievienot vēl vienu paneļu līniju"
         }
       }
     }
@@ -51,21 +53,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Izvēlieties, ko rediģēt.",
         "menu_options": {
           "settings": "Rediģēt iestatījumus (atrašanās vieta, invertors, ražošanas sensors, baterija, ierobežojuma signāls)",
-          "lines": "Edit panel lines",
-          "benchmark": "Piedalies kopienas salīdzinājumā"
+          "lines": "Rediģēt paneļu līnijas"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: iestatījumi",
         "description": "Kopīga atrašanās vieta, invertora limits, ražošanas sensors, atsauces stunda, baterija un ierobežojuma signāls katrai šī ieraksta paneļu rindai.",
         "data": {
           "latitude": "Platums (neobligāti)",
           "longitude": "Garums (neobligāti)",
           "inverter_max_kw": "Invertora maksimālā jauda (kW, neobligāti)",
-          "production_entity": "PV ražošanas sensors (apgūtajai korekcijai)",
+          "production_entity": "Saražotās saules enerģijas sensors (kWh, apgūtajai korekcijai)",
           "trend_anchor_hour": "Šodienas tendences atskaites stunda (0-23, noklusējums 6)",
           "battery_capacity_kwh": "Izmantojamā akumulatora ietilpība (kWh)",
           "battery_soc_entity": "Akumulatora uzlādes līmeņa sensors (%)",
@@ -73,17 +74,19 @@
           "battery_max_discharge_kw": "Maks. akumulatora izlādes jauda (kW, neobligāti)",
           "battery_min_soc": "Akumulatora rezerve, minimālais uzlādes līmenis (%, noklusējums 10)",
           "battery_efficiency": "Akumulatora cikla lietderības koeficients (%, noklusējums 90)",
-          "curtailment_entity": "Ierobežojuma signāls (binārais sensors, pēc izvēles)"
+          "curtailment_entity": "Ierobežošanas signāls (binārs sensors, input boolean vai slēdzis, neobligāts)",
+          "benchmark_enabled": "Sniegt ieguldījumu publiskajā precizitātes mērījumā (neobligāti)"
         },
         "data_description": {
           "production_entity": "Kumulatīvs enerģijas sensors (kWh), piem., invertora vai skaitītāja kopējā ražošana. Jaudas sensors (W) nedarbosies: tam nav ilgtermiņa summas statistikas, tāpēc mācīšanās un uzticamības indekss paliktu izslēgti.",
           "battery_soc_entity": "Aizpildiet ietilpību un šo sensoru, lai ieslēgtu uzlādes līmeņa prognozi. Mājas patēriņš tiek ņemts no Enerģijas paneļa, sensors šeit nav vajadzīgs.",
-          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita."
+          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita.",
+          "benchmark_enabled": "Reizi stundā nosūta to, ko šī iekārta prognozē, lai to varētu salīdzināt ar patiesi saražoto. Rezultāti tiek publicēti atklāti vietnē helios-ha.org/benchmark. Tiek nosūtīta tikai paneļu ģeometrija, prognozētā līkne, izmērītā ražošana un uzticamības indekss: nekādu entītiju nosaukumu, nekāda patēriņa, nekādu citu sensoru, un jūsu koordinātas noapaļotas līdz aptuveni kilometram. Nepieciešama versija 2026.9.5 vai jaunāka, tā ir mērītā versija. Izslēgts, kamēr to neieslēdzat."
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: paneļu līnija {index}/{total}",
+        "description": "Rediģējiet paneļu līniju {index} no {total} vai atzīmējiet, lai pievienotu vēl vienu.",
         "data": {
           "tilt": "Slīpums (grādi, 0 = horizontāli, 90 = vertikāli)",
           "azimuth": "Azimuts (grādi no ziemeļiem, 90 = austrumi, 180 = dienvidi, 270 = rietumi)",
@@ -92,22 +95,8 @@
           "tracker": "Saules sekotājs",
           "latitude": "Platums šai līnijai (neobligāti)",
           "longitude": "Garums šai līnijai (neobligāti)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: kopienas salīdzinājums",
-        "description": "Atklāts mērījums tam, cik precīzs Helios Forecast patiešām ir, uz reālām iekārtām, publicēts pakāpeniski. Vai vēlaties piedalīties? Šeit: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nIegūstiet atslēgu ar vienu klikšķi, bez konta un bez vārda, un ielīmējiet to zemāk. Lai visu apturētu, izdzēsiet to.",
-        "data": {
-          "benchmark_enabled": "Piedalīties publiskajā precizitātes salīdzinājumā (neobligāti)",
-          "benchmark_key": "Salīdzinājuma atslēga",
-          "benchmark_url": "Savācēja adrese"
-        },
-        "data_description": {
-          "benchmark_enabled": "Reizi stundā nosūta to, ko šī iekārta prognozē, lai to varētu salīdzināt ar patieso ražošanu. Rezultāti tiek publicēti atklāti. Tiek nosūtīta tikai paneļu ģeometrija, prognozētā līkne, izmērītā ražošana un uzticamības indekss: nekādu entītiju nosaukumu, nekāda patēriņa, nekādu citu sensoru, un koordinātas noapaļotas līdz aptuveni kilometram. Izslēgts, līdz to ieslēgsiet.",
-          "benchmark_key": "Rakstīšanas atslēga, ko saņēmāt, pievienojoties salīdzinājumam. Bez tās nekas netiek nosūtīts.",
-          "benchmark_url": "Adrese, uz kuru tiek sūtīti mērījumi, parādīta, lai zinātu, kurp tie dodas."
+          "remove_this_line": "Noņemt šo paneļu līniju",
+          "add_another": "Pievienot vēl vienu paneļu līniju"
         }
       }
     }
@@ -128,7 +117,7 @@
       "description": "Atgriež pilnu ražošanas prognozi (no šodienas, viens punkts ik pēc 15 minūtēm, katrs ar prognozētajiem vatiem un P10/P90 ticamības joslu) kā atbildes datus izmantošanai automatizācijās.",
       "fields": {
         "config_entry_id": {
-          "name": "Instalācija",
+          "name": "Iekārta",
           "description": "Kuru Helios Forecast instalāciju nolasīt. Nav obligāti, ja konfigurēta tikai viena."
         }
       }
@@ -138,7 +127,7 @@
       "description": "Atgriež prognozēto akumulatora uzlādes līmeni nākamajām 48 stundām (viens punkts ik pēc 15 minūtēm) kā atbildes datus izmantošanai automatizācijās.",
       "fields": {
         "config_entry_id": {
-          "name": "Instalācija",
+          "name": "Iekārta",
           "description": "Kuru Helios Forecast instalāciju nolasīt. Nav obligāti, ja konfigurēta tikai viena."
         }
       }
@@ -229,10 +218,6 @@
       "title": "Akumulatora lietderības koeficients ārpus diapazona",
       "description": "{entry} pilna cikla lietderības koeficients ir {value}. Ievadiet procentus no 50 līdz 100 (lielākā daļa mājas akumulatoru ir ap 90)."
     },
-    "benchmark_key": {
-      "title": "Salīdzinošās novērtēšanas atslēga neizskatās pēc atslēgas",
-      "description": "{entry} piedalās kopienas salīdzinošajā novērtēšanā, bet tā atslēga nav savācēja izdota atslēga. Ielīmējiet visu atslēgu no helios-ha.org/benchmark vai izslēdziet salīdzinošo novērtēšanu."
-    },
     "production_entity_missing": {
       "title": "Ražošanas sensors nav atrasts",
       "description": "{entry} ražošanas sensors {entity} neeksistē. Prognoze darbojas bez korekcijas, līdz tas parādās. Pārbaudiet entītijas ID vai vēlreiz izvēlieties sensoru iestatījumos."
@@ -274,8 +259,19 @@
       "description": "Enerģijas panelī {source} ir dati par {pct} % stundu, kuras aptver labākais avots ({best} %). Patēriņa profils tiek veidots tikai no stundām, kuras tas aptver, tāpēc paliek pareizs, bet balstās uz mazāku vēsturi. Uzticamāks šīs plūsmas sensors padara akumulatora projekciju precīzāku."
     },
     "benchmark_excluded": {
-      "title": "Izslēgta no salīdzinošās novērtēšanas skaitļiem ({reason})",
-      "description": "Kopienas salīdzinošā novērtēšana saņem {entry} sūtījumus, bet tur tos ārpus publicētajiem skaitļiem. Iemesls {reason}: kwp nozīmē, ka norādītā maksimālā jauda trūkst, ir nulle vai ievadīta vatos; night nozīmē, ka ražošanas sensors reģistrē enerģiju naktī, tātad mēra vairāk nekā paneļus. Izlabojiet konfigurāciju, un iekārta dienas laikā tiks skaitīta atkal."
+      "title": "Netiek iekļauta mērījuma rādītājos ({reason})",
+      "description": "Publiskais mērījums saņem {entry} sūtījumus, bet netur tos publicētajos rādītājos. Iemesls {reason}: kwp nozīmē, ka deklarētā maksimālā jauda trūkst, ir nulle vai ievadīta vatos; night nozīmē, ka ražošanas sensors nakts laikā reģistrē enerģiju un tātad mēra vairāk nekā paneļi. Izlabojiet konfigurāciju, un iekārta diennakts laikā atkal tiek ieskaitīta."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Nav nevienas Helios Forecast iekārtas ar ieraksta ID {entry_id}."
+    },
+    "service_no_installation": {
+      "message": "Nav iestatīta neviena Helios Forecast iekārta."
+    },
+    "service_several_installations": {
+      "message": "Ir iestatītas vairākas Helios Forecast iekārtas; norādiet 'config_entry_id', lai izvēlētos vienu."
     }
   }
 }

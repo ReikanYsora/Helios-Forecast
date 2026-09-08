@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: линија панела",
-        "description": "Једна прогноза за једну линију панела (групу панела исте оријентације). Додајте интеграцију поново за сваку додатну линију. Оставите локацију празном да бисте користили локацију вашег Home Assistant-а.",
+        "description": "Једна прогноза за фотонапонску инсталацију. Додајте по једну линију панела за сваку оријентацију; више линија дели један сензор производње и ограничење инвертера ове инсталације. Оставите локацију празном да бисте користили кућну локацију из Home Assistant-а.",
         "data": {
           "name": "Назив (нпр. Јужни кров)",
           "tilt": "Нагиб (степени, 0 = равно, 90 = усправно)",
@@ -14,26 +14,28 @@
           "latitude": "Географска ширина (опционо)",
           "longitude": "Географска дужина (опционо)",
           "inverter_max_kw": "Максимална снага инвертора (kW, опционо)",
-          "production_entity": "Сензор PV производње (за научену корекцију)",
+          "production_entity": "Сензор произведене енергије панела (kWh, за научену корекцију)",
           "trend_anchor_hour": "Референтни сат за данашњи тренд (0-23, подразумевано 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Додај још једну линију панела",
           "battery_capacity_kwh": "Искористиви капацитет батерије (kWh)",
           "battery_soc_entity": "Сензор стања напуњености батерије (%)",
           "battery_max_charge_kw": "Макс. снага пуњења батерије (kW, опционо)",
           "battery_max_discharge_kw": "Макс. снага пражњења батерије (kW, опционо)",
           "battery_min_soc": "Резерва батерије, минимално стање напуњености (%, подразумевано 10)",
           "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)",
-          "curtailment_entity": "Signal ograničenja (binarni senzor, opciono)"
+          "curtailment_entity": "Сигнал ограничења (бинарни сензор, input boolean или прекидач, опционо)",
+          "benchmark_enabled": "Допринесите јавном мерењу тачности (опционо)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbira, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
+          "benchmark_enabled": "Једном на сат шаље оно што ова инсталација предвиђа, како би се упоредило са оним што је стварно произвела. Резултати се објављују отворено на helios-ha.org/benchmark. Путују само геометрија панела, предвиђена крива, измерена производња и индекс поузданости: никаква имена ентитета, никаква потрошња, никакав други сензор, а ваше координате заокружене на отприлике километар. Захтева верзију 2026.9.5 или новију, ону која се мери. Искључено док га не укључите."
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: додатна линија панела",
+        "description": "Линија панела {index}: још једна група панела исте оријентације на истој инсталацији (заједнички сензор производње и инвертер).",
         "data": {
           "tilt": "Нагиб (степени, 0 = равно, 90 = усправно)",
           "azimuth": "Азимут (степени од севера, 90 = исток, 180 = југ, 270 = запад)",
@@ -42,7 +44,7 @@
           "tracker": "Пратилац сунца",
           "latitude": "Географска ширина за ову линију (опционо)",
           "longitude": "Географска дужина за ову линију (опционо)",
-          "add_another": "Add another panel line"
+          "add_another": "Додај још једну линију панела"
         }
       }
     }
@@ -51,21 +53,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Изаберите шта желите да уредите.",
         "menu_options": {
           "settings": "Uredi podešavanja (lokacija, pretvarač, senzor proizvodnje, baterija, signal ograničenja)",
-          "lines": "Edit panel lines",
-          "benchmark": "Учествуј у поређењу заједнице"
+          "lines": "Уреди линије панела"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: подешавања",
         "description": "Zajednička lokacija, granica pretvarača, senzor proizvodnje, referentni sat, baterija i signal ograničenja za svaki red panela u ovom unosu.",
         "data": {
           "latitude": "Географска ширина (опционо)",
           "longitude": "Географска дужина (опционо)",
           "inverter_max_kw": "Максимална снага инвертора (kW, опционо)",
-          "production_entity": "Сензор PV производње (за научену корекцију)",
+          "production_entity": "Сензор произведене енергије панела (kWh, за научену корекцију)",
           "trend_anchor_hour": "Референтни сат за данашњи тренд (0-23, подразумевано 6)",
           "battery_capacity_kwh": "Искористиви капацитет батерије (kWh)",
           "battery_soc_entity": "Сензор стања напуњености батерије (%)",
@@ -73,17 +74,19 @@
           "battery_max_discharge_kw": "Макс. снага пражњења батерије (kW, опционо)",
           "battery_min_soc": "Резерва батерије, минимално стање напуњености (%, подразумевано 10)",
           "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)",
-          "curtailment_entity": "Signal ograničenja (binarni senzor, opciono)"
+          "curtailment_entity": "Сигнал ограничења (бинарни сензор, input boolean или прекидач, опционо)",
+          "benchmark_enabled": "Допринесите јавном мерењу тачности (опционо)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbira, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
+          "benchmark_enabled": "Једном на сат шаље оно што ова инсталација предвиђа, како би се упоредило са оним што је стварно произвела. Резултати се објављују отворено на helios-ha.org/benchmark. Путују само геометрија панела, предвиђена крива, измерена производња и индекс поузданости: никаква имена ентитета, никаква потрошња, никакав други сензор, а ваше координате заокружене на отприлике километар. Захтева верзију 2026.9.5 или новију, ону која се мери. Искључено док га не укључите."
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: линија панела {index}/{total}",
+        "description": "Уредите линију панела {index} од {total} или означите да додате још једну.",
         "data": {
           "tilt": "Нагиб (степени, 0 = равно, 90 = усправно)",
           "azimuth": "Азимут (степени од севера, 90 = исток, 180 = југ, 270 = запад)",
@@ -92,22 +95,8 @@
           "tracker": "Пратилац сунца",
           "latitude": "Географска ширина за ову линију (опционо)",
           "longitude": "Географска дужина за ову линију (опционо)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: поређење заједнице",
-        "description": "Отворено мерење стварне тачности Helios Forecasta, на правим инсталацијама, објављивано успут. Желите да учествујете? Овуда: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nУзмите кључ једним кликом, без налога и без имена, па га налепите испод. Да бисте све зауставили, обришите га.",
-        "data": {
-          "benchmark_enabled": "Допринеси јавном поређењу тачности (опционо)",
-          "benchmark_key": "Кључ поређења",
-          "benchmark_url": "Адреса сакупљача"
-        },
-        "data_description": {
-          "benchmark_enabled": "Једном на сат шаље оно што ова инсталација предвиђа, како би се упоредило са стварном производњом. Резултати се објављују отворено. Шаљу се само геометрија панела, предвиђена крива, измерена производња и индекс поузданости: никаква имена ентитета, никаква потрошња, никакви други сензори, а координате заокружене на отприлике километар. Искључено док га не укључите.",
-          "benchmark_key": "Кључ за уписивање добијен при приступању поређењу. Без њега се ништа не шаље.",
-          "benchmark_url": "Адреса на коју се шаљу мерења, приказана да знате тачно куда иду."
+          "remove_this_line": "Уклони ову линију панела",
+          "add_another": "Додај још једну линију панела"
         }
       }
     }
@@ -229,10 +218,6 @@
       "title": "Ефикасност батерије ван опсега",
       "description": "{entry} има укупну ефикасност {value}. Унесите проценат од 50 до 100 (већина кућних батерија је око 90)."
     },
-    "benchmark_key": {
-      "title": "Кључ бенчмарка не изгледа као кључ",
-      "description": "{entry} учествује у бенчмарку заједнице, али његов кључ није кључ који издаје колектор. Налепите цео кључ са helios-ha.org/benchmark или искључите бенчмарк."
-    },
     "production_entity_missing": {
       "title": "Сензор производње није пронађен",
       "description": "Сензор производње {entry}, {entity}, не постоји. Прогноза ради без исправке док се не појави. Проверите ID ентитета или поново изаберите сензор у подешавањима."
@@ -274,8 +259,19 @@
       "description": "На контролној табли Енергија {source} има податке за {pct} % сати које покрива најбољи извор ({best} %). Профил потрошње гради се само од сати које покрива, па остаје тачан, али почива на мање историје. Поузданији сензор за тај ток изоштрава пројекцију батерије."
     },
     "benchmark_excluded": {
-      "title": "Искључена из бројки бенчмарка ({reason})",
-      "description": "Бенчмарк заједнице прима емисије {entry}, али их држи ван објављених бројки. Разлог {reason}: kwp значи да наведена вршна снага недостаје, нула је или је унета у ватима; night значи да сензор производње бележи енергију ноћу, па мери више од панела. Исправите конфигурацију и инсталација се поново броји у року од једног дана."
+      "title": "Изузета из бројки мерења ({reason})",
+      "description": "Јавно мерење прима емисије са {entry} али их држи изван објављених бројки. Разлог {reason}: kwp значи да декларисана вршна снага недостаје, једнака је нули или је унета у ватима; night значи да сензор производње бележи енергију ноћу, дакле мери више од панела. Исправите конфигурацију и инсталација се у року од дана поново броји."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Нема Helios Forecast инсталације са идентификатором уноса {entry_id}."
+    },
+    "service_no_installation": {
+      "message": "Није подешена ниједна Helios Forecast инсталација."
+    },
+    "service_several_installations": {
+      "message": "Подешено је више Helios Forecast инсталација; наведите 'config_entry_id' да изаберете једну."
     }
   }
 }

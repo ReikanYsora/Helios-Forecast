@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: linha de painéis",
-        "description": "Uma previsão para uma linha de painéis (um grupo de painéis com a mesma orientação). Adicione novamente a integração para cada linha adicional. Deixe a localização em branco para usar a casa do seu Home Assistant.",
+        "description": "Uma previsão para uma instalação fotovoltaica. Adicione uma linha de painéis por orientação; várias linhas partilham o único sensor de produção e o limite do inversor desta instalação. Deixe a localização em branco para usar a do seu Home Assistant.",
         "data": {
           "name": "Nome (p. ex. Telhado sul)",
           "tilt": "Inclinação (graus, 0 = plano, 90 = vertical)",
@@ -14,26 +14,28 @@
           "latitude": "Latitude (opcional)",
           "longitude": "Longitude (opcional)",
           "inverter_max_kw": "Potência máxima do inversor (kW, opcional)",
-          "production_entity": "Sensor de produção fotovoltaica (para a correção aprendida)",
+          "production_entity": "Sensor da energia produzida pelos painéis (kWh, para a correção aprendida)",
           "trend_anchor_hour": "Hora de referência da tendência do dia (0-23, predefinição 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Adicionar outra linha de painéis",
           "battery_capacity_kwh": "Capacidade útil da bateria (kWh)",
           "battery_soc_entity": "Sensor de estado de carga da bateria (%)",
           "battery_max_charge_kw": "Potência máx. de carga da bateria (kW, opcional)",
           "battery_max_discharge_kw": "Potência máx. de descarga da bateria (kW, opcional)",
           "battery_min_soc": "Reserva da bateria, estado de carga mínimo (%, predefinição 10)",
           "battery_efficiency": "Eficiência de ida e volta da bateria (%, predefinição 90)",
-          "curtailment_entity": "Sinal de limitação (sensor binário, opcional)"
+          "curtailment_entity": "Sinal de limitação (sensor binário, input boolean ou interruptor, opcional)",
+          "benchmark_enabled": "Contribuir para a avaliação pública de precisão (opcional)"
         },
         "data_description": {
           "production_entity": "Um sensor de energia acumulada (kWh), p. ex. a produção total do inversor ou do contador. Um sensor de potência (W) não funciona: não tem estatísticas de soma a longo prazo, pelo que a aprendizagem e o índice de fiabilidade ficariam inativos.",
           "battery_soc_entity": "Preencha a capacidade e este sensor para ativar a projeção do estado de carga. O consumo da casa vem do seu painel de Energia, aqui não é necessário nenhum sensor.",
-          "curtailment_entity": "Ativo enquanto o inversor está limitado por um motivo que o céu não explica: bateria cheia, injeção zero, limite de rede. As horas que marca não são aprendidas como produção baixa. Sem ele, uma bateria cheia continua a ser detetada pelo sensor de estado de carga e pelo limite do inversor."
+          "curtailment_entity": "Ativo enquanto o inversor está limitado por um motivo que o céu não explica: bateria cheia, injeção zero, limite de rede. As horas que marca não são aprendidas como produção baixa. Sem ele, uma bateria cheia continua a ser detetada pelo sensor de estado de carga e pelo limite do inversor.",
+          "benchmark_enabled": "Envia o que esta instalação prevê, uma vez por hora, para o comparar com o que realmente produziu. Os resultados são publicados abertamente em helios-ha.org/benchmark. Apenas a geometria dos seus painéis, a curva prevista, a produção medida e o índice de fiabilidade circulam: nenhum nome de entidade, nenhum consumo, nenhum outro sensor, e as suas coordenadas arredondadas a cerca de um quilómetro. Requer a 2026.9.5 ou posterior, a versão que é medida. Desligado enquanto não o ligar."
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: linha de painéis adicional",
+        "description": "Linha de painéis {index}: outro grupo de painéis com a mesma orientação na mesma instalação (sensor de produção e inversor partilhados).",
         "data": {
           "tilt": "Inclinação (graus, 0 = plano, 90 = vertical)",
           "azimuth": "Azimute (graus a partir do norte, 90 = este, 180 = sul, 270 = oeste)",
@@ -42,7 +44,7 @@
           "tracker": "Seguidor solar",
           "latitude": "Latitude para esta linha (opcional)",
           "longitude": "Longitude para esta linha (opcional)",
-          "add_another": "Add another panel line"
+          "add_another": "Adicionar outra linha de painéis"
         }
       }
     }
@@ -51,21 +53,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Escolha o que pretende editar.",
         "menu_options": {
           "settings": "Editar definições (localização, inversor, sensor de produção, bateria, sinal de limitação)",
-          "lines": "Edit panel lines",
-          "benchmark": "Participar no teste comunitário"
+          "lines": "Editar as linhas de painéis"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: definições",
         "description": "Localização, limite do inversor, sensor de produção, hora de referência, bateria e sinal de limitação partilhados por todas as linhas de painéis desta entrada.",
         "data": {
           "latitude": "Latitude (opcional)",
           "longitude": "Longitude (opcional)",
           "inverter_max_kw": "Potência máxima do inversor (kW, opcional)",
-          "production_entity": "Sensor de produção fotovoltaica (para a correção aprendida)",
+          "production_entity": "Sensor da energia produzida pelos painéis (kWh, para a correção aprendida)",
           "trend_anchor_hour": "Hora de referência da tendência do dia (0-23, predefinição 6)",
           "battery_capacity_kwh": "Capacidade útil da bateria (kWh)",
           "battery_soc_entity": "Sensor de estado de carga da bateria (%)",
@@ -73,17 +74,19 @@
           "battery_max_discharge_kw": "Potência máx. de descarga da bateria (kW, opcional)",
           "battery_min_soc": "Reserva da bateria, estado de carga mínimo (%, predefinição 10)",
           "battery_efficiency": "Eficiência de ida e volta da bateria (%, predefinição 90)",
-          "curtailment_entity": "Sinal de limitação (sensor binário, opcional)"
+          "curtailment_entity": "Sinal de limitação (sensor binário, input boolean ou interruptor, opcional)",
+          "benchmark_enabled": "Contribuir para a avaliação pública de precisão (opcional)"
         },
         "data_description": {
           "production_entity": "Um sensor de energia acumulada (kWh), p. ex. a produção total do inversor ou do contador. Um sensor de potência (W) não funciona: não tem estatísticas de soma a longo prazo, pelo que a aprendizagem e o índice de fiabilidade ficariam inativos.",
           "battery_soc_entity": "Preencha a capacidade e este sensor para ativar a projeção do estado de carga. O consumo da casa vem do seu painel de Energia, aqui não é necessário nenhum sensor.",
-          "curtailment_entity": "Ativo enquanto o inversor está limitado por um motivo que o céu não explica: bateria cheia, injeção zero, limite de rede. As horas que marca não são aprendidas como produção baixa. Sem ele, uma bateria cheia continua a ser detetada pelo sensor de estado de carga e pelo limite do inversor."
+          "curtailment_entity": "Ativo enquanto o inversor está limitado por um motivo que o céu não explica: bateria cheia, injeção zero, limite de rede. As horas que marca não são aprendidas como produção baixa. Sem ele, uma bateria cheia continua a ser detetada pelo sensor de estado de carga e pelo limite do inversor.",
+          "benchmark_enabled": "Envia o que esta instalação prevê, uma vez por hora, para o comparar com o que realmente produziu. Os resultados são publicados abertamente em helios-ha.org/benchmark. Apenas a geometria dos seus painéis, a curva prevista, a produção medida e o índice de fiabilidade circulam: nenhum nome de entidade, nenhum consumo, nenhum outro sensor, e as suas coordenadas arredondadas a cerca de um quilómetro. Requer a 2026.9.5 ou posterior, a versão que é medida. Desligado enquanto não o ligar."
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: linha de painéis {index}/{total}",
+        "description": "Edite a linha de painéis {index} de {total}, ou assinale para adicionar outra.",
         "data": {
           "tilt": "Inclinação (graus, 0 = plano, 90 = vertical)",
           "azimuth": "Azimute (graus a partir do norte, 90 = este, 180 = sul, 270 = oeste)",
@@ -92,22 +95,8 @@
           "tracker": "Seguidor solar",
           "latitude": "Latitude para esta linha (opcional)",
           "longitude": "Longitude para esta linha (opcional)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: teste comunitário",
-        "description": "Uma medição aberta da precisão real do Helios Forecast, em instalações reais, publicada à medida. Quer participar? É por aqui: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nObtenha uma chave num clique, sem conta e sem nome, e cole-a abaixo. Para parar tudo, apague-a.",
-        "data": {
-          "benchmark_enabled": "Contribuir para o teste público de precisão (opcional)",
-          "benchmark_key": "Chave do teste",
-          "benchmark_url": "Endereço do coletor"
-        },
-        "data_description": {
-          "benchmark_enabled": "Envia uma vez por hora o que esta instalação prevê, para comparar com o que realmente produziu. Os resultados são publicados abertamente. Apenas a geometria dos seus painéis, a curva prevista, a produção medida e o índice de fiabilidade são enviados: nenhum nome de entidade, nenhum consumo, nenhum outro sensor, e as suas coordenadas arredondadas a cerca de um quilómetro. Desativado enquanto não o ativar.",
-          "benchmark_key": "A chave de escrita que recebeu ao aderir ao teste. Sem ela nada é enviado.",
-          "benchmark_url": "O endereço para onde as medições são enviadas, mostrado para que saiba exatamente para onde vão."
+          "remove_this_line": "Remover esta linha de painéis",
+          "add_another": "Adicionar outra linha de painéis"
         }
       }
     }
@@ -229,10 +218,6 @@
       "title": "Rendimento da bateria fora do intervalo",
       "description": "{entry} tem um rendimento de ida e volta de {value}. Introduza uma percentagem de 50 a 100 (a maioria das baterias domésticas anda à volta de 90)."
     },
-    "benchmark_key": {
-      "title": "A chave do benchmark não parece uma chave",
-      "description": "{entry} participa no benchmark da comunidade mas a sua chave não é uma das emitidas pelo coletor. Cole a chave inteira obtida em helios-ha.org/benchmark, ou desligue o benchmark."
-    },
     "production_entity_missing": {
       "title": "Sensor de produção não encontrado",
       "description": "O sensor de produção de {entry}, {entity}, não existe. A previsão corre sem correção até ele existir. Verifique o identificador da entidade, ou volte a escolher o sensor nas definições."
@@ -274,8 +259,19 @@
       "description": "No painel de Energia, {source} tem dados para {pct}% das horas que a melhor fonte cobre ({best}%). O perfil de consumo é construído apenas com as horas que ela cobre, por isso continua certo mas assenta em menos histórico. Um sensor mais fiável para esse fluxo torna a projeção da bateria mais precisa."
     },
     "benchmark_excluded": {
-      "title": "Excluída dos números do benchmark ({reason})",
-      "description": "O benchmark da comunidade recebe as emissões de {entry} mas mantém-nas fora dos números publicados. Motivo {reason}: kwp significa que a potência de pico declarada falta, é zero ou está em watts; night significa que o sensor de produção regista energia de noite, por isso mede mais do que os painéis. Corrija a configuração e a instalação volta a ser contada dentro de um dia."
+      "title": "Mantida fora dos números da avaliação ({reason})",
+      "description": "A avaliação pública recebe as emissões de {entry} mas mantém-nas fora dos números publicados. Motivo {reason}: kwp significa que a potência de pico declarada está ausente, é zero ou foi introduzida em watts; night significa que o sensor de produção regista energia à noite, portanto mede mais do que os painéis. Corrija a configuração e a instalação volta a ser contada dentro de um dia."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Nenhuma instalação Helios Forecast com o identificador de entrada {entry_id}."
+    },
+    "service_no_installation": {
+      "message": "Não há nenhuma instalação Helios Forecast configurada."
+    },
+    "service_several_installations": {
+      "message": "Estão configuradas várias instalações Helios Forecast; indique 'config_entry_id' para escolher uma."
     }
   }
 }

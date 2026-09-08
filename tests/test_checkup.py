@@ -13,7 +13,6 @@ from custom_components.helios_forecast.checkup import (  # noqa: E402
     ERROR,
     WARNING,
     EntitySnapshot,
-    check_benchmark_quality,
     check_config,
     check_consumption_coverage,
     check_entities,
@@ -46,6 +45,17 @@ def _config(**over):
 
 def test_a_sound_configuration_has_no_problem() -> None:
     assert check_config(_config(), *HOME) == []
+
+
+def test_a_hybrid_inverter_sized_for_the_house_is_not_called_a_mistake() -> None:
+    """A battery inverter is sized for the house, not for the array, so a small roof behind a big
+    hybrid is an ordinary installation. Told it is an error every time it opens the page, the owner
+    learns to ignore the check-up, and the mistake it exists to catch is a factor of a thousand."""
+    data = _config(arrays=[_line(kwp=3.0)], inverter_max_kw=10.0)
+    assert "inverter_cap_unit" not in {p.key for p in check_config(data, *HOME)}
+    # The real mistake, a limit typed in watts, still is one.
+    data["inverter_max_kw"] = 10_000.0
+    assert "inverter_cap_unit" in {p.key for p in check_config(data, *HOME)}
 
 
 def test_no_line_is_an_error() -> None:
@@ -142,15 +152,6 @@ def test_battery_block() -> None:
     assert _keys(absurd) == ["battery_capacity"]
 
 
-def test_benchmark_key_format_only_when_enabled() -> None:
-    assert check_config(_config(benchmark_enabled=False, benchmark_key="x"), *HOME) == []
-    assert _keys(check_config(_config(benchmark_enabled=True, benchmark_key="x"), *HOME)) == ["benchmark_key"]
-    assert check_config(_config(benchmark_enabled=True, benchmark_key="a" * 43), *HOME) == []
-
-
-# --- entities --------------------------------------------------------------------------------
-
-
 def test_production_entity_must_exist_and_be_a_cumulative_energy_sensor() -> None:
     data = _config()
     missing = EntitySnapshot("sensor.pv_energy", exists=False)
@@ -236,7 +237,7 @@ def test_silent_meter_for_days() -> None:
     assert _keys(check_production_history(never, "sensor.pv", *HOME, 3.0, NOW, 60)) == ["production_stale"]
 
 
-# --- consumption coverage and the collector's verdict -----------------------------------------
+# --- consumption coverage ---------------------------------------------------------------------
 
 
 def test_sparse_consumption_source_is_named_with_its_share() -> None:
@@ -245,11 +246,3 @@ def test_sparse_consumption_source_is_named_with_its_share() -> None:
     assert problems[0].placeholders == {"source": "sensor.bat_out", "pct": "24", "best": "100"}
     assert check_consumption_coverage({"a": 1.0, "b": 0.6}) == []
     assert check_consumption_coverage({}) == []
-
-
-def test_benchmark_exclusion_becomes_a_warning() -> None:
-    assert check_benchmark_quality(None) == []
-    assert check_benchmark_quality({"excluded": None}) == []
-    problems = check_benchmark_quality({"excluded": "night"})
-    assert _keys(problems) == ["benchmark_excluded_night"]
-    assert problems[0].placeholders == {"reason": "night"}

@@ -15,6 +15,7 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
 from custom_components.helios_forecast.analog import (  # noqa: E402
+    BAND_MIN_CONFIDENCE,
     AnalogSample,
     _az_diff,
     _sample_series,
@@ -97,6 +98,20 @@ def test_temperature_influences_match() -> None:
     assert band_none is not None
 
 
+def test_a_library_with_no_temperature_is_still_usable() -> None:
+    """Penalised, not disqualified. Set above the close-analog threshold, a missing reading puts
+    every analog beyond it at once: the confidence falls to zero, the band disappears and the blend
+    hands the forecast back to the bare physics, on a site whose weather simply carries no
+    temperature. The penalty must order the analogs without silencing them."""
+    lib = [AnalogSample(alt=40.0, az=180.0, cloud=30.0, watt=1000.0, temp=None) for _ in range(40)]
+
+    band = predict(lib, 40.0, 180.0, 30.0, temp=20.0)
+
+    assert band is not None
+    assert band.confidence >= BAND_MIN_CONFIDENCE
+    assert band.p50 == 1000.0
+
+
 def test_missing_temperature_is_penalised_not_a_perfect_match() -> None:
     # Three equally-sized groups at identical geometry+cloud (so distance is temperature-only),
     # tagged with distinct watts so the winning group is visible in the percentiles: an exact
@@ -107,13 +122,12 @@ def test_missing_temperature_is_penalised_not_a_perfect_match() -> None:
     lib = exact + small_mismatch + no_temp
     band = predict(lib, 40.0, 180.0, 30.0, temp=20.0)
     assert band is not None
-    # Ranking by distance (closest wins the lowest quantiles first): exact is closest (wins p10),
-    # small mismatch is second (wins p50 and p90 too). No-temperature-data never wins a quantile
-    # here: it is ranked last, not tied with the exact match as it was before the fix (where it
-    # used to pull p90 all the way to its own 3000 W).
-    assert band.p10 == 1000.0
-    assert band.p50 == 2000.0
-    assert band.p90 == 2000.0
+    # Ranking by distance, closest first: the exact match wins p10, the one-degree mismatch p50, and
+    # the group with no reading at all comes last, at p90. Last, not excluded: the penalty that kept
+    # it out of every quantile also put it beyond the close-analog threshold, and one site with no
+    # temperature in its weather then had the whole correction switched off.
+    assert (band.p10, band.p50, band.p90) == (1000.0, 2000.0, 3000.0)
+    assert band.confidence > 0.0
 
 
 def test_sample_series_clamps_outside_range() -> None:
@@ -203,6 +217,33 @@ def test_build_library_drops_curtailed_hours() -> None:
     assert [s.watt for s in lib] == [3000.0]
 
 
+def test_build_library_drops_a_meter_reset_instead_of_filing_it_as_a_dark_hour() -> None:
+    # A meter that is reset, replaced, or restored from an older backup writes one enormous negative
+    # hour into the recorder. Seen for real: change = -927.750 kWh on a bright afternoon. Clamped to
+    # zero it would file that hour in the library as one where the sky gave nothing, and drag every
+    # later prediction under similar sun and cloud down with it.
+    lat, lon = 45.0, 0.0
+    noon = _june_noon(12)
+    one = _june_noon(13)
+    prod = [
+        _Bucket(noon.timestamp() * 1000.0, (noon + timedelta(hours=1)).timestamp() * 1000.0, 3.0),
+        _Bucket(one.timestamp() * 1000.0, (one + timedelta(hours=1)).timestamp() * 1000.0, -927.75),
+    ]
+    times = [_june_noon(h) for h in range(24)]
+    weather = WeatherSeries(
+        times=times,
+        cloud=[20.0] * 24,
+        shortwave=[0.0] * 24,
+        direct=[0.0] * 24,
+        diffuse=[0.0] * 24,
+        temp=[20.0] * 24,
+        wind=[5.0] * 24,
+        snow=[0.0] * 24,
+    )
+    lib = build_library(prod, weather, lat, lon)
+    assert [s.watt for s in lib] == [3000.0]
+
+
 def test_enrich_points_past_untouched_future_blended() -> None:
     lat, lon = 45.0, 0.0
     now = _june_noon(12)
@@ -273,7 +314,7 @@ def _flat_weather() -> WeatherSeries:
 
 def test_ceiling_caps_overprediction() -> None:
     # A shaded site: the physical model predicts far more than the site ever produces at this sun
-    # position. With enough close analogs, the learned ceiling caps the forecast to p90 * margin (#28).
+    # position. With enough close analogs, the learned ceiling caps the forecast to p90 * margin.
     lat, lon = 45.0, 0.0
     now = _june_noon(12)
     fut = ForecastPoint(t=_june_noon(13), pv_w=6500.0, pv_raw_w=6500.0)  # physical over-predicts
@@ -289,7 +330,7 @@ def test_enrich_archive_points_caps_a_past_point_enrich_points_would_leave_untou
     # Same over-prediction as test_ceiling_caps_overprediction, but on a point that is already in
     # the past relative to any "now" - enrich_points() would leave it as the raw physical model by
     # design (see test_enrich_points_past_untouched_future_blended). The archive has no future side
-    # to gate on, so every one of its points needs this same ceiling clamp, not just future ones (#52).
+    # to gate on, so every one of its points needs this same ceiling clamp, not just future ones.
     lat, lon = 45.0, 0.0
     past = ForecastPoint(t=_june_noon(13), pv_w=6500.0, pv_raw_w=6500.0)  # physical over-predicts
     sun = sun_position(past.t, lat, lon)
@@ -322,14 +363,6 @@ def test_ceiling_skipped_when_analogs_thin() -> None:
     lib = [AnalogSample(alt=sun.altitude, az=sun.azimuth, cloud=30.0, watt=4500.0) for _ in range(3)]
     out = enrich_points([fut], lib, _flat_weather(), lat, lon, now)
     assert out[0].pv_w > 4500.0 * 1.25  # no ceiling applied with thin support
-
-
-if __name__ == "__main__":
-    for name, fn in sorted(globals().items()):
-        if name.startswith("test_") and callable(fn):
-            fn()
-            print(f"ok  {name}")
-    print("all analog tests passed")
 
 
 # --- ratio analogs: the analog's word is a ratio to the physics, applied to today's physics ----------
@@ -414,3 +447,11 @@ def test_ratio_analogs_follow_todays_physics_not_yesterdays_watts() -> None:
     # The same library without ratios is read as watts and drags the point toward 1000 W.
     watts_only = [AnalogSample(alt=s.alt, az=s.az, cloud=s.cloud, watt=s.watt, temp=s.temp) for s in lib]
     assert enrich_points([fut], watts_only, weather, lat, lon, now)[0].pv_w < 1200.0
+
+
+if __name__ == "__main__":
+    for name, fn in sorted(globals().items()):
+        if name.startswith("test_") and callable(fn):
+            fn()
+            print(f"ok  {name}")
+    print("all analog tests passed")

@@ -53,12 +53,12 @@ def consumption_sources(prefs: Optional[dict]) -> ConsumptionSources:
             _add(signed, src.get("stat_energy_from"), +1)  # discharge, out of the battery
             _add(signed, src.get("stat_energy_to"), -1)  # charge, into the battery
         elif source_type == "grid":
-            _add(signed, src.get("stat_energy_from"), +1)  # import (unified format)
-            _add(signed, src.get("stat_energy_to"), -1)  # export (unified format)
-            for flow in src.get("flow_from") or []:  # legacy import list
-                _add(signed, flow.get("stat_energy_from"), +1)
-            for flow in src.get("flow_to") or []:  # legacy export list
-                _add(signed, flow.get("stat_energy_to"), -1)
+            # A grid source carries its meters in two required lists and never at the top level
+            # (homeassistant/components/energy/data.py, GRID_SOURCE_SCHEMA).
+            for flow in src.get("flow_from") or []:
+                _add(signed, flow.get("stat_energy_from"), +1)  # import
+            for flow in src.get("flow_to") or []:
+                _add(signed, flow.get("stat_energy_to"), -1)  # export
     return ConsumptionSources(signed=signed)
 
 
@@ -73,8 +73,9 @@ class ConsumptionProfile:
     hour_w: Dict[int, float]
     overall_w: float
     samples: int  # hours of history that fed the profile, for the caller to gauge confidence
-    # Share of the profile's hours each source had a bucket for (0..1), by statistic id. A source far
-    # below the others is the sign of a meter that reports intermittently (see checkup.py).
+    # Per statistic id, the share of the hours ANY source reported that this one also reported
+    # (0..1, see source_coverage). A source far below the others is a meter reporting
+    # intermittently, which dilutes the profile rather than leaving a visible gap (see checkup.py).
     coverage: Dict[str, float] = field(default_factory=dict)
 
     def at(self, moment_local: datetime) -> float:

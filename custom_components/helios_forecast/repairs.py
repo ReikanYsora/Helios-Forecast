@@ -22,11 +22,24 @@ def _issue_id(entry: ConfigEntry, problem: Problem) -> str:
     return f"{entry.entry_id}_{problem.issue_id}"
 
 
-def sync(hass: HomeAssistant, entry: ConfigEntry, problems: Iterable[Problem], previous: Set[str]) -> Set[str]:
+def sync(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    problems: Iterable[Problem],
+    previous: Set[str],
+    *,
+    retire: bool = True,
+) -> Set[str]:
     """Publish `problems`, retire the issues of `previous` that are no longer among them, and return
-    the ids now published so the next sync knows what to retire."""
+    the ids now published so the next sync knows what to retire.
+
+    ``retire=False`` only adds. A caller publishing part of the list, as the configuration checks do
+    before any data is fetched, would otherwise delete every issue the data checks raised and create
+    it again seconds later. Deleting an issue throws away the registry entry, and with it the user's
+    decision to ignore that one, forty-eight times a day on a thirty-minute refresh.
+    """
     current = {_issue_id(entry, p): p for p in problems}
-    for issue_id in previous - set(current):
+    for issue_id in (previous - set(current)) if retire else ():
         ir.async_delete_issue(hass, DOMAIN, issue_id)
     for issue_id, problem in current.items():
         ir.async_create_issue(
@@ -38,7 +51,7 @@ def sync(hass: HomeAssistant, entry: ConfigEntry, problems: Iterable[Problem], p
             translation_key=problem.key,
             translation_placeholders={"entry": entry.title, **problem.placeholders},
         )
-    return set(current)
+    return set(current) if retire else previous | set(current)
 
 
 def clear(hass: HomeAssistant, entry: ConfigEntry) -> None:

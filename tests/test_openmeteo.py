@@ -13,7 +13,6 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-import pytest
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
@@ -37,6 +36,17 @@ def test_pick_models_for_location() -> None:
     assert pick_models_for_location(48.8566, 2.3522) == ["meteofrance_seamless", "ecmwf_ifs025"]  # Paris
     assert pick_models_for_location(40.0, 140.0) == ["jma_seamless", "ecmwf_ifs025"]  # Japan
     assert pick_models_for_location(0.0, -30.0) == ["ecmwf_ifs025", "gfs_seamless"]  # open ocean fallback
+
+
+def test_a_country_inside_another_box_keeps_its_own_model_to_its_own_edge() -> None:
+    """Korea's box sits entirely inside Japan's. Ranked on centrality alone, the vast box around it
+    wins wherever the small one is near its own edge, which is most of a small country: Jeju, on the
+    southern edge, was forecast from the Japanese model."""
+    for lat, lon in ((33.50, 126.53), (33.25, 126.56), (37.57, 126.98), (35.18, 129.08)):
+        assert pick_models_for_location(lat, lon)[0] == "kma_seamless"
+    # And the enclosing box still answers for the country it belongs to.
+    for lat, lon in ((33.59, 130.40), (34.39, 132.46), (35.68, 139.69)):
+        assert pick_models_for_location(lat, lon)[0] == "jma_seamless"
 
 
 def test_pick_models_resolves_overlapping_boxes() -> None:
@@ -88,7 +98,7 @@ def test_parse_weather_fuses_models_and_weights_layers() -> None:
     assert w is not None
     assert w.cloud == [54.0, 90.0]  # 20 + 0.6*40 + 0.2*50 = 54 ; 90 + 0 + 0 = 90
     assert w.shortwave == [0.0, 150.0]
-    assert w.cloud_spread == [0.0, 0.0]  # baseline; the ensemble call overlays the real spread
+    assert w.cloud_spread == [None, None]  # unanswered until the ensemble call overlays a real spread
 
 
 def test_cloud_effective_weights_and_clamps() -> None:
@@ -208,19 +218,18 @@ def test_fetch_parsed_retries_after_malformed_body() -> None:
     assert session.calls == 2  # first attempt malformed and swallowed, second attempt succeeds
 
 
-def test_parse_cloud_spread_asserts_on_layer_key_collision() -> None:
-    # If a payload ever carried both the per-layer keys and the aggregate 'cloud_cover' key together,
-    # the prefix match in _model_arrays would silently fold the per-layer arrays into the spread
-    # lookup. This must fail loudly instead of returning a corrupted result.
+def test_a_payload_carrying_both_cloud_key_families_is_refused() -> None:
+    """The aggregate key is a string prefix of the per-layer ones, so a payload with both would be
+    read from the wrong arrays. It must be refused, not asserted on: the only caller catches every
+    exception, and "no spread this refresh" reads downstream as the models agreeing perfectly."""
     payload = {
         "hourly": {
-            "time": ["2026-06-11T00:00"],
-            "cloud_cover": [50.0],
-            "cloud_cover_low": [10.0],
+            "time": ["2026-01-01T00:00"],
+            "cloud_cover_member01": [40.0],
+            "cloud_cover_low_member01": [10.0],
         }
     }
-    with pytest.raises(AssertionError):
-        parse_cloud_spread(payload)
+    assert parse_cloud_spread(payload) is None
 
 
 def test_parse_cloud_spread() -> None:
@@ -365,10 +374,11 @@ def test_fetch_weather_values_with_ensemble_spread() -> None:
     assert session.calls == 4  # 3 values tries + 1 ensemble
 
 
-def test_fetch_weather_ensemble_failure_degrades_to_zero_spread() -> None:
+def test_fetch_weather_ensemble_failure_leaves_the_spread_unanswered() -> None:
     om._RETRY_DELAY_S = 0.0
-    # Values succeed on the first try; the ensemble call fails every retry. The series still returns,
-    # with the baseline zero spread rather than failing the refresh (best-effort).
+    # Values succeed on the first try; the ensemble call fails every retry. The series still returns
+    # rather than failing the refresh (best effort), with no spread rather than a spread of zero:
+    # zero is what every model agreeing exactly looks like, and the reliability index reads it so.
     session = _FakeSession(
         values_responses=[_FakeResp(200, _GOOD_WEATHER)],
         ensemble_responses=[_FakeResp(500, None), _FakeResp(500, None), _FakeResp(500, None)],
@@ -376,7 +386,7 @@ def test_fetch_weather_ensemble_failure_degrades_to_zero_spread() -> None:
     result = asyncio.run(fetch_weather(session, 1.0, 2.0))
     assert result is not None
     assert result.cloud == [50.0, 60.0]
-    assert result.cloud_spread == [0.0, 0.0]  # no ensemble spread available this refresh
+    assert result.cloud_spread == [None, None]  # no ensemble spread available this refresh
     assert session.calls == 4  # 1 values + 3 ensemble tries
 
 

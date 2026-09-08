@@ -95,7 +95,7 @@ def test_merge_and_read_back_lines_roundtrip() -> None:
 
 
 def test_multi_line_entry_shares_one_inverter_cap() -> None:
-    # Two strings on one 8 kW inverter (issue #18): the entry-level cap applies to the
+    # Two strings on one 8 kW inverter: the entry-level cap applies to the
     # combined output, and the layout sums them by kWp share.
     data = merge_entry_data(
         {"inverter_max_kw": 8.0},
@@ -108,7 +108,7 @@ def test_multi_line_entry_shares_one_inverter_cap() -> None:
 
 
 def test_decimal_peak_power_preserved() -> None:
-    # Regression for issue #13: a decimal kWp must survive into the layout at full precision.
+    # A decimal kWp must survive into the layout at full precision, not be rounded on the way.
     layout = layout_from_config(merge_entry_data({}, [{"tilt": 30, "azimuth": 180, "kwp": 2.61}]))
     assert layout.total_kwp == 2.61
 

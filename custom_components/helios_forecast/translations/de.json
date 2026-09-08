@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Helios Forecast: Modulreihe",
-        "description": "Eine Prognose für eine Modulreihe (eine Gruppe gleich ausgerichteter Module). Füge die Integration für jede weitere Reihe erneut hinzu. Lasse den Standort leer, um den Standort deiner Home-Assistant-Installation zu verwenden.",
+        "description": "Eine Prognose für eine Photovoltaikanlage. Fügen Sie eine Modulreihe je Ausrichtung hinzu; mehrere Reihen teilen sich den einen Erzeugungssensor und die Wechselrichtergrenze dieser Anlage. Lassen Sie den Standort leer, um den Standort Ihrer Home-Assistant-Installation zu verwenden.",
         "data": {
           "name": "Name (z. B. Süddach)",
           "tilt": "Neigung (Grad, 0 = flach, 90 = senkrecht)",
@@ -14,26 +14,28 @@
           "latitude": "Breitengrad (optional)",
           "longitude": "Längengrad (optional)",
           "inverter_max_kw": "Maximale Wechselrichter-Leistung (kW, optional)",
-          "production_entity": "PV-Erzeugungssensor (für die gelernte Korrektur)",
+          "production_entity": "Sensor der erzeugten PV-Energie (kWh, für die gelernte Korrektur)",
           "trend_anchor_hour": "Referenzstunde für den Tagestrend (0-23, Standard 6)",
-          "add_another": "Add another panel line",
+          "add_another": "Weitere Modulreihe hinzufügen",
           "battery_capacity_kwh": "Nutzbare Batteriekapazität (kWh)",
           "battery_soc_entity": "Batterieladezustand-Sensor (%)",
           "battery_max_charge_kw": "Max. Ladeleistung der Batterie (kW, optional)",
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
           "battery_min_soc": "Batteriereserve, minimaler Ladezustand (%, Standard 10)",
           "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
-          "curtailment_entity": "Abregelungssignal (Binärsensor, optional)"
+          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)",
+          "benchmark_enabled": "Zum öffentlichen Genauigkeits-Benchmark beitragen (optional)"
         },
         "data_description": {
           "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
           "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
-          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt.",
+          "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit dem verglichen werden kann, was sie wirklich erzeugt hat. Die Ergebnisse werden offen auf helios-ha.org/benchmark veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Erzeugung und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, kein anderer Sensor, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Erfordert 2026.9.5 oder neuer, die gemessene Version. Aus, solange Sie es nicht einschalten."
         }
       },
       "line": {
-        "title": "Helios Forecast: additional panel line",
-        "description": "Panel line {index}: another group of co-oriented panels on the same installation (shared production sensor and inverter).",
+        "title": "Helios Forecast: weitere Modulreihe",
+        "description": "Modulreihe {index}: eine weitere Gruppe gleich ausgerichteter Module derselben Anlage (gemeinsamer Erzeugungssensor und Wechselrichter).",
         "data": {
           "tilt": "Neigung (Grad, 0 = flach, 90 = senkrecht)",
           "azimuth": "Azimut (Grad ab Norden, 90 = Ost, 180 = Süd, 270 = West)",
@@ -42,7 +44,7 @@
           "tracker": "Sonnen-Nachführung",
           "latitude": "Breitengrad für diese Linie (optional)",
           "longitude": "Längengrad für diese Linie (optional)",
-          "add_another": "Add another panel line"
+          "add_another": "Weitere Modulreihe hinzufügen"
         }
       }
     }
@@ -51,21 +53,20 @@
     "step": {
       "init": {
         "title": "Helios Forecast",
-        "description": "Choose what to edit.",
+        "description": "Wählen Sie, was Sie bearbeiten möchten.",
         "menu_options": {
           "settings": "Einstellungen bearbeiten (Standort, Wechselrichter, Produktionssensor, Batterie, Abregelungssignal)",
-          "lines": "Edit panel lines",
-          "benchmark": "Am Community-Benchmark teilnehmen"
+          "lines": "Modulreihen bearbeiten"
         }
       },
       "settings": {
-        "title": "Helios Forecast: settings",
+        "title": "Helios Forecast: Einstellungen",
         "description": "Gemeinsamer Standort, Wechselrichtergrenze, Produktionssensor, Referenzstunde, Batterie und Abregelungssignal für jede Panelreihe dieses Eintrags.",
         "data": {
           "latitude": "Breitengrad (optional)",
           "longitude": "Längengrad (optional)",
           "inverter_max_kw": "Maximale Wechselrichter-Leistung (kW, optional)",
-          "production_entity": "PV-Erzeugungssensor (für die gelernte Korrektur)",
+          "production_entity": "Sensor der erzeugten PV-Energie (kWh, für die gelernte Korrektur)",
           "trend_anchor_hour": "Referenzstunde für den Tagestrend (0-23, Standard 6)",
           "battery_capacity_kwh": "Nutzbare Batteriekapazität (kWh)",
           "battery_soc_entity": "Batterieladezustand-Sensor (%)",
@@ -73,17 +74,19 @@
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
           "battery_min_soc": "Batteriereserve, minimaler Ladezustand (%, Standard 10)",
           "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
-          "curtailment_entity": "Abregelungssignal (Binärsensor, optional)"
+          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)",
+          "benchmark_enabled": "Zum öffentlichen Genauigkeits-Benchmark beitragen (optional)"
         },
         "data_description": {
           "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
           "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
-          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt.",
+          "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit dem verglichen werden kann, was sie wirklich erzeugt hat. Die Ergebnisse werden offen auf helios-ha.org/benchmark veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Erzeugung und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, kein anderer Sensor, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Erfordert 2026.9.5 oder neuer, die gemessene Version. Aus, solange Sie es nicht einschalten."
         }
       },
       "lines": {
-        "title": "Helios Forecast: panel line {index}/{total}",
-        "description": "Edit panel line {index} of {total}, or tick to add another.",
+        "title": "Helios Forecast: Modulreihe {index}/{total}",
+        "description": "Bearbeiten Sie Modulreihe {index} von {total}, oder setzen Sie das Häkchen, um eine weitere hinzuzufügen.",
         "data": {
           "tilt": "Neigung (Grad, 0 = flach, 90 = senkrecht)",
           "azimuth": "Azimut (Grad ab Norden, 90 = Ost, 180 = Süd, 270 = West)",
@@ -92,22 +95,8 @@
           "tracker": "Sonnen-Nachführung",
           "latitude": "Breitengrad für diese Linie (optional)",
           "longitude": "Längengrad für diese Linie (optional)",
-          "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
-        }
-      },
-      "benchmark": {
-        "title": "Helios Forecast: Community-Benchmark",
-        "description": "Eine offene Messung der tatsächlichen Genauigkeit von Helios Forecast, an echten Anlagen, laufend veröffentlicht. Möchten Sie mitmachen? Hier entlang: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nHolen Sie sich mit einem Klick einen Schlüssel, ohne Konto und ohne Namen, und fügen Sie ihn unten ein. Zum Beenden einfach löschen.",
-        "data": {
-          "benchmark_enabled": "Am öffentlichen Genauigkeits-Benchmark teilnehmen (optional)",
-          "benchmark_key": "Benchmark-Schlüssel",
-          "benchmark_url": "Adresse des Benchmark-Sammlers"
-        },
-        "data_description": {
-          "benchmark_enabled": "Sendet einmal pro Stunde, was diese Anlage vorhersagt, damit es mit der tatsächlichen Produktion verglichen werden kann. Die Ergebnisse werden offen veröffentlicht. Übertragen werden nur die Geometrie Ihrer Module, die vorhergesagte Kurve, die gemessene Produktion und der Zuverlässigkeitsindex: keine Entitätsnamen, kein Verbrauch, keine anderen Sensoren, und Ihre Koordinaten auf etwa einen Kilometer gerundet. Aus, solange Sie es nicht einschalten.",
-          "benchmark_key": "Der Schreibschlüssel, den Sie beim Beitritt zum Benchmark erhalten haben. Ohne ihn wird nichts gesendet.",
-          "benchmark_url": "Wohin die Messungen gesendet werden, angezeigt, damit Sie genau wissen, wo sie landen."
+          "remove_this_line": "Diese Modulreihe entfernen",
+          "add_another": "Weitere Modulreihe hinzufügen"
         }
       }
     }
@@ -128,7 +117,7 @@
       "description": "Gibt die vollständige Produktionsprognose (ab heute, ein Punkt alle 15 Minuten, jeder mit den prognostizierten Watt und dem P10/P90-Konfidenzband) als Antwortdaten zur Verwendung in Automatisierungen zurück.",
       "fields": {
         "config_entry_id": {
-          "name": "Installation",
+          "name": "Anlage",
           "description": "Welche Helios-Forecast-Installation gelesen werden soll. Optional, wenn nur eine konfiguriert ist."
         }
       }
@@ -138,7 +127,7 @@
       "description": "Gibt den prognostizierten Batterieladezustand für die nächsten 48 Stunden (ein Punkt alle 15 Minuten) als Antwortdaten zur Verwendung in Automatisierungen zurück.",
       "fields": {
         "config_entry_id": {
-          "name": "Installation",
+          "name": "Anlage",
           "description": "Welche Helios-Forecast-Installation gelesen werden soll. Optional, wenn nur eine konfiguriert ist."
         }
       }
@@ -229,10 +218,6 @@
       "title": "Batteriewirkungsgrad außerhalb des Bereichs",
       "description": "{entry} hat einen Round-Trip-Wirkungsgrad von {value}. Geben Sie einen Prozentwert von 50 bis 100 ein (die meisten Hausbatterien liegen um 90)."
     },
-    "benchmark_key": {
-      "title": "Der Benchmark-Schlüssel sieht nicht wie ein Schlüssel aus",
-      "description": "{entry} nimmt am Community-Benchmark teil, aber sein Schlüssel ist keiner, den der Collector ausgibt. Fügen Sie den ganzen Schlüssel von helios-ha.org/benchmark ein oder schalten Sie den Benchmark aus."
-    },
     "production_entity_missing": {
       "title": "Erzeugungssensor nicht gefunden",
       "description": "Der Erzeugungssensor von {entry}, {entity}, existiert nicht. Die Prognose läuft unkorrigiert, bis es ihn gibt. Prüfen Sie die Entitäts-ID oder wählen Sie den Sensor in den Einstellungen neu."
@@ -274,8 +259,19 @@
       "description": "Im Energie-Dashboard hat {source} Daten für {pct} % der Stunden, die die beste Quelle abdeckt ({best} %). Das Verbrauchsprofil wird nur aus den Stunden gebaut, die sie abdeckt, bleibt also richtig, stützt sich aber auf weniger Historie. Ein zuverlässigerer Sensor für diesen Fluss macht die Batterieprojektion schärfer."
     },
     "benchmark_excluded": {
-      "title": "Aus den Benchmark-Zahlen ausgeschlossen ({reason})",
-      "description": "Der Community-Benchmark empfängt die Emissionen von {entry}, hält sie aber aus den veröffentlichten Zahlen heraus. Grund {reason}: kwp bedeutet, dass die angegebene Spitzenleistung fehlt, null ist oder in Watt eingegeben wurde; night bedeutet, dass der Erzeugungssensor nachts Energie aufzeichnet, also mehr als die Module misst. Korrigieren Sie die Konfiguration, und die Anlage wird innerhalb eines Tages wieder gezählt."
+      "title": "Von den Benchmark-Zahlen ausgenommen ({reason})",
+      "description": "Der öffentliche Benchmark erhält die Emissionen von {entry}, hält sie aber aus den veröffentlichten Zahlen heraus. Grund {reason}: kwp bedeutet, dass die angegebene Spitzenleistung fehlt, null ist oder in Watt eingetragen wurde; night bedeutet, dass der Erzeugungssensor nachts Energie aufzeichnet und damit mehr misst als die Module. Korrigieren Sie die Konfiguration, und die Anlage wird binnen eines Tages wieder mitgezählt."
+    }
+  },
+  "exceptions": {
+    "service_unknown_entry": {
+      "message": "Keine Helios-Forecast-Anlage mit der Eintrags-ID {entry_id}."
+    },
+    "service_no_installation": {
+      "message": "Es ist keine Helios-Forecast-Anlage eingerichtet."
+    },
+    "service_several_installations": {
+      "message": "Es sind mehrere Helios-Forecast-Anlagen eingerichtet; geben Sie 'config_entry_id' an, um eine auszuwählen."
     }
   }
 }

@@ -46,15 +46,18 @@ def async_register_services(hass: HomeAssistant) -> None:
         if entry_id is not None:
             coordinator = coordinators.get(entry_id)
             if coordinator is None:
-                raise ServiceValidationError(f"No Helios Forecast installation with config entry id '{entry_id}'.")
+                raise ServiceValidationError(
+                    translation_domain=DOMAIN,
+                    translation_key="service_unknown_entry",
+                    translation_placeholders={"entry_id": str(entry_id)},
+                )
             return coordinator
         if not coordinators:
-            raise ServiceValidationError("No Helios Forecast installation is set up.")
+            raise ServiceValidationError(translation_domain=DOMAIN, translation_key="service_no_installation")
         if len(coordinators) == 1:
             return next(iter(coordinators.values()))
-        raise ServiceValidationError(
-            "Several Helios Forecast installations are set up; pass 'config_entry_id' to choose one."
-        )
+        # Several installations and no target: the caller has to say which one.
+        raise ServiceValidationError(translation_domain=DOMAIN, translation_key="service_several_installations")
 
     async def _async_get_forecast(call: ServiceCall) -> dict[str, Any]:
         """Return the production forecast curve (today onward) for one installation."""
