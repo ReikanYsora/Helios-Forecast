@@ -30,7 +30,7 @@
           "production_entity": "En kumulativ energisensor (kWh), f.eks. inverterens eller strømmålerens totale produksjon. En effektsensor (W) fungerer ikke: den har ingen langtidsstatistikk for summen, så læringen og pålitelighetsindeksen ville forbli av.",
           "battery_soc_entity": "Fyll inn kapasiteten og denne sensoren for å slå på ladenivåprojeksjonen. Husforbruket hentes fra Energi-dashbordet ditt, så det trengs ingen sensor her.",
           "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket.",
-          "benchmark_enabled": "Sender én gang i timen hva dette anlegget forutsier, slik at det kan sammenlignes med hva det virkelig produserte. Resultatene publiseres åpent på helios-ha.org/benchmark. Bare panelenes geometri, den forutsagte kurven, den målte produksjonen og pålitelighetsindeksen sendes: ingen entitetsnavn, intet forbruk, ingen annen sensor, og koordinatene dine avrundet til omtrent en kilometer. Ingenting å søke om og ingen nøkkel å ta vare på. Av inntil du slår det på."
+          "benchmark_enabled": "Sender én gang i timen hva dette anlegget forutsier, slik at det kan sammenlignes med hva det virkelig produserte. Resultatene publiseres åpent på helios-ha.org/benchmark. Bare panelenes geometri, den forutsagte kurven, den målte produksjonen og pålitelighetsindeksen sendes: ingen entitetsnavn, intet forbruk, ingen annen sensor, og koordinatene dine avrundet til omtrent en kilometer. Krever 2026.9.5 eller nyere, versjonen som måles. Av inntil du slår det på."
         }
       },
       "line": {
@@ -81,7 +81,7 @@
           "production_entity": "En kumulativ energisensor (kWh), f.eks. inverterens eller strømmålerens totale produksjon. En effektsensor (W) fungerer ikke: den har ingen langtidsstatistikk for summen, så læringen og pålitelighetsindeksen ville forbli av.",
           "battery_soc_entity": "Fyll inn kapasiteten og denne sensoren for å slå på ladenivåprojeksjonen. Husforbruket hentes fra Energi-dashbordet ditt, så det trengs ingen sensor her.",
           "curtailment_entity": "På så lenge inverteren holdes tilbake av en grunn himmelen ikke forklarer: fullt batteri, null eksport, nettgrense. Timene den markerer læres ikke som lav produksjon. Uten den oppdages et fullt batteri fortsatt fra ladetilstandssensoren og invertertaket.",
-          "benchmark_enabled": "Sender én gang i timen hva dette anlegget forutsier, slik at det kan sammenlignes med hva det virkelig produserte. Resultatene publiseres åpent på helios-ha.org/benchmark. Bare panelenes geometri, den forutsagte kurven, den målte produksjonen og pålitelighetsindeksen sendes: ingen entitetsnavn, intet forbruk, ingen annen sensor, og koordinatene dine avrundet til omtrent en kilometer. Ingenting å søke om og ingen nøkkel å ta vare på. Av inntil du slår det på."
+          "benchmark_enabled": "Sender én gang i timen hva dette anlegget forutsier, slik at det kan sammenlignes med hva det virkelig produserte. Resultatene publiseres åpent på helios-ha.org/benchmark. Bare panelenes geometri, den forutsagte kurven, den målte produksjonen og pålitelighetsindeksen sendes: ingen entitetsnavn, intet forbruk, ingen annen sensor, og koordinatene dine avrundet til omtrent en kilometer. Krever 2026.9.5 eller nyere, versjonen som måles. Av inntil du slår det på."
         }
       },
       "lines": {

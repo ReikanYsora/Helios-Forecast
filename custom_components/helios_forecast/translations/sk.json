@@ -30,7 +30,7 @@
           "production_entity": "Kumulatívny senzor energie (kWh), napr. celková výroba striedača alebo elektromera. Senzor výkonu (W) nebude fungovať: nemá dlhodobé štatistiky súčtu, takže učenie a index spoľahlivosti by zostali vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor.",
           "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača.",
-          "benchmark_enabled": "Raz za hodinu odosiela to, čo táto inštalácia predpovedá, aby sa to dalo porovnať s tým, čo skutočne vyrobila. Výsledky sú otvorene zverejňované na helios-ha.org/benchmark. Putuje iba geometria panelov, predpovedaná krivka, nameraná výroba a index spoľahlivosti: žiadne názvy entít, žiadna spotreba, žiadny iný senzor a súradnice zaokrúhlené približne na kilometer. Nie je o čo žiadať a nie je čo uchovávať. Vypnuté, kým to nezapnete."
+          "benchmark_enabled": "Raz za hodinu odosiela to, čo táto inštalácia predpovedá, aby sa to dalo porovnať s tým, čo skutočne vyrobila. Výsledky sú otvorene zverejňované na helios-ha.org/benchmark. Putuje iba geometria panelov, predpovedaná krivka, nameraná výroba a index spoľahlivosti: žiadne názvy entít, žiadna spotreba, žiadny iný senzor a súradnice zaokrúhlené približne na kilometer. Vyžaduje verziu 2026.9.5 alebo novšiu, teda tú meranú. Vypnuté, kým to nezapnete."
         }
       },
       "line": {
@@ -81,7 +81,7 @@
           "production_entity": "Kumulatívny senzor energie (kWh), napr. celková výroba striedača alebo elektromera. Senzor výkonu (W) nebude fungovať: nemá dlhodobé štatistiky súčtu, takže učenie a index spoľahlivosti by zostali vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor.",
           "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača.",
-          "benchmark_enabled": "Raz za hodinu odosiela to, čo táto inštalácia predpovedá, aby sa to dalo porovnať s tým, čo skutočne vyrobila. Výsledky sú otvorene zverejňované na helios-ha.org/benchmark. Putuje iba geometria panelov, predpovedaná krivka, nameraná výroba a index spoľahlivosti: žiadne názvy entít, žiadna spotreba, žiadny iný senzor a súradnice zaokrúhlené približne na kilometer. Nie je o čo žiadať a nie je čo uchovávať. Vypnuté, kým to nezapnete."
+          "benchmark_enabled": "Raz za hodinu odosiela to, čo táto inštalácia predpovedá, aby sa to dalo porovnať s tým, čo skutočne vyrobila. Výsledky sú otvorene zverejňované na helios-ha.org/benchmark. Putuje iba geometria panelov, predpovedaná krivka, nameraná výroba a index spoľahlivosti: žiadne názvy entít, žiadna spotreba, žiadny iný senzor a súradnice zaokrúhlené približne na kilometer. Vyžaduje verziu 2026.9.5 alebo novšiu, teda tú meranú. Vypnuté, kým to nezapnete."
         }
       },
       "lines": {

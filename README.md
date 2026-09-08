@@ -28,6 +28,34 @@ Home Assistant already knows how to show it.
 
 ---
 
+> ### Update to 2026.9.5 as soon as you can
+>
+> Every version before this one could take an entire hour of long-term statistics down with it, and
+> not only its own: when the recorder's hourly compile hit the collision this integration caused, it
+> rolled the whole hour back, so **every integration on that machine silently lost that hour of
+> history**. It was not rare. On one instance, two hours of a single day kept 14 series out of 494.
+>
+> The cause was here since the first version and it is fixed at the root rather than worked around,
+> so nothing you can configure avoids it on an older version. Your archived history is moved to the
+> new series on the first start, hour by hour, and the old one is deleted only once every hour of it
+> has been read back at its new home. The [changelog](CHANGELOG.md) says exactly what it does.
+
+## The community benchmark, if you want in
+
+"Is it accurate?" deserves an answer with numbers behind it, so there is an open measurement running
+on real installations, published as it goes: **[helios-ha.org/benchmark](https://helios-ha.org/benchmark)**.
+
+Taking part is one checkbox, in **Settings** > **Devices and services** > **Helios Forecast** >
+**Configure** > **Settings**, and it needs 2026.9.5 or newer. There is no key to ask for and no
+account to create. What travels is the panel geometry, the predicted curve, the measured production
+and the reliability index, once an hour: no entity names, no consumption, no other sensor, and
+coordinates rounded to about a kilometre. Clear the box and it stops.
+
+The integration itself never needs any of this. It has no key, sends nothing of its own accord and
+computes everything on your machine, whether you take part or not.
+
+---
+
 ## Install
 
 Helios Forecast is in the **HACS default store**.

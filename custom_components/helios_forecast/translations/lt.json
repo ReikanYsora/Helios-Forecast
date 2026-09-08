@@ -30,7 +30,7 @@
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
           "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
           "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą.",
-          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tuo, ką ji iš tikrųjų pagamino. Rezultatai skelbiami viešai adresu helios-ha.org/benchmark. Siunčiama tik skydelių geometrija, prognozuojama kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokio kito jutiklio, o koordinatės suapvalintos maždaug iki kilometro. Nieko nereikia prašyti ir nereikia saugoti rakto. Išjungta, kol neįjungsite."
+          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tuo, ką ji iš tikrųjų pagamino. Rezultatai skelbiami viešai adresu helios-ha.org/benchmark. Siunčiama tik skydelių geometrija, prognozuojama kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokio kito jutiklio, o koordinatės suapvalintos maždaug iki kilometro. Reikalinga 2026.9.5 arba naujesnė versija, būtent ji matuojama. Išjungta, kol neįjungsite."
         }
       },
       "line": {
@@ -81,7 +81,7 @@
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
           "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
           "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą.",
-          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tuo, ką ji iš tikrųjų pagamino. Rezultatai skelbiami viešai adresu helios-ha.org/benchmark. Siunčiama tik skydelių geometrija, prognozuojama kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokio kito jutiklio, o koordinatės suapvalintos maždaug iki kilometro. Nieko nereikia prašyti ir nereikia saugoti rakto. Išjungta, kol neįjungsite."
+          "benchmark_enabled": "Kartą per valandą siunčia tai, ką ši sistema prognozuoja, kad būtų galima palyginti su tuo, ką ji iš tikrųjų pagamino. Rezultatai skelbiami viešai adresu helios-ha.org/benchmark. Siunčiama tik skydelių geometrija, prognozuojama kreivė, išmatuota gamyba ir patikimumo indeksas: jokių esybių pavadinimų, jokio suvartojimo, jokio kito jutiklio, o koordinatės suapvalintos maždaug iki kilometro. Reikalinga 2026.9.5 arba naujesnė versija, būtent ji matuojama. Išjungta, kol neįjungsite."
         }
       },
       "lines": {

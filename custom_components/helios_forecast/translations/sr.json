@@ -30,7 +30,7 @@
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbira, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
           "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
-          "benchmark_enabled": "Једном на сат шаље оно што ова инсталација предвиђа, како би се упоредило са оним што је стварно произвела. Резултати се објављују отворено на helios-ha.org/benchmark. Путују само геометрија панела, предвиђена крива, измерена производња и индекс поузданости: никаква имена ентитета, никаква потрошња, никакав други сензор, а ваше координате заокружене на отприлике километар. Нема шта да се тражи и нема кључа да се чува. Искључено док га не укључите."
+          "benchmark_enabled": "Једном на сат шаље оно што ова инсталација предвиђа, како би се упоредило са оним што је стварно произвела. Резултати се објављују отворено на helios-ha.org/benchmark. Путују само геометрија панела, предвиђена крива, измерена производња и индекс поузданости: никаква имена ентитета, никаква потрошња, никакав други сензор, а ваше координате заокружене на отприлике километар. Захтева верзију 2026.9.5 или новију, ону која се мери. Искључено док га не укључите."
         }
       },
       "line": {
@@ -81,7 +81,7 @@
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbira, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
           "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
-          "benchmark_enabled": "Једном на сат шаље оно што ова инсталација предвиђа, како би се упоредило са оним што је стварно произвела. Резултати се објављују отворено на helios-ha.org/benchmark. Путују само геометрија панела, предвиђена крива, измерена производња и индекс поузданости: никаква имена ентитета, никаква потрошња, никакав други сензор, а ваше координате заокружене на отприлике километар. Нема шта да се тражи и нема кључа да се чува. Искључено док га не укључите."
+          "benchmark_enabled": "Једном на сат шаље оно што ова инсталација предвиђа, како би се упоредило са оним што је стварно произвела. Резултати се објављују отворено на helios-ha.org/benchmark. Путују само геометрија панела, предвиђена крива, измерена производња и индекс поузданости: никаква имена ентитета, никаква потрошња, никакав други сензор, а ваше координате заокружене на отприлике километар. Захтева верзију 2026.9.5 или новију, ону која се мери. Искључено док га не укључите."
         }
       },
       "lines": {

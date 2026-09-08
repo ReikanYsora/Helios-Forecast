@@ -30,7 +30,7 @@
           "production_entity": "Kumulatiivne energiaandur (kWh), nt inverteri või energiaarvesti kogutoodang. Võimsusandur (W) ei tööta: sellel puudub pikaajaline summastatistika, nii et õppimine ja usaldusväärsuse indeks jääksid välja.",
           "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
           "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi.",
-          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegelikult toodetuga. Tulemused avaldatakse avalikult aadressil helios-ha.org/benchmark. Liiguvad ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: ei ühtegi olemi nime, ei tarbimist, ei muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Midagi pole taotleda ega võtit hoida. Väljas, kuni te selle sisse lülitate."
+          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegelikult toodetuga. Tulemused avaldatakse avalikult aadressil helios-ha.org/benchmark. Liiguvad ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: ei ühtegi olemi nime, ei tarbimist, ei muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Nõuab versiooni 2026.9.5 või uuemat, see on mõõdetav versioon. Väljas, kuni te selle sisse lülitate."
         }
       },
       "line": {
@@ -81,7 +81,7 @@
           "production_entity": "Kumulatiivne energiaandur (kWh), nt inverteri või energiaarvesti kogutoodang. Võimsusandur (W) ei tööta: sellel puudub pikaajaline summastatistika, nii et õppimine ja usaldusväärsuse indeks jääksid välja.",
           "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
           "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi.",
-          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegelikult toodetuga. Tulemused avaldatakse avalikult aadressil helios-ha.org/benchmark. Liiguvad ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: ei ühtegi olemi nime, ei tarbimist, ei muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Midagi pole taotleda ega võtit hoida. Väljas, kuni te selle sisse lülitate."
+          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegelikult toodetuga. Tulemused avaldatakse avalikult aadressil helios-ha.org/benchmark. Liiguvad ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: ei ühtegi olemi nime, ei tarbimist, ei muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Nõuab versiooni 2026.9.5 või uuemat, see on mõõdetav versioon. Väljas, kuni te selle sisse lülitate."
         }
       },
       "lines": {
