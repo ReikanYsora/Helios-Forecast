@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: komunitní srovnání",
-        "description": "Otevřené měření skutečné přesnosti Helios Forecast na reálných instalacích, průběžně zveřejňované. Chcete se zapojit? Tudy: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNení třeba žádat o klíč ani zakládat účet: zaškrtněte pole níže a to je vše. Chcete-li skončit, zaškrtnutí zrušte.",
+        "description": "Otevřené měření skutečné přesnosti Helios Forecast na reálných instalacích, průběžně zveřejňované. Chcete se zapojit? Tudy: {url}\n\nNení třeba žádat o klíč ani zakládat účet: zaškrtněte pole níže a to je vše. Chcete-li skončit, zaškrtnutí zrušte.",
         "data": {
           "benchmark_enabled": "Přispět do veřejného měření přesnosti (volitelné)"
         },
         "data_description": {
-          "benchmark_enabled": "Jednou za hodinu odesílá to, co tato instalace předpovídá, aby to bylo možné porovnat s tím, co skutečně vyrobila. Výsledky jsou otevřeně zveřejňovány na helios-ha.org/benchmark. Putuje pouze geometrie panelů, předpovězená křivka, naměřená výroba a index spolehlivosti: žádné názvy entit, žádná spotřeba, žádný jiný senzor a souřadnice zaokrouhlené zhruba na kilometr. Vyžaduje verzi 2026.9.5 nebo novější, tedy tu měřenou. Vypnuto, dokud to nezapnete."
+          "benchmark_enabled": "Jednou za hodinu odesílá to, co tato instalace předpovídá, aby to bylo možné porovnat s tím, co skutečně vyrobila. Výsledky jsou otevřeně zveřejňovány na {url}. Putuje pouze geometrie panelů, předpovězená křivka, naměřená výroba a index spolehlivosti: žádné názvy entit, žádná spotřeba, žádný jiný senzor a souřadnice zaokrouhlené zhruba na kilometr. Vyžaduje verzi 2026.9.5 nebo novější, tedy tu měřenou. Vypnuto, dokud to nezapnete."
         }
       }
     }

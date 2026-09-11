@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: testul comunității",
-        "description": "O măsurătoare deschisă a preciziei reale a Helios Forecast, pe instalații adevărate, publicată pe măsură. Doriți să participați? Pe aici: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNu există nicio cheie de cerut și niciun cont de creat: bifați caseta de mai jos și asta este tot. Pentru a opri, debifați-o.",
+        "description": "O măsurătoare deschisă a preciziei reale a Helios Forecast, pe instalații adevărate, publicată pe măsură. Doriți să participați? Pe aici: {url}\n\nNu există nicio cheie de cerut și niciun cont de creat: bifați caseta de mai jos și asta este tot. Pentru a opri, debifați-o.",
         "data": {
           "benchmark_enabled": "Contribuiți la măsurarea publică a preciziei (opțional)"
         },
         "data_description": {
-          "benchmark_enabled": "Trimite o dată pe oră ceea ce prezice această instalație, pentru a fi comparat cu ceea ce a produs cu adevărat. Rezultatele sunt publicate deschis pe helios-ha.org/benchmark. Circulă doar geometria panourilor, curba prezisă, producția măsurată și indicele de fiabilitate: niciun nume de entitate, niciun consum, niciun alt senzor, iar coordonatele dumneavoastră rotunjite la aproximativ un kilometru. Necesită versiunea 2026.9.5 sau mai nouă, cea care este măsurată. Dezactivat până când îl activați."
+          "benchmark_enabled": "Trimite o dată pe oră ceea ce prezice această instalație, pentru a fi comparat cu ceea ce a produs cu adevărat. Rezultatele sunt publicate deschis pe {url}. Circulă doar geometria panourilor, curba prezisă, producția măsurată și indicele de fiabilitate: niciun nume de entitate, niciun consum, niciun alt senzor, iar coordonatele dumneavoastră rotunjite la aproximativ un kilometru. Necesită versiunea 2026.9.5 sau mai nouă, cea care este măsurată. Dezactivat până când îl activați."
         }
       }
     }

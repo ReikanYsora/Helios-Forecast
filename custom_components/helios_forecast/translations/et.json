@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: kogukonna võrdlustest",
-        "description": "Avatud mõõtmine sellest, kui täpne Helios Forecast tegelikult on, päris paigaldistel, jooksvalt avaldatud. Kas soovid osaleda? Siit läheb: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nVõtit pole vaja küsida ega kontot luua: märkige allolev ruut ja ongi kõik. Lõpetamiseks eemaldage märge.",
+        "description": "Avatud mõõtmine sellest, kui täpne Helios Forecast tegelikult on, päris paigaldistel, jooksvalt avaldatud. Kas soovid osaleda? Siit läheb: {url}\n\nVõtit pole vaja küsida ega kontot luua: märkige allolev ruut ja ongi kõik. Lõpetamiseks eemaldage märge.",
         "data": {
           "benchmark_enabled": "Panusta avalikku täpsusmõõtmisse (valikuline)"
         },
         "data_description": {
-          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegelikult toodetuga. Tulemused avaldatakse avalikult aadressil helios-ha.org/benchmark. Liiguvad ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: ei ühtegi olemi nime, ei tarbimist, ei muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Nõuab versiooni 2026.9.5 või uuemat, see on mõõdetav versioon. Väljas, kuni te selle sisse lülitate."
+          "benchmark_enabled": "Saadab kord tunnis selle, mida see paigaldis ennustab, et seda saaks võrrelda tegelikult toodetuga. Tulemused avaldatakse avalikult aadressil {url}. Liiguvad ainult paneelide geomeetria, ennustatud kõver, mõõdetud toodang ja usaldusväärsuse indeks: ei ühtegi olemi nime, ei tarbimist, ei muud andurit, ja koordinaadid ümardatud umbes kilomeetrini. Nõuab versiooni 2026.9.5 või uuemat, see on mõõdetav versioon. Väljas, kuni te selle sisse lülitate."
         }
       }
     }

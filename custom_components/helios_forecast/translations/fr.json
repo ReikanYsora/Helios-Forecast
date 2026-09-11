@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast : benchmark communautaire",
-        "description": "Une mesure ouverte de la précision réelle d'Helios Forecast, sur de vraies installations, publiée au fur et à mesure. Vous souhaitez y participer ? Ça se passe ici : [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nIl n'y a pas de clé à demander ni de compte à créer : cochez la case ci-dessous, et c'est tout. Pour arrêter, décochez-la.",
+        "description": "Une mesure ouverte de la précision réelle d'Helios Forecast, sur de vraies installations, publiée au fur et à mesure. Vous souhaitez y participer ? Ça se passe ici : {url}\n\nIl n'y a pas de clé à demander ni de compte à créer : cochez la case ci-dessous, et c'est tout. Pour arrêter, décochez-la.",
         "data": {
           "benchmark_enabled": "Contribuer au benchmark public de précision (facultatif)"
         },
         "data_description": {
-          "benchmark_enabled": "Envoie ce que cette installation prévoit, une fois par heure, pour le comparer à ce qu'elle a réellement produit. Les résultats sont publiés ouvertement sur helios-ha.org/benchmark. Seuls la géométrie de vos panneaux, la courbe prévue, la production mesurée et l'indice de fiabilité circulent : aucun nom d'entité, aucune consommation, aucun autre capteur, et vos coordonnées arrondies au kilomètre environ. Nécessite la version 2026.9.5 ou plus récente, celle qui est mesurée. Désactivé tant que vous ne l'activez pas."
+          "benchmark_enabled": "Envoie ce que cette installation prévoit, une fois par heure, pour le comparer à ce qu'elle a réellement produit. Les résultats sont publiés ouvertement sur {url}. Seuls la géométrie de vos panneaux, la courbe prévue, la production mesurée et l'indice de fiabilité circulent : aucun nom d'entité, aucune consommation, aucun autre capteur, et vos coordonnées arrondies au kilomètre environ. Nécessite la version 2026.9.5 ou plus récente, celle qui est mesurée. Désactivé tant que vous ne l'activez pas."
         }
       }
     }

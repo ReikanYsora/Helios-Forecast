@@ -95,6 +95,23 @@ def test_no_placeholder_sits_inside_single_quotes() -> None:
             assert not re.search(r"'\{\w+\}'", text), f"{path.name}: {key} -> {text}"
 
 
+def test_no_string_carries_a_url() -> None:
+    """Another rule of Home Assistant's own validator, and the one that cost a release.
+
+    A literal address in a translation file is refused: hassfest asks for a description placeholder
+    instead, so the address lives in the code and the twenty-seven locales cannot drift apart on it.
+    The benchmark step shipped with one, in every language at once, and nothing here noticed until
+    the badge on the README turned red.
+    """
+    url = re.compile(r"https?://|www\.|\b[a-z0-9-]+\.(?:org|com|net|io|dev|eu|fr)\b")
+    for path in [_STRINGS, *_TRANSLATIONS]:
+        flat = _flat(json.loads(path.read_text(encoding="utf-8")))
+        for key, text in flat.items():
+            if not isinstance(text, str):
+                continue
+            assert not url.search(text), f"{path.name}: {key} -> {text}"
+
+
 if __name__ == "__main__":
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):

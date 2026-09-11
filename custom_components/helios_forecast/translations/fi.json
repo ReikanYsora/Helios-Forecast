@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: yhteisön vertailu",
-        "description": "Avoin mittaus siitä, kuinka tarkka Helios Forecast todella on, oikeilla järjestelmillä, julkaistuna sitä mukaa. Haluatko osallistua? Täältä pääset: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nAvainta ei tarvitse pyytää eikä tiliä luoda: rastita alla oleva ruutu, siinä kaikki. Lopettaaksesi poista rasti.",
+        "description": "Avoin mittaus siitä, kuinka tarkka Helios Forecast todella on, oikeilla järjestelmillä, julkaistuna sitä mukaa. Haluatko osallistua? Täältä pääset: {url}\n\nAvainta ei tarvitse pyytää eikä tiliä luoda: rastita alla oleva ruutu, siinä kaikki. Lopettaaksesi poista rasti.",
         "data": {
           "benchmark_enabled": "Osallistu julkiseen tarkkuusmittaukseen (valinnainen)"
         },
         "data_description": {
-          "benchmark_enabled": "Lähettää kerran tunnissa sen, mitä tämä laitos ennustaa, jotta sitä voidaan verrata siihen, mitä se todella tuotti. Tulokset julkaistaan avoimesti osoitteessa helios-ha.org/benchmark. Mukana kulkevat vain paneelien geometria, ennustettu käyrä, mitattu tuotanto ja luotettavuusindeksi: ei entiteettien nimiä, ei kulutusta, ei muita antureita, ja koordinaattisi pyöristettynä noin kilometriin. Vaatii version 2026.9.5 tai uudemman, eli mitattavan version. Pois päältä, kunnes kytket sen päälle."
+          "benchmark_enabled": "Lähettää kerran tunnissa sen, mitä tämä laitos ennustaa, jotta sitä voidaan verrata siihen, mitä se todella tuotti. Tulokset julkaistaan avoimesti osoitteessa {url}. Mukana kulkevat vain paneelien geometria, ennustettu käyrä, mitattu tuotanto ja luotettavuusindeksi: ei entiteettien nimiä, ei kulutusta, ei muita antureita, ja koordinaattisi pyöristettynä noin kilometriin. Vaatii version 2026.9.5 tai uudemman, eli mitattavan version. Pois päältä, kunnes kytket sen päälle."
         }
       }
     }

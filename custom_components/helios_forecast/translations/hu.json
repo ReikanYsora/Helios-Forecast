@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: közösségi mérés",
-        "description": "Nyílt mérés arról, mennyire pontos valójában a Helios Forecast, valódi rendszereken, folyamatosan közzétéve. Szeretne részt venni? Erre tessék: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNincs kérendő kulcs és nincs létrehozandó fiók: jelölje be az alábbi négyzetet, és ennyi. A leállításhoz vegye ki a jelölést.",
+        "description": "Nyílt mérés arról, mennyire pontos valójában a Helios Forecast, valódi rendszereken, folyamatosan közzétéve. Szeretne részt venni? Erre tessék: {url}\n\nNincs kérendő kulcs és nincs létrehozandó fiók: jelölje be az alábbi négyzetet, és ennyi. A leállításhoz vegye ki a jelölést.",
         "data": {
           "benchmark_enabled": "Hozzájárulás a nyilvános pontosságméréshez (opcionális)"
         },
         "data_description": {
-          "benchmark_enabled": "Óránként egyszer elküldi, amit ez a rendszer előrejelez, hogy összevethető legyen azzal, amit valóban termelt. Az eredmények nyilvánosan megjelennek a helios-ha.org/benchmark címen. Csak a panelek geometriája, az előrejelzett görbe, a mért termelés és a megbízhatósági index utazik: semmilyen entitásnév, semmilyen fogyasztás, semmilyen más érzékelő, és a koordinátái körülbelül egy kilométerre kerekítve. A 2026.9.5 vagy újabb verziót igényli, azt mérik. Kikapcsolva, amíg be nem kapcsolja."
+          "benchmark_enabled": "Óránként egyszer elküldi, amit ez a rendszer előrejelez, hogy összevethető legyen azzal, amit valóban termelt. Az eredmények nyilvánosan megjelennek a {url} címen. Csak a panelek geometriája, az előrejelzett görbe, a mért termelés és a megbízhatósági index utazik: semmilyen entitásnév, semmilyen fogyasztás, semmilyen más érzékelő, és a koordinátái körülbelül egy kilométerre kerekítve. A 2026.9.5 vagy újabb verziót igényli, azt mérik. Kikapcsolva, amíg be nem kapcsolja."
         }
       }
     }

@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: primerjava skupnosti",
-        "description": "Odprto merjenje dejanske natančnosti Helios Forecasta na resničnih napravah, objavljeno sproti. Želite sodelovati? Tukaj: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nKljuča ni treba zahtevati in računa ni treba ustvariti: označite spodnje polje in to je vse. Za prekinitev oznako odstranite.",
+        "description": "Odprto merjenje dejanske natančnosti Helios Forecasta na resničnih napravah, objavljeno sproti. Želite sodelovati? Tukaj: {url}\n\nKljuča ni treba zahtevati in računa ni treba ustvariti: označite spodnje polje in to je vse. Za prekinitev oznako odstranite.",
         "data": {
           "benchmark_enabled": "Prispevajte k javni meritvi natančnosti (izbirno)"
         },
         "data_description": {
-          "benchmark_enabled": "Enkrat na uro pošlje, kar ta naprava napoveduje, da se to lahko primerja s tem, kar je resnično proizvedla. Rezultati so odprto objavljeni na helios-ha.org/benchmark. Potujejo le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenega drugega senzorja, in vaše koordinate zaokrožene na približno kilometer. Zahteva različico 2026.9.5 ali novejšo, torej tisto, ki se meri. Izklopljeno, dokler tega ne vklopite."
+          "benchmark_enabled": "Enkrat na uro pošlje, kar ta naprava napoveduje, da se to lahko primerja s tem, kar je resnično proizvedla. Rezultati so odprto objavljeni na {url}. Potujejo le geometrija panelov, napovedana krivulja, izmerjena proizvodnja in indeks zanesljivosti: nobenih imen entitet, nobene porabe, nobenega drugega senzorja, in vaše koordinate zaokrožene na približno kilometer. Zahteva različico 2026.9.5 ali novejšo, torej tisto, ki se meri. Izklopljeno, dokler tega ne vklopite."
         }
       }
     }

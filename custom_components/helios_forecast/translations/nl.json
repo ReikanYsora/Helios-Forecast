@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: gemeenschapsbenchmark",
-        "description": "Een open meting van hoe nauwkeurig Helios Forecast werkelijk is, op echte installaties, gaandeweg gepubliceerd. Wilt u meedoen? Dat gaat hier: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nEr is geen sleutel om aan te vragen en geen account om aan te maken: vink het vakje hieronder aan, en dat is alles. Vink het uit om te stoppen.",
+        "description": "Een open meting van hoe nauwkeurig Helios Forecast werkelijk is, op echte installaties, gaandeweg gepubliceerd. Wilt u meedoen? Dat gaat hier: {url}\n\nEr is geen sleutel om aan te vragen en geen account om aan te maken: vink het vakje hieronder aan, en dat is alles. Vink het uit om te stoppen.",
         "data": {
           "benchmark_enabled": "Bijdragen aan de openbare nauwkeurigheidsmeting (optioneel)"
         },
         "data_description": {
-          "benchmark_enabled": "Verstuurt eens per uur wat deze installatie voorspelt, zodat het vergeleken kan worden met wat ze werkelijk heeft opgewekt. De resultaten worden openbaar gepubliceerd op helios-ha.org/benchmark. Alleen de geometrie van uw panelen, de voorspelde curve, de gemeten opwekking en de betrouwbaarheidsindex gaan mee: geen entiteitsnamen, geen verbruik, geen andere sensor, en uw coördinaten afgerond op ongeveer een kilometer. Vereist 2026.9.5 of nieuwer, de versie die gemeten wordt. Uit tenzij u het aanzet."
+          "benchmark_enabled": "Verstuurt eens per uur wat deze installatie voorspelt, zodat het vergeleken kan worden met wat ze werkelijk heeft opgewekt. De resultaten worden openbaar gepubliceerd op {url}. Alleen de geometrie van uw panelen, de voorspelde curve, de gemeten opwekking en de betrouwbaarheidsindex gaan mee: geen entiteitsnamen, geen verbruik, geen andere sensor, en uw coördinaten afgerond op ongeveer een kilometer. Vereist 2026.9.5 of nieuwer, de versie die gemeten wordt. Uit tenzij u het aanzet."
         }
       }
     }
