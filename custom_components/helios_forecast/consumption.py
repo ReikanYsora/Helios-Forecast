@@ -53,8 +53,12 @@ def consumption_sources(prefs: Optional[dict]) -> ConsumptionSources:
             _add(signed, src.get("stat_energy_from"), +1)  # discharge, out of the battery
             _add(signed, src.get("stat_energy_to"), -1)  # charge, into the battery
         elif source_type == "grid":
-            # A grid source carries its meters in two required lists and never at the top level
-            # (homeassistant/components/energy/data.py, GRID_SOURCE_SCHEMA).
+            # The dashboard keeps the grid meters at the top level since the unified source format
+            # (homeassistant/components/energy/data.py, GRID_SOURCE_SCHEMA): the import meter in
+            # stat_energy_from, the export meter in stat_energy_to. The older flow_from / flow_to
+            # lists are kept for configurations still stored in the previous format.
+            _add(signed, src.get("stat_energy_from"), +1)  # import
+            _add(signed, src.get("stat_energy_to"), -1)  # export
             for flow in src.get("flow_from") or []:
                 _add(signed, flow.get("stat_energy_from"), +1)  # import
             for flow in src.get("flow_to") or []:

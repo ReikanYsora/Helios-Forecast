@@ -59,6 +59,21 @@ def test_sources_grid_flow_lists() -> None:
     assert consumption_sources(prefs).signed == {"sensor.import": 1, "sensor.export": -1}
 
 
+def test_sources_grid_unified_top_level_meters() -> None:
+    # The unified Energy source format (HA 2026.9 and later) writes the meters at the top level
+    # instead of the flow lists; both directions must survive, or home consumption loses the grid.
+    prefs = {
+        "energy_sources": [
+            {
+                "type": "grid",
+                "stat_energy_from": "sensor.import",
+                "stat_energy_to": "sensor.export",
+            }
+        ]
+    }
+    assert consumption_sources(prefs).signed == {"sensor.import": 1, "sensor.export": -1}
+
+
 def test_sources_missing_pieces_drop_out() -> None:
     assert consumption_sources(None).signed == {}
     assert consumption_sources({}).signed == {}
