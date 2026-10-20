@@ -21,6 +21,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import math
+import random
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, TypeVar
@@ -42,11 +43,11 @@ _BASE_URL = "https://api.open-meteo.com/v1/forecast"
 
 _T = TypeVar("_T")
 
-# Open-Meteo occasionally answers a valid request with a non-200 or an empty payload (a brief
-# rate-limit or hiccup). A couple of short retries turn that transient blank into a success instead
-# of a failed 30-minute refresh.
+# Open-Meteo occasionally answers a valid request with a non-200 or an empty payload.
+# Wider jittered retries can outlast a brief overload; bounded attempts still return
+# to last-good reuse during a prolonged outage.
 _RETRY_ATTEMPTS = 3
-_RETRY_DELAY_S = 2.0
+_RETRY_DELAYS_S = ((6.0, 12.0), (16.0, 24.0))
 # Per-request timeout. Without it a stalled connection could hang a refresh indefinitely and leave a
 # config entry's sensors unavailable until a manual update_entity; a timeout instead becomes a None
 # result that the retry + last-good-reuse path recovers from.
@@ -335,7 +336,7 @@ async def _fetch_parsed(
         if result is not None:
             return result
         if attempt + 1 < _RETRY_ATTEMPTS:
-            await asyncio.sleep(_RETRY_DELAY_S)
+            await asyncio.sleep(random.uniform(*_RETRY_DELAYS_S[attempt]))
     return None
 
 

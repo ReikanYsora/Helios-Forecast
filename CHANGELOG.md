@@ -5,6 +5,14 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## Unreleased
+
+### Fixed
+
+Hourly archive refreshes use a stable per-entry phase between HH:05 and HH:09 instead of one shared HH:07:00 trigger. Weather retries wait with bounded jitter beyond brief overloads while preserving three attempts and cancellation.
+
+---
+
 ## 2026.9.6
 
 The one line 2026.9.5 was missing. Everything that release fixed is in it and unchanged;

@@ -12,6 +12,7 @@ import asyncio
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import AsyncMock, call, patch
 
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -183,10 +184,10 @@ def test_get_json_returns_none_on_invalid_json() -> None:
     assert result is None
 
 
+@patch.object(om.asyncio, "sleep", new=AsyncMock())
 def test_fetch_parsed_retries_after_malformed_body() -> None:
     # A malformed-but-200 first attempt must not escape _get_json as an uncaught exception: the
     # retry loop in _fetch_parsed keeps running and recovers on the next, good attempt.
-    om._RETRY_DELAY_S = 0.0
 
     class _BadThenGoodResp:
         def __init__(self, raise_bad):
@@ -355,8 +356,8 @@ _ENSEMBLE_SPREAD = {
 }
 
 
+@patch.object(om.asyncio, "sleep", new=AsyncMock())
 def test_fetch_weather_values_with_ensemble_spread() -> None:
-    om._RETRY_DELAY_S = 0.0  # do not actually sleep between retries in tests
     # Values call: empty, non-200, then good (the third try wins). Then the ensemble call overlays
     # the cross-model cloud spread onto the values.
     session = _FakeSession(
@@ -374,8 +375,8 @@ def test_fetch_weather_values_with_ensemble_spread() -> None:
     assert session.calls == 4  # 3 values tries + 1 ensemble
 
 
+@patch.object(om.asyncio, "sleep", new=AsyncMock())
 def test_fetch_weather_ensemble_failure_leaves_the_spread_unanswered() -> None:
-    om._RETRY_DELAY_S = 0.0
     # Values succeed on the first try; the ensemble call fails every retry. The series still returns
     # rather than failing the refresh (best effort), with no spread rather than a spread of zero:
     # zero is what every model agreeing exactly looks like, and the reliability index reads it so.
@@ -390,8 +391,8 @@ def test_fetch_weather_ensemble_failure_leaves_the_spread_unanswered() -> None:
     assert session.calls == 4  # 1 values + 3 ensemble tries
 
 
+@patch.object(om.asyncio, "sleep", new=AsyncMock())
 def test_fetch_weather_none_after_exhausting_retries() -> None:
-    om._RETRY_DELAY_S = 0.0
     # Values fail every retry. The two calls now run concurrently (see the dedicated concurrency
     # test below), so the ensemble call is also attempted here even though its result is discarded.
     session = _FakeSession(
@@ -447,6 +448,38 @@ def test_fetch_weather_runs_values_and_ensemble_concurrently() -> None:
     assert result is not None
     assert result.cloud == [50.0, 60.0]
     assert result.cloud_spread == [10.0, 0.0]
+
+
+def test_retry_spacing_is_widened_and_stops_after_three_attempts() -> None:
+    sleeps = AsyncMock()
+    fetch = AsyncMock(return_value=None)
+    with (
+        patch.object(om, "_get_json", fetch),
+        patch.object(om.asyncio, "sleep", sleeps),
+        patch.object(om.random, "uniform", side_effect=lambda low, high: low) as jitter,
+    ):
+        result = asyncio.run(om._fetch_parsed(object(), "https://example.invalid", lambda data: data))
+    assert result is None
+    assert fetch.await_count == 3
+    assert jitter.call_args_list == [call(6.0, 12.0), call(16.0, 24.0)]
+    assert sleeps.await_args_list == [call(6.0), call(16.0)]
+
+
+def test_success_does_not_wait_and_cancellation_is_not_retried() -> None:
+    for response in ({"valid": True}, asyncio.CancelledError()):
+        fetch = (
+            AsyncMock(side_effect=response) if isinstance(response, BaseException) else AsyncMock(return_value=response)
+        )
+        sleeps = AsyncMock()
+        with patch.object(om, "_get_json", fetch), patch.object(om.asyncio, "sleep", sleeps):
+            try:
+                result = asyncio.run(om._fetch_parsed(object(), "https://example.invalid", lambda data: data))
+            except asyncio.CancelledError:
+                assert isinstance(response, asyncio.CancelledError)
+            else:
+                assert result == response
+        assert fetch.await_count == 1
+        sleeps.assert_not_awaited()
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .const import DOMAIN
+from .refresh import refresh_phase
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -62,7 +63,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     def _hour_rolled_over(_now) -> None:
         hass.async_create_task(coordinator.async_request_refresh())
 
-    entry.async_on_unload(async_track_time_change(hass, _hour_rolled_over, minute=7, second=0))
+    # A fixed HH:07 merely relocates the shared provider peak. Spread entries
+    # over five minutes while keeping the phase stable across restarts.
+    minute, second = refresh_phase(entry.entry_id)
+    entry.async_on_unload(async_track_time_change(hass, _hour_rolled_over, minute=minute, second=second))
 
     # Re-project the battery SoC the moment its source entity comes back from unavailable/unknown
     # rather than waiting for the 30-minute tick: battery integrations are often briefly unavailable

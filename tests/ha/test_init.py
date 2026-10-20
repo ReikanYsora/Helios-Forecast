@@ -22,6 +22,7 @@ import custom_components.helios_forecast.archive as archive_mod
 import custom_components.helios_forecast.coordinator as coordinator_mod
 from custom_components.helios_forecast import async_setup_entry, async_unload_entry, _legacy_issue_id
 from custom_components.helios_forecast.const import DOMAIN
+from custom_components.helios_forecast.refresh import refresh_phase
 
 from _weather import make_weather_series
 
@@ -254,6 +255,7 @@ async def test_hour_rollover_triggers_off_cycle_refresh(hass, monkeypatch) -> No
     await hass.async_block_till_done()
     refresh_mock.assert_not_awaited()
 
-    async_fire_time_changed(hass, top_of_hour.replace(minute=7, second=0))
+    minute, second = refresh_phase(entry.entry_id)
+    async_fire_time_changed(hass, top_of_hour.replace(minute=minute, second=second))
     await hass.async_block_till_done()
     refresh_mock.assert_awaited_once()
