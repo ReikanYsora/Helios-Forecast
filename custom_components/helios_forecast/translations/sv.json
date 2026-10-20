@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: gemenskapens jämförelse",
-        "description": "En öppen mätning av hur noggrann Helios Forecast verkligen är, på riktiga anläggningar, publicerad efter hand. Vill du vara med? Det sker här: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nDet finns ingen nyckel att be om och inget konto att skapa: kryssa i rutan nedan, det är allt. Ta bort krysset för att sluta.",
+        "description": "En öppen mätning av hur noggrann Helios Forecast verkligen är, på riktiga anläggningar, publicerad efter hand. Vill du vara med? Det sker här: {url}\n\nDet finns ingen nyckel att be om och inget konto att skapa: kryssa i rutan nedan, det är allt. Ta bort krysset för att sluta.",
         "data": {
           "benchmark_enabled": "Bidra till den öppna noggrannhetsmätningen (valfritt)"
         },
         "data_description": {
-          "benchmark_enabled": "Skickar en gång i timmen vad denna anläggning förutsäger, så att det kan jämföras med vad den verkligen producerade. Resultaten publiceras öppet på helios-ha.org/benchmark. Endast panelernas geometri, den förutsagda kurvan, den uppmätta produktionen och tillförlitlighetsindexet skickas: inga entitetsnamn, ingen förbrukning, ingen annan sensor, och dina koordinater avrundade till ungefär en kilometer. Kräver 2026.9.5 eller senare, den version som mäts. Av tills du slår på det."
+          "benchmark_enabled": "Skickar en gång i timmen vad denna anläggning förutsäger, så att det kan jämföras med vad den verkligen producerade. Resultaten publiceras öppet på {url}. Endast panelernas geometri, den förutsagda kurvan, den uppmätta produktionen och tillförlitlighetsindexet skickas: inga entitetsnamn, ingen förbrukning, ingen annan sensor, och dina koordinater avrundade till ungefär en kilometer. Kräver 2026.9.5 eller senare, den version som mäts. Av tills du slår på det."
         }
       }
     }

@@ -193,6 +193,11 @@ def _benchmark_fields(settings: dict[str, Any]) -> dict[Any, Any]:
     return {vol.Optional(CONF_BENCHMARK_ENABLED, default=bool(settings.get(CONF_BENCHMARK_ENABLED, False))): _BOOL}
 
 
+# Where the published figures live, quoted by the benchmark step. Not in the strings themselves: hassfest
+# rejects a URL inside a translation file and asks for a description placeholder instead.
+BENCHMARK_PAGE = "helios-ha.org/benchmark"
+
+
 class HeliosForecastConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]  # HA passes `domain` to __init_subclass__
     """Config flow for Helios Solar Forecast: settings + one or more panel lines."""
 
@@ -295,7 +300,14 @@ class HeliosForecastOptionsFlow(OptionsFlow):
             kept = {k: v for k, v in split_settings(current).items() if k not in BENCHMARK_KEYS}
             settings = {**kept, **split_settings(user_input)}
             return self._save(merge_entry_data(settings, lines_from_config(current)))
-        return self.async_show_form(step_id="benchmark", data_schema=vol.Schema(_benchmark_fields(current)))
+        # The address is handed over as a placeholder rather than written into the strings: hassfest refuses a
+        # literal URL in a translation file, and this is the escape it points at. One value, so the twenty-seven
+        # locales cannot drift apart on where the results live.
+        return self.async_show_form(
+            step_id="benchmark",
+            data_schema=vol.Schema(_benchmark_fields(current)),
+            description_placeholders={"url": BENCHMARK_PAGE},
+        )
 
     async def async_step_lines(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Walk the existing lines (edit / remove each), then optionally append new ones."""

@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: benchmark della comunità",
-        "description": "Una misura aperta della precisione reale di Helios Forecast, su impianti veri, pubblicata via via. Volete partecipare? Si passa di qui: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNon c'è nessuna chiave da chiedere né alcun account da creare: spuntate la casella qui sotto, ed è tutto. Per interrompere, toglietela.",
+        "description": "Una misura aperta della precisione reale di Helios Forecast, su impianti veri, pubblicata via via. Volete partecipare? Si passa di qui: {url}\n\nNon c'è nessuna chiave da chiedere né alcun account da creare: spuntate la casella qui sotto, ed è tutto. Per interrompere, toglietela.",
         "data": {
           "benchmark_enabled": "Contribuire al banco di prova pubblico di precisione (facoltativo)"
         },
         "data_description": {
-          "benchmark_enabled": "Invia ciò che questo impianto prevede, una volta all'ora, per confrontarlo con ciò che ha realmente prodotto. I risultati sono pubblicati apertamente su helios-ha.org/benchmark. Viaggiano solo la geometria dei pannelli, la curva prevista, la produzione misurata e l'indice di affidabilità: nessun nome di entità, nessun consumo, nessun altro sensore, e le coordinate arrotondate a circa un chilometro. Richiede la 2026.9.5 o successiva, la versione misurata. Disattivato finché non lo attiva."
+          "benchmark_enabled": "Invia ciò che questo impianto prevede, una volta all'ora, per confrontarlo con ciò che ha realmente prodotto. I risultati sono pubblicati apertamente su {url}. Viaggiano solo la geometria dei pannelli, la curva prevista, la produzione misurata e l'indice di affidabilità: nessun nome di entità, nessun consumo, nessun altro sensore, e le coordinate arrotondate a circa un chilometro. Richiede la 2026.9.5 o successiva, la versione misurata. Disattivato finché non lo attiva."
         }
       }
     }

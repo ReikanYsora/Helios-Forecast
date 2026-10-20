@@ -31,6 +31,12 @@ alone, while a refresh republishes the whole problem list from scratch: it was c
 next refresh and raised again at the next emission, once an hour. It is now restated on every
 refresh, so it stays up until the configuration is corrected.
 
+### Development backport (unreleased): benchmark translation validation
+
+Restore the benchmark description placeholders already present on main to the
+development branch. Translations pass Home Assistant validation, the benchmark
+remains optional, and the options form supplies the results-page address.
+
 ---
 
 ## 2026.9.5

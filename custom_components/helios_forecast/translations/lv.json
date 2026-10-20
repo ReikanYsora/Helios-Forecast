@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: kopienas salīdzinājums",
-        "description": "Atklāts mērījums tam, cik precīzs Helios Forecast patiešām ir, uz reālām iekārtām, publicēts pakāpeniski. Vai vēlaties piedalīties? Šeit: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNav jāprasā atslēga un nav jāveido konts: atzīmējiet zemāk esošo lodziņu, un tas ir viss. Lai pārtrauktu, noņemiet atzīmi.",
+        "description": "Atklāts mērījums tam, cik precīzs Helios Forecast patiešām ir, uz reālām iekārtām, publicēts pakāpeniski. Vai vēlaties piedalīties? Šeit: {url}\n\nNav jāprasā atslēga un nav jāveido konts: atzīmējiet zemāk esošo lodziņu, un tas ir viss. Lai pārtrauktu, noņemiet atzīmi.",
         "data": {
           "benchmark_enabled": "Sniegt ieguldījumu publiskajā precizitātes mērījumā (neobligāti)"
         },
         "data_description": {
-          "benchmark_enabled": "Reizi stundā nosūta to, ko šī iekārta prognozē, lai to varētu salīdzināt ar patiesi saražoto. Rezultāti tiek publicēti atklāti vietnē helios-ha.org/benchmark. Tiek nosūtīta tikai paneļu ģeometrija, prognozētā līkne, izmērītā ražošana un uzticamības indekss: nekādu entītiju nosaukumu, nekāda patēriņa, nekādu citu sensoru, un jūsu koordinātas noapaļotas līdz aptuveni kilometram. Nepieciešama versija 2026.9.5 vai jaunāka, tā ir mērītā versija. Izslēgts, kamēr to neieslēdzat."
+          "benchmark_enabled": "Reizi stundā nosūta to, ko šī iekārta prognozē, lai to varētu salīdzināt ar patiesi saražoto. Rezultāti tiek publicēti atklāti vietnē {url}. Tiek nosūtīta tikai paneļu ģeometrija, prognozētā līkne, izmērītā ražošana un uzticamības indekss: nekādu entītiju nosaukumu, nekāda patēriņa, nekādu citu sensoru, un jūsu koordinātas noapaļotas līdz aptuveni kilometram. Nepieciešama versija 2026.9.5 vai jaunāka, tā ir mērītā versija. Izslēgts, kamēr to neieslēdzat."
         }
       }
     }

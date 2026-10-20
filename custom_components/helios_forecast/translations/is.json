@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: samanburður samfélagsins",
-        "description": "Opin mæling á því hversu nákvæmt Helios Forecast er í raun, á raunverulegum kerfum, birt jafnóðum. Viltu taka þátt? Hér er leiðin: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nÞað þarf hvorki að biðja um lykil né stofna reikning: hakaðu í reitinn hér að neðan og það er allt. Til að hætta, taktu hakið af.",
+        "description": "Opin mæling á því hversu nákvæmt Helios Forecast er í raun, á raunverulegum kerfum, birt jafnóðum. Viltu taka þátt? Hér er leiðin: {url}\n\nÞað þarf hvorki að biðja um lykil né stofna reikning: hakaðu í reitinn hér að neðan og það er allt. Til að hætta, taktu hakið af.",
         "data": {
           "benchmark_enabled": "Leggðu þitt af mörkum í opinberri nákvæmnismælingu (valfrjálst)"
         },
         "data_description": {
-          "benchmark_enabled": "Sendir einu sinni á klukkustund það sem þetta kerfi spáir fyrir um, svo hægt sé að bera það saman við það sem það framleiddi í raun. Niðurstöður eru birtar opinberlega á helios-ha.org/benchmark. Aðeins rúmfræði spjaldanna, spáða ferillinn, mæld framleiðsla og áreiðanleikavísitalan ferðast: engin heiti eininga, engin notkun, enginn annar skynjari, og hnitin þín rúnnuð að um það bil kílómetra. Krefst 2026.9.5 eða nýrri, útgáfunnar sem er mæld. Slökkt þar til þú kveikir á því."
+          "benchmark_enabled": "Sendir einu sinni á klukkustund það sem þetta kerfi spáir fyrir um, svo hægt sé að bera það saman við það sem það framleiddi í raun. Niðurstöður eru birtar opinberlega á {url}. Aðeins rúmfræði spjaldanna, spáða ferillinn, mæld framleiðsla og áreiðanleikavísitalan ferðast: engin heiti eininga, engin notkun, enginn annar skynjari, og hnitin þín rúnnuð að um það bil kílómetra. Krefst 2026.9.5 eða nýrri, útgáfunnar sem er mæld. Slökkt þar til þú kveikir á því."
         }
       }
     }

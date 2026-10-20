@@ -285,6 +285,7 @@ async def test_the_benchmark_step_opens_on_the_value_already_stored(
     result = await hass.config_entries.options.async_configure(result["flow_id"], {"next_step_id": "benchmark"})
     assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "benchmark"
+    assert result["description_placeholders"] == {"url": "helios-ha.org/benchmark"}
     marker = next(k for k in result["data_schema"].schema if str(k) == CONF_BENCHMARK_ENABLED)
     assert marker.default() is True
 

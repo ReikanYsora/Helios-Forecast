@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: community benchmark",
-        "description": "An open measurement of how accurate Helios Forecast really is, on real installations, published as it goes. Would you like to take part? It happens here: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nThere is no key to ask for and no account to create: tick the box below, and that is all. To stop, clear it.",
+        "description": "An open measurement of how accurate Helios Forecast really is, on real installations, published as it goes. Would you like to take part? It happens here: {url}\n\nThere is no key to ask for and no account to create: tick the box below, and that is all. To stop, clear it.",
         "data": {
           "benchmark_enabled": "Contribute to the public accuracy benchmark (optional)"
         },
         "data_description": {
-          "benchmark_enabled": "Sends what this installation predicts, once an hour, so it can be compared with what it really produced. The results are published openly at helios-ha.org/benchmark. Only your panel geometry, the predicted curve, the measured production and the reliability index travel: no entity names, no consumption, no other sensor, and your coordinates rounded to about a kilometre. Requires 2026.9.5 or newer, which is the version being measured. Off unless you turn it on."
+          "benchmark_enabled": "Sends what this installation predicts, once an hour, so it can be compared with what it really produced. The results are published openly at {url}. Only your panel geometry, the predicted curve, the measured production and the reliability index travel: no entity names, no consumption, no other sensor, and your coordinates rounded to about a kilometre. Requires 2026.9.5 or newer, which is the version being measured. Off unless you turn it on."
         }
       }
     }

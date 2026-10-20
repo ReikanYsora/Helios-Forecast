@@ -98,12 +98,12 @@
       },
       "benchmark": {
         "title": "Helios Forecast: test społecznościowy",
-        "description": "Otwarty pomiar rzeczywistej dokładności Helios Forecast, na prawdziwych instalacjach, publikowany na bieżąco. Chcesz wziąć udział? Tędy: [helios-ha.org/benchmark](https://helios-ha.org/benchmark)\n\nNie trzeba prosić o klucz ani zakładać konta: zaznacz poniższe pole i to wszystko. Aby przerwać, odznacz je.",
+        "description": "Otwarty pomiar rzeczywistej dokładności Helios Forecast, na prawdziwych instalacjach, publikowany na bieżąco. Chcesz wziąć udział? Tędy: {url}\n\nNie trzeba prosić o klucz ani zakładać konta: zaznacz poniższe pole i to wszystko. Aby przerwać, odznacz je.",
         "data": {
           "benchmark_enabled": "Wnieś wkład do publicznego testu dokładności (opcjonalnie)"
         },
         "data_description": {
-          "benchmark_enabled": "Wysyła raz na godzinę to, co ta instalacja przewiduje, aby porównać to z tym, co naprawdę wyprodukowała. Wyniki są publikowane otwarcie na helios-ha.org/benchmark. Przesyłane są tylko geometria paneli, przewidywana krzywa, zmierzona produkcja i wskaźnik wiarygodności: żadnych nazw encji, żadnego zużycia, żadnego innego czujnika, a współrzędne zaokrąglone do około kilometra. Wymaga wersji 2026.9.5 lub nowszej, czyli tej mierzonej. Wyłączone, dopóki tego nie włączysz."
+          "benchmark_enabled": "Wysyła raz na godzinę to, co ta instalacja przewiduje, aby porównać to z tym, co naprawdę wyprodukowała. Wyniki są publikowane otwarcie na {url}. Przesyłane są tylko geometria paneli, przewidywana krzywa, zmierzona produkcja i wskaźnik wiarygodności: żadnych nazw encji, żadnego zużycia, żadnego innego czujnika, a współrzędne zaokrąglone do około kilometra. Wymaga wersji 2026.9.5 lub nowszej, czyli tej mierzonej. Wyłączone, dopóki tego nie włączysz."
         }
       }
     }
