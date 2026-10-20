@@ -5,6 +5,14 @@ date-based versioning scheme (`YEAR.MONTH.PATCH`).
 
 ---
 
+## Unreleased
+
+### Fixed
+
+Forecast intervals now advance in elapsed UTC time across daylight saving transitions. Local spring and autumn days retain all 92 or 100 quarter-hours, including both autumn offsets, without changing the forecast response schema.
+
+---
+
 ## 2026.9.6
 
 The one line 2026.9.5 was missing. Everything that release fixed is in it and unchanged;

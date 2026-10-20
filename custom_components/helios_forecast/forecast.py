@@ -125,10 +125,12 @@ def build_forecast_series(
     # below would otherwise collapse onto that sample and hold it forward, which reads as an
     # ordinary forecast because the sun geometry on top of it is still right. The last sample
     # describes the hour beginning on it, hence the hour of slack.
-    limit = min(end, times[-1] + timedelta(hours=1))
+    limit = min(end.astimezone(timezone.utc), times[-1].astimezone(timezone.utc) + timedelta(hours=1))
 
     wi = 0
-    t = start
+    # Advance in elapsed time: local arithmetic skips the autumn fold and
+    # invents spring-gap wall times. Convert only the published timestamp back.
+    t = start.astimezone(timezone.utc)
     while t < limit:
         t_ms = t.timestamp()
         # Bracket between two hourly weather samples, moving cursor (ascending t).
@@ -165,7 +167,7 @@ def build_forecast_series(
             corrected = min(inverter_max_w, max(0.0, corrected_w))
             points.append(
                 ForecastPoint(
-                    t=t,
+                    t=t.astimezone(start.tzinfo),
                     pv_w=corrected,
                     pv_raw_w=raw_clamped,
                     ghi=sample.ghi,

@@ -65,6 +65,9 @@
 > `forecast` attribute (section 2). (d) Home Assistant **2025.11** is the minimum:
 > the archived metadata carries a unit class the recorder only stores from there.
 
+> Revision (2026-10-20): clarify elapsed-time intervals on clock-change days
+> (section 2). Field names, units, output surfaces and the card API are unchanged.
+
 The integration owns one **config entry per installation**, holding one or more
 **panel lines** (a group of co-oriented panels each). Every surface below is scoped
 to that entry: one device, one entity set and one detail series per entry, summing
@@ -218,6 +221,11 @@ the charge decision to the user's own automation.
 All PV values are residual-corrected. A raw (pre-correction) variant is not exposed
 as entities to keep the set clean; the raw curve stays available to the card via
 the detail series in section 3.
+
+**Intervals.** The sub-hourly forecast advances in real elapsed time. A local
+clock-change day therefore has 92 or 100 quarter-hour intervals instead of 96;
+the repeated autumn hour retains both UTC offsets. Field names, units and
+calendar-day boundaries are unchanged.
 
 **Horizon.** The integration computes a 7-day forecast and every per-day entity
 (energy AND peak) covers `day_1` (today) through `day_7` (J+6). Days beyond ~J+2
