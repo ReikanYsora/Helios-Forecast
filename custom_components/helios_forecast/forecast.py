@@ -11,7 +11,7 @@ analog blend on top of that lives in the sibling ``analog`` module.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone, tzinfo
 from typing import Dict, List, Optional
 
@@ -40,6 +40,50 @@ class ForecastPoint:
     # irradiance / cloud at that exact instant when scrubbing (already computed for the model).
     ghi: Optional[float] = None
     cloud: Optional[float] = None
+
+
+def _check_power_limit(watts: float) -> None:
+    if math.isnan(watts) or watts < 0:
+        raise ValueError("Hardware power limit must be nonnegative or positive infinity")
+
+
+def hardware_power_limit_w(layout: PvLayout, inverter_max_w: float = INF) -> float:
+    """Combined hardware ceiling, independent of today's irradiance or learned ratios.
+
+    An uncapped producing line contributes infinity: its nameplate or present raw
+    output is not an inverter limit. Zero-share lines cannot produce. The entry cap
+    still applies when no complete per-line layout is available.
+    """
+    _check_power_limit(inverter_max_w)
+    if not layout.orientations or len(layout.shares) != len(layout.orientations):
+        return inverter_max_w
+    total = 0.0
+    for i, share in enumerate(layout.shares):
+        if not math.isfinite(share) or share < 0:
+            raise ValueError("PV layout shares must be finite and nonnegative")
+        if share == 0:
+            continue
+        cap = layout.caps[i] if i < len(layout.caps) else INF
+        _check_power_limit(cap)
+        total += cap
+    return min(inverter_max_w, total)
+
+
+def limit_forecast_power(point: ForecastPoint, hardware_max_w: float = INF) -> ForecastPoint:
+    """Bound the final forecast and existing bands without inventing uncertainty.
+
+    Raw watts remain the physical reference for analog ratios; they are not a
+    substitute for an explicit hardware ceiling.
+    """
+    _check_power_limit(hardware_max_w)
+    if hardware_max_w == INF:
+        return point
+    return replace(
+        point,
+        pv_w=min(point.pv_w, hardware_max_w),
+        pv_p10=min(point.pv_p10, hardware_max_w) if point.pv_p10 is not None else None,
+        pv_p90=min(point.pv_p90, hardware_max_w) if point.pv_p90 is not None else None,
+    )
 
 
 def forecast_point_dict(p: ForecastPoint) -> Dict[str, object]:

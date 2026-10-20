@@ -32,7 +32,7 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from typing import List, Optional, Sequence, TypeGuard
 
-from .forecast import ForecastPoint
+from .forecast import ForecastPoint, limit_forecast_power
 from .openmeteo import WeatherSeries
 from .solar.geometry import sun_position
 from .solar.irradiance import snow_cover_factor
@@ -371,24 +371,27 @@ def enrich_points(
     lat: float,
     lon: float,
     now: datetime,
+    hardware_max_w: float = math.inf,
 ) -> List[ForecastPoint]:
     """Blend the analog median into the future points and attach the P10/P90 band.
 
     Past points (t < now) are left as the physical model output: this is the live series, where
     a past point already stood as "what the forecast said" at the time and isn't reworked after
     the fact. The future P50 blends analog and physical by confidence; the band is surfaced only
-    once the analog support is solid (BAND_MIN_CONFIDENCE)."""
+    once the analog support is solid (BAND_MIN_CONFIDENCE). ``hardware_max_w``
+    bounds final watts and nonnull bands after refinement, including cold start
+    and past points; it must come from configured hardware, not raw model watts."""
     if not library:
-        return points
+        return [limit_forecast_power(p, hardware_max_w) for p in points]
     w_epochs = series_epochs(weather.times) if weather.times else None
     ratios = ratio_samples(library)
     lib, on_ratio = (ratios, True) if ratios else (library, False)
     out: List[ForecastPoint] = []
     for p in points:
         if p.t < now:
-            out.append(p)
+            out.append(limit_forecast_power(p, hardware_max_w))
             continue
-        out.append(_enrich_one(p, lib, weather, w_epochs, lat, lon, on_ratio))
+        out.append(limit_forecast_power(_enrich_one(p, lib, weather, w_epochs, lat, lon, on_ratio), hardware_max_w))
     return out
 
 
@@ -398,13 +401,16 @@ def enrich_archive_points(
     weather: WeatherSeries,
     lat: float,
     lon: float,
+    hardware_max_w: float = math.inf,
 ) -> List[ForecastPoint]:
     """Same blend and ceiling clamp as `enrich_points`, applied to every point: the archive is past by
     construction, so there is no "future" side to gate on, and it needs the analog ceiling as much as
-    the live forecast does."""
+    the live forecast does. The optional hardware ceiling also bounds nonnull bands."""
     if not library:
-        return points
+        return [limit_forecast_power(p, hardware_max_w) for p in points]
     w_epochs = series_epochs(weather.times) if weather.times else None
     ratios = ratio_samples(library)
     lib, on_ratio = (ratios, True) if ratios else (library, False)
-    return [_enrich_one(p, lib, weather, w_epochs, lat, lon, on_ratio) for p in points]
+    return [
+        limit_forecast_power(_enrich_one(p, lib, weather, w_epochs, lat, lon, on_ratio), hardware_max_w) for p in points
+    ]

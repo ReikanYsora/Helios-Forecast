@@ -64,7 +64,7 @@ from .benchmark import DEFAULT_ENDPOINT, async_upload, build_payload
 from .consumption import ConsumptionProfile, build_consumption_profile, consumption_sources
 from .trend import TodayTrend, TrendReference, compute_trend, should_capture
 from .const import DOMAIN
-from .forecast import ForecastPoint, build_forecast_series
+from .forecast import ForecastPoint, build_forecast_series, hardware_power_limit_w
 from .openmeteo import WeatherSeries, fetch_weather
 from .reliability import SKILL_WINDOW_DAYS, Reliability, compute_reliability
 from .statistics import (
@@ -315,12 +315,15 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
         analog_library = await self.hass.async_add_executor_job(
             build_library, self._production_buckets, weather, lat, lon, layout, cap
         )
-        points = await self.hass.async_add_executor_job(enrich_points, points, analog_library, weather, lat, lon, now)
+        final_cap = hardware_power_limit_w(layout, cap)
+        points = await self.hass.async_add_executor_job(
+            enrich_points, points, analog_library, weather, lat, lon, now, final_cap
+        )
         # The live series keeps its elapsed points raw on purpose (what the forecast said at the time), but the
         # card draws them next to the archive's clamped hours, where a raw point hugs the nameplate ceiling for
         # up to an hour before the archive catches up. Serve the card a clamped copy of that stretch instead.
         self.elapsed_points = await self.hass.async_add_executor_job(
-            enrich_archive_points, [p for p in points if p.t < now], analog_library, weather, lat, lon
+            enrich_archive_points, [p for p in points if p.t < now], analog_library, weather, lat, lon, final_cap
         )
 
         # The sensors read the same curve the card draws: clamped up to now, raw after it. "Now" always
@@ -689,7 +692,7 @@ class HeliosForecastCoordinator(DataUpdateCoordinator[ForecastData]):
             step_minutes=60,
             residual_map=residual_map,
         )
-        return enrich_archive_points(points, analog_library, weather, lat, lon)
+        return enrich_archive_points(points, analog_library, weather, lat, lon, hardware_power_limit_w(layout, cap))
 
     @callback
     def write_forecast_statistics(self) -> None:
