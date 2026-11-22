@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
+from .solar.horizon import parse_horizon_profile
 from .solar.irradiance import PanelOrientation
 from .solar.power import PvLayout
 
@@ -49,6 +50,8 @@ CONF_TILT = "tilt"
 CONF_AZIMUTH = "azimuth"
 CONF_KWP = "kwp"
 CONF_TRACKER = "tracker"
+# Optional per-line horizon profile.
+CONF_HORIZON_PROFILE = "horizon_profile"
 # Optional per-line inverter cap (kW). For micro-inverter strings that saturate on their own: two very different
 # orientations sharing one meter never peak together, so summing then clipping loses that per-string ceiling. When
 # set, the line is clipped at this cap before the arrays are summed; the entry-level cap still bounds the total.
@@ -71,6 +74,7 @@ LINE_KEYS: Tuple[str, ...] = (
     CONF_LINE_INVERTER_MAX_KW,
     CONF_LATITUDE,
     CONF_LONGITUDE,
+    CONF_HORIZON_PROFILE,
 )
 # Entry-level settings, shared by every line in the entry.
 SETTINGS_KEYS: Tuple[str, ...] = (
@@ -97,7 +101,10 @@ BENCHMARK_KEYS: Tuple[str, ...] = (CONF_BENCHMARK_ENABLED,)
 
 def split_line(user_input: Dict[str, Any]) -> Dict[str, Any]:
     """The per-line geometry fields of a submitted form (drops empty values)."""
-    return {k: user_input[k] for k in LINE_KEYS if user_input.get(k) is not None}
+    out = {k: user_input[k] for k in LINE_KEYS if user_input.get(k) is not None}
+    if CONF_HORIZON_PROFILE in out:
+        out[CONF_HORIZON_PROFILE] = parse_horizon_profile(out[CONF_HORIZON_PROFILE])
+    return out
 
 
 def split_settings(user_input: Dict[str, Any]) -> Dict[str, Any]:
@@ -142,7 +149,15 @@ def layout_from_config(data: Dict[str, Any]) -> PvLayout:
         # "none" (and anything not a known tracker) is a fixed array.
         raw_tracker = arr.get(CONF_TRACKER)
         tracker = raw_tracker if raw_tracker in _VALID_TRACKERS else None
-        orientations.append(PanelOrientation(tilt_deg=tilt, azimuth_deg=azimuth, tracker=tracker))
+        horizon = parse_horizon_profile(arr.get(CONF_HORIZON_PROFILE))
+        orientations.append(
+            PanelOrientation(
+                tilt_deg=tilt,
+                azimuth_deg=azimuth,
+                tracker=tracker,
+                horizon_profile=horizon,
+            )
+        )
 
         kwp = _as_float(arr.get(CONF_KWP))
         kwps.append(max(0.0, kwp) if kwp is not None else 0.0)

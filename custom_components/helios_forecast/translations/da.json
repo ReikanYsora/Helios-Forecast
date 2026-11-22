@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Maks. afladningseffekt for batteri (kW, valgfrit)",
           "battery_min_soc": "Batterireserve, minimal ladetilstand (%, standard 10)",
           "battery_efficiency": "Batteriets rundtursvirkningsgrad (%, standard 90)",
-          "curtailment_entity": "Begrænsningssignal (binær sensor, input boolean eller kontakt, valgfri)"
+          "curtailment_entity": "Begrænsningssignal (binær sensor, input boolean eller kontakt, valgfri)",
+          "horizon_profile": "Horisontprofil (valgfri, 24 kommaseparerede forhindringshøjdevinkler)"
         },
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), f.eks. din inverters eller elmålers samlede produktion. En effektsensor (W) virker ikke: den har ingen langtidsstatistik for summen, så læringen og pålidelighedsindekset ville forblive slået fra.",
           "battery_soc_entity": "Udfyld kapaciteten og denne sensor for at slå projektionen af ladetilstand til. Husforbruget hentes fra dit Energi-dashboard, så der kræves ingen sensor her.",
-          "curtailment_entity": "Tændt, så længe din inverter holdes tilbage af en grund, himlen ikke forklarer: fuldt batteri, nul-eksport, netgrænse. De markerede timer læres ikke som lav produktion. Uden det opdages et fuldt batteri stadig ud fra ladetilstandssensoren og inverterloftet."
+          "curtailment_entity": "Tændt, så længe din inverter holdes tilbage af en grund, himlen ikke forklarer: fuldt batteri, nul-eksport, netgrænse. De markerede timer læres ikke som lav produktion. Uden det opdages et fuldt batteri stadig ud fra ladetilstandssensoren og inverterloftet.",
+          "horizon_profile": "Fysisk 360° horisontskyggeprofil som 24 forhindringshøjdevinkler i grader (0 til 90), prøvetaget med uret med 15° azimutintervaller fra nord (0°): 1. værdi ved 0° (Nord), 7. ved 90° (Øst), 13. ved 180° (Syd), 19. ved 270° (Vest). Indtast som kommaseparerede værdier (f.eks. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Solfølger",
           "latitude": "Breddegrad for denne linje (valgfrit)",
           "longitude": "Længdegrad for denne linje (valgfrit)",
-          "add_another": "Tilføj endnu en panellinje"
+          "add_another": "Tilføj endnu en panellinje",
+          "horizon_profile": "Horisontprofil (valgfri, 24 kommaseparerede forhindringshøjdevinkler)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "En kumulativ energisensor (kWh), f.eks. din inverters eller elmålers samlede produktion. En effektsensor (W) virker ikke: den har ingen langtidsstatistik for summen, så læringen og pålidelighedsindekset ville forblive slået fra.",
           "battery_soc_entity": "Udfyld kapaciteten og denne sensor for at slå projektionen af ladetilstand til. Husforbruget hentes fra dit Energi-dashboard, så der kræves ingen sensor her.",
-          "curtailment_entity": "Tændt, så længe din inverter holdes tilbage af en grund, himlen ikke forklarer: fuldt batteri, nul-eksport, netgrænse. De markerede timer læres ikke som lav produktion. Uden det opdages et fuldt batteri stadig ud fra ladetilstandssensoren og inverterloftet."
+          "curtailment_entity": "Tændt, så længe din inverter holdes tilbage af en grund, himlen ikke forklarer: fuldt batteri, nul-eksport, netgrænse. De markerede timer læres ikke som lav produktion. Uden det opdages et fuldt batteri stadig ud fra ladetilstandssensoren og inverterloftet.",
+          "horizon_profile": "Fysisk 360° horisontskyggeprofil som 24 forhindringshøjdevinkler i grader (0 til 90), prøvetaget med uret med 15° azimutintervaller fra nord (0°): 1. værdi ved 0° (Nord), 7. ved 90° (Øst), 13. ved 180° (Syd), 19. ved 270° (Vest). Indtast som kommaseparerede værdier (f.eks. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Breddegrad for denne linje (valgfrit)",
           "longitude": "Længdegrad for denne linje (valgfrit)",
           "remove_this_line": "Fjern denne panellinje",
-          "add_another": "Tilføj endnu en panellinje"
+          "add_another": "Tilføj endnu en panellinje",
+          "horizon_profile": "Horisontprofil (valgfri, 24 kommaseparerede forhindringshøjdevinkler)"
         }
       },
       "benchmark": {

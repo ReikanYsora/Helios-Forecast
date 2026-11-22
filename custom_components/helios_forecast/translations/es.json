@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Potencia máx. de descarga de la batería (kW, opcional)",
           "battery_min_soc": "Reserva de la batería, estado de carga mínimo (%, predeterminado 10)",
           "battery_efficiency": "Eficiencia de ciclo completo de la batería (%, predeterminado 90)",
-          "curtailment_entity": "Señal de recorte (sensor binario, input boolean o interruptor, opcional)"
+          "curtailment_entity": "Señal de recorte (sensor binario, input boolean o interruptor, opcional)",
+          "horizon_profile": "Perfil de horizonte (opcional, 24 ángulos de elevación de obstáculos separados por comas)"
         },
         "data_description": {
           "production_entity": "Un sensor de energía acumulada (kWh), p. ej. la producción total de su inversor o contador. Un sensor de potencia (W) no funcionará: no tiene estadísticas de suma a largo plazo, así que el aprendizaje y el índice de fiabilidad quedarían inactivos.",
           "battery_soc_entity": "Rellena la capacidad y este sensor para activar la proyección del estado de carga. El consumo del hogar se toma de tu panel de Energía, aquí no hace falta ningún sensor.",
-          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor."
+          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor.",
+          "horizon_profile": "Perfil físico de sombreado de horizonte de 360° como 24 ángulos de elevación de obstáculos en grados (0 a 90), muestreados en el sentido de las agujas del reloj a intervalos de acimut de 15° desde el Norte (0°): el 1er valor está a 0° (Norte), el 7º a 90° (Este), el 13º a 180° (Sur), el 19º a 270° (Oeste). Ingrese valores separados por comas (ej. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Seguidor solar",
           "latitude": "Latitud para esta línea (opcional)",
           "longitude": "Longitud para esta línea (opcional)",
-          "add_another": "Añadir otra línea de paneles"
+          "add_another": "Añadir otra línea de paneles",
+          "horizon_profile": "Perfil de horizonte (opcional, 24 ángulos de elevación de obstáculos separados por comas)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Un sensor de energía acumulada (kWh), p. ej. la producción total de su inversor o contador. Un sensor de potencia (W) no funcionará: no tiene estadísticas de suma a largo plazo, así que el aprendizaje y el índice de fiabilidad quedarían inactivos.",
           "battery_soc_entity": "Rellena la capacidad y este sensor para activar la proyección del estado de carga. El consumo del hogar se toma de tu panel de Energía, aquí no hace falta ningún sensor.",
-          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor."
+          "curtailment_entity": "Activo mientras el inversor está limitado por una razón que el cielo no explica: batería llena, inyección cero, límite de red. Las horas que marca no se aprenden como producción baja. Sin él, una batería llena se detecta igualmente con el sensor de estado de carga y el tope del inversor.",
+          "horizon_profile": "Perfil físico de sombreado de horizonte de 360° como 24 ángulos de elevación de obstáculos en grados (0 a 90), muestreados en el sentido de las agujas del reloj a intervalos de acimut de 15° desde el Norte (0°): el 1er valor está a 0° (Norte), el 7º a 90° (Este), el 13º a 180° (Sur), el 19º a 270° (Oeste). Ingrese valores separados por comas (ej. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Latitud para esta línea (opcional)",
           "longitude": "Longitud para esta línea (opcional)",
           "remove_this_line": "Eliminar esta línea de paneles",
-          "add_another": "Añadir otra línea de paneles"
+          "add_another": "Añadir otra línea de paneles",
+          "horizon_profile": "Perfil de horizonte (opcional, 24 ángulos de elevación de obstáculos separados por comas)"
         }
       },
       "benchmark": {

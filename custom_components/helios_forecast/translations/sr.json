@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Макс. снага пражњења батерије (kW, опционо)",
           "battery_min_soc": "Резерва батерије, минимално стање напуњености (%, подразумевано 10)",
           "battery_efficiency": "Ефикасност пуног циклуса батерије (%, подразумевано 90)",
-          "curtailment_entity": "Сигнал ограничења (бинарни сензор, input boolean или прекидач, опционо)"
+          "curtailment_entity": "Сигнал ограничења (бинарни сензор, input boolean или прекидач, опционо)",
+          "horizon_profile": "Профил хоризонта (опционо, 24 угла елевације препрека раздвојена запетама)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbira, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
+          "horizon_profile": "Физички профил засенчења хоризонта од 360° као 24 угла елевације препрека у степенима (0 до 90), мерених у смеру казаљке на сату у интервалима азимута од 15° почињући од севера (0°): 1. вредност је на 0° (Север), 7. на 90° (Исток), 13. на 180° (Југ), 19. на 270° (Запад). Унесите као вредности раздвојене запетама (нпр. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Пратилац сунца",
           "latitude": "Географска ширина за ову линију (опционо)",
           "longitude": "Географска дужина за ову линију (опционо)",
-          "add_another": "Додај још једну линију панела"
+          "add_another": "Додај још једну линију панела",
+          "horizon_profile": "Профил хоризонта (опционо, 24 угла елевације препрека раздвојена запетама)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbira, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Попуните капацитет и овај сензор да бисте укључили пројекцију стања напуњености. Потрошња куће се узима са ваше Енергетске контролне табле, сензор овде није потребан.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati se ne uče kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
+          "horizon_profile": "Физички профил засенчења хоризонта од 360° као 24 угла елевације препрека у степенима (0 до 90), мерених у смеру казаљке на сату у интервалима азимута од 15° почињући од севера (0°): 1. вредност је на 0° (Север), 7. на 90° (Исток), 13. на 180° (Југ), 19. на 270° (Запад). Унесите као вредности раздвојене запетама (нпр. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Географска ширина за ову линију (опционо)",
           "longitude": "Географска дужина за ову линију (опционо)",
           "remove_this_line": "Уклони ову линију панела",
-          "add_another": "Додај још једну линију панела"
+          "add_another": "Додај још једну линију панела",
+          "horizon_profile": "Профил хоризонта (опционо, 24 угла елевације препрека раздвојена запетама)"
         }
       },
       "benchmark": {

@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Maks. snaga pražnjenja baterije (kW, neobavezno)",
           "battery_min_soc": "Rezerva baterije, minimalno stanje napunjenosti (%, zadano 10)",
           "battery_efficiency": "Učinkovitost punog ciklusa baterije (%, zadano 90)",
-          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)"
+          "curtailment_entity": "Signal ograničenja (binarni senzor, input boolean ili prekidač, neobavezno)",
+          "horizon_profile": "Profil horizonta (opcionalno, 24 kuta elevacije překaza odvojenih zarezima)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbroja, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Ispunite kapacitet i ovaj senzor da biste uključili projekciju stanja napunjenosti. Potrošnja kuće uzima se s vaše Energetske nadzorne ploče, senzor ovdje nije potreban.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
+          "horizon_profile": "Fizički profil zasjenjenja horizonta od 360° kao 24 kuta elevacije překaza u stupnjevima (0 do 90), uzorkovanih u smjeru kazaljke na satu u intervalima azimuta od 15° počevši od sjevera (0°): 1. vrijednost je na 0° (Sjever), 7. na 90° (Istok), 13. na 180° (Jug), 19. na 270° (Zapad). Unesite kao vrijednosti odvojene zarezima (npr. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Praćenje Sunca",
           "latitude": "Zemljopisna širina za ovu liniju (opcionalno)",
           "longitude": "Zemljopisna dužina za ovu liniju (opcionalno)",
-          "add_another": "Dodaj još jednu liniju panela"
+          "add_another": "Dodaj još jednu liniju panela",
+          "horizon_profile": "Profil horizonta (opcionalno, 24 kuta elevacije překaza odvojenih zarezima)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. ukupna proizvodnja pretvarača ili brojila. Senzor snage (W) neće raditi: nema dugoročnu statistiku zbroja, pa bi učenje i indeks pouzdanosti ostali isključeni.",
           "battery_soc_entity": "Ispunite kapacitet i ovaj senzor da biste uključili projekciju stanja napunjenosti. Potrošnja kuće uzima se s vaše Energetske nadzorne ploče, senzor ovdje nije potreban.",
-          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača."
+          "curtailment_entity": "Uključen dok je pretvarač ograničen iz razloga koji nebo ne objašnjava: puna baterija, nulti izvoz, ograničenje mreže. Označeni sati ne uče se kao niska proizvodnja. Bez njega se puna baterija i dalje prepoznaje iz senzora stanja napunjenosti i granice pretvarača.",
+          "horizon_profile": "Fizički profil zasjenjenja horizonta od 360° kao 24 kuta elevacije překaza u stupnjevima (0 do 90), uzorkovanih u smjeru kazaljke na satu u intervalima azimuta od 15° počevši od sjevera (0°): 1. vrijednost je na 0° (Sjever), 7. na 90° (Istok), 13. na 180° (Jug), 19. na 270° (Zapad). Unesite kao vrijednosti odvojene zarezima (npr. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Zemljopisna širina za ovu liniju (opcionalno)",
           "longitude": "Zemljopisna dužina za ovu liniju (opcionalno)",
           "remove_this_line": "Ukloni ovu liniju panela",
-          "add_another": "Dodaj još jednu liniju panela"
+          "add_another": "Dodaj još jednu liniju panela",
+          "horizon_profile": "Profil horizonta (opcionalno, 24 kuta elevacije překaza odvojenih zarezima)"
         }
       },
       "benchmark": {

@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Potenza massima di scarica della batteria (kW, opzionale)",
           "battery_min_soc": "Riserva della batteria, stato di carica minimo (%, predefinito 10)",
           "battery_efficiency": "Efficienza di andata e ritorno della batteria (%, predefinito 90)",
-          "curtailment_entity": "Segnale di limitazione (sensore binario, input boolean o interruttore, opzionale)"
+          "curtailment_entity": "Segnale di limitazione (sensore binario, input boolean o interruttore, opzionale)",
+          "horizon_profile": "Profilo dell'orizzonte (opzionale, 24 angoli di elevazione ostacolo separati da virgole)"
         },
         "data_description": {
           "production_entity": "Un sensore di energia cumulativa (kWh), ad es. la produzione totale dell'inverter o del contatore. Un sensore di potenza (W) non funzionerà: non ha statistiche di somma a lungo termine, quindi l'apprendimento e l'indice di affidabilità resterebbero inattivi.",
           "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore.",
-          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter."
+          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter.",
+          "horizon_profile": "Profilo fisico di ombreggiamento dell'orizzonte a 360° come 24 angoli di elevazione degli ostacoli in gradi (da 0 a 90), campionati in senso orario a intervalli di azimut di 15° a partire dal Nord (0°): il 1° valore è a 0° (Nord), il 7° è a 90° (Est), il 13° è a 180° (Sud), il 19° è a 270° (Ovest). Inserire come valori separati da virgole (es. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Inseguitore solare",
           "latitude": "Latitudine per questa linea (opzionale)",
           "longitude": "Longitudine per questa linea (opzionale)",
-          "add_another": "Aggiungi un'altra stringa di pannelli"
+          "add_another": "Aggiungi un'altra stringa di pannelli",
+          "horizon_profile": "Profilo dell'orizzonte (opzionale, 24 angoli di elevazione ostacolo separati da virgole)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Un sensore di energia cumulativa (kWh), ad es. la produzione totale dell'inverter o del contatore. Un sensore di potenza (W) non funzionerà: non ha statistiche di somma a lungo termine, quindi l'apprendimento e l'indice di affidabilità resterebbero inattivi.",
           "battery_soc_entity": "Compila la capacità e questo sensore per attivare la proiezione dello stato di carica. Il consumo di casa è preso dalla dashboard Energia, qui non serve alcun sensore.",
-          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter."
+          "curtailment_entity": "Attivo finché l'inverter è limitato per un motivo che il cielo non spiega: batteria piena, immissione zero, limite di rete. Le ore che segnala non vengono apprese come produzione bassa. Senza di esso, una batteria piena viene comunque rilevata dal sensore di stato di carica e dal tetto dell'inverter.",
+          "horizon_profile": "Profilo fisico di ombreggiamento dell'orizzonte a 360° come 24 angoli di elevazione degli ostacoli in gradi (da 0 a 90), campionati in senso orario a intervalli di azimut di 15° a partire dal Nord (0°): il 1° valore è a 0° (Nord), il 7° è a 90° (Est), il 13° è a 180° (Sud), il 19° è a 270° (Ovest). Inserire come valori separati da virgole (es. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Latitudine per questa linea (opzionale)",
           "longitude": "Longitudine per questa linea (opzionale)",
           "remove_this_line": "Rimuovi questa stringa di pannelli",
-          "add_another": "Aggiungi un'altra stringa di pannelli"
+          "add_another": "Aggiungi un'altra stringa di pannelli",
+          "horizon_profile": "Profilo dell'orizzonte (opzionale, 24 angoli di elevazione ostacolo separati da virgole)"
         }
       },
       "benchmark": {

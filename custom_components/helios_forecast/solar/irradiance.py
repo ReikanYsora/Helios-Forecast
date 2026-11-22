@@ -14,11 +14,12 @@ orientation, built from:
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from .geometry import sun_position
+from .horizon import beam_shading_factor, default_horizon_profile
 
 if TYPE_CHECKING:
     from typing import TypeGuard
@@ -49,6 +50,7 @@ class PanelOrientation:
     tilt_deg: float
     azimuth_deg: float
     tracker: Optional[Tracker] = None
+    horizon_profile: List[float] = field(default_factory=default_horizon_profile)
 
 
 @dataclass(frozen=True)
@@ -179,7 +181,10 @@ def compute_pv_power(
             direct_fraction = max(0.0, min(0.85, (k_cloud - 0.25) / 0.75 * 0.85))
         diffuse_fraction = 1.0 - direct_fraction
 
-        direct_poa = 0.0 if shading else ghi_eff * direct_fraction * r_b * _incidence_modifier(cos_theta)
+        horizon = panel.horizon_profile if panel and panel.horizon_profile else None
+        beam_shade = beam_shading_factor(alt, sun.azimuth, horizon)
+
+        direct_poa = 0.0 if shading else ghi_eff * direct_fraction * r_b * _incidence_modifier(cos_theta) * beam_shade
         diffuse_poa = ghi_eff * diffuse_fraction * (1.0 + math.cos(beta)) / 2.0
         ground_poa = ghi_eff * 0.2 * (1.0 - math.cos(beta)) / 2.0
 

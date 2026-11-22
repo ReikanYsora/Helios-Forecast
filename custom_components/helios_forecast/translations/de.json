@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Max. Entladeleistung der Batterie (kW, optional)",
           "battery_min_soc": "Batteriereserve, minimaler Ladezustand (%, Standard 10)",
           "battery_efficiency": "Round-Trip-Wirkungsgrad der Batterie (%, Standard 90)",
-          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)"
+          "curtailment_entity": "Abregelungssignal (Binärsensor, Input Boolean oder Schalter, optional)",
+          "horizon_profile": "Horizontprofil (optional, 24 kommagetrennte Hindernis-Höhenwinkel)"
         },
         "data_description": {
           "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
           "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
-          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt.",
+          "horizon_profile": "Physikalisches 360°-Horizont-Schattierungsprofil als 24 Hindernis-Höhenwinkel in Grad (0 bis 90), im Uhrzeigersinn in 15°-Azimut-Intervallen ab Nord (0°) abgetastet: 1. Wert bei 0° (Nord), 7. bei 90° (Ost), 13. bei 180° (Süd), 19. bei 270° (West). Als kommagetrennte Werte eingeben (z. B. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Sonnen-Nachführung",
           "latitude": "Breitengrad für diese Linie (optional)",
           "longitude": "Längengrad für diese Linie (optional)",
-          "add_another": "Weitere Modulreihe hinzufügen"
+          "add_another": "Weitere Modulreihe hinzufügen",
+          "horizon_profile": "Horizontprofil (optional, 24 kommagetrennte Hindernis-Höhenwinkel)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Ein kumulativer Energiesensor (kWh), z. B. die Gesamtproduktion Ihres Wechselrichters oder Energiezählers. Ein Leistungssensor (W) funktioniert nicht: er hat keine Langzeit-Summenstatistik, das Lernen und der Zuverlässigkeitsindex blieben inaktiv.",
           "battery_soc_entity": "Kapazität und diesen Sensor ausfüllen, um die Ladezustandsprognose zu aktivieren. Der Hausverbrauch stammt aus deinem Energie-Dashboard, hier ist kein Sensor nötig.",
-          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt."
+          "curtailment_entity": "Ein, solange Ihr Wechselrichter aus einem Grund gedrosselt wird, den der Himmel nicht erklärt: volle Batterie, Nulleinspeisung, Netzlimit. Die markierten Stunden werden nicht als niedrige Produktion gelernt. Ohne dieses Signal wird eine volle Batterie weiterhin über den Ladezustandssensor und die Wechselrichtergrenze erkannt.",
+          "horizon_profile": "Physikalisches 360°-Horizont-Schattierungsprofil als 24 Hindernis-Höhenwinkel in Grad (0 bis 90), im Uhrzeigersinn in 15°-Azimut-Intervallen ab Nord (0°) abgetastet: 1. Wert bei 0° (Nord), 7. bei 90° (Ost), 13. bei 180° (Süd), 19. bei 270° (West). Als kommagetrennte Werte eingeben (z. B. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Breitengrad für diese Linie (optional)",
           "longitude": "Längengrad für diese Linie (optional)",
           "remove_this_line": "Diese Modulreihe entfernen",
-          "add_another": "Weitere Modulreihe hinzufügen"
+          "add_another": "Weitere Modulreihe hinzufügen",
+          "horizon_profile": "Horizontprofil (optional, 24 kommagetrennte Hindernis-Höhenwinkel)"
         }
       },
       "benchmark": {

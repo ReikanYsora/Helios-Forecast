@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Puissance de décharge max de la batterie (kW, optionnel)",
           "battery_min_soc": "Réserve batterie, état de charge minimum (%, défaut 10)",
           "battery_efficiency": "Rendement aller-retour de la batterie (%, défaut 90)",
-          "curtailment_entity": "Signal de bridage (capteur binaire, input boolean ou interrupteur, optionnel)"
+          "curtailment_entity": "Signal de bridage (capteur binaire, input boolean ou interrupteur, optionnel)",
+          "horizon_profile": "Profil d'horizon (optionnel, 24 angles d'élévation d'obstacles séparés par des virgules)"
         },
         "data_description": {
           "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs.",
           "battery_soc_entity": "Renseignez la capacité et ce capteur pour activer la projection d'état de charge. La consommation de la maison vient de votre tableau de bord Énergie, aucun capteur n'est requis ici.",
-          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur."
+          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur.",
+          "horizon_profile": "Profil physique d'ombrage d'horizon à 360° sous forme de 24 angles d'élévation d'obstacles en degrés (0 à 90), échantillonnés dans le sens des aiguilles d'une montre à des intervalles d'azimut de 15° à partir du Nord (0°) : 1re valeur à 0° (Nord), 7e à 90° (Est), 13e à 180° (Sud), 19e à 270° (Ouest). Saisir sous forme de valeurs séparées par des virgules (ex. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Suiveur solaire",
           "latitude": "Latitude pour cette ligne (optionnel)",
           "longitude": "Longitude pour cette ligne (optionnel)",
-          "add_another": "Ajouter une autre ligne de panneaux"
+          "add_another": "Ajouter une autre ligne de panneaux",
+          "horizon_profile": "Profil d'horizon (optionnel, 24 angles d'élévation d'obstacles séparés par des virgules)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Un capteur d'énergie cumulative (kWh), p. ex. l'énergie totale produite de votre onduleur ou compteur. Un capteur de puissance (W) ne fonctionnera pas : il n'a pas de statistiques de somme à long terme, donc l'apprentissage et l'indice de fiabilité resteraient inactifs.",
           "battery_soc_entity": "Renseignez la capacité et ce capteur pour activer la projection d'état de charge. La consommation de la maison vient de votre tableau de bord Énergie, aucun capteur n'est requis ici.",
-          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur."
+          "curtailment_entity": "Actif tant que votre onduleur est bridé pour une raison que le ciel n'explique pas : batterie pleine, zéro injection, limite réseau. Les heures qu'il marque ne sont pas apprises comme une production faible. Sans lui, une batterie pleine est tout de même détectée depuis le capteur d'état de charge et le plafond onduleur.",
+          "horizon_profile": "Profil physique d'ombrage d'horizon à 360° sous forme de 24 angles d'élévation d'obstacles en degrés (0 à 90), échantillonnés dans le sens des aiguilles d'une montre à des intervalles d'azimut de 15° à partir du Nord (0°) : 1re valeur à 0° (Nord), 7e à 90° (Est), 13e à 180° (Sud), 19e à 270° (Ouest). Saisir sous forme de valeurs séparées par des virgules (ex. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Latitude pour cette ligne (optionnel)",
           "longitude": "Longitude pour cette ligne (optionnel)",
           "remove_this_line": "Supprimer cette ligne de panneaux",
-          "add_another": "Ajouter une autre ligne de panneaux"
+          "add_another": "Ajouter une autre ligne de panneaux",
+          "horizon_profile": "Profil d'horizon (optionnel, 24 angles d'élévation d'obstacles séparés par des virgules)"
         }
       },
       "benchmark": {

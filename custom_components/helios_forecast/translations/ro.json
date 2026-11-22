@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Putere max. de descărcare a bateriei (kW, opțional)",
           "battery_min_soc": "Rezerva bateriei, stare de încărcare minimă (%, implicit 10)",
           "battery_efficiency": "Randamentul dus-întors al bateriei (%, implicit 90)",
-          "curtailment_entity": "Semnal de limitare (senzor binar, input boolean sau comutator, opțional)"
+          "curtailment_entity": "Semnal de limitare (senzor binar, input boolean sau comutator, opțional)",
+          "horizon_profile": "Profil orizont (opțional, 24 unghiuri de elevație a obstacolelor separate prin virgulă)"
         },
         "data_description": {
           "production_entity": "Un senzor de energie cumulată (kWh), de ex. producția totală a invertorului sau a contorului. Un senzor de putere (W) nu va funcționa: nu are statistici de sumă pe termen lung, așa că învățarea și indicele de fiabilitate ar rămâne inactive.",
           "battery_soc_entity": "Completați capacitatea și acest senzor pentru a activa proiecția stării de încărcare. Consumul casei este preluat din tabloul de bord Energie, aici nu este nevoie de niciun senzor.",
-          "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului."
+          "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului.",
+          "horizon_profile": "Profil fizic de umbrire a orizontului la 360° ca 24 unghiuri de elevație a obstacolului în grade (0 la 90), eșantionate în sensul acelor de ceasornic la intervale de azimut de 15° începând de la Nord (0°): prima valoare este la 0° (Nord), a 7-a la 90° (Est), a 13-a la 180° (Sud), a 19-a la 270° (Vest). Introduceți ca valori separate prin virgulă (de ex. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Urmăritor solar",
           "latitude": "Latitudine pentru această linie (opțional)",
           "longitude": "Longitudine pentru această linie (opțional)",
-          "add_another": "Adaugă altă linie de panouri"
+          "add_another": "Adaugă altă linie de panouri",
+          "horizon_profile": "Profil orizont (opțional, 24 unghiuri de elevație a obstacolelor separate prin virgulă)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Un senzor de energie cumulată (kWh), de ex. producția totală a invertorului sau a contorului. Un senzor de putere (W) nu va funcționa: nu are statistici de sumă pe termen lung, așa că învățarea și indicele de fiabilitate ar rămâne inactive.",
           "battery_soc_entity": "Completați capacitatea și acest senzor pentru a activa proiecția stării de încărcare. Consumul casei este preluat din tabloul de bord Energie, aici nu este nevoie de niciun senzor.",
-          "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului."
+          "curtailment_entity": "Activ cât timp invertorul este limitat dintr-un motiv pe care cerul nu îl explică: baterie plină, export zero, limită de rețea. Orele marcate nu sunt învățate ca producție scăzută. Fără el, o baterie plină este detectată oricum din senzorul de stare de încărcare și plafonul invertorului.",
+          "horizon_profile": "Profil fizic de umbrire a orizontului la 360° ca 24 unghiuri de elevație a obstacolului în grade (0 la 90), eșantionate în sensul acelor de ceasornic la intervale de azimut de 15° începând de la Nord (0°): prima valoare este la 0° (Nord), a 7-a la 90° (Est), a 13-a la 180° (Sud), a 19-a la 270° (Vest). Introduceți ca valori separate prin virgulă (de ex. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Latitudine pentru această linie (opțional)",
           "longitude": "Longitudine pentru această linie (opțional)",
           "remove_this_line": "Elimină această linie de panouri",
-          "add_another": "Adaugă altă linie de panouri"
+          "add_another": "Adaugă altă linie de panouri",
+          "horizon_profile": "Profil orizont (opțional, 24 unghiuri de elevație a obstacolelor separate prin virgulă)"
         }
       },
       "benchmark": {

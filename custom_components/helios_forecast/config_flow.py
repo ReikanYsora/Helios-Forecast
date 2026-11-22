@@ -31,6 +31,7 @@ from .config import (
     CONF_BATTERY_SOC_ENTITY,
     CONF_BENCHMARK_ENABLED,
     CONF_CURTAILMENT_ENTITY,
+    CONF_HORIZON_PROFILE,
     CONF_INVERTER_MAX_KW,
     CONF_KWP,
     CONF_LATITUDE,
@@ -50,6 +51,7 @@ from .config import (
     split_line,
     split_settings,
 )
+from .solar.horizon import parse_horizon_profile
 from .const import DOMAIN
 
 _DEFAULT_NAME = "Helios Forecast"
@@ -92,6 +94,8 @@ _TRACKER = selector.SelectSelector(
         mode=selector.SelectSelectorMode.DROPDOWN,
     )
 )
+# Manual horizon obstacle elevation profile (comma-separated angles or list).
+_HORIZON = selector.TextSelector(selector.TextSelectorConfig(multiline=False))
 # Battery SoC projection fields. Capacity in kWh, the live SoC entity (a % battery sensor), and the optional
 # limits / efficiency as percentages. Charge / discharge power reuse the kW input.
 _KWH = selector.NumberSelector(selector.NumberSelectorConfig(min=0, step=0.1, mode=_BOX, unit_of_measurement="kWh"))
@@ -139,6 +143,13 @@ def _line_fields(
     # them straight back and the line then carries its own copy of the home position.
     _optional(fields, CONF_LATITUDE, _LATITUDE, arr.get(CONF_LATITUDE, home_lat))
     _optional(fields, CONF_LONGITUDE, _LONGITUDE, arr.get(CONF_LONGITUDE, home_lon))
+    existing_horizon = arr.get(CONF_HORIZON_PROFILE)
+    horizon_str = (
+        ", ".join(str(round(v, 1)) for v in existing_horizon)
+        if isinstance(existing_horizon, list) and any(existing_horizon)
+        else existing_horizon
+    )
+    _optional(fields, CONF_HORIZON_PROFILE, _HORIZON, horizon_str)
     if allow_remove:
         fields[vol.Optional(_REMOVE, default=False)] = _BOOL
     if with_add_another:

@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Aku maksimaalne tühjenemisvõimsus (kW, valikuline)",
           "battery_min_soc": "Aku reserv, minimaalne laetus (%, vaikimisi 10)",
           "battery_efficiency": "Aku edasi-tagasi kasutegur (%, vaikimisi 90)",
-          "curtailment_entity": "Piiramise signaal (binaarandur, input boolean või lüliti, valikuline)"
+          "curtailment_entity": "Piiramise signaal (binaarandur, input boolean või lüliti, valikuline)",
+          "horizon_profile": "Horisondiprofiil (valikuline, 24 komadega eraldatud takistuse tõusunurka)"
         },
         "data_description": {
           "production_entity": "Kumulatiivne energiaandur (kWh), nt inverteri või energiaarvesti kogutoodang. Võimsusandur (W) ei tööta: sellel puudub pikaajaline summastatistika, nii et õppimine ja usaldusväärsuse indeks jääksid välja.",
           "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
-          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi."
+          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi.",
+          "horizon_profile": "Füüsiline 360° horisondi varjutuse profiil 24 takistuse tõusunurgana kraadides (0 kuni 90), mõõdetud päripäeva 15° asimuudisammuga alates põhjasuunast (0°): 1. väärtus on 0° (Põhi), 7. on 90° (Ida), 13. on 180° (Lõuna), 19. on 270° (Lääs). Sisestage komadega eraldatud väärtustena (nt 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Päikese jälgija",
           "latitude": "Laiuskraad sellele reale (valikuline)",
           "longitude": "Pikkuskraad sellele reale (valikuline)",
-          "add_another": "Lisa veel üks paneeliliin"
+          "add_another": "Lisa veel üks paneeliliin",
+          "horizon_profile": "Horisondiprofiil (valikuline, 24 komadega eraldatud takistuse tõusunurka)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Kumulatiivne energiaandur (kWh), nt inverteri või energiaarvesti kogutoodang. Võimsusandur (W) ei tööta: sellel puudub pikaajaline summastatistika, nii et õppimine ja usaldusväärsuse indeks jääksid välja.",
           "battery_soc_entity": "Täitke mahtuvus ja see andur, et lülitada sisse laetuse prognoos. Kodu tarbimine võetakse energia töölaualt, siin pole andurit vaja.",
-          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi."
+          "curtailment_entity": "Sees, kuni inverterit piiratakse põhjusel, mida taevas ei seleta: täis aku, nullsisestus, võrgupiirang. Märgitud tunde ei õpita madala tootmisena. Ilma selleta tuvastatakse täis aku siiski laetuse anduri ja inverteri piiri järgi.",
+          "horizon_profile": "Füüsiline 360° horisondi varjutuse profiil 24 takistuse tõusunurgana kraadides (0 kuni 90), mõõdetud päripäeva 15° asimuudisammuga alates põhjasuunast (0°): 1. väärtus on 0° (Põhi), 7. on 90° (Ida), 13. on 180° (Lõuna), 19. on 270° (Lääs). Sisestage komadega eraldatud väärtustena (nt 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Laiuskraad sellele reale (valikuline)",
           "longitude": "Pikkuskraad sellele reale (valikuline)",
           "remove_this_line": "Eemalda see paneeliliin",
-          "add_another": "Lisa veel üks paneeliliin"
+          "add_another": "Lisa veel üks paneeliliin",
+          "horizon_profile": "Horisondiprofiil (valikuline, 24 komadega eraldatud takistuse tõusunurka)"
         }
       },
       "benchmark": {

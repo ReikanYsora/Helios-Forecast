@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Max. vybíjecí výkon baterie (kW, volitelné)",
           "battery_min_soc": "Rezerva baterie, minimální stav nabití (%, výchozí 10)",
           "battery_efficiency": "Účinnost cyklu baterie (%, výchozí 90)",
-          "curtailment_entity": "Signál omezení výkonu (binární senzor, input boolean nebo spínač, volitelné)"
+          "curtailment_entity": "Signál omezení výkonu (binární senzor, input boolean nebo spínač, volitelné)",
+          "horizon_profile": "Profil horizontu (volitelný, 24 úhlů elevace překážek oddělených čárkami)"
         },
         "data_description": {
           "production_entity": "Kumulativní senzor energie (kWh), např. celková výroba střídače nebo elektroměru. Senzor výkonu (W) nebude fungovat: nemá dlouhodobé statistiky součtu, takže učení a index spolehlivosti by zůstaly vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
-          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
+          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače.",
+          "horizon_profile": "Fyzický 360° profil stínění horizontu jako 24 úhlů elevace překážek v rozmezí 0 až 90 stupňů, vzorkovaných po směru hodinových ručiček v krocích po 15° azimutu od severu (0°): 1. hodnota je na 0° (Sever), 7. na 90° (Východ), 13. na 180° (Jih), 19. na 270° (Západ). Zadejte jako hodnoty oddělené čárkami (např. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Sledovač slunce",
           "latitude": "Zeměpisná šířka pro tuto linii (volitelné)",
           "longitude": "Zeměpisná délka pro tuto linii (volitelné)",
-          "add_another": "Přidat další linii panelů"
+          "add_another": "Přidat další linii panelů",
+          "horizon_profile": "Profil horizontu (volitelný, 24 úhlů elevace překážek oddělených čárkami)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Kumulativní senzor energie (kWh), např. celková výroba střídače nebo elektroměru. Senzor výkonu (W) nebude fungovat: nemá dlouhodobé statistiky součtu, takže učení a index spolehlivosti by zůstaly vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor pro zapnutí projekce stavu nabití. Spotřeba domácnosti se přebírá z panelu Energie, zde není potřeba žádný senzor.",
-          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače."
+          "curtailment_entity": "Zapnutý, dokud je střídač omezován z důvodu, který obloha nevysvětlí: plná baterie, nulový export, limit sítě. Označené hodiny se neučí jako nízká výroba. Bez něj se plná baterie stále rozpozná ze senzoru stavu nabití a limitu střídače.",
+          "horizon_profile": "Fyzický 360° profil stínění horizontu jako 24 úhlů elevace překážek v rozmezí 0 až 90 stupňů, vzorkovaných po směru hodinových ručiček v krocích po 15° azimutu od severu (0°): 1. hodnota je na 0° (Sever), 7. na 90° (Východ), 13. na 180° (Jih), 19. na 270° (Západ). Zadejte jako hodnoty oddělené čárkami (např. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Zeměpisná šířka pro tuto linii (volitelné)",
           "longitude": "Zeměpisná délka pro tuto linii (volitelné)",
           "remove_this_line": "Odebrat tuto linii panelů",
-          "add_another": "Přidat další linii panelů"
+          "add_another": "Přidat další linii panelů",
+          "horizon_profile": "Profil horizontu (volitelný, 24 úhlů elevace překážek oddělených čárkami)"
         }
       },
       "benchmark": {

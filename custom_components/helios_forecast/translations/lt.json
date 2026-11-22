@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Maks. akumuliatoriaus iškrovimo galia (kW, neprivaloma)",
           "battery_min_soc": "Akumuliatoriaus rezervas, minimali įkrova (%, numatytoji 10)",
           "battery_efficiency": "Akumuliatoriaus ciklo naudingumas (%, numatytasis 90)",
-          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)"
+          "curtailment_entity": "Ribojimo signalas (dvejetainis jutiklis, input boolean arba jungiklis, nebūtina)",
+          "horizon_profile": "Horizonto profilis (neprivaloma, 24 kableliais atskirti kliūčių pakilimo kampai)"
         },
         "data_description": {
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
           "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
-          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą."
+          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą.",
+          "horizon_profile": "Fizinis 360° horizonto šešėliavimo profilis kaip 24 kliūčių pakilimo kampai laipsniais (nuo 0 iki 90), išmatuoti pagal laikrodžio rodyklę 15° azimuto intervalais nuo šiaurės (0°): 1-oji reikšmė yra ties 0° (Šiaurė), 7-oji – ties 90° (Rytai), 13-oji – ties 180° (Pietūs), 19-oji – ties 270° (Vakarai). Įveskite kableliais atskirtas reikšmes (pvz., 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Saulės sekiklis",
           "latitude": "Platuma šiai linijai (neprivaloma)",
           "longitude": "Ilguma šiai linijai (neprivaloma)",
-          "add_another": "Pridėti dar vieną skydelių liniją"
+          "add_another": "Pridėti dar vieną skydelių liniją",
+          "horizon_profile": "Horizonto profilis (neprivaloma, 24 kableliais atskirti kliūčių pakilimo kampai)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Kaupiamasis energijos jutiklis (kWh), pvz., bendra inverterio ar skaitiklio gamyba. Galios jutiklis (W) neveiks: jis neturi ilgalaikės sumos statistikos, todėl mokymasis ir patikimumo indeksas liktų išjungti.",
           "battery_soc_entity": "Užpildykite talpą ir šį jutiklį, kad įjungtumėte įkrovos prognozę. Namų suvartojimas imamas iš Energijos skydelio, jutiklio čia nereikia.",
-          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą."
+          "curtailment_entity": "Įjungtas, kol inverteris ribojamas dėl priežasties, kurios dangus nepaaiškina: pilna baterija, nulinis eksportas, tinklo riba. Pažymėtos valandos nemokomos kaip maža gamyba. Be jo pilna baterija vis tiek aptinkama pagal įkrovos lygio jutiklį ir inverterio ribą.",
+          "horizon_profile": "Fizinis 360° horizonto šešėliavimo profilis kaip 24 kliūčių pakilimo kampai laipsniais (nuo 0 iki 90), išmatuoti pagal laikrodžio rodyklę 15° azimuto intervalais nuo šiaurės (0°): 1-oji reikšmė yra ties 0° (Šiaurė), 7-oji – ties 90° (Rytai), 13-oji – ties 180° (Pietūs), 19-oji – ties 270° (Vakarai). Įveskite kableliais atskirtas reikšmes (pvz., 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Platuma šiai linijai (neprivaloma)",
           "longitude": "Ilguma šiai linijai (neprivaloma)",
           "remove_this_line": "Pašalinti šią skydelių liniją",
-          "add_another": "Pridėti dar vieną skydelių liniją"
+          "add_another": "Pridėti dar vieną skydelių liniją",
+          "horizon_profile": "Horizonto profilis (neprivaloma, 24 kableliais atskirti kliūčių pakilimo kampai)"
         }
       },
       "benchmark": {
