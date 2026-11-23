@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Max. akkumulátor kisütési teljesítmény (kW, opcionális)",
           "battery_min_soc": "Akkumulátor tartalék, minimális töltöttségi szint (%, alapértelmezett 10)",
           "battery_efficiency": "Akkumulátor körfordulási hatásfok (%, alapértelmezett 90)",
-          "curtailment_entity": "Korlátozási jel (bináris érzékelő, input boolean vagy kapcsoló, opcionális)"
+          "curtailment_entity": "Korlátozási jel (bináris érzékelő, input boolean vagy kapcsoló, opcionális)",
+          "horizon_profile": "Horizontprofil (opcionális, 24 vesszővel elválasztott akadálymagassági szög)"
         },
         "data_description": {
           "production_entity": "Kumulatív energiaérzékelő (kWh), pl. az inverter vagy a fogyasztásmérő teljes termelése. Teljesítményérzékelő (W) nem működik: nincs hosszú távú összegstatisztikája, így a tanulás és a megbízhatósági index kikapcsolva maradna.",
           "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre.",
-          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel."
+          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel.",
+          "horizon_profile": "Fizikai 360°-os horizont árnyékolási profil 24 akadálymagassági szögként fokban (0-tól 90-ig), az óramutató járásával megegyező irányban 15°-os azimut intervallumokban mintavételezve északról (0°) indulva: az 1. érték 0°-nál van (Észak), a 7. 90°-nál (Kelet), a 13. 180°-nál (Dél), a 19. 270°-nál (Nyugat). Vesszővel elválasztott értékekként adja meg (pl. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Napkövető",
           "latitude": "Szélességi fok ehhez a sorhoz (opcionális)",
           "longitude": "Hosszúsági fok ehhez a sorhoz (opcionális)",
-          "add_another": "További panelsor hozzáadása"
+          "add_another": "További panelsor hozzáadása",
+          "horizon_profile": "Horizontprofil (opcionális, 24 vesszővel elválasztott akadálymagassági szög)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Kumulatív energiaérzékelő (kWh), pl. az inverter vagy a fogyasztásmérő teljes termelése. Teljesítményérzékelő (W) nem működik: nincs hosszú távú összegstatisztikája, így a tanulás és a megbízhatósági index kikapcsolva maradna.",
           "battery_soc_entity": "Töltse ki a kapacitást és ezt az érzékelőt a töltöttségi szint előrejelzésének bekapcsolásához. A ház fogyasztása az Energia irányítópultról származik, itt nincs szükség érzékelőre.",
-          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel."
+          "curtailment_entity": "Bekapcsolva, amíg az invertert olyan okból fogják vissza, amelyet az ég nem magyaráz: tele akkumulátor, nulla betáplálás, hálózati korlát. A megjelölt órákat nem tanulja alacsony termelésként. Nélküle a tele akkumulátort továbbra is a töltöttségi érzékelő és az inverter korlátja alapján ismeri fel.",
+          "horizon_profile": "Fizikai 360°-os horizont árnyékolási profil 24 akadálymagassági szögként fokban (0-tól 90-ig), az óramutató járásával megegyező irányban 15°-os azimut intervallumokban mintavételezve északról (0°) indulva: az 1. érték 0°-nál van (Észak), a 7. 90°-nál (Kelet), a 13. 180°-nál (Dél), a 19. 270°-nál (Nyugat). Vesszővel elválasztott értékekként adja meg (pl. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Szélességi fok ehhez a sorhoz (opcionális)",
           "longitude": "Hosszúsági fok ehhez a sorhoz (opcionális)",
           "remove_this_line": "Panelsor eltávolítása",
-          "add_another": "További panelsor hozzáadása"
+          "add_another": "További panelsor hozzáadása",
+          "horizon_profile": "Horizontprofil (opcionális, 24 vesszővel elválasztott akadálymagassági szög)"
         }
       },
       "benchmark": {

@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Hámarks afhleðsluafl rafhlöðu (kW, valfrjálst)",
           "battery_min_soc": "Varaforði rafhlöðu, lágmarks hleðslustaða (%, sjálfgefið 10)",
           "battery_efficiency": "Heildarnýtni rafhlöðu (%, sjálfgefið 90)",
-          "curtailment_entity": "Skerðingarmerki (tvíundaskynjari, input boolean eða rofi, valfrjálst)"
+          "curtailment_entity": "Skerðingarmerki (tvíundaskynjari, input boolean eða rofi, valfrjálst)",
+          "horizon_profile": "Sjóndeildarhringssnið (valfrjálst, 24 kommu-aðskilin fyrirstöðuhornaáhorf)"
         },
         "data_description": {
           "production_entity": "Uppsafnaður orkuskynjari (kWh), t.d. heildarframleiðsla áriðils eða orkumælis. Aflskynjari (W) virkar ekki: hann hefur enga langtímasummutölfræði, svo lærdómurinn og áreiðanleikavísitalan yrðu áfram óvirk.",
           "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér.",
-          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins."
+          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins.",
+          "horizon_profile": "Eðlisfræðilegt 360° skuggasnið sjóndeildarhrings sem 24 fyrirstöðuhornaáhorf í gráðum (0 til 90), mæld réttsælis með 15° stefnuhornabili frá norðri (0°): 1. gildi er við 0° (Norður), 7. við 90° (Austur), 13. við 180° (Suður), 19. við 270° (Vestur). Sláðu inn sem kommu-aðskilin gildi (t.d. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Sólarrakari",
           "latitude": "Breiddargráða fyrir þessa línu (valfrjálst)",
           "longitude": "Lengdargráða fyrir þessa línu (valfrjálst)",
-          "add_another": "Bæta við annarri spjaldalínu"
+          "add_another": "Bæta við annarri spjaldalínu",
+          "horizon_profile": "Sjóndeildarhringssnið (valfrjálst, 24 kommu-aðskilin fyrirstöðuhornaáhorf)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Uppsafnaður orkuskynjari (kWh), t.d. heildarframleiðsla áriðils eða orkumælis. Aflskynjari (W) virkar ekki: hann hefur enga langtímasummutölfræði, svo lærdómurinn og áreiðanleikavísitalan yrðu áfram óvirk.",
           "battery_soc_entity": "Fylltu út getuna og þennan skynjara til að kveikja á spá um hleðslustöðu. Heimilisnotkunin er tekin af Orku-stjórnborðinu þínu, svo ekki þarf skynjara hér.",
-          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins."
+          "curtailment_entity": "Kveikt á meðan áriðillinn er skertur af ástæðu sem himinninn skýrir ekki: full rafhlaða, engin útflutningur, netmörk. Merktu tímarnir eru ekki lærðir sem lág framleiðsla. Án þess greinist full rafhlaða samt út frá hleðslustöðuskynjara og hámarki áriðilsins.",
+          "horizon_profile": "Eðlisfræðilegt 360° skuggasnið sjóndeildarhrings sem 24 fyrirstöðuhornaáhorf í gráðum (0 til 90), mæld réttsælis með 15° stefnuhornabili frá norðri (0°): 1. gildi er við 0° (Norður), 7. við 90° (Austur), 13. við 180° (Suður), 19. við 270° (Vestur). Sláðu inn sem kommu-aðskilin gildi (t.d. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Breiddargráða fyrir þessa línu (valfrjálst)",
           "longitude": "Lengdargráða fyrir þessa línu (valfrjálst)",
           "remove_this_line": "Fjarlægja þessa spjaldalínu",
-          "add_another": "Bæta við annarri spjaldalínu"
+          "add_another": "Bæta við annarri spjaldalínu",
+          "horizon_profile": "Sjóndeildarhringssnið (valfrjálst, 24 kommu-aðskilin fyrirstöðuhornaáhorf)"
         }
       },
       "benchmark": {

@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Battery max discharge power (kW, optional)",
           "battery_min_soc": "Battery reserve, minimum state of charge (%, default 10)",
           "battery_efficiency": "Battery round-trip efficiency (%, default 90)",
-          "curtailment_entity": "Curtailment signal (binary sensor, input boolean or switch, optional)"
+          "curtailment_entity": "Curtailment signal (binary sensor, input boolean or switch, optional)",
+          "horizon_profile": "Horizon profile (optional, 24 comma-separated obstacle elevation angles)"
         },
         "data_description": {
           "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off.",
           "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here.",
-          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap."
+          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap.",
+          "horizon_profile": "Physical 360° horizon shading profile as 24 obstacle elevation angles in degrees (0 to 90), sampled clockwise at 15° azimuth intervals starting due North (0°): 1st value is at 0° (North), 7th is at 90° (East), 13th is at 180° (South), 19th is at 270° (West). Enter as comma-separated values (e.g. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Sun tracker",
           "latitude": "Latitude override (optional)",
           "longitude": "Longitude override (optional)",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "horizon_profile": "Horizon profile (optional, 24 comma-separated obstacle elevation angles)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "A cumulative energy sensor (kWh), e.g. your inverter's or energy meter's total production. A power sensor (W) will not work: it has no long-term sum statistics, so the learning and the reliability index would stay off.",
           "battery_soc_entity": "Fill in the capacity and this sensor to turn on the battery state-of-charge projection. Home consumption is taken from your Energy dashboard, so it needs no sensor here.",
-          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap."
+          "curtailment_entity": "On while your inverter is being held back for a reason the sky cannot explain: a full battery, a zero-export rule, a grid limit. The hours it marks are not learned as low production. Without it, a full battery is still detected from the state of charge sensor and the inverter cap.",
+          "horizon_profile": "Physical 360° horizon shading profile as 24 obstacle elevation angles in degrees (0 to 90), sampled clockwise at 15° azimuth intervals starting due North (0°): 1st value is at 0° (North), 7th is at 90° (East), 13th is at 180° (South), 19th is at 270° (West). Enter as comma-separated values (e.g. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Latitude override (optional)",
           "longitude": "Longitude override (optional)",
           "remove_this_line": "Remove this panel line",
-          "add_another": "Add another panel line"
+          "add_another": "Add another panel line",
+          "horizon_profile": "Horizon profile (optional, 24 comma-separated obstacle elevation angles)"
         }
       },
       "benchmark": {

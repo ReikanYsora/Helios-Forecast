@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Maks. moc rozładowania akumulatora (kW, opcjonalnie)",
           "battery_min_soc": "Rezerwa akumulatora, minimalny stan naładowania (%, domyślnie 10)",
           "battery_efficiency": "Sprawność cyklu akumulatora (%, domyślnie 90)",
-          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)"
+          "curtailment_entity": "Sygnał ograniczenia (czujnik binarny, input boolean lub przełącznik, opcjonalnie)",
+          "horizon_profile": "Profil horyzontu (opcjonalny, 24 kąty elewacji przeszkód rozdzielone przecinkami)"
         },
         "data_description": {
           "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
           "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
-          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
+          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika.",
+          "horizon_profile": "Fizyczny profil cieniowania horyzontu 360° jako 24 kąty elewacji przeszkód w stopniach (0 do 90), próbkowane zgodnie z ruchem wskazówek zegara w odstępach azymutu co 15° od północy (0°): 1. wartość przy 0° (Północ), 7. przy 90° (Wschód), 13. przy 180° (Południe), 19. przy 270° (Zachód). Wprowadź jako wartości rozdzielone przecinkami (np. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Tracker słoneczny",
           "latitude": "Szerokość geograficzna dla tej linii (opcjonalnie)",
           "longitude": "Długość geograficzna dla tej linii (opcjonalnie)",
-          "add_another": "Dodaj kolejną linię paneli"
+          "add_another": "Dodaj kolejną linię paneli",
+          "horizon_profile": "Profil horyzontu (opcjonalny, 24 kąty elewacji przeszkód rozdzielone przecinkami)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Skumulowany czujnik energii (kWh), np. całkowita produkcja falownika lub licznika. Czujnik mocy (W) nie zadziała: nie ma długoterminowych statystyk sumy, więc uczenie i wskaźnik wiarygodności pozostałyby wyłączone.",
           "battery_soc_entity": "Wypełnij pojemność i ten czujnik, aby włączyć prognozę stanu naładowania. Zużycie domu jest pobierane z panelu Energia, tutaj nie jest potrzebny żaden czujnik.",
-          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika."
+          "curtailment_entity": "Włączony, gdy falownik jest ograniczany z powodu, którego niebo nie tłumaczy: pełny akumulator, zerowy eksport, limit sieci. Oznaczone godziny nie są uczone jako niska produkcja. Bez niego pełny akumulator jest nadal wykrywany z czujnika stanu naładowania i limitu falownika.",
+          "horizon_profile": "Fizyczny profil cieniowania horyzontu 360° jako 24 kąty elewacji przeszkód w stopniach (0 do 90), próbkowane zgodnie z ruchem wskazówek zegara w odstępach azymutu co 15° od północy (0°): 1. wartość przy 0° (Północ), 7. przy 90° (Wschód), 13. przy 180° (Południe), 19. przy 270° (Zachód). Wprowadź jako wartości rozdzielone przecinkami (np. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Szerokość geograficzna dla tej linii (opcjonalnie)",
           "longitude": "Długość geograficzna dla tej linii (opcjonalnie)",
           "remove_this_line": "Usuń tę linię paneli",
-          "add_another": "Dodaj kolejną linię paneli"
+          "add_another": "Dodaj kolejną linię paneli",
+          "horizon_profile": "Profil horyzontu (opcjonalny, 24 kąty elewacji przeszkód rozdzielone przecinkami)"
         }
       },
       "benchmark": {

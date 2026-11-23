@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Maks. akumulatora izlādes jauda (kW, neobligāti)",
           "battery_min_soc": "Akumulatora rezerve, minimālais uzlādes līmenis (%, noklusējums 10)",
           "battery_efficiency": "Akumulatora cikla lietderības koeficients (%, noklusējums 90)",
-          "curtailment_entity": "Ierobežošanas signāls (binārs sensors, input boolean vai slēdzis, neobligāts)"
+          "curtailment_entity": "Ierobežošanas signāls (binārs sensors, input boolean vai slēdzis, neobligāts)",
+          "horizon_profile": "Horizonta profils (neobligāti, 24 ar komatu atdalīti šķēršļu pacēluma leņķi)"
         },
         "data_description": {
           "production_entity": "Kumulatīvs enerģijas sensors (kWh), piem., invertora vai skaitītāja kopējā ražošana. Jaudas sensors (W) nedarbosies: tam nav ilgtermiņa summas statistikas, tāpēc mācīšanās un uzticamības indekss paliktu izslēgti.",
           "battery_soc_entity": "Aizpildiet ietilpību un šo sensoru, lai ieslēgtu uzlādes līmeņa prognozi. Mājas patēriņš tiek ņemts no Enerģijas paneļa, sensors šeit nav vajadzīgs.",
-          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita."
+          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita.",
+          "horizon_profile": "Fiziskais 360° horizonta ēnojuma profils kā 24 šķēršļu pacēluma leņķi grādos (no 0 līdz 90), nolasīti pulksteņrādītāja virzienā ar 15° azimuta intervālu no ziemeļiem (0°): 1. vērtība ir pie 0° (Ziemeļi), 7. pie 90° (Austrumi), 13. pie 180° (Dienvidi), 19. pie 270° (Rietumi). Ievadiet kā ar komatu atdalītas vērtības (piem., 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Saules sekotājs",
           "latitude": "Platums šai līnijai (neobligāti)",
           "longitude": "Garums šai līnijai (neobligāti)",
-          "add_another": "Pievienot vēl vienu paneļu līniju"
+          "add_another": "Pievienot vēl vienu paneļu līniju",
+          "horizon_profile": "Horizonta profils (neobligāti, 24 ar komatu atdalīti šķēršļu pacēluma leņķi)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Kumulatīvs enerģijas sensors (kWh), piem., invertora vai skaitītāja kopējā ražošana. Jaudas sensors (W) nedarbosies: tam nav ilgtermiņa summas statistikas, tāpēc mācīšanās un uzticamības indekss paliktu izslēgti.",
           "battery_soc_entity": "Aizpildiet ietilpību un šo sensoru, lai ieslēgtu uzlādes līmeņa prognozi. Mājas patēriņš tiek ņemts no Enerģijas paneļa, sensors šeit nav vajadzīgs.",
-          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita."
+          "curtailment_entity": "Ieslēgts, kamēr invertors tiek ierobežots iemesla dēļ, ko debesis neizskaidro: pilna baterija, nulles eksports, tīkla limits. Atzīmētās stundas netiek mācītas kā zema ražošana. Bez tā pilna baterija tik un tā tiek noteikta pēc uzlādes līmeņa sensora un invertora limita.",
+          "horizon_profile": "Fiziskais 360° horizonta ēnojuma profils kā 24 šķēršļu pacēluma leņķi grādos (no 0 līdz 90), nolasīti pulksteņrādītāja virzienā ar 15° azimuta intervālu no ziemeļiem (0°): 1. vērtība ir pie 0° (Ziemeļi), 7. pie 90° (Austrumi), 13. pie 180° (Dienvidi), 19. pie 270° (Rietumi). Ievadiet kā ar komatu atdalītas vērtības (piem., 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Platums šai līnijai (neobligāti)",
           "longitude": "Garums šai līnijai (neobligāti)",
           "remove_this_line": "Noņemt šo paneļu līniju",
-          "add_another": "Pievienot vēl vienu paneļu līniju"
+          "add_another": "Pievienot vēl vienu paneļu līniju",
+          "horizon_profile": "Horizonta profils (neobligāti, 24 ar komatu atdalīti šķēršļu pacēluma leņķi)"
         }
       },
       "benchmark": {

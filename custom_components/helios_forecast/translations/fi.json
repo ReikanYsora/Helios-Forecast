@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Akun suurin purkausteho (kW, valinnainen)",
           "battery_min_soc": "Akun varaus, vähimmäisvaraustila (%, oletus 10)",
           "battery_efficiency": "Akun edestakainen hyötysuhde (%, oletus 90)",
-          "curtailment_entity": "Rajoitussignaali (binäärianturi, input boolean tai kytkin, valinnainen)"
+          "curtailment_entity": "Rajoitussignaali (binäärianturi, input boolean tai kytkin, valinnainen)",
+          "horizon_profile": "Horisonttiprofiili (valinnainen, 24 pilkuilla erotettua esteen korotuskulmaa)"
         },
         "data_description": {
           "production_entity": "Kumulatiivinen energia-anturi (kWh), esim. invertterin tai energiamittarin kokonaistuotanto. Tehoanturi (W) ei toimi: sillä ei ole pitkän aikavälin summatilastoja, joten oppiminen ja luotettavuusindeksi jäisivät pois päältä.",
           "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
-          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
+          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta.",
+          "horizon_profile": "Fyysinen 360° horisontin varjostusprofiili 24 esteen korotuskulmana asteina (0 - 90), mitattuna myötäpäivään 15° atsimuuttivälein pohjoisesta (0°) alkaen: 1. arvo on 0° (Pohjoinen), 7. on 90° (Itä), 13. on 180° (Etelä), 19. on 270° (Länsi). Syötä pilkuilla erotettuina arvoina (esim. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Aurinkoseuranta",
           "latitude": "Leveysaste tälle linjalle (valinnainen)",
           "longitude": "Pituusaste tälle linjalle (valinnainen)",
-          "add_another": "Lisää toinen paneelilinja"
+          "add_another": "Lisää toinen paneelilinja",
+          "horizon_profile": "Horisonttiprofiili (valinnainen, 24 pilkuilla erotettua esteen korotuskulmaa)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Kumulatiivinen energia-anturi (kWh), esim. invertterin tai energiamittarin kokonaistuotanto. Tehoanturi (W) ei toimi: sillä ei ole pitkän aikavälin summatilastoja, joten oppiminen ja luotettavuusindeksi jäisivät pois päältä.",
           "battery_soc_entity": "Täytä kapasiteetti ja tämä anturi ottaaksesi varaustilan ennusteen käyttöön. Kodin kulutus haetaan Energia-koontinäytöstä, joten tähän ei tarvita anturia.",
-          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta."
+          "curtailment_entity": "Päällä, kun invertteriä rajoitetaan syystä, jota taivas ei selitä: täysi akku, nollasyöttö, verkkoraja. Merkittyjä tunteja ei opita matalana tuotantona. Ilman sitä täysi akku tunnistetaan silti varaustila-anturista ja invertterin rajasta.",
+          "horizon_profile": "Fyysinen 360° horisontin varjostusprofiili 24 esteen korotuskulmana asteina (0 - 90), mitattuna myötäpäivään 15° atsimuuttivälein pohjoisesta (0°) alkaen: 1. arvo on 0° (Pohjoinen), 7. on 90° (Itä), 13. on 180° (Etelä), 19. on 270° (Länsi). Syötä pilkuilla erotettuina arvoina (esim. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Leveysaste tälle linjalle (valinnainen)",
           "longitude": "Pituusaste tälle linjalle (valinnainen)",
           "remove_this_line": "Poista tämä paneelilinja",
-          "add_another": "Lisää toinen paneelilinja"
+          "add_another": "Lisää toinen paneelilinja",
+          "horizon_profile": "Horisonttiprofiili (valinnainen, 24 pilkuilla erotettua esteen korotuskulmaa)"
         }
       },
       "benchmark": {

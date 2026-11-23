@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Max. vybíjací výkon batérie (kW, voliteľné)",
           "battery_min_soc": "Rezerva batérie, minimálny stav nabitia (%, predvolené 10)",
           "battery_efficiency": "Účinnosť cyklu batérie (%, predvolené 90)",
-          "curtailment_entity": "Signál obmedzenia výkonu (binárny senzor, input boolean alebo spínač, voliteľné)"
+          "curtailment_entity": "Signál obmedzenia výkonu (binárny senzor, input boolean alebo spínač, voliteľné)",
+          "horizon_profile": "Profil horizontu (voliteľný, 24 uhlov elevácie prekážok oddelených čiarkami)"
         },
         "data_description": {
           "production_entity": "Kumulatívny senzor energie (kWh), napr. celková výroba striedača alebo elektromera. Senzor výkonu (W) nebude fungovať: nemá dlhodobé štatistiky súčtu, takže učenie a index spoľahlivosti by zostali vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor.",
-          "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača."
+          "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača.",
+          "horizon_profile": "Fyzický 360° profil tienienia horizontu ako 24 uhlov elevácie prekážok v stupňoch (0 až 90), vzorkovaných v smere hodinových ručičiek v krokoch po 15° azimutu od severu (0°): 1. hodnota je na 0° (Sever), 7. na 90° (Východ), 13. na 180° (Juh), 19. na 270° (Západ). Zadajte ako hodnoty oddelené čiarkami (napr. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Sledovač slnka",
           "latitude": "Zemepisná šírka pre túto líniu (voliteľné)",
           "longitude": "Zemepisná dĺžka pre túto líniu (voliteľné)",
-          "add_another": "Pridať ďalšiu líniu panelov"
+          "add_another": "Pridať ďalšiu líniu panelov",
+          "horizon_profile": "Profil horizontu (voliteľný, 24 uhlov elevácie prekážok oddelených čiarkami)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Kumulatívny senzor energie (kWh), napr. celková výroba striedača alebo elektromera. Senzor výkonu (W) nebude fungovať: nemá dlhodobé štatistiky súčtu, takže učenie a index spoľahlivosti by zostali vypnuté.",
           "battery_soc_entity": "Vyplňte kapacitu a tento senzor na zapnutie projekcie stavu nabitia. Spotreba domácnosti sa preberá z panela Energia, tu nie je potrebný žiadny senzor.",
-          "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača."
+          "curtailment_entity": "Zapnutý, kým je striedač obmedzovaný z dôvodu, ktorý obloha nevysvetlí: plná batéria, nulový export, limit siete. Označené hodiny sa neučia ako nízka výroba. Bez neho sa plná batéria stále rozpozná zo senzora stavu nabitia a limitu striedača.",
+          "horizon_profile": "Fyzický 360° profil tienienia horizontu ako 24 uhlov elevácie prekážok v stupňoch (0 až 90), vzorkovaných v smere hodinových ručičiek v krokoch po 15° azimutu od severu (0°): 1. hodnota je na 0° (Sever), 7. na 90° (Východ), 13. na 180° (Juh), 19. na 270° (Západ). Zadajte ako hodnoty oddelené čiarkami (napr. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Zemepisná šírka pre túto líniu (voliteľné)",
           "longitude": "Zemepisná dĺžka pre túto líniu (voliteľné)",
           "remove_this_line": "Odstrániť túto líniu panelov",
-          "add_another": "Pridať ďalšiu líniu panelov"
+          "add_another": "Pridať ďalšiu líniu panelov",
+          "horizon_profile": "Profil horizontu (voliteľný, 24 uhlov elevácie prekážok oddelených čiarkami)"
         }
       },
       "benchmark": {

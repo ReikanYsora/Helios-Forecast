@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Najv. moč praznjenja baterije (kW, izbirno)",
           "battery_min_soc": "Rezerva baterije, najmanjše stanje napolnjenosti (%, privzeto 10)",
           "battery_efficiency": "Izkoristek celotnega cikla baterije (%, privzeto 90)",
-          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)"
+          "curtailment_entity": "Signal omejevanja (binarni senzor, input boolean ali stikalo, neobvezno)",
+          "horizon_profile": "Profil obzorja (neobvezno, 24 kotov dviga ovir, ločenih z vejicami)"
         },
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
           "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
-          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika.",
+          "horizon_profile": "Fizikalni profil senčenja obzorja 360° kot 24 kotov dviga ovir v stopinjah (0 do 90), vzorčenih v smeri urinega kazalca v intervalih azimuta po 15° od severa (0°): 1. vrednost je pri 0° (Sever), 7. pri 90° (Vzhod), 13. pri 180° (Jug), 19. pri 270° (Zahod). Vnesite kot z vejicami ločene vrednosti (npr. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Sledilnik soncu",
           "latitude": "Zemljepisna širina za to linijo (izbirno)",
           "longitude": "Zemljepisna dolžina za to linijo (izbirno)",
-          "add_another": "Dodaj še eno vrsto panelov"
+          "add_another": "Dodaj še eno vrsto panelov",
+          "horizon_profile": "Profil obzorja (neobvezno, 24 kotov dviga ovir, ločenih z vejicami)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Kumulativni senzor energije (kWh), npr. skupna proizvodnja razsmernika ali števca. Senzor moči (W) ne bo deloval: nima dolgoročne statistike vsote, zato bi učenje in indeks zanesljivosti ostala izklopljena.",
           "battery_soc_entity": "Izpolnite zmogljivost in ta senzor, da vklopite projekcijo stanja napolnjenosti. Poraba doma je vzeta z nadzorne plošče Energija, senzor tukaj ni potreben.",
-          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika."
+          "curtailment_entity": "Vklopljen, dokler je razsmernik omejen iz razloga, ki ga nebo ne pojasni: polna baterija, ničelni izvoz, omejitev omrežja. Označene ure se ne učijo kot nizka proizvodnja. Brez njega se polna baterija še vedno zazna iz senzorja stanja napolnjenosti in omejitve razsmernika.",
+          "horizon_profile": "Fizikalni profil senčenja obzorja 360° kot 24 kotov dviga ovir v stopinjah (0 do 90), vzorčenih v smeri urinega kazalca v intervalih azimuta po 15° od severa (0°): 1. vrednost je pri 0° (Sever), 7. pri 90° (Vzhod), 13. pri 180° (Jug), 19. pri 270° (Zahod). Vnesite kot z vejicami ločene vrednosti (npr. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Zemljepisna širina za to linijo (izbirno)",
           "longitude": "Zemljepisna dolžina za to linijo (izbirno)",
           "remove_this_line": "Odstrani to vrsto panelov",
-          "add_another": "Dodaj še eno vrsto panelov"
+          "add_another": "Dodaj še eno vrsto panelov",
+          "horizon_profile": "Profil obzorja (neobvezno, 24 kotov dviga ovir, ločenih z vejicami)"
         }
       },
       "benchmark": {

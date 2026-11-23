@@ -23,12 +23,14 @@
           "battery_max_discharge_kw": "Max. ontlaadvermogen batterij (kW, optioneel)",
           "battery_min_soc": "Batterijreserve, minimale laadtoestand (%, standaard 10)",
           "battery_efficiency": "Retourrendement batterij (%, standaard 90)",
-          "curtailment_entity": "Beperkingssignaal (binaire sensor, input boolean of schakelaar, optioneel)"
+          "curtailment_entity": "Beperkingssignaal (binaire sensor, input boolean of schakelaar, optioneel)",
+          "horizon_profile": "Horizonprofiel (optioneel, 24 door komma's gescheiden obstakelhoeken)"
         },
         "data_description": {
           "production_entity": "Een cumulatieve energiesensor (kWh), bijv. de totale productie van uw omvormer of energiemeter. Een vermogenssensor (W) werkt niet: die heeft geen langetermijn-somstatistieken, dus het leren en de betrouwbaarheidsindex blijven uit.",
           "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
-          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
+          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet.",
+          "horizon_profile": "Fysiek 360° schaduwprofiel voor de horizon als 24 obstakelhoeken in graden (0 tot 90), met de klok mee bemonsterd met intervallen van 15° azimut vanaf het noorden (0°): 1e waarde op 0° (Noord), 7e op 90° (Oost), 13e op 180° (Zuid), 19e op 270° (West). Voer in als door komma's gescheiden waarden (bijv. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "line": {
@@ -42,7 +44,8 @@
           "tracker": "Zonnevolger",
           "latitude": "Breedtegraad voor deze lijn (optioneel)",
           "longitude": "Lengtegraad voor deze lijn (optioneel)",
-          "add_another": "Nog een paneellijn toevoegen"
+          "add_another": "Nog een paneellijn toevoegen",
+          "horizon_profile": "Horizonprofiel (optioneel, 24 door komma's gescheiden obstakelhoeken)"
         }
       }
     }
@@ -78,7 +81,8 @@
         "data_description": {
           "production_entity": "Een cumulatieve energiesensor (kWh), bijv. de totale productie van uw omvormer of energiemeter. Een vermogenssensor (W) werkt niet: die heeft geen langetermijn-somstatistieken, dus het leren en de betrouwbaarheidsindex blijven uit.",
           "battery_soc_entity": "Vul de capaciteit en deze sensor in om de laadtoestandsprojectie in te schakelen. Het huisverbruik komt uit je Energie-dashboard, hier is geen sensor nodig.",
-          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet."
+          "curtailment_entity": "Aan zolang uw omvormer wordt afgeknepen om een reden die de lucht niet verklaart: volle accu, nul-injectie, netlimiet. De uren die het markeert worden niet als lage productie geleerd. Zonder dit signaal wordt een volle accu nog steeds herkend via de laadtoestandsensor en de omvormerlimiet.",
+          "horizon_profile": "Fysiek 360° schaduwprofiel voor de horizon als 24 obstakelhoeken in graden (0 tot 90), met de klok mee bemonsterd met intervallen van 15° azimut vanaf het noorden (0°): 1e waarde op 0° (Noord), 7e op 90° (Oost), 13e op 180° (Zuid), 19e op 270° (West). Voer in als door komma's gescheiden waarden (bijv. 0, 0, 0, 10, 15, 20, 15, 10, 0...)."
         }
       },
       "lines": {
@@ -93,7 +97,8 @@
           "latitude": "Breedtegraad voor deze lijn (optioneel)",
           "longitude": "Lengtegraad voor deze lijn (optioneel)",
           "remove_this_line": "Deze paneellijn verwijderen",
-          "add_another": "Nog een paneellijn toevoegen"
+          "add_another": "Nog een paneellijn toevoegen",
+          "horizon_profile": "Horizonprofiel (optioneel, 24 door komma's gescheiden obstakelhoeken)"
         }
       },
       "benchmark": {
